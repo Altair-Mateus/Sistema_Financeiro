@@ -340,6 +340,7 @@
             <Form>frmDetalhesOrigemCpCr</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="src\model\uBaseDAO.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
