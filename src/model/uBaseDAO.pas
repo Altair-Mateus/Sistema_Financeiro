@@ -11,8 +11,9 @@ type
     class var FConnection: TFDConnection;
   public
     class function Insert(const pTabela: string; pObjeto: TObject) : Boolean;
-    class function Update(const pTabela: string; const pCampos: array of string; const pValores: array of Variant): Boolean;
-    class function Delete(const pTabela: string; const pCampos: array of string; const pValores: array of Variant): Boolean;
+    class function Update(const pTabela: string; const pCampos: array of string; const pValores: array of Variant) : Boolean;
+    class function Delete(const pTabela: string; const pCampos: array of string; const pValores: array of Variant) : Boolean;
+    class function LoadObjectByID(const pTabela: string; pID: Integer; pObjeto: TObject) : Boolean;
 
     class property Connection: TFDConnection read FConnection write FConnection;
   end;
@@ -171,5 +172,49 @@ begin
   end;
 end;
 
+class function TBaseDAO.LoadObjectByID(const pTabela: string; pID: Integer; pObjeto: TObject) : Boolean;
+var
+  lContext: TRttiContext;
+  lType: TRttiType;
+  lProperty: TRttiProperty;
+  lSQL: string;
+  lQuery: TFDQuery;
+
+begin
+
+  lContext := TRttiContext.Create;
+  lQuery := TFDQuery.Create(nil);
+
+  try
+    lType := lContext.GetType(pObjeto.ClassType);
+    lQuery.Connection := FConnection;
+
+    // Monta a query SQL de seleção
+    lSQL := 'SELECT * FROM ' + pTabela + ' WHERE ID = :ID';
+
+    // Execute a query SQL
+    try
+      lQuery.SQL.Add(lSQL);
+      lQuery.ParamByName('ID').Value := pID;
+      lQuery.Open;
+
+      // Atribui os valores das colunas às propriedades do objeto
+      for lProperty in lType.GetProperties do
+      begin
+        if not lQuery.FieldByName(lProperty.Name).IsNull then
+          lProperty.SetValue(pObjeto, lQuery.FieldByName(lProperty.Name).Value);
+      end;
+
+    except
+      on E: Exception do
+      begin
+        raise Exception.Create('Erro ao executar a query SQL: ' + E.Message);
+      end;
+    end;
+  finally
+    lContext.Free;
+    lQuery.Free;
+  end;
+end;
 
 end.
