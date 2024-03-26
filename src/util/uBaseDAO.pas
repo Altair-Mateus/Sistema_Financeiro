@@ -182,6 +182,7 @@ var
 
 begin
 
+  Result := False;
   lContext := TRttiContext.Create;
   lQuery := TFDQuery.Create(nil);
 
@@ -201,20 +202,26 @@ begin
       // Atribui os valores das colunas às propriedades do objeto
       for lProperty in lType.GetProperties do
       begin
-        if not lQuery.FieldByName(lProperty.Name).IsNull then
-          lProperty.SetValue(pObjeto, lQuery.FieldByName(lProperty.Name).Value);
+       if not lQuery.FieldByName(lProperty.Name).IsNull then
+        lProperty.SetValue(pObjeto, TValue.FromVariant(lQuery.FieldByName(lProperty.Name).Value));
       end;
 
+      Result := True;
+
     except
+
       on E: Exception do
       begin
         raise Exception.Create('Erro ao executar a query SQL: ' + E.Message);
       end;
+
     end;
+
   finally
     lContext.Free;
     lQuery.Free;
   end;
+
 end;
 
 end.

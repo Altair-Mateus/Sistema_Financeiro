@@ -66,8 +66,8 @@ begin
     Usuario.Nome       := 'Administrador';
     Usuario.Login      := 'admin';
     Usuario.Senha      := Trim(edtSenha.Text);
-    Usuario.Senha_Temp := false;
-    Usuario.Admin      := True;
+    Usuario.Senha_Temp := 'N';
+    Usuario.User_Admin      := 'S';
 
     dmUsuarios.CadastrarUsuario(Usuario);
 

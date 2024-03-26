@@ -3,8 +3,8 @@ object frmCadAdmin: TfrmCadAdmin
   Top = 0
   BorderIcons = []
   Caption = 'Cadastrando Administrador'
-  ClientHeight = 442
-  ClientWidth = 396
+  ClientHeight = 441
+  ClientWidth = 392
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -17,15 +17,13 @@ object frmCadAdmin: TfrmCadAdmin
   object pnlLogin: TPanel
     Left = 0
     Top = 0
-    Width = 396
-    Height = 442
+    Width = 392
+    Height = 441
     Align = alClient
     BevelOuter = bvNone
     Color = clWhite
     ParentBackground = False
     TabOrder = 0
-    ExplicitWidth = 392
-    ExplicitHeight = 441
     object imgPessoa: TImage
       Left = 0
       Top = 0
@@ -477,7 +475,7 @@ object frmCadAdmin: TfrmCadAdmin
       AlignWithMargins = True
       Left = 3
       Top = 91
-      Width = 390
+      Width = 146
       Height = 29
       Align = alTop
       Alignment = taCenter
@@ -488,9 +486,6 @@ object frmCadAdmin: TfrmCadAdmin
       Font.Name = 'Tahoma'
       Font.Style = []
       ParentFont = False
-      ExplicitLeft = 4
-      ExplicitTop = 92
-      ExplicitWidth = 146
     end
     object lblRedefina: TLabel
       Left = 94

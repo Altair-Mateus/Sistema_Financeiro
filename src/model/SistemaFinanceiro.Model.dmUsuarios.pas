@@ -85,7 +85,7 @@ begin
     FDQueryUser.ParamByName('DATA').AsDate     := Now;
     FDQueryUser.ParamByName('STATUS').AsString := 'A';
 
-    if Usuario.Senha_Temp then
+    if Usuario.Senha_Temp = 'S' then
     begin
       FDQueryUser.ParamByName('SENHATEMP').AsString := 'S';
     end
@@ -94,7 +94,7 @@ begin
       FDQueryUser.ParamByName('SENHATEMP').AsString := 'N';
     end;
 
-    if Usuario.Admin then
+    if Usuario.User_Admin = 'S' then
     begin
       FDQueryUser.ParamByName('ADMIN').AsString := 'S';
     end
@@ -186,8 +186,8 @@ begin
     FUsuario.Nome       := FDQueryLogin.FieldByName('NOME').AsString;
     FUsuario.Login      := FDQueryLogin.FieldByName('LOGIN').AsString;
     FUsuario.Senha      := FDQueryLogin.FieldByName('SENHA').AsString;
-    FUsuario.Senha_Temp := FDQueryLogin.FieldByName('SENHA_TEMP').AsString = 'S';
-    FUsuario.Admin      := FDQueryLogin.FieldByName('USER_ADMIN').AsString = 'S';
+    FUsuario.Senha_Temp := FDQueryLogin.FieldByName('SENHA_TEMP').AsString;
+    FUsuario.User_Admin := FDQueryLogin.FieldByName('USER_ADMIN').AsString;
 
   finally
 

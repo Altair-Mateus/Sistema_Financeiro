@@ -60,7 +60,7 @@ uses
   SistemaFinanceiro.View.GeraRelResumoMensalCr in 'src\view\SistemaFinanceiro.View.GeraRelResumoMensalCr.pas' {frmGeraRelResumoMensalCr},
   SistemaFinanceiro.View.Relatorios.ResumoMensalCr in 'src\view\Relatorios\SistemaFinanceiro.View.Relatorios.ResumoMensalCr.pas' {frmRelMensalCr},
   SistemaFinanceiro.View.DetalhesOrigemCpCr in 'src\view\SistemaFinanceiro.View.DetalhesOrigemCpCr.pas' {frmDetalhesOrigemCpCr},
-  uBaseDAO in 'src\model\uBaseDAO.pas';
+  uBaseDAO in 'src\util\uBaseDAO.pas';
 
 {$R *.res}
 

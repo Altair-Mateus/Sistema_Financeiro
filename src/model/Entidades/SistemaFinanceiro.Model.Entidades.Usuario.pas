@@ -1,67 +1,48 @@
 unit SistemaFinanceiro.Model.Entidades.Usuario;
-
 interface
-
 type
-
   TModelUsuario = class
   private
     FLogin: String;
     FNome: String;
     FId: String;
-    FSenha_Temp: Boolean;
+    FSenha_Temp: String;
     FSenha: String;
-    FAdmin: Boolean;
+    FTeste: Integer;
+    FStatus: String;
+    FData_Cadastro: TDateTime;
+    FUser_Admin: String;
+    FTable_Name: String;
 
-    procedure SetId(const Value: String);
-    procedure SetLogin(const Value: String);
-    procedure SetNome(const Value: String);
-    procedure SetSenha(const Value: String);
-    procedure SetSenha_Temp(const Value: Boolean);
-
-    procedure SetAdmin(const Value: Boolean);
   public
-    property Nome         : String read FNome write SetNome;
-    property Login        : String read FLogin write SetLogin;
-    property Id           : String read FId write SetId;
-    property Senha        : String read FSenha write SetSenha;
-    property Senha_Temp   : Boolean read FSenha_Temp write SetSenha_Temp;
-    property Admin        : Boolean read FAdmin write SetAdmin;
+    property Table_Name    : String read FTable_Name;
+    property Id            : String read FId write FId;
+    property Nome          : String read FNome write FNome;
+    property Login         : String read FLogin write FLogin;
+    property Senha         : String read FSenha write FSenha;
+    property Status        : String read FStatus write FStatus;
+    property Data_Cadastro : TDateTime read FData_Cadastro write FData_Cadastro;
+    property Senha_Temp    : String read FSenha_Temp write FSenha_Temp;
+    property User_Admin    : String read FUser_Admin write FUser_Admin;
+
+    constructor Create;
+    destructor Destroy; override;
 
   end;
-
 implementation
+{ TModelUsuario }
 
 { TModelUsuario }
 
-procedure TModelUsuario.SetAdmin(const Value: Boolean);
+constructor TModelUsuario.Create;
 begin
-  FAdmin := Value;
+  FTable_Name := 'USUARIOS';
 end;
 
-procedure TModelUsuario.SetId(const Value: String);
+destructor TModelUsuario.Destroy;
 begin
-  FId := Value;
-end;
 
-procedure TModelUsuario.SetLogin(const Value: String);
-begin
-  FLogin := Value;
-end;
-
-procedure TModelUsuario.SetNome(const Value: String);
-begin
-  FNome := Value;
-end;
-
-procedure TModelUsuario.SetSenha(const Value: String);
-begin
-  FSenha := Value;
-end;
-
-procedure TModelUsuario.SetSenha_Temp(const Value: Boolean);
-begin
-  FSenha_Temp := Value;
+  inherited;
 end;
 
 end.

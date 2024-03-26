@@ -1,14 +1,14 @@
 inherited frmContasReceber: TfrmContasReceber
   Caption = 'Contas a Receber'
-  ClientHeight = 646
-  ClientWidth = 1343
+  ClientHeight = 645
+  ClientWidth = 1339
   WindowState = wsMaximized
   ExplicitWidth = 1355
   ExplicitHeight = 684
   TextHeight = 19
   inherited CardPanelPrincipal: TCardPanel
-    Width = 1343
-    Height = 646
+    Width = 1339
+    Height = 645
     ExplicitWidth = 1339
     ExplicitHeight = 645
     inherited CardCadastro: TCard
@@ -4914,8 +4914,8 @@ inherited frmContasReceber: TfrmContasReceber
         end
       end
       inherited pnlBotoes: TPanel
-        Top = 577
-        Width = 1343
+        Top = 576
+        Width = 1339
         ExplicitTop = 576
         ExplicitWidth = 1339
         inherited btnExcluir: TButton
@@ -5057,8 +5057,8 @@ inherited frmContasReceber: TfrmContasReceber
       end
       inherited pnlGrid: TPanel
         Top = 137
-        Width = 1343
-        Height = 411
+        Width = 1339
+        Height = 410
         ExplicitTop = 137
         ExplicitWidth = 1339
         ExplicitHeight = 410
@@ -5164,15 +5164,13 @@ inherited frmContasReceber: TfrmContasReceber
       end
       object pnlTotais: TPanel
         Left = 0
-        Top = 548
-        Width = 1343
+        Top = 547
+        Width = 1339
         Height = 29
         Align = alBottom
         Color = clWindow
         ParentBackground = False
         TabOrder = 3
-        ExplicitTop = 547
-        ExplicitWidth = 1339
         object lblQtdCp: TLabel
           AlignWithMargins = True
           Left = 939

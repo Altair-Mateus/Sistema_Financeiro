@@ -264,7 +264,7 @@ procedure TfrmUsuarios.mnuLimpaSenhaClick(Sender: TObject);
 begin
   inherited;
 
-  if not dmUsuarios.GetUsuarioLogado.Admin then
+  if not (dmUsuarios.GetUsuarioLogado.User_Admin = 'S') then
   begin
 
     Application.MessageBox('Somente Administradores podem redefinir a senha!', 'Erro', MB_OK + MB_ICONERROR);

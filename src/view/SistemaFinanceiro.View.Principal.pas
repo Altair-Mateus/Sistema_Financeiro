@@ -549,7 +549,7 @@ begin
 
   end;
 
-  if dmUsuarios.GetUsuarioLogado.Senha_Temp then
+  if dmUsuarios.GetUsuarioLogado.Senha_Temp = 'S' then
   begin
 
     frmRedefinirSenha := TfrmRedefinirSenha.Create(nil);
