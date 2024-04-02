@@ -88,8 +88,11 @@ begin
 
     for lProperty in lType.GetProperties do
     begin
-      lColumns := lColumns + lProperty.Name + ', ';
-      lValues  := lValues + ':' + lProperty.Name + ', ';
+      if not (lProperty.Name = 'Id') and not (lProperty.Name = 'Table_Name') then
+      begin
+        lColumns := lColumns + lProperty.Name + ', ';
+        lValues  := lValues + ':' + lProperty.Name + ', ';
+      end;
     end;
 
     // Remove a última vírgula
@@ -108,8 +111,17 @@ begin
       // Definindo parâmetros
       for lProperty in lType.GetProperties do
       begin
-        lValues := VarToStr(lProperty.GetValue(pObjeto).AsVariant);
-        lQuery.Params.ParamByName(lProperty.Name).Value := lValues;
+        if not (lProperty.Name = 'Id') and not (lProperty.Name = 'Table_Name') then
+        begin
+
+           if lProperty.GetValue(pObjeto).TypeInfo = TypeInfo(TDate) then
+            lValues  := VarToStr(FormatDateTime('yyyy/mm/dd', (lProperty.GetValue(pObjeto).AsExtended)))
+           else
+            lValues := VarToStr(lProperty.GetValue(pObjeto).AsVariant);
+
+          lQuery.Params.ParamByName(lProperty.Name).Value := lValues;
+
+        end;
       end;
 
       lQuery.ExecSQL;
