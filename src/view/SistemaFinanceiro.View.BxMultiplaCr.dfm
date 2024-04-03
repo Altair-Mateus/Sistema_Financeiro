@@ -2,8 +2,8 @@ object frmBxMultiplaCR: TfrmBxMultiplaCR
   Left = 0
   Top = 0
   Caption = 'Baixar V'#225'rias CRs'
-  ClientHeight = 686
-  ClientWidth = 1305
+  ClientHeight = 685
+  ClientWidth = 1301
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,13 +16,15 @@ object frmBxMultiplaCR: TfrmBxMultiplaCR
   TextHeight = 19
   object pnlBotoes: TPanel
     Left = 0
-    Top = 617
-    Width = 1305
+    Top = 616
+    Width = 1301
     Height = 69
     Align = alBottom
     Color = clWhite
     ParentBackground = False
     TabOrder = 0
+    ExplicitTop = 617
+    ExplicitWidth = 1305
     object btnConfirmar: TButton
       AlignWithMargins = True
       Left = 6
@@ -206,15 +208,13 @@ object frmBxMultiplaCR: TfrmBxMultiplaCR
   object pnlContas: TPanel
     Left = 0
     Top = 177
-    Width = 1305
-    Height = 440
+    Width = 1301
+    Height = 439
     Align = alClient
     BevelOuter = bvNone
     Color = clWhite
     ParentBackground = False
     TabOrder = 1
-    ExplicitWidth = 1301
-    ExplicitHeight = 439
     object DBGrid1: TDBGrid
       Left = 0
       Top = 0
@@ -302,14 +302,13 @@ object frmBxMultiplaCR: TfrmBxMultiplaCR
   object pnlFiltros: TPanel
     Left = 0
     Top = 0
-    Width = 1305
+    Width = 1301
     Height = 177
     Align = alTop
     BevelOuter = bvNone
     Color = 5737262
     ParentBackground = False
     TabOrder = 2
-    ExplicitWidth = 1301
     object lblDataInicial: TLabel
       Left = 18
       Top = 18

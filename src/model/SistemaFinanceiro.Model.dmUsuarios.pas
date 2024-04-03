@@ -182,7 +182,7 @@ begin
       raise Exception.Create('Usuário e/ou senha inválidos');
     end;
 
-    FUsuario.Id         := FDQueryLogin.FieldByName('ID').AsString;
+    FUsuario.Id         := FDQueryLogin.FieldByName('ID').AsInteger;
     FUsuario.Nome       := FDQueryLogin.FieldByName('NOME').AsString;
     FUsuario.Login      := FDQueryLogin.FieldByName('LOGIN').AsString;
     FUsuario.Senha      := FDQueryLogin.FieldByName('SENHA').AsString;
@@ -342,7 +342,7 @@ begin
 
     FDQueryRSenha.ParamByName('SENHA_TEMP').AsString := 'N';
     FDQueryRSenha.ParamByName('SENHA').AsString      := TBCrypt.GenerateHash(Usuario.Senha);
-    FDQueryRSenha.ParamByName('ID').AsString         := Usuario.Id;
+    FDQueryRSenha.ParamByName('ID').AsInteger         := Usuario.Id;
 
     FDQueryRSenha.ExecSQL;
 

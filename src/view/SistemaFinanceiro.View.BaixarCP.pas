@@ -218,7 +218,7 @@ begin
     CpDetalhe.Detalhes  := Trim(edtObs.Text);
     CpDetalhe.Valor     := ValorAbater;
     CpDetalhe.Data      := datePgto.Date;
-    CpDetalhe.Usuario   := dmUsuarios.GetUsuarioLogado.Id;
+    CpDetalhe.Usuario   := inttostr(dmUsuarios.GetUsuarioLogado.Id);
     CpDetalhe.ValorDesc := ValorDesc;
 
     //  Forma de pgto

@@ -60,7 +60,9 @@ uses
   SistemaFinanceiro.View.GeraRelResumoMensalCr in 'src\view\SistemaFinanceiro.View.GeraRelResumoMensalCr.pas' {frmGeraRelResumoMensalCr},
   SistemaFinanceiro.View.Relatorios.ResumoMensalCr in 'src\view\Relatorios\SistemaFinanceiro.View.Relatorios.ResumoMensalCr.pas' {frmRelMensalCr},
   SistemaFinanceiro.View.DetalhesOrigemCpCr in 'src\view\SistemaFinanceiro.View.DetalhesOrigemCpCr.pas' {frmDetalhesOrigemCpCr},
-  uBaseDAO in 'src\util\uBaseDAO.pas';
+  uBaseDAO in 'src\util\uBaseDAO.pas',
+  uTeste in 'src\view\uTeste.pas' {Form1},
+  uDBColumnAttribute in 'src\util\uDBColumnAttribute.pas';
 
 {$R *.res}
 
@@ -68,6 +70,7 @@ begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TDataModule1, DataModule1);
+  Application.CreateForm(TForm1, Form1);
   Application.CreateForm(TdmUsuarios, dmUsuarios);
   Application.CreateForm(TdmCaixa, dmCaixa);
   Application.CreateForm(TfrmPrincipal, frmPrincipal);

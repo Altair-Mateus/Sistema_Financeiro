@@ -7,7 +7,7 @@ uses
   System.SysUtils;
 
 type
-  TDBColumnAtrribute = class(TCustomAttributeClass)
+  TDBColumnAtrribute = class(TCustomAttribute)
   private
     FIsPrimaryKey: Boolean;
     FIsAutoIncrement: Boolean;
@@ -20,6 +20,14 @@ type
       property IsAutoIncrement: Boolean read FIsAutoIncrement;
   end;
 
+  TDBTable = class(TCustomAttribute)
+  private
+    FTableName: String;
+  published
+    constructor Create(const ATableName: String);
+    property TableName: String read FTableName write FTableName;
+  end;
+
 implementation
 
 { TDBColumnAtrribute }
@@ -30,6 +38,13 @@ begin
   FFieldName       := AFieldName;
   FIsPrimaryKey    := AIsPrimaryKey;
   FIsAutoIncrement := AIsAutoIncrement;
+end;
+
+{ TDBTable }
+
+constructor TDBTable.Create(const ATableName: String);
+begin
+  FTableName := ATableName;
 end;
 
 end.
