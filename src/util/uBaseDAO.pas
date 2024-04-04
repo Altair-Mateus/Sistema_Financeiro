@@ -12,9 +12,13 @@ type
   private
     FPropertiesToWhere: TStringList;
     class var FConnection: TFDConnection;
+    //  Verifica se a classe possui o atributo com o nome da tabela
     function CheckTableAttribute(pType: TRttiType) : Boolean;
+    //  Verifica se a property tem o atributo com o nome da coluna do Banco de dados
     function CheckColumnsAttribute(pProperty : TRttiProperty) : Boolean;
+    //  Realiza a conversão do tipo Variant
     function GetParameterValue(const pObject: TObject; const pProperty: TRttiProperty): string;
+    //  Localiza a property com o atributo de Primary Key no banco de dados
     function FindPrimaryKeyProperty(const pType: TRttiType): TRttiProperty;
 
   public
@@ -22,22 +26,32 @@ type
     function Insert(const pObject: TObject) : Boolean;
 
     //  Atualiza com base no SQL passado por parametro
-    function UpdateByText(const pObject: TObject; const pWhereClause: string = '') : Boolean;
+    function UpdateBySQLText(const pObject: TObject; const pWhereClause: string = '') : Boolean;
     //  Atualiza usando a property mapeada como Primary Key na property
     function UpdateByPK(const pObject : TObject) : Boolean;
     //  Atualiza usando as propertys passada como parametro
     function UpdateByProp(const pObject: TObject): Boolean;
 
-    function Delete(const pObject: TObject; const pWhereClause: string = '') : Boolean;
+    //  Deleta com base no SQL passado por parametro
+    function DeleteBySQLText(const pObject: TObject; const pWhereClause: string = '') : Boolean;
+    //  Deleta usando a property mapeada como Primary Key na property
+    function DeleteByPK(const pObject : TObject) : Boolean;
+    //  Atualiza usando as propertys passada como parametro
+    function DeleteByProp(const pObject: TObject) : Boolean;
+
     function LoadObjectByPK(const pObject: TObject) : Boolean;
 
+    //  Adiciona em um StringList as propertys que serão usadas no Where de um Update ou Delete
     procedure AddPropertyToWhere(const pPropertyName: string);
+    //  Retorna a String List usada no Where de um Update ou Delete
     function GetPropertiesToWhere: TStringList;
 
     constructor Create;
     destructor Destroy; override;
 
+    //  Define a conexão com o banco de dados. Deve ser definido no DM a conexão para esta property
     class property Connection: TFDConnection read FConnection write FConnection;
+
   end;
 
 implementation
@@ -74,13 +88,17 @@ var
   lWhereClause: string;
 
 begin
+
   Result := False;
   lContext := TRttiContext.Create;
   lQuery := TFDQuery.Create(nil);
 
   try
+
+    //  Localiza a classe
     lType := lContext.GetType(pObject.ClassType);
 
+    //  Verifica se a classe possui o atributo referente a tabela do BD
     if not CheckTableAttribute(lType) then
     begin
       raise Exception.Create('A classe ' + lType.Name + ' possui o atributo TDBTable vazio ou inexistente!');
@@ -95,7 +113,7 @@ begin
     begin
       if CheckColumnsAttribute(lProperty) then
       begin
-        lSets := lSets + lProperty.GetAttribute<TDBColumnAtrribute>.FieldName +
+        lSets := lSets + lProperty.GetAttribute<TDBColumnAttribute>.FieldName +
                  ' = :' + lProperty.Name + ', ';
       end;
     end;
@@ -111,7 +129,7 @@ begin
       begin
         if not lWhereClause.IsEmpty then
           lWhereClause := lWhereClause + ' AND ';
-        lWhereClause := lWhereClause + lProperty.GetAttribute<TDBColumnAtrribute>.FieldName + ' = :' + lProperty.Name;
+        lWhereClause := lWhereClause + lProperty.GetAttribute<TDBColumnAttribute>.FieldName + ' = :' + lProperty.Name;
       end;
     end;
 
@@ -125,6 +143,7 @@ begin
     lSQL := 'UPDATE ' + lTable + ' SET ' + lSets + ' WHERE ' + lWhereClause;
 
     try
+
       lQuery.Connection := FConnection;
       lQuery.SQL.Text := lSQL;
 
@@ -137,6 +156,7 @@ begin
 
       lQuery.ExecSQL;
       Result := True;
+
     except
       on E: Exception do
       begin
@@ -150,7 +170,160 @@ begin
 end;
 
 
-function TBaseDAO.Delete(const pObject: TObject; const pWhereClause: string = '') : Boolean;
+function TBaseDAO.DeleteByPK(const pObject: TObject): Boolean;
+var
+  lContext: TRttiContext;
+  lType: TRttiType;
+  lPk: TRttiProperty;
+  lSQL, lTable: String;
+  lQuery: TFDQuery;
+
+begin
+
+  Result := False;
+  lContext := TRttiContext.Create;
+  lQuery := TFDQuery.Create(nil);
+
+  try
+
+    //  Localiza a classe
+    lType := lContext.GetType(pObject.ClassType);
+
+    // Verifica se a classe possui o atributo com o nome da tabela
+    if not CheckTableAttribute(lType) then
+    begin
+      raise Exception.Create('Classe ' + lType.Name + ' está com o atributo TDBTable em branco ou inexistente!');
+      exit;
+    end;
+
+    // Encontra a propriedade com o atributo Chave Primária (PrimaryKey)
+    lPk := FindPrimaryKeyProperty(lType);
+
+    //  Valida se existe uma property com o atributo de Primary Key
+    if lPk = nil then
+    begin
+      raise Exception.Create('A classe ' + lType.Name + ' não possui uma propriedade marcada como Chave Primária!');
+      exit;
+    end;
+
+    lTable := lType.GetAttribute<TDBTable>.TableName;
+
+    //  Monta o SQL para o Delete
+    lSQL := 'DELETE FROM ' + lTable + ' WHERE ' +
+      lPk.GetAttribute<TDBColumnAttribute>.FieldName + ' = :' + lPk.Name;
+
+    try
+
+      lQuery.Connection := FConnection;
+      lQuery.SQL.Text := lSQL;
+
+      //  Parametro da PK
+      lQuery.Params.ParamByName(lPk.Name).Value := GetParameterValue(pObject, lPk);
+
+      lQuery.ExecSQL;
+      Result := True;
+
+    except
+      on E: Exception do
+      begin
+        raise Exception.Create('Erro ao atualizar registro na tabela ' + lTable + E.Message);
+      end;
+    end;
+
+  finally
+    lQuery.Free;
+    lContext.Free;
+  end;
+
+
+end;
+
+function TBaseDAO.DeleteByProp(const pObject: TObject): Boolean;
+var
+  lContext: TRttiContext;
+  lType: TRttiType;
+  lProperty: TRttiProperty;
+  lSQL, lTable: string;
+  lQuery: TFDQuery;
+  lWhereClause : String;
+
+begin
+
+  Result := False;
+  lContext := TRttiContext.Create;
+  lQuery := TFDQuery.Create(nil);
+
+  try
+
+    //  Localiza a classe
+    lType := lContext.GetType(pObject.ClassType);
+
+    //  Verifica se a classe possui o atributo com o nome da tabela
+    if not CheckTableAttribute(lType) then
+    begin
+      raise Exception.Create('A classe ' + lType.Name + ' possui o atributo TDBTable vazio ou inexistente!');
+      exit;
+    end;
+
+    lTable := lType.GetAttribute<TDBTable>.TableName;
+
+    // Constrói a cláusula WHERE baseada na lista de propriedades fornecida
+    lWhereClause := '';
+    for lProperty in lType.GetProperties do
+    begin
+      if (CheckColumnsAttribute(lProperty)) and (FPropertiesToWhere.IndexOf(lProperty.Name) > -1) then
+      begin
+        if not lWhereClause.IsEmpty then
+          lWhereClause := lWhereClause + ' AND ';
+        lWhereClause := lWhereClause + lProperty.GetAttribute<TDBColumnAttribute>.FieldName + ' = :' + lProperty.Name;
+      end;
+    end;
+
+    if lWhereClause.IsEmpty then
+    begin
+      raise Exception.Create('Nenhuma propriedade válida fornecida para construir a cláusula WHERE!');
+      exit;
+    end;
+
+    //  Monta o SQL para o delete
+    lSQL := 'DELETE FROM ' + lTable + ' WHERE ' + lWhereClause;
+
+    try
+
+      lQuery.Connection := FConnection;
+      lQuery.SQL.Text := lSQL;
+
+      //  Define os parametros
+      for lProperty in lType.GetProperties do
+      begin
+        if (CheckColumnsAttribute(lProperty)) and (FPropertiesToWhere.IndexOf(lProperty.Name) > -1) then
+        begin
+          if not lWhereClause.IsEmpty then
+            lQuery.Params.ParamByName(lProperty.Name).Value := GetParameterValue(pObject, lProperty);
+
+        ShowMessage(lProperty.Name);
+        end;
+      end;
+
+      ShowMessage(lQuery.SQL.Text);
+      lQuery.ExecSQL;
+      Result := True;
+
+    except
+      on E: Exception do
+      begin
+        raise Exception.Create('Erro ao atualizar registro na tabela ' + lTable + ': ' + E.Message);
+      end;
+    end
+
+  finally
+    lContext.Free;
+    lQuery.Free;
+  end;
+
+end;
+
+function TBaseDAO.DeleteBySQLText(const pObject: TObject; const pWhereClause: string = '') : Boolean;
 var
   lContext: TRttiContext;
   lType: TRttiType;
@@ -184,6 +357,7 @@ begin
 
     lTable := lType.GetAttribute<TDBTable>.TableName;
 
+    //  Monta o SQL para o Delete
     lSQL := 'DELETE FROM ' + lTable + ' WHERE ' + pWhereClause;
 
     try
@@ -219,11 +393,13 @@ var
 begin
 
   Result := nil;
+
+  //  Percorre todas a propertys em busca da que tenha o atributo Primary Key
   for lProperty in pType.GetProperties do
   begin
-    if lProperty.GetAttribute<TDBColumnAtrribute> is TDBColumnAtrribute then
+    if lProperty.GetAttribute<TDBColumnAttribute> is TDBColumnAttribute then
     begin
-      if lProperty.GetAttribute<TDBColumnAtrribute>.IsPrimaryKey then
+      if lProperty.GetAttribute<TDBColumnAttribute>.IsPrimaryKey then
       begin
         Result := lProperty;
         Exit;
@@ -237,6 +413,7 @@ function TBaseDAO.GetParameterValue(const pObject: TObject;
   const pProperty: TRttiProperty): string;
 begin
 
+  //  Converte o Variant para tipos especificos para persistir no banco de dados
   if pProperty.GetValue(pObject).TypeInfo = TypeInfo(TDate) then
   begin
     Result := VarToStr(FormatDateTime('yyyy/mm/dd', pProperty.GetValue(pObject).AsExtended));
@@ -268,9 +445,9 @@ begin
   Result := False;
 
   //  Verifica se a property possui o atributo com o nome da coluna
-  if pProperty.HasAttribute<TDBColumnAtrribute> then
+  if pProperty.HasAttribute<TDBColumnAttribute> then
     //  Verifica se o atributo não é PK
-    if not (pProperty.GetAttribute<TDBColumnAtrribute>.IsPrimaryKey) then
+    if not (pProperty.GetAttribute<TDBColumnAttribute>.IsPrimaryKey) then
       Result := True;
 
 end;
@@ -311,7 +488,7 @@ begin
       //  Verifica se a property possui o atributo com o nome da coluna e se a mesma não é PK
       if CheckColumnsAttribute(lProperty) then
       begin
-          lColumns := lColumns + lProperty.GetAttribute<TDBColumnAtrribute>.FieldName + ', ';
+          lColumns := lColumns + lProperty.GetAttribute<TDBColumnAttribute>.FieldName + ', ';
           lValues  := lValues + ':' + lProperty.Name + ', ';
       end;
 
@@ -324,7 +501,6 @@ begin
     // Monta a query
     lSQL := 'INSERT INTO ' + lTable + ' (' + lColumns + ') VALUES (' + lValues + ')';
 
-
     try
 
       lQuery.Connection := FConnection;
@@ -335,7 +511,6 @@ begin
       begin
         if CheckColumnsAttribute(lProperty)  then
           lQuery.Params.ParamByName(lProperty.Name).Value := GetParameterValue(pObject, lProperty);
-
       end;
 
       lQuery.ExecSQL;
@@ -354,7 +529,7 @@ begin
 
 end;
 
-function TBaseDAO.UpdateByText(const pObject: TObject; const pWhereClause: string = '') : Boolean;
+function TBaseDAO.UpdateBySQLText(const pObject: TObject; const pWhereClause: string = '') : Boolean;
 var
   lContext: TRttiContext;
   lType: TRttiType;
@@ -394,7 +569,7 @@ begin
     begin
       if CheckColumnsAttribute(lProperty) then
       begin
-        lSets := lSets + lProperty.GetAttribute<TDBColumnAtrribute>.FieldName +
+        lSets := lSets + lProperty.GetAttribute<TDBColumnAttribute>.FieldName +
                  ' = :' + lProperty.Name + ', ';
       end;
     end;
@@ -472,7 +647,7 @@ begin
     begin
       if CheckColumnsAttribute(lProperty) then
       begin
-        lSets := lSets + lProperty.GetAttribute<TDBColumnAtrribute>.FieldName +
+        lSets := lSets + lProperty.GetAttribute<TDBColumnAttribute>.FieldName +
                  ' = :' + lProperty.Name + ', ';
       end;
     end;
@@ -482,7 +657,7 @@ begin
 
     // Monta a consulta UPDATE
     lSQL := 'UPDATE ' + lTable + ' SET ' + lSets + ' WHERE '  +
-      lPk.GetAttribute<TDBColumnAtrribute>.FieldName + ' = :' + lPk.Name;
+      lPk.GetAttribute<TDBColumnAttribute>.FieldName + ' = :' + lPk.Name;
 
     try
       lQuery.Connection := FConnection;
@@ -552,12 +727,14 @@ begin
       exit;
     end;
 
-    // Monta a consulta SQL de seleção
+    // Monta a consulta SQL
     lTable := lType.GetAttribute<TDBTable>.TableName;
-    lSQL := 'SELECT * FROM ' + lTable + ' WHERE ' + lProperty.GetAttribute<TDBColumnAtrribute>.FieldName + ' = :' + lProperty.Name;
+    lSQL := 'SELECT * FROM ' + lTable + ' WHERE ' +
+      lProperty.GetAttribute<TDBColumnAttribute>.FieldName + ' = :' + lProperty.Name;
 
     // Executa a consulta SQL
     try
+
       lQuery.SQL.Add(lSQL);
       lQuery.Params.ParamByName(lProperty.Name).Value := GetParameterValue(pObject, lProperty);;
       lQuery.Open;
@@ -570,6 +747,7 @@ begin
       end;
 
       Result := True;
+
     except
       on E: Exception do
       begin

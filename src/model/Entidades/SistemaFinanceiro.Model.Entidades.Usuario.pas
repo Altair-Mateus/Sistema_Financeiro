@@ -28,27 +28,29 @@ type
     function UpdateByText(const pWhereClause: string = '') : Boolean;
     function UpdateByPK : Boolean;
     function UpdateByProp : Boolean;
-    function Delete(const pWhere : String = '') : Boolean;
+    function DeleteByText(const pWhere : String = '') : Boolean;
+    function DeleteByPk : Boolean;
+    function DeleteByProp : Boolean;
     function Load : Boolean;
 
     procedure AddPropertyToWhere(const APropertyName : String);
 
 
-    [TDBColumnAtrribute('ID', True, True)]
+    [TDBColumnAttribute('ID', True, True)]
     property Id            : Integer read FId write FId;
-    [TDBColumnAtrribute('NOME')]
+    [TDBColumnAttribute('NOME')]
     property Nome          : String read FNome write FNome;
-    [TDBColumnAtrribute('LOGIN')]
+    [TDBColumnAttribute('LOGIN')]
     property Login         : String read FLogin write FLogin;
-    [TDBColumnAtrribute('SENHA')]
+    [TDBColumnAttribute('SENHA')]
     property Senha         : String read FSenha write FSenha;
-    [TDBColumnAtrribute('STATUS')]
+    [TDBColumnAttribute('STATUS')]
     property Status        : String read FStatus write FStatus;
-    [TDBColumnAtrribute('DATA_CADASTRO')]
+    [TDBColumnAttribute('DATA_CADASTRO')]
     property Data_Cadastro : TDate read FData_Cadastro write FData_Cadastro;
-    [TDBColumnAtrribute('SENHA_TEMP')]
+    [TDBColumnAttribute('SENHA_TEMP')]
     property Senha_Temp    : String read FSenha_Temp write FSenha_Temp;
-    [TDBColumnAtrribute('USER_ADMIN')]
+    [TDBColumnAttribute('USER_ADMIN')]
     property User_Admin    : String read FUser_Admin write FUser_Admin;
 
     constructor Create;
@@ -69,12 +71,32 @@ begin
 end;
 
 
-function TModelUsuario.Delete(const pWhere: String = ''): Boolean;
+function TModelUsuario.DeleteByPk: Boolean;
+begin
+
+  Result := False;
+
+  if FBaseDAO.DeleteByPK(Self) then
+    Result := true;
+
+end;
+
+function TModelUsuario.DeleteByProp: Boolean;
+begin
+
+  Result := False;
+
+  if FBaseDAO.DeleteByProp(Self) then
+    Result := True;
+
+end;
+
+function TModelUsuario.DeleteByText(const pWhere: String = ''): Boolean;
 begin
 
   Result := false;
 
-  if FBaseDAO.Delete(Self, pWhere) then
+  if FBaseDAO.DeleteBySQLText(Self, pWhere) then
     Result := True;
 end;
 
@@ -131,7 +153,7 @@ begin
 
   Result := False;
 
-  if FBaseDAO.UpdateByText(Self, pWhereClause) then
+  if FBaseDAO.UpdateBySQLText(Self, pWhereClause) then
     Result := true;
 
 end;
