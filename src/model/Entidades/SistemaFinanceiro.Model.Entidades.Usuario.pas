@@ -25,7 +25,14 @@ type
   public
 
     function Insert : Boolean;
-    function Update(const pWhere : String = '') : Boolean;
+    function UpdateByText(const pWhereClause: string = '') : Boolean;
+    function UpdateByPK : Boolean;
+    function UpdateByProp : Boolean;
+    function Delete(const pWhere : String = '') : Boolean;
+    function Load : Boolean;
+
+    procedure AddPropertyToWhere(const APropertyName : String);
+
 
     [TDBColumnAtrribute('ID', True, True)]
     property Id            : Integer read FId write FId;
@@ -51,19 +58,31 @@ type
 implementation
 { TModelUsuario }
 
+procedure TModelUsuario.AddPropertyToWhere(const APropertyName: String);
+begin
+  FBaseDAO.AddPropertyToWhere(APropertyName);
+end;
+
 constructor TModelUsuario.Create;
 begin
   FBaseDAO := TBaseDAO.Create;
 end;
 
 
+function TModelUsuario.Delete(const pWhere: String = ''): Boolean;
+begin
+
+  Result := false;
+
+  if FBaseDAO.Delete(Self, pWhere) then
+    Result := True;
+end;
+
 destructor TModelUsuario.Destroy;
 begin
   FBaseDAO.Free;
   inherited;
 end;
-
-
 
 function TModelUsuario.Insert: Boolean;
 begin
@@ -75,13 +94,45 @@ begin
 
 end;
 
-function TModelUsuario.Update(const pWhere : String = '') : Boolean;
+function TModelUsuario.Load: Boolean;
 begin
 
   Result := False;
 
-  if FBaseDAO.Update(Self, pWhere) then
+  if FBaseDAO.LoadObjectByPK(Self) then
     Result := True;
+
+end;
+
+
+function TModelUsuario.UpdateByPK: Boolean;
+begin
+
+  Result := False;
+
+  if FBaseDAO.UpdateByPK(Self) then
+    Result := True;
+
+end;
+
+function TModelUsuario.UpdateByProp: Boolean;
+begin
+
+   Result := False;
+
+  if FBaseDAO.UpdateByProp(Self) then
+    Result := True;
+
+end;
+
+
+function TModelUsuario.UpdateByText(const pWhereClause: string): Boolean;
+begin
+
+  Result := False;
+
+  if FBaseDAO.UpdateByText(Self, pWhereClause) then
+    Result := true;
 
 end;
 
