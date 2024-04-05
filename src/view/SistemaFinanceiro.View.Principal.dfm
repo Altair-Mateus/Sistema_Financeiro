@@ -15,6 +15,7 @@ object frmPrincipal: TfrmPrincipal
   WindowState = wsMaximized
   OnCreate = FormCreate
   OnKeyDown = FormKeyDown
+  OnShow = FormShow
   TextHeight = 16
   object pnlDadosGerais: TPanel
     AlignWithMargins = True
