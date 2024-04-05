@@ -906,7 +906,7 @@ var
 begin
 
   //  Valida se o user logado é adm
-  if not dmUsuarios.GetUsuarioLogado.Admin then
+  if not (dmUsuarios.GetUsuarioLogado.User_Admin = 'S') then
   begin
 
     Application.MessageBox('Somente Administradores podem cancelar uma Baixa!', 'Erro', MB_OK + MB_ICONERROR);

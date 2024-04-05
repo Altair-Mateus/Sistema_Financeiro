@@ -1,14 +1,13 @@
 inherited frmUsuarios: TfrmUsuarios
   Caption = 'Cadastro de Usu'#225'rios'
-  ClientHeight = 511
-  ClientWidth = 815
+  ClientHeight = 510
+  ClientWidth = 811
   ExplicitWidth = 827
   ExplicitHeight = 549
   TextHeight = 19
   inherited CardPanelPrincipal: TCardPanel
-    Width = 815
-    Height = 511
-    ActiveCard = CardCadastro
+    Width = 811
+    Height = 510
     ExplicitWidth = 811
     ExplicitHeight = 510
     inherited CardCadastro: TCard
@@ -55,7 +54,7 @@ inherited frmUsuarios: TfrmUsuarios
           AlignWithMargins = True
           Left = 4
           Top = 349
-          Width = 805
+          Width = 797
           Height = 46
           Align = alBottom
           Caption = 
@@ -70,7 +69,6 @@ inherited frmUsuarios: TfrmUsuarios
           ParentFont = False
           Visible = False
           WordWrap = True
-          ExplicitWidth = 797
         end
         object Label5: TLabel
           Left = 80

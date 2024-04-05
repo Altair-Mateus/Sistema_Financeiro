@@ -2,66 +2,160 @@ unit SistemaFinanceiro.Model.Entidades.Usuario;
 
 interface
 
-type
+uses
+   uDBColumnAttribute, uDaoRTTI;
 
+type
+  [TDBTable('USUARIOS')]
   TModelUsuario = class
+
   private
+    FDaoRTTI : TDaoRTTI;
     FLogin: String;
     FNome: String;
-    FId: String;
-    FSenha_Temp: Boolean;
+    FId: Integer;
+    FSenha_Temp: String;
     FSenha: String;
-    FAdmin: Boolean;
+    FTeste: Integer;
+    FStatus: String;
+    FData_Cadastro: TDate;
+    FUser_Admin: String;
+    FTable_Name: String;
 
-    procedure SetId(const Value: String);
-    procedure SetLogin(const Value: String);
-    procedure SetNome(const Value: String);
-    procedure SetSenha(const Value: String);
-    procedure SetSenha_Temp(const Value: Boolean);
-
-    procedure SetAdmin(const Value: Boolean);
   public
-    property Nome         : String read FNome write SetNome;
-    property Login        : String read FLogin write SetLogin;
-    property Id           : String read FId write SetId;
-    property Senha        : String read FSenha write SetSenha;
-    property Senha_Temp   : Boolean read FSenha_Temp write SetSenha_Temp;
-    property Admin        : Boolean read FAdmin write SetAdmin;
+
+    function Insert : Boolean;
+    function UpdateByText(const pWhereClause: string = '') : Boolean;
+    function UpdateByPK : Boolean;
+    function UpdateByProp : Boolean;
+    function DeleteByText(const pWhere : String = '') : Boolean;
+    function DeleteByPk : Boolean;
+    function DeleteByProp : Boolean;
+    function Load : Boolean;
+
+    procedure AddPropertyToWhere(const APropertyName : String);
+
+
+    [TDBColumnAttribute('ID', True, True)]
+    property Id            : Integer read FId write FId;
+    [TDBColumnAttribute('NOME')]
+    property Nome          : String read FNome write FNome;
+    [TDBColumnAttribute('LOGIN')]
+    property Login         : String read FLogin write FLogin;
+    [TDBColumnAttribute('SENHA')]
+    property Senha         : String read FSenha write FSenha;
+    [TDBColumnAttribute('STATUS')]
+    property Status        : String read FStatus write FStatus;
+    [TDBColumnAttribute('DATA_CADASTRO')]
+    property Data_Cadastro : TDate read FData_Cadastro write FData_Cadastro;
+    [TDBColumnAttribute('SENHA_TEMP')]
+    property Senha_Temp    : String read FSenha_Temp write FSenha_Temp;
+    [TDBColumnAttribute('USER_ADMIN')]
+    property User_Admin    : String read FUser_Admin write FUser_Admin;
+
+    constructor Create;
+    destructor Destroy; override;
 
   end;
-
 implementation
-
 { TModelUsuario }
 
-procedure TModelUsuario.SetAdmin(const Value: Boolean);
+procedure TModelUsuario.AddPropertyToWhere(const APropertyName: String);
 begin
-  FAdmin := Value;
+  FDaoRTTI.AddPropertyToWhere(APropertyName);
 end;
 
-procedure TModelUsuario.SetId(const Value: String);
+constructor TModelUsuario.Create;
 begin
-  FId := Value;
+  FDaoRTTI := TDaoRTTI.Create;
 end;
 
-procedure TModelUsuario.SetLogin(const Value: String);
+
+function TModelUsuario.DeleteByPk: Boolean;
 begin
-  FLogin := Value;
+
+  Result := False;
+
+  if FDaoRTTI.DeleteByPK(Self) then
+    Result := true;
+
 end;
 
-procedure TModelUsuario.SetNome(const Value: String);
+function TModelUsuario.DeleteByProp: Boolean;
 begin
-  FNome := Value;
+
+  Result := False;
+
+  if FDaoRTTI.DeleteByProp(Self) then
+    Result := True;
+
 end;
 
-procedure TModelUsuario.SetSenha(const Value: String);
+function TModelUsuario.DeleteByText(const pWhere: String = ''): Boolean;
 begin
-  FSenha := Value;
+
+  Result := false;
+
+  if FDaoRTTI.DeleteBySQLText(Self, pWhere) then
+    Result := True;
 end;
 
-procedure TModelUsuario.SetSenha_Temp(const Value: Boolean);
+destructor TModelUsuario.Destroy;
 begin
-  FSenha_Temp := Value;
+  FDaoRTTI.Free;
+  inherited;
+end;
+
+function TModelUsuario.Insert: Boolean;
+begin
+
+  Result := False;
+
+  if FDaoRTTI.Insert(Self) then
+    Result := True;
+
+end;
+
+function TModelUsuario.Load: Boolean;
+begin
+
+  Result := False;
+
+  if FDaoRTTI.LoadObjectByPK(Self) then
+    Result := True;
+
+end;
+
+
+function TModelUsuario.UpdateByPK: Boolean;
+begin
+
+  Result := False;
+
+  if FDaoRTTI.UpdateByPK(Self) then
+    Result := True;
+
+end;
+
+function TModelUsuario.UpdateByProp: Boolean;
+begin
+
+   Result := False;
+
+  if FDaoRTTI.UpdateByProp(Self) then
+    Result := True;
+
+end;
+
+
+function TModelUsuario.UpdateByText(const pWhereClause: string): Boolean;
+begin
+
+  Result := False;
+
+  if FDaoRTTI.UpdateBySQLText(Self, pWhereClause) then
+    Result := true;
+
 end;
 
 end.

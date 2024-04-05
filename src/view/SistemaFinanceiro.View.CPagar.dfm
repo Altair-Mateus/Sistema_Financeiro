@@ -1,16 +1,15 @@
 inherited frmContasPagar: TfrmContasPagar
   Caption = 'Contas a Pagar'
-  ClientHeight = 644
-  ClientWidth = 1393
+  ClientHeight = 643
+  ClientWidth = 1389
   Position = poDesigned
   WindowState = wsMaximized
-  ExplicitLeft = -632
   ExplicitWidth = 1405
   ExplicitHeight = 682
   TextHeight = 19
   inherited CardPanelPrincipal: TCardPanel
-    Width = 1393
-    Height = 644
+    Width = 1389
+    Height = 643
     ActiveCard = CardPesquisa
     ExplicitWidth = 1370
     ExplicitHeight = 643
@@ -3769,8 +3768,8 @@ inherited frmContasPagar: TfrmContasPagar
         end
       end
       inherited pnlBotoes: TPanel
-        Top = 575
-        Width = 1393
+        Top = 574
+        Width = 1389
         BevelOuter = bvNone
         ExplicitTop = 575
         ExplicitWidth = 1374
@@ -3950,8 +3949,8 @@ inherited frmContasPagar: TfrmContasPagar
       end
       inherited pnlGrid: TPanel
         Top = 153
-        Width = 1393
-        Height = 393
+        Width = 1389
+        Height = 392
         ExplicitTop = 145
         ExplicitWidth = 1374
         ExplicitHeight = 401
@@ -4055,13 +4054,14 @@ inherited frmContasPagar: TfrmContasPagar
       end
       object pnlTotais: TPanel
         Left = 0
-        Top = 546
-        Width = 1393
+        Top = 545
+        Width = 1389
         Height = 29
         Align = alBottom
         Color = clWindow
         ParentBackground = False
         TabOrder = 3
+        ExplicitTop = 546
         ExplicitWidth = 1374
         object lblQtdCp: TLabel
           AlignWithMargins = True

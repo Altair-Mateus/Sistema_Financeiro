@@ -116,6 +116,8 @@ type
     procedure ExibeTelaRelMensalCR;
     procedure CarregaImgPrincipal;
 
+    function GetVesaoArq : String;
+
   public
     { Public declarations }
     procedure ResumoMensalCaixa;
@@ -549,7 +551,7 @@ begin
 
   end;
 
-  if dmUsuarios.GetUsuarioLogado.Senha_Temp then
+  if dmUsuarios.GetUsuarioLogado.Senha_Temp = 'S' then
   begin
 
     frmRedefinirSenha := TfrmRedefinirSenha.Create(nil);
@@ -579,6 +581,7 @@ begin
 
   CarregaImgPrincipal;
 
+
 end;
 
 procedure TfrmPrincipal.FormKeyDown(Sender: TObject; var Key: Word;
@@ -598,12 +601,42 @@ end;
 
 procedure TfrmPrincipal.FormShow(Sender: TObject);
 begin
+
   lblUserLogado.Caption := '';
+
+  Self.Caption := 'Sistema Financeiro - v. ' + GetVesaoArq + ' - Desenvolvido por Altair Mateus T. Alencastro';
+
 end;
 
 procedure TfrmPrincipal.Fornecedores1Click(Sender: TObject);
 begin
   ExibeTelaFonecedores;
+end;
+
+function TfrmPrincipal.GetVesaoArq: String;
+var
+  VerInfoSize: DWORD;
+  VerInfo: Pointer;
+  VerValueSize: DWORD;
+  VerValue: PVSFixedFileInfo;
+  Dummy: DWORD;
+
+begin
+
+  VerInfoSize := GetFileVersionInfoSize(PChar(ParamStr(0)), Dummy);
+  GetMem(VerInfo, VerInfoSize);
+  GetFileVersionInfo(PChar(ParamStr(0)), 0, VerInfoSize, VerInfo);
+  VerQueryValue(VerInfo, '\\', Pointer(VerValue), VerValueSize);
+
+  with VerValue^ do
+  begin
+    Result := IntToStr(dwFileVersionMS shr 16);
+    Result := Result + '.' + IntToStr(dwFileVersionMS and $FFFF);
+    Result := Result + '.' + IntToStr(dwFileVersionLS shr 16);
+  end;
+
+  FreeMem(VerInfo, VerInfoSize);
+
 end;
 
 procedure TfrmPrincipal.mnuAjudaClick(Sender: TObject);
