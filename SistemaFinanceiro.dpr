@@ -60,9 +60,9 @@ uses
   SistemaFinanceiro.View.GeraRelResumoMensalCr in 'src\view\SistemaFinanceiro.View.GeraRelResumoMensalCr.pas' {frmGeraRelResumoMensalCr},
   SistemaFinanceiro.View.Relatorios.ResumoMensalCr in 'src\view\Relatorios\SistemaFinanceiro.View.Relatorios.ResumoMensalCr.pas' {frmRelMensalCr},
   SistemaFinanceiro.View.DetalhesOrigemCpCr in 'src\view\SistemaFinanceiro.View.DetalhesOrigemCpCr.pas' {frmDetalhesOrigemCpCr},
-  uBaseDAO in 'src\util\uBaseDAO.pas',
   uTeste in 'src\view\uTeste.pas' {Form1},
-  uDBColumnAttribute in 'src\util\uDBColumnAttribute.pas';
+  uDaoRTTI in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\model\uDaoRTTI.pas',
+  uDBColumnAttribute in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\model\uDBColumnAttribute.pas';
 
 {$R *.res}
 

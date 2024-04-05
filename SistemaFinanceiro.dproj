@@ -339,12 +339,12 @@
             <Form>frmDetalhesOrigemCpCr</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="src\util\uBaseDAO.pas"/>
         <DCCReference Include="src\view\uTeste.pas">
             <Form>Form1</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="src\util\uDBColumnAttribute.pas"/>
+        <DCCReference Include="..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\model\uDaoRTTI.pas"/>
+        <DCCReference Include="..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\model\uDBColumnAttribute.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

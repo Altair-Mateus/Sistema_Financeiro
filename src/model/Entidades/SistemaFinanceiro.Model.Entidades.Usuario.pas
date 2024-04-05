@@ -3,14 +3,14 @@ unit SistemaFinanceiro.Model.Entidades.Usuario;
 interface
 
 uses
-   uDBColumnAttribute, uBaseDAO;
+   uDBColumnAttribute, uDaoRTTI;
 
 type
   [TDBTable('USUARIOS')]
   TModelUsuario = class
 
   private
-    FBaseDAO : TBaseDAO;
+    FDaoRTTI : TDaoRTTI;
     FLogin: String;
     FNome: String;
     FId: Integer;
@@ -62,12 +62,12 @@ implementation
 
 procedure TModelUsuario.AddPropertyToWhere(const APropertyName: String);
 begin
-  FBaseDAO.AddPropertyToWhere(APropertyName);
+  FDaoRTTI.AddPropertyToWhere(APropertyName);
 end;
 
 constructor TModelUsuario.Create;
 begin
-  FBaseDAO := TBaseDAO.Create;
+  FDaoRTTI := TDaoRTTI.Create;
 end;
 
 
@@ -76,7 +76,7 @@ begin
 
   Result := False;
 
-  if FBaseDAO.DeleteByPK(Self) then
+  if FDaoRTTI.DeleteByPK(Self) then
     Result := true;
 
 end;
@@ -86,7 +86,7 @@ begin
 
   Result := False;
 
-  if FBaseDAO.DeleteByProp(Self) then
+  if FDaoRTTI.DeleteByProp(Self) then
     Result := True;
 
 end;
@@ -96,13 +96,13 @@ begin
 
   Result := false;
 
-  if FBaseDAO.DeleteBySQLText(Self, pWhere) then
+  if FDaoRTTI.DeleteBySQLText(Self, pWhere) then
     Result := True;
 end;
 
 destructor TModelUsuario.Destroy;
 begin
-  FBaseDAO.Free;
+  FDaoRTTI.Free;
   inherited;
 end;
 
@@ -111,7 +111,7 @@ begin
 
   Result := False;
 
-  if FBaseDAO.Insert(Self) then
+  if FDaoRTTI.Insert(Self) then
     Result := True;
 
 end;
@@ -121,7 +121,7 @@ begin
 
   Result := False;
 
-  if FBaseDAO.LoadObjectByPK(Self) then
+  if FDaoRTTI.LoadObjectByPK(Self) then
     Result := True;
 
 end;
@@ -132,7 +132,7 @@ begin
 
   Result := False;
 
-  if FBaseDAO.UpdateByPK(Self) then
+  if FDaoRTTI.UpdateByPK(Self) then
     Result := True;
 
 end;
@@ -142,7 +142,7 @@ begin
 
    Result := False;
 
-  if FBaseDAO.UpdateByProp(Self) then
+  if FDaoRTTI.UpdateByProp(Self) then
     Result := True;
 
 end;
@@ -153,7 +153,7 @@ begin
 
   Result := False;
 
-  if FBaseDAO.UpdateBySQLText(Self, pWhereClause) then
+  if FDaoRTTI.UpdateBySQLText(Self, pWhereClause) then
     Result := true;
 
 end;
