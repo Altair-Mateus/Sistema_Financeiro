@@ -61,7 +61,8 @@ uses
   SistemaFinanceiro.View.Relatorios.ResumoMensalCr in 'src\view\Relatorios\SistemaFinanceiro.View.Relatorios.ResumoMensalCr.pas' {frmRelMensalCr},
   SistemaFinanceiro.View.DetalhesOrigemCpCr in 'src\view\SistemaFinanceiro.View.DetalhesOrigemCpCr.pas' {frmDetalhesOrigemCpCr},
   uDaoRTTI in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\model\uDaoRTTI.pas',
-  uDBColumnAttribute in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\model\uDBColumnAttribute.pas';
+  uDBColumnAttribute in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\model\uDBColumnAttribute.pas',
+  SistemaFinanceiro.Model.Entidades.LancamentoPadrao in 'src\model\Entidades\SistemaFinanceiro.Model.Entidades.LancamentoPadrao.pas';
 
 {$R *.res}
 

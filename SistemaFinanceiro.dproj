@@ -339,6 +339,7 @@
         </DCCReference>
         <DCCReference Include="..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\model\uDaoRTTI.pas"/>
         <DCCReference Include="..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\model\uDBColumnAttribute.pas"/>
+        <DCCReference Include="src\model\Entidades\SistemaFinanceiro.Model.Entidades.LancamentoPadrao.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
