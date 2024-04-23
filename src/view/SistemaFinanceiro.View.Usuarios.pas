@@ -56,7 +56,7 @@ var
 uses
   SistemaFinanceiro.Model.dmUsuarios,
   BCrypt, SistemaFinanceiro.Utilitarios,
-  SistemaFinanceiro.View.Relatorios.Usuarios;
+  SistemaFinanceiro.View.Relatorios.Usuarios, uQueriesSQL;
 
   procedure TfrmUsuarios.btnAlterarClick(Sender: TObject);
 begin
@@ -290,16 +290,17 @@ end;
 procedure TfrmUsuarios.Pesquisar;
 var
   LFiltroPesquisa : String;
-
+  lQuery : TQueriesSQL;
 begin
-
-  dmUsuarios.cdsUsuarios.Params.Clear;
 
   LFiltroPesquisa := TUtilitario.LikeFind(edtPesquisar.Text, DBGrid1);
 
-  dmUsuarios.cdsUsuarios.Close;
-  dmUsuarios.cdsUsuarios.CommandText := 'SELECT * FROM USUARIOS WHERE 1 = 1' + LFiltroPesquisa + 'ORDER BY 1';
-  dmUsuarios.cdsUsuarios.Open;
+  lQuery := TQueriesSQL.Create;
+  try
+    DataSourceUsuarios.DataSet := lQuery.ExecuteQuery('SELECT * FROM USUARIOS WHERE 1 = 1' + LFiltroPesquisa + 'ORDER BY 1', []);
+  finally
+    lQuery.Free;
+  end;
 
   HabilitaBotoes;
 

@@ -2,33 +2,33 @@ inherited frmUsuarios: TfrmUsuarios
   Caption = 'Cadastro de Usu'#225'rios'
   ClientHeight = 510
   ClientWidth = 811
-  ExplicitWidth = 827
-  ExplicitHeight = 549
+  ExplicitWidth = 823
+  ExplicitHeight = 548
   TextHeight = 19
   inherited CardPanelPrincipal: TCardPanel
     Width = 811
     Height = 510
-    ExplicitWidth = 811
-    ExplicitHeight = 510
+    ExplicitWidth = 807
+    ExplicitHeight = 509
     inherited CardCadastro: TCard
-      Width = 813
-      Height = 509
-      ExplicitWidth = 813
-      ExplicitHeight = 509
+      Width = 811
+      Height = 510
+      ExplicitWidth = 811
+      ExplicitHeight = 510
       inherited pnlBotoesCad: TPanel
-        Top = 440
-        Width = 813
-        ExplicitTop = 440
-        ExplicitWidth = 813
+        Top = 441
+        Width = 811
+        ExplicitTop = 441
+        ExplicitWidth = 811
         inherited btnSalvar: TButton
           OnClick = btnSalvarClick
         end
       end
       inherited PanelCampos: TPanel
-        Width = 813
-        Height = 399
-        ExplicitWidth = 813
-        ExplicitHeight = 399
+        Width = 811
+        Height = 400
+        ExplicitWidth = 811
+        ExplicitHeight = 400
         object LabelNome: TLabel
           Left = 32
           Top = 40
@@ -52,9 +52,9 @@ inherited frmUsuarios: TfrmUsuarios
         end
         object lblAvisoSenha: TLabel
           AlignWithMargins = True
-          Left = 4
-          Top = 349
-          Width = 797
+          Left = 3
+          Top = 351
+          Width = 805
           Height = 46
           Align = alBottom
           Caption = 
@@ -69,6 +69,9 @@ inherited frmUsuarios: TfrmUsuarios
           ParentFont = False
           Visible = False
           WordWrap = True
+          ExplicitLeft = 4
+          ExplicitTop = 349
+          ExplicitWidth = 797
         end
         object Label5: TLabel
           Left = 80
@@ -136,8 +139,8 @@ inherited frmUsuarios: TfrmUsuarios
         end
       end
       inherited PanelTitulo: TPanel
-        Width = 813
-        ExplicitWidth = 813
+        Width = 811
+        ExplicitWidth = 811
         inherited lblTitulo: TLabel
           Width = 211
           Caption = 'Inserindo um novo usu'#225'rio'
@@ -146,31 +149,34 @@ inherited frmUsuarios: TfrmUsuarios
       end
     end
     inherited CardPesquisa: TCard
-      Width = 813
-      Height = 509
-      ExplicitWidth = 809
-      ExplicitHeight = 508
+      Width = 811
+      Height = 510
+      ExplicitWidth = 807
+      ExplicitHeight = 509
       inherited pnlPesquisa: TPanel
-        Width = 813
+        Width = 811
         Margins.Left = 0
         Margins.Top = 0
         Margins.Right = 0
         Margins.Bottom = 0
-        ExplicitWidth = 809
+        ExplicitWidth = 807
         inherited edtPesquisar: TEdit
           OnChange = edtPesquisarChange
         end
         inherited btnPesquisae: TButton
-          Left = 689
+          Left = 687
           OnClick = btnPesquisaeClick
-          ExplicitLeft = 685
+          ExplicitLeft = 683
         end
       end
       inherited pnlBotoes: TPanel
-        Top = 440
-        Width = 813
-        ExplicitTop = 439
-        ExplicitWidth = 809
+        Top = 441
+        Width = 811
+        ExplicitTop = 440
+        ExplicitWidth = 807
+        inherited btnIncluir: TButton
+          ExplicitTop = 5
+        end
         inherited btnExcluir: TButton
           OnClick = btnExcluirClick
         end
@@ -178,24 +184,25 @@ inherited frmUsuarios: TfrmUsuarios
           OnClick = btnImprimirClick
         end
         inherited btnSair: TButton
-          Left = 689
+          Left = 687
           ImageIndex = 8
-          ExplicitLeft = 685
+          ExplicitLeft = 683
         end
       end
       inherited pnlGrid: TPanel
-        Width = 813
-        Height = 359
-        ExplicitWidth = 809
-        ExplicitHeight = 358
+        Width = 811
+        Height = 360
+        ExplicitWidth = 807
+        ExplicitHeight = 359
         inherited DBGrid1: TDBGrid
-          Width = 811
-          Height = 357
+          Width = 809
+          Height = 358
           Margins.Top = 0
           DataSource = DataSourceUsuarios
           PopupMenu = PopupMenu
           Columns = <
             item
+              Alignment = taLeftJustify
               Expanded = False
               FieldName = 'id'
               Title.Caption = 'C'#243'digo'
@@ -216,6 +223,7 @@ inherited frmUsuarios: TfrmUsuarios
               Visible = True
             end
             item
+              Alignment = taCenter
               Expanded = False
               FieldName = 'status'
               Title.Caption = 'Status'
@@ -223,9 +231,11 @@ inherited frmUsuarios: TfrmUsuarios
               Visible = True
             end
             item
+              Alignment = taCenter
               Expanded = False
               FieldName = 'USER_ADMIN'
               Title.Caption = 'Admin'
+              Width = 64
               Visible = True
             end>
         end
@@ -1828,7 +1838,6 @@ inherited frmUsuarios: TfrmUsuarios
       000000000000}
   end
   object DataSourceUsuarios: TDataSource
-    DataSet = dmUsuarios.cdsUsuarios
     Left = 728
     Top = 152
   end

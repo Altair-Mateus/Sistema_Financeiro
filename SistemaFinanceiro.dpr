@@ -62,7 +62,9 @@ uses
   SistemaFinanceiro.View.DetalhesOrigemCpCr in 'src\view\SistemaFinanceiro.View.DetalhesOrigemCpCr.pas' {frmDetalhesOrigemCpCr},
   uDaoRTTI in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\model\uDaoRTTI.pas',
   uDBColumnAttribute in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\model\uDBColumnAttribute.pas',
-  SistemaFinanceiro.Model.Entidades.LancamentoPadrao in 'src\model\Entidades\SistemaFinanceiro.Model.Entidades.LancamentoPadrao.pas';
+  SistemaFinanceiro.Model.Entidades.LancamentoPadraoContas in 'src\model\Entidades\SistemaFinanceiro.Model.Entidades.LancamentoPadraoContas.pas',
+  SistemaFinanceiro.View.LancamentoPadraoContas in 'src\view\SistemaFinanceiro.View.LancamentoPadraoContas.pas' {frmCadastroPadrao1},
+  uQueriesSQL in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\model\uQueriesSQL.pas';
 
 {$R *.res}
 
@@ -81,5 +83,6 @@ begin
   Application.CreateForm(TdmPgtoBxCr, dmPgtoBxCr);
   Application.CreateForm(TdmPgtoBxCp, dmPgtoBxCp);
   Application.CreateForm(TdmFaturaCartao, dmFaturaCartao);
+  Application.CreateForm(TfrmCadastroPadrao1, frmCadastroPadrao1);
   Application.Run;
 end.
