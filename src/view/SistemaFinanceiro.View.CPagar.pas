@@ -348,10 +348,6 @@ begin
 
   memDesc.SetFocus;
 
-  //  Coloca a data atual no datetimepicker
-  dateCompra.Date := now;
-  dateVencimento.Date := now + 7;
-
   //  Seta parcela previamente como 1
   edtParcela.Text := '1';
 
@@ -374,6 +370,11 @@ begin
   edtValorParcela.ReadOnly   := True;
   lblNomeFornecedor.Visible  := False;
   lblNomeFatCartao.Visible   := False;
+
+  //  Coloca a data atual no datetimepicker
+  dateCompra.DateTime := Now;
+  dateVencimento.DateTime := Now + 7;
+
 
   memDesc.SetFocus;
 
@@ -533,7 +534,6 @@ begin
 
   //  Atualiza a lista
   Pesquisar;
-  inherited;
 
   //  Atualiza relatorio tela principal
   frmPrincipal.TotalCP;
@@ -1001,7 +1001,6 @@ end;
 
 procedure TfrmContasPagar.CheckFatViradaClick(Sender: TObject);
 begin
-  inherited;
 
   //  Pula o mês de vencimento caso seja CP p1
   if CheckFatVirada.Checked then
@@ -1202,7 +1201,6 @@ end;
 
 procedure TfrmContasPagar.edtCodFatCartaoExit(Sender: TObject);
 begin
-  inherited;
 
   BuscaNomeFatCartao;
 
@@ -1220,21 +1218,23 @@ begin
 
     end;
 
+    if toggleParcelamento.State = tssOn then
+    begin
+
+      FatCartaoAtiva;
+
+    end;
+
+    if edtQtdParcelas.Text <> '' then
+    begin
+
+      GeraParcelas;
+
+    end;
+
   end;
 
-  if toggleParcelamento.State = tssOn then
-  begin
 
-    FatCartaoAtiva;
-
-  end;
-
-  if edtQtdParcelas.Text <> '' then
-  begin
-
-    GeraParcelas;
-
-  end;
 
 end;
 
@@ -1814,7 +1814,6 @@ end;
 
 procedure TfrmContasPagar.toggleFaturaClick(Sender: TObject);
 begin
-  inherited;
 
   if toggleFatura.State = tssOff then
   begin
@@ -1822,6 +1821,7 @@ begin
     //  Oculta as info de fatura
     lblCodFatCartao.Visible  := False;
     lblNomeFatCartao.Visible := False;
+    edtCodFatCartao.Clear;
     edtCodFatCartao.Visible  := False;
     btnPesqFat.Visible       := False;
 
@@ -1841,30 +1841,28 @@ begin
     CheckFatVirada.Visible := False;
 
   end
-    else if toggleFatura.State = tssOn then
-         begin
+  else
+   begin
 
-          //  Oculta as info de fatura
-          lblCodFatCartao.Visible := True;
-          edtCodFatCartao.Visible := True;
-          btnPesqFat.Visible      := True;
+    //  Oculta as info de fatura
+    lblCodFatCartao.Visible := True;
+    edtCodFatCartao.Visible := True;
+    btnPesqFat.Visible      := True;
 
-          edtCodFatCartao.SetFocus;
+    edtCodFatCartao.SetFocus;
 
-          pnlAviso.Visible := True;
+    pnlAviso.Visible := True;
 
-          if not (dmCPagar.cdsCPagar.State in [dsEdit]) then
-            CheckFatVirada.Visible := True;
+    if not (dmCPagar.cdsCPagar.State in [dsEdit]) then
+      CheckFatVirada.Visible := True;
 
-         end;
+   end;
 
 
 end;
 
 procedure TfrmContasPagar.toggleParcelamentoClick(Sender: TObject);
 begin
-
-  inherited;
 
   if toggleParcelamento.State = tssOff then
   begin

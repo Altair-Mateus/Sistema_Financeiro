@@ -602,9 +602,7 @@ end;
 procedure TfrmPrincipal.FormShow(Sender: TObject);
 begin
 
-  lblUserLogado.Caption := '';
-
-  Self.Caption := 'Sistema Financeiro - v. ' + GetVesaoArq + ' - Desenvolvido por Altair Mateus T. Alencastro';
+  Self.Caption := 'Sistema Financeiro ' + GetVesaoArq + ' - Desenvolvido por Altair Mateus T. Alencastro';
 
 end;
 
