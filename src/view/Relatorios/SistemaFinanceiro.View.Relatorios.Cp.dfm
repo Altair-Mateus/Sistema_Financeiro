@@ -31,13 +31,13 @@ inherited frmRelCp: TfrmRelCp
         Font.Style = []
         ParentFont = False
       end
-      object rllblNDoc: TRLLabel
-        Left = 64
+      object rllblDescricao: TRLLabel
+        Left = 47
         Top = 1
-        Width = 128
+        Width = 91
         Height = 22
         Align = faTopOnly
-        Caption = 'N'#186' Documento'
+        Caption = 'Descri'#231#227'o'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
         Font.Height = -19
@@ -46,7 +46,7 @@ inherited frmRelCp: TfrmRelCp
         ParentFont = False
       end
       object rllblVencimento: TRLLabel
-        Left = 276
+        Left = 318
         Top = 1
         Width = 106
         Height = 22
@@ -60,7 +60,7 @@ inherited frmRelCp: TfrmRelCp
         ParentFont = False
       end
       object rllblParcela: TRLLabel
-        Left = 388
+        Left = 430
         Top = 1
         Width = 69
         Height = 22
@@ -74,7 +74,7 @@ inherited frmRelCp: TfrmRelCp
         ParentFont = False
       end
       object rllblStatus: TRLLabel
-        Left = 474
+        Left = 499
         Top = 1
         Width = 58
         Height = 22
@@ -102,7 +102,7 @@ inherited frmRelCp: TfrmRelCp
         ParentFont = False
       end
       object rllblCodFornec: TRLLabel
-        Left = 205
+        Left = 247
         Top = 1
         Width = 65
         Height = 22
@@ -120,9 +120,10 @@ inherited frmRelCp: TfrmRelCp
       object rldbtId: TRLDBText
         Left = 0
         Top = 0
-        Width = 17
+        Width = 41
         Height = 18
         Align = faLeftTop
+        AutoSize = False
         DataField = 'id'
         DataSource = DataSourceCp
         Font.Charset = DEFAULT_CHARSET
@@ -133,13 +134,14 @@ inherited frmRelCp: TfrmRelCp
         ParentFont = False
         Text = ''
       end
-      object rldbtNDoc: TRLDBText
-        Left = 64
+      object rldbtDescricao: TRLDBText
+        Left = 47
         Top = 0
-        Width = 91
+        Width = 194
         Height = 18
         Align = faTopOnly
-        DataField = 'numero_doc'
+        AutoSize = False
+        DataField = 'DESCRICAO'
         DataSource = DataSourceCp
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
@@ -150,12 +152,13 @@ inherited frmRelCp: TfrmRelCp
         Text = ''
       end
       object rldbtDataVenc: TRLDBText
-        Left = 268
+        Left = 310
         Top = 0
         Width = 128
         Height = 18
         Align = faTopOnly
         Alignment = taCenter
+        AutoSize = False
         DataField = 'data_Vencimento'
         DataSource = DataSourceCp
         Font.Charset = DEFAULT_CHARSET
@@ -167,12 +170,13 @@ inherited frmRelCp: TfrmRelCp
         Text = ''
       end
       object rldbtParcela: TRLDBText
-        Left = 388
+        Left = 437
         Top = 0
         Width = 56
         Height = 18
         Align = faTopOnly
         Alignment = taCenter
+        AutoSize = False
         DataField = 'parcela'
         DataSource = DataSourceCp
         Font.Charset = DEFAULT_CHARSET
@@ -184,11 +188,12 @@ inherited frmRelCp: TfrmRelCp
         Text = ''
       end
       object rldbtStatus: TRLDBText
-        Left = 474
+        Left = 503
         Top = 0
-        Width = 45
+        Width = 74
         Height = 18
         Align = faTopOnly
+        AutoSize = False
         DataField = 'status'
         DataSource = DataSourceCp
         Font.Charset = DEFAULT_CHARSET
@@ -205,6 +210,7 @@ inherited frmRelCp: TfrmRelCp
         Width = 98
         Height = 18
         Align = faTopOnly
+        AutoSize = False
         DataField = 'valor_parcela'
         DataSource = DataSourceCp
         Font.Charset = DEFAULT_CHARSET
@@ -216,12 +222,13 @@ inherited frmRelCp: TfrmRelCp
         Text = ''
       end
       object rldbCodFornec: TRLDBText
-        Left = 161
+        Left = 247
         Top = 0
-        Width = 141
+        Width = 57
         Height = 18
         Align = faTopOnly
         Alignment = taCenter
+        AutoSize = False
         DataField = 'ID_FORNECEDOR'
         DataSource = DataSourceCp
         Font.Charset = DEFAULT_CHARSET

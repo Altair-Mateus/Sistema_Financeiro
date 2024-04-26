@@ -10,13 +10,13 @@ uses
 type
   TfrmRelCp = class(TfrmRelatorioPadrao)
     rllblId: TRLLabel;
-    rllblNDoc: TRLLabel;
+    rllblDescricao: TRLLabel;
     rllblVencimento: TRLLabel;
     rllblParcela: TRLLabel;
     rllblStatus: TRLLabel;
     rllblValorParcela: TRLLabel;
     rldbtId: TRLDBText;
-    rldbtNDoc: TRLDBText;
+    rldbtDescricao: TRLDBText;
     rldbtDataVenc: TRLDBText;
     rldbtParcela: TRLDBText;
     rldbtStatus: TRLDBText;

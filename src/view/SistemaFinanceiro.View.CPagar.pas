@@ -317,6 +317,8 @@ begin
 
   try
 
+    // Desativa a atualização visual do grid
+    DataSourceCPagar.DataSet.DisableControls;
     frmRelCp.DataSourceCp.DataSet := DataSourceCPagar.DataSet;
 
     //  Mostra a pre visualização
@@ -325,6 +327,8 @@ begin
   finally
 
     FreeAndNil(frmRelCp);
+    // Ativa a atualização visual do grid novamente
+    DataSourceCPagar.DataSet.EnableControls;
 
   end;
 
