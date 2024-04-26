@@ -13,7 +13,8 @@ uses
   SistemaFinanceiro.View.CadAdmin, System.IOUtils, SistemaFinanceiro.View.Ajuda,
   SistemaFinanceiro.View.FaturaCartao,
   SistemaFinanceiro.View.GeraRelResumoMensalCp,
-  SistemaFinanceiro.View.GeraRelResumoMensalCr, Vcl.Buttons;
+  SistemaFinanceiro.View.GeraRelResumoMensalCr, Vcl.Buttons,
+  SistemaFinanceiro.View.Consulta.ConsultaLancamentoPadraoContas;
 
 type
   TfrmPrincipal = class(TForm)
@@ -74,6 +75,7 @@ type
     ResumoMensal1: TMenuItem;
     ContasaReceber2: TMenuItem;
     ResumoMensal2: TMenuItem;
+    LanamentosPadres1: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
     procedure mnuUsuariosClick(Sender: TObject);
@@ -98,6 +100,7 @@ type
     procedure FaturasdeCarto1Click(Sender: TObject);
     procedure ResumoMensal1Click(Sender: TObject);
     procedure ResumoMensal2Click(Sender: TObject);
+    procedure LanamentosPadres1Click(Sender: TObject);
 
 
   private
@@ -114,6 +117,7 @@ type
     procedure ExibeTelaFaturaCartao;
     procedure ExibeTelaRelMensalCP;
     procedure ExibeTelaRelMensalCR;
+    procedure ExibeTelaLancPadrao;
     procedure CarregaImgPrincipal;
 
     function GetVesaoArq : String;
@@ -262,6 +266,18 @@ begin
   end;
 
 
+end;
+
+procedure TfrmPrincipal.ExibeTelaLancPadrao;
+begin
+
+  frmLancamentoPadraoContas := TfrmLancamentoPadraoContas.Create(Self);
+
+  try
+    frmLancamentoPadraoContas.ShowModal
+  finally
+    FreeAndNil(frmLancamentoPadraoContas);
+  end;
 end;
 
 procedure TfrmPrincipal.ExibeTelaRelMensalCP;
@@ -635,6 +651,11 @@ begin
 
   FreeMem(VerInfo, VerInfoSize);
 
+end;
+
+procedure TfrmPrincipal.LanamentosPadres1Click(Sender: TObject);
+begin
+  ExibeTelaLancPadrao;
 end;
 
 procedure TfrmPrincipal.mnuAjudaClick(Sender: TObject);

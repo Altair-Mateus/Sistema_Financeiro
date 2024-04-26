@@ -14911,6 +14911,10 @@ object frmPrincipal: TfrmPrincipal
         ImageIndex = 10
         OnClick = FaturasdeCarto1Click
       end
+      object LanamentosPadres1: TMenuItem
+        Caption = 'Lan'#231'amentos Padr'#245'es'
+        OnClick = LanamentosPadres1Click
+      end
       object N3: TMenuItem
         Caption = '-'
       end
