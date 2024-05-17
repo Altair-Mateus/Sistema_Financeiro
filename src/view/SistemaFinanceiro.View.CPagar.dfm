@@ -4,12 +4,14 @@ inherited frmContasPagar: TfrmContasPagar
   ClientWidth = 1389
   Position = poDesigned
   WindowState = wsMaximized
+  ExplicitTop = -142
   ExplicitWidth = 1401
   ExplicitHeight = 681
   TextHeight = 19
   inherited CardPanelPrincipal: TCardPanel
     Width = 1389
     Height = 643
+    ActiveCard = CardPesquisa
     ExplicitWidth = 1385
     ExplicitHeight = 642
     inherited CardCadastro: TCard
@@ -224,7 +226,7 @@ inherited frmContasPagar: TfrmContasPagar
           Top = 296
           Width = 793
           Height = 249
-          ActiveCard = cardParcelamento
+          ActiveCard = cardParcelaUnica
           BevelOuter = bvNone
           Caption = 'CardPanel1'
           TabOrder = 6
@@ -312,6 +314,14 @@ inherited frmContasPagar: TfrmContasPagar
               Date = 45099.000000000000000000
               Time = 0.866143263890990100
               TabOrder = 2
+            end
+            object chkBaixarAoSalvar: TCheckBox
+              Left = 218
+              Top = 88
+              Width = 167
+              Height = 33
+              Caption = 'Baixar CP ao Salvar'
+              TabOrder = 3
             end
           end
           object cardParcelamento: TCard
@@ -686,12 +696,14 @@ inherited frmContasPagar: TfrmContasPagar
     inherited CardPesquisa: TCard
       Width = 1389
       Height = 643
-      ExplicitWidth = 1385
-      ExplicitHeight = 642
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 1389
+      ExplicitHeight = 643
       inherited pnlPesquisa: TPanel
         Width = 1389
         Height = 153
-        ExplicitWidth = 1385
+        ExplicitWidth = 1389
         ExplicitHeight = 153
         inherited lblPesquisar: TLabel
           Left = 192

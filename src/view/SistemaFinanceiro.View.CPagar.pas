@@ -115,6 +115,7 @@ type
     PopupMenu: TPopupMenu;
     CancelarBaixa1: TMenuItem;
     checkNaoConsideraFatura: TCheckBox;
+    chkBaixarAoSalvar: TCheckBox;
     procedure btnCancelarClick(Sender: TObject);
     procedure btnExcluirClick(Sender: TObject);
     procedure btnPesquisaeClick(Sender: TObject);
@@ -128,7 +129,6 @@ type
     procedure FormCreate(Sender: TObject);
     procedure edtValorCompraExit(Sender: TObject);
     procedure edtValorParcelaExit(Sender: TObject);
-    procedure Baixar1Click(Sender: TObject);
     procedure btnBaixarCPClick(Sender: TObject);
     procedure DBGrid1DrawColumnCell(Sender: TObject; const Rect: TRect;
       DataCol: Integer; Column: TColumn; State: TGridDrawState);
@@ -163,13 +163,14 @@ type
 
   private
     { Private declarations }
+    FCodCP : Integer;
     DataVctoFat : Integer;
 
     procedure HabilitaBotoes;
     procedure CadParcelaUnica;
     procedure CadParcelamento;
     procedure EditarRegCPagar;
-    procedure ExibeTelaBaixar;
+    procedure ExibeTelaBaixar(pCodCP : Integer);
     procedure ExibeTelaBxMultipla;
     procedure ExibeDetalhe;
     procedure BuscaNomeFornecedor;
@@ -198,16 +199,8 @@ uses
   SistemaFinanceiro.Utilitarios,
   System.DateUtils, SistemaFinanceiro.View.Principal,
   SistemaFinanceiro.View.Relatorios.Cp, SistemaFinanceiro.Model.dmFornecedores,
-  SistemaFinanceiro.Model.dmFaturaCartao, SistemaFinanceiro.Model.dmUsuarios;
-
-{ TfrmCadastroPadrao1 }
-procedure TfrmContasPagar.Baixar1Click(Sender: TObject);
-begin
-
-  inherited;
-  ExibeTelaBaixar;
-
-end;
+  SistemaFinanceiro.Model.dmFaturaCartao, SistemaFinanceiro.Model.dmUsuarios,
+  SistemaFinanceiro.View.BaixarCP.FrPgto;
 
 procedure TfrmContasPagar.btnAlterarClick(Sender: TObject);
 begin
@@ -220,7 +213,7 @@ end;
 procedure TfrmContasPagar.btnBaixarCPClick(Sender: TObject);
 begin
 
-  ExibeTelaBaixar;
+  ExibeTelaBaixar(DataSourceCPagar.DataSet.FieldByName('ID').AsInteger);
 
 end;
 
@@ -364,6 +357,7 @@ begin
   edtDiaFixoVcto.Enabled     := False;
   checkDiaFixoVcto.Checked   := False;
   checkDiaFixoVcto.Enabled   := True;
+  chkBaixarAoSalvar.Checked  := False;
   CheckFatVirada.Checked     := False;
   btnGerar.Enabled           := True;
   btnLimpar.Enabled          := False;
@@ -527,13 +521,15 @@ begin
   if toggleParcelamento.State = tssOff then
   begin
     CadParcelaUnica;
+    if (chkBaixarAoSalvar.Checked) and (FCodCP > 0) then
+      ExibeTelaBaixar(FCodCP);
   end
-    else
-    begin
-      CadParcelamento;
-    end;
+  else
+  begin
+    CadParcelamento;
+  end;
 
-  //  Retorna ao card de pesquisa
+  // Retorna ao card de pesquisa
   CardPanelPrincipal.ActiveCard := CardPesquisa;
 
   //  Atualiza a lista
@@ -613,11 +609,11 @@ begin
   //  Valida valor da compra
   if not TryStrToCurr(edtValorCompra.Text, ValorCompra) then
   begin
-  
+
     edtValorCompra.SetFocus;
     Application.MessageBox('Valor da Compra inválido!', 'Atenção', MB_OK + MB_ICONWARNING);
-    abort;  
-  
+    abort;
+
   end;
 
   if not TryStrToInt(edtFornecedor.Text, IdFornecedor) then
@@ -843,6 +839,8 @@ begin
 
     end;
 
+   if chkBaixarAoSalvar.Checked then
+    FCodCP := dmCPagar.cdsCPagarID.AsInteger;
 
   //  Gravando no BD
   dmCPagar.cdsCPagar.Post;
@@ -1138,7 +1136,7 @@ begin
     CardPanelPrincipal.ActiveCard := CardPesquisa;
     Application.MessageBox('Documento já pago não pode ser alterado!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
     abort;
-    
+
   end;
 
   //  Se o documento foi cancelado, a edição é cancelada
@@ -1147,7 +1145,7 @@ begin
     CardPanelPrincipal.ActiveCard := CardPesquisa;
     Application.MessageBox('Documento já cancelado não pode ser alterado!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
     abort;
- 
+
   end;
 
   // Coloca o dataset em modo de edição
@@ -1164,7 +1162,8 @@ begin
   CheckFatVirada.Visible      := False;
   CheckFatVirada.Checked      := False;
 
-  edtValorParcela.ReadOnly := False;
+  edtValorParcela.ReadOnly  := False;
+  chkBaixarAoSalvar.Checked := False;
 
   //  Carrega os dados
   edtNDoc.Text         := dmCPagar.cdsCPagarNUMERO_DOC.AsString;
@@ -1336,7 +1335,7 @@ begin
 
 end;
 
-procedure TfrmContasPagar.ExibeTelaBaixar;
+procedure TfrmContasPagar.ExibeTelaBaixar(pCodCP : Integer);
 begin
 
   // Cria o form
@@ -1344,7 +1343,7 @@ begin
 
   try
 
-    frmBaixarCP.BaixarCP(DataSourceCPagar.DataSet.FieldByName('ID').AsInteger);
+    frmBaixarCP.BaixarCP(pCodCP);
 
     //  Exibe o form
     frmBaixarCP.ShowModal;
@@ -1411,12 +1410,9 @@ begin
   edtValorCompra.OnKeyPress  := KeyPressValor;
   edtValorParcela.OnKeyPress := KeyPressValor;
 
-
   //  Define as datas da consulta
   dateInicial.Date := StartOfTheMonth(Now);
   dateFinal.Date   := EndOfTheMonth(Now);
-
-
 
 end;
 
