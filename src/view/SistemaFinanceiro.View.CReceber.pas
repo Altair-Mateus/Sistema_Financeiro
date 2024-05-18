@@ -100,6 +100,7 @@ type
     PopupMenu: TPopupMenu;
     CancelarBaixa1: TMenuItem;
     btnBxMultipla: TButton;
+    chkBaixarAoSalvar: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure btnPesquisaeClick(Sender: TObject);
     procedure btnIncluirClick(Sender: TObject);
@@ -115,7 +116,6 @@ type
     procedure DBGrid1DrawColumnCell(Sender: TObject; const Rect: TRect;
       DataCol: Integer; Column: TColumn; State: TGridDrawState);
     procedure btnBaixarCRClick(Sender: TObject);
-    procedure Baixar1Click(Sender: TObject);
     procedure btnDetalhesClick(Sender: TObject);
     procedure DataSourceCReceberDataChange(Sender: TObject; Field: TField);
     procedure cbStatusClick(Sender: TObject);
@@ -141,11 +141,12 @@ type
 
   private
     { Private declarations }
+    FCodCR : Integer;
     procedure HabilitaBotoes;
     procedure EditarRegCReceber;
     procedure CadParcelaUnica;
     procedure CadParcelamento;
-    procedure ExibeTelaBaixar;
+    procedure ExibeTelaBaixar(pCodCr : Integer);
     procedure ExibeTelaBxMultipla;
     procedure ExibeDetalhe;
     procedure BuscaNomeCliente;
@@ -174,14 +175,6 @@ uses
 
 { TfrmContasReceber }
 
-procedure TfrmContasReceber.Baixar1Click(Sender: TObject);
-begin
-  inherited;
-
-  ExibeTelaBaixar;
-
-end;
-
 procedure TfrmContasReceber.btnAlterarClick(Sender: TObject);
 begin
 
@@ -194,7 +187,7 @@ procedure TfrmContasReceber.btnBaixarCRClick(Sender: TObject);
 begin
   inherited;
 
-  ExibeTelaBaixar;
+  ExibeTelaBaixar(DataSourceCReceber.DataSet.FieldByName('ID').AsInteger);
 
 end;
 
@@ -445,6 +438,8 @@ begin
   if toggleParcelamento.State = tssOff then
   begin
       CadParcelaUnica;
+      if (chkBaixarAoSalvar.Checked) and (FCodCR > 0) then
+        ExibeTelaBaixar(FCodCR);
   end
     else
     begin
@@ -674,6 +669,9 @@ begin
   dmCReceber.cdsCReceberDATA_VENCIMENTO.AsDateTime := dateVencimento.Date;
   dmCReceber.cdsCReceberDATA_VENDA.AsDateTime      := dateVenda.Date;
   dmCReceber.cdsCReceberPARCIAL.AsString           := 'N';
+
+  if chkBaixarAoSalvar.Checked then
+    FCodCR := dmCReceber.cdsCReceberID.AsInteger;
 
   //  Gravando no BD
   dmCReceber.cdsCReceber.Post;
@@ -948,6 +946,7 @@ begin
   edtParcela.ReadOnly         := True;
 
   edtValorParcela.ReadOnly := False;
+  chkBaixarAoSalvar.Checked := False;
 
   //  Carrega os dados
   edtCliente.Text      := dmCReceber.cdsCReceberID_CLIENTE.AsString;
@@ -1047,7 +1046,7 @@ begin
 
 end;
 
-procedure TfrmContasReceber.ExibeTelaBaixar;
+procedure TfrmContasReceber.ExibeTelaBaixar(pCodCR : Integer);
 begin
 
   //  Cria o form
@@ -1055,7 +1054,7 @@ begin
 
   try
 
-    frmBaixarCR.BaixarCR(DataSourceCReceber.DataSet.FieldByName('ID').AsInteger);
+    frmBaixarCR.BaixarCR(pCodCR);
 
     //  Exibe o form
     frmBaixarCR.ShowModal;

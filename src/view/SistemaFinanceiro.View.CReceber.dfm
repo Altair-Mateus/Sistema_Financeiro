@@ -3,33 +3,34 @@ inherited frmContasReceber: TfrmContasReceber
   ClientHeight = 645
   ClientWidth = 1339
   WindowState = wsMaximized
-  ExplicitWidth = 1355
-  ExplicitHeight = 684
+  ExplicitTop = -144
+  ExplicitWidth = 1351
+  ExplicitHeight = 683
   TextHeight = 19
   inherited CardPanelPrincipal: TCardPanel
     Width = 1339
     Height = 645
-    ExplicitWidth = 1339
-    ExplicitHeight = 645
+    ExplicitWidth = 1335
+    ExplicitHeight = 644
     inherited CardCadastro: TCard
-      Width = 1343
-      Height = 646
-      ExplicitWidth = 1343
-      ExplicitHeight = 646
+      Width = 1339
+      Height = 645
+      ExplicitWidth = 1335
+      ExplicitHeight = 644
       inherited pnlBotoesCad: TPanel
-        Top = 577
-        Width = 1343
-        ExplicitTop = 577
-        ExplicitWidth = 1343
+        Top = 576
+        Width = 1339
+        ExplicitTop = 575
+        ExplicitWidth = 1335
         inherited btnSalvar: TButton
           OnClick = btnSalvarClick
         end
       end
       inherited PanelCampos: TPanel
-        Width = 1343
-        Height = 536
-        ExplicitWidth = 1343
-        ExplicitHeight = 536
+        Width = 1339
+        Height = 535
+        ExplicitWidth = 1335
+        ExplicitHeight = 534
         object lblDataVend: TLabel
           Left = 258
           Top = 159
@@ -143,7 +144,7 @@ inherited frmContasReceber: TfrmContasReceber
           Top = 295
           Width = 793
           Height = 249
-          ActiveCard = cardParcelamento
+          ActiveCard = cardParcelaUnica
           BevelOuter = bvNone
           Caption = 'CardPanel1'
           TabOrder = 6
@@ -229,6 +230,14 @@ inherited frmContasReceber: TfrmContasReceber
               Date = 45099.000000000000000000
               Time = 0.866143263890990100
               TabOrder = 2
+            end
+            object chkBaixarAoSalvar: TCheckBox
+              Left = 218
+              Top = 88
+              Width = 207
+              Height = 33
+              Caption = 'Baixar Conta ao Salvar'
+              TabOrder = 3
             end
           end
           object cardParcelamento: TCard
@@ -479,19 +488,19 @@ inherited frmContasReceber: TfrmContasReceber
         end
       end
       inherited PanelTitulo: TPanel
-        Width = 1343
-        ExplicitWidth = 1343
+        Width = 1339
+        ExplicitWidth = 1335
       end
     end
     inherited CardPesquisa: TCard
-      Width = 1343
-      Height = 646
+      Width = 1339
+      Height = 645
       ExplicitLeft = 0
       ExplicitTop = 0
       ExplicitWidth = 1339
       ExplicitHeight = 645
       inherited pnlPesquisa: TPanel
-        Width = 1343
+        Width = 1339
         Height = 137
         ExplicitWidth = 1339
         ExplicitHeight = 137
@@ -4678,7 +4687,7 @@ inherited frmContasReceber: TfrmContasReceber
           ExplicitWidth = 297
         end
         inherited btnPesquisae: TButton
-          Left = 1219
+          Left = 1215
           Top = 30
           Height = 77
           Margins.Top = 30
@@ -4925,7 +4934,7 @@ inherited frmContasReceber: TfrmContasReceber
           OnClick = btnImprimirClick
         end
         inherited btnSair: TButton
-          Left = 1219
+          Left = 1215
           ImageIndex = 12
           ExplicitLeft = 1215
         end
@@ -4961,7 +4970,7 @@ inherited frmContasReceber: TfrmContasReceber
         end
         object gbLegenda: TGroupBox
           AlignWithMargins = True
-          Left = 1023
+          Left = 1019
           Top = 4
           Width = 190
           Height = 61
@@ -4974,7 +4983,6 @@ inherited frmContasReceber: TfrmContasReceber
           Font.Style = []
           ParentFont = False
           TabOrder = 7
-          ExplicitLeft = 1019
           object lblPagas: TLabel
             Left = 31
             Top = 16
@@ -5063,8 +5071,8 @@ inherited frmContasReceber: TfrmContasReceber
         ExplicitWidth = 1339
         ExplicitHeight = 410
         inherited DBGrid1: TDBGrid
-          Width = 1341
-          Height = 409
+          Width = 1337
+          Height = 408
           DataSource = DataSourceCReceber
           PopupMenu = PopupMenu
           Columns = <
@@ -5173,7 +5181,7 @@ inherited frmContasReceber: TfrmContasReceber
         TabOrder = 3
         object lblQtdCp: TLabel
           AlignWithMargins = True
-          Left = 939
+          Left = 935
           Top = 6
           Width = 70
           Height = 19
@@ -5191,7 +5199,7 @@ inherited frmContasReceber: TfrmContasReceber
         end
         object lblTotalCpGrid: TLabel
           AlignWithMargins = True
-          Left = 1209
+          Left = 1205
           Top = 6
           Width = 118
           Height = 19
@@ -5210,7 +5218,7 @@ inherited frmContasReceber: TfrmContasReceber
         end
         object lblTQtdCo: TLabel
           AlignWithMargins = True
-          Left = 771
+          Left = 767
           Top = 6
           Width = 162
           Height = 19
@@ -5222,7 +5230,7 @@ inherited frmContasReceber: TfrmContasReceber
         end
         object lblTValorCp: TLabel
           AlignWithMargins = True
-          Left = 1042
+          Left = 1038
           Top = 6
           Width = 161
           Height = 19
