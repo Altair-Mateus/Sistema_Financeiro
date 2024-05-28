@@ -9,15 +9,7 @@ uses
 
 type
   TfrmRelCr = class(TfrmRelatorioPadrao)
-    rllblVencimento: TRLLabel;
-    rllblNDoc: TRLLabel;
-    rllblParcela: TRLLabel;
-    rllblStatus: TRLLabel;
     rllblValorParcela: TRLLabel;
-    rldbtDataVenc: TRLDBText;
-    rldbtNDoc: TRLDBText;
-    rldbtParcela: TRLDBText;
-    rldbtStatus: TRLDBText;
     rldbtValorParc: TRLDBText;
     DataSourceCr: TDataSource;
     RLBand1: TRLBand;
@@ -26,7 +18,15 @@ type
     rllblId: TRLLabel;
     rldbtId: TRLDBText;
     rllblCodCliente: TRLLabel;
-    rldbtCodCliente: TRLDBText;
+    rllblVencimento: TRLLabel;
+    rllblParcela: TRLLabel;
+    rllblStatus: TRLLabel;
+    rldbtDataVenc: TRLDBText;
+    rldbtParcela: TRLDBText;
+    rldbtStatus: TRLDBText;
+    rldbCodFornec: TRLDBText;
+    rllblDescricao: TRLLabel;
+    rldbtDescricao: TRLDBText;
     procedure RLReportBeforePrint(Sender: TObject; var PrintIt: Boolean);
   private
     { Private declarations }

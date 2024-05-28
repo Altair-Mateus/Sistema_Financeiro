@@ -285,7 +285,8 @@ begin
   frmRelCr := TfrmRelCr.Create(Self);
 
   try
-
+    // Desativa a atualização visual do grid
+    DataSourceCReceber.DataSet.DisableControls;
     frmRelCr.DataSourceCr.DataSet := DataSourceCReceber.DataSet;
 
     //  Mostra a pre vizualizacao
@@ -294,7 +295,8 @@ begin
   finally
 
     FreeAndNil(frmRelCr);
-
+     // Ativa a atualização visual do grid novamente
+    DataSourceCReceber.DataSet.EnableControls;
   end;
 
   Pesquisar;
