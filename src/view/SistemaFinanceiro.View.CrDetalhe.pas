@@ -13,7 +13,6 @@ type
     ImageList1: TImageList;
     pnlBotoes: TPanel;
     btnVoltar: TButton;
-    pnlGrid: TPanel;
     DataSourceCrDetalhe: TDataSource;
     lblTNDoc: TLabel;
     lblTVencimento: TLabel;
@@ -29,11 +28,7 @@ type
     lblTDesc: TLabel;
     lblTCodCliente: TLabel;
     lblCodCliente: TLabel;
-    DBGridPgto: TDBGrid;
     DataSourcePgto: TDataSource;
-    lblFrPgto: TLabel;
-    DBGridParciais: TDBGrid;
-    lblParciais: TLabel;
     DataSourceParciais: TDataSource;
     pnlInfopag: TPanel;
     lblDtPag: TLabel;
@@ -46,6 +41,14 @@ type
     edtUser: TEdit;
     edtValDesc: TEdit;
     edtValPago: TEdit;
+    pnlPrincipal: TPanel;
+    pnlGrids: TPanel;
+    pnlGridFormasPagamento: TPanel;
+    lblFrPgto: TLabel;
+    DBGridPgto: TDBGrid;
+    pnlGridParciais: TPanel;
+    lblParciais: TLabel;
+    DBGridParciais: TDBGrid;
     procedure btnVoltarClick(Sender: TObject);
   private
     { Private declarations }
@@ -167,16 +170,11 @@ begin
   dmCReceber.FDQueryCrParciais.Open;
 
 
-  //  Se não exisitir nenhuma CR Parcial ira ocultar
-  //  O grid das parciais e diminuir a altura da tela
-  if dmCReceber.FDQueryCrParciais.IsEmpty then
+  //  Se Existir Parcial Gerada irá informar na tela
+  if not (dmCReceber.FDQueryCrParciais.IsEmpty) then
   begin
-
-    lblParciais.Visible    := False;
-    DBGridParciais.Visible := False;
-
-    frmCrDetalhe.Height := 570;
-
+    pnlGridParciais.Visible := False;
+    frmCrDetalhe.Height := 540;
   end;
 
 

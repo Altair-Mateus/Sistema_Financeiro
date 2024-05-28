@@ -12,7 +12,6 @@ type
     ImageList1: TImageList;
     pnlBotoes: TPanel;
     btnVoltar: TButton;
-    pnlGrid: TPanel;
     pnlPesquisa: TPanel;
     DataSourceCPDetalhe: TDataSource;
     lblTValorParcela: TLabel;
@@ -29,11 +28,7 @@ type
     lblTDesc: TLabel;
     lblTVencimento: TLabel;
     lblTNumParcela: TLabel;
-    lblFrPgto: TLabel;
-    DBGridPgto: TDBGrid;
     DataSourcePgto: TDataSource;
-    DBGridParciais: TDBGrid;
-    lblParciais: TLabel;
     DataSourceParciais: TDataSource;
     edtDtPag: TEdit;
     lblDtPag: TLabel;
@@ -46,6 +41,14 @@ type
     lblObsPag: TLabel;
     edtObsPag: TEdit;
     pnlInfopag: TPanel;
+    pnlPrincipal: TPanel;
+    pnlGrids: TPanel;
+    pnlGridFormasPagamento: TPanel;
+    DBGridPgto: TDBGrid;
+    lblFrPgto: TLabel;
+    pnlGridParciais: TPanel;
+    DBGridParciais: TDBGrid;
+    lblParciais: TLabel;
     procedure btnVoltarClick(Sender: TObject);
   private
     { Private declarations }
@@ -167,12 +170,8 @@ begin
   //  O grid das parciais e diminuir a altura da tela
   if dmCPagar.FDQueryCpParciais.IsEmpty then
   begin
-
-    lblParciais.Visible    := False;
-    DBGridParciais.Visible := False;
-
-    frmCpDetalhe.Height := 570;
-
+    pnlGridParciais.Visible := False;
+    frmCpDetalhe.Height := 540;
   end;
 
 
