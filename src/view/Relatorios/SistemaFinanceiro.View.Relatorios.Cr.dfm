@@ -1,7 +1,5 @@
 inherited frmRelCr: TfrmRelCr
   Caption = 'frmRelCr'
-  ClientHeight = 441
-  ClientWidth = 774
   TextHeight = 15
   inherited RLReport: TRLReport
     Borders.Sides = sdCustom
@@ -18,99 +16,106 @@ inherited frmRelCr: TfrmRelCr
     end
     inherited rlbNomeColunas: TRLBand
       object rllblValorParcela: TRLLabel
-        Left = 583
-        Top = 1
-        Width = 118
-        Height = 22
-        Align = faTopOnly
+        Left = 616
+        Top = 3
+        Width = 99
+        Height = 18
         Caption = 'Valor Parcela'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
-        Font.Height = -19
+        Font.Height = -16
         Font.Name = 'Arial'
         Font.Style = []
         ParentFont = False
       end
       object rllblId: TRLLabel
         Left = 0
-        Top = 1
-        Width = 41
-        Height = 22
-        Align = faLeftTop
+        Top = 3
+        Width = 34
+        Height = 18
+        Align = faCenterLeft
         Caption = 'Cod'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
-        Font.Height = -19
+        Font.Height = -16
         Font.Name = 'Arial'
         Font.Style = []
         ParentFont = False
       end
       object rllblCodCliente: TRLLabel
         Left = 245
-        Top = 1
-        Width = 64
-        Height = 22
-        Align = faTopOnly
+        Top = 3
+        Width = 53
+        Height = 18
         Caption = 'Cliente'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
-        Font.Height = -19
+        Font.Height = -16
         Font.Name = 'Arial'
         Font.Style = []
         ParentFont = False
       end
       object rllblVencimento: TRLLabel
-        Left = 318
-        Top = 1
-        Width = 106
-        Height = 22
-        Align = faTopOnly
+        Left = 402
+        Top = 2
+        Width = 87
+        Height = 18
         Caption = 'Vencimento'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
-        Font.Height = -19
+        Font.Height = -16
         Font.Name = 'Arial'
         Font.Style = []
         ParentFont = False
       end
       object rllblParcela: TRLLabel
-        Left = 430
-        Top = 1
-        Width = 69
-        Height = 22
-        Align = faTopOnly
-        Caption = 'Parcela'
+        Left = 499
+        Top = 2
+        Width = 37
+        Height = 18
+        Caption = 'Parc'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
-        Font.Height = -19
+        Font.Height = -16
         Font.Name = 'Arial'
         Font.Style = []
         ParentFont = False
       end
       object rllblStatus: TRLLabel
-        Left = 499
-        Top = 1
-        Width = 58
-        Height = 22
-        Align = faTopOnly
+        Left = 539
+        Top = 4
+        Width = 48
+        Height = 18
         Caption = 'Status'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
-        Font.Height = -19
+        Font.Height = -16
         Font.Name = 'Arial'
         Font.Style = []
         ParentFont = False
       end
       object rllblDescricao: TRLLabel
         Left = 47
-        Top = 0
-        Width = 91
-        Height = 22
-        Align = faTopOnly
+        Top = 3
+        Width = 76
+        Height = 18
         Caption = 'Descri'#231#227'o'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
-        Font.Height = -19
+        Font.Height = -16
+        Font.Name = 'Arial'
+        Font.Style = []
+        ParentFont = False
+      end
+      object lblDataVenda: TRLLabel
+        Left = 307
+        Top = 3
+        Width = 88
+        Height = 18
+        Caption = 'Data Venda'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -16
         Font.Name = 'Arial'
         Font.Style = []
         ParentFont = False
@@ -118,17 +123,16 @@ inherited frmRelCr: TfrmRelCr
     end
     inherited rlbDados: TRLBand
       object rldbtValorParc: TRLDBText
-        Left = 599
-        Top = 0
+        Left = 616
+        Top = 1
         Width = 98
         Height = 18
-        Align = faTopOnly
         AutoSize = False
         DataField = 'valor_parcela'
         DataSource = DataSourceCr
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
-        Font.Height = -16
+        Font.Height = -13
         Font.Name = 'Arial'
         Font.Style = []
         ParentFont = False
@@ -136,69 +140,66 @@ inherited frmRelCr: TfrmRelCr
       end
       object rldbtId: TRLDBText
         Left = 0
-        Top = 0
+        Top = 1
         Width = 41
         Height = 18
-        Align = faLeftTop
+        Align = faCenterLeft
         AutoSize = False
         DataField = 'id'
         DataSource = DataSourceCr
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
-        Font.Height = -16
+        Font.Height = -13
         Font.Name = 'Arial'
         Font.Style = []
         ParentFont = False
         Text = ''
       end
       object rldbtDataVenc: TRLDBText
-        Left = 310
-        Top = 0
-        Width = 128
+        Left = 402
+        Top = 1
+        Width = 87
         Height = 18
-        Align = faTopOnly
         Alignment = taCenter
         AutoSize = False
         DataField = 'data_Vencimento'
         DataSource = DataSourceCr
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
-        Font.Height = -16
+        Font.Height = -13
         Font.Name = 'Arial'
         Font.Style = []
         ParentFont = False
         Text = ''
       end
       object rldbtParcela: TRLDBText
-        Left = 437
-        Top = 0
-        Width = 56
+        Left = 499
+        Top = 1
+        Width = 36
         Height = 18
-        Align = faTopOnly
         Alignment = taCenter
         AutoSize = False
         DataField = 'parcela'
         DataSource = DataSourceCr
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
-        Font.Height = -16
+        Font.Height = -13
         Font.Name = 'Arial'
         Font.Style = []
         ParentFont = False
         Text = ''
       end
       object rldbtStatus: TRLDBText
-        Left = 503
-        Top = 0
+        Left = 539
+        Top = 1
         Width = 74
         Height = 18
-        Align = faTopOnly
         AutoSize = False
         DataField = 'status'
         DataSource = DataSourceCr
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
-        Font.Height = -16
+        Font.Height = -13
         Font.Name = 'Arial'
         Font.Style = []
         ParentFont = False
@@ -206,17 +207,16 @@ inherited frmRelCr: TfrmRelCr
       end
       object rldbCodFornec: TRLDBText
         Left = 247
-        Top = 0
-        Width = 58
+        Top = 1
+        Width = 51
         Height = 18
-        Align = faTopOnly
         Alignment = taCenter
         AutoSize = False
         DataField = 'ID_CLIENTE'
         DataSource = DataSourceCr
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
-        Font.Height = -16
+        Font.Height = -13
         Font.Name = 'Arial'
         Font.Style = []
         ParentFont = False
@@ -224,16 +224,32 @@ inherited frmRelCr: TfrmRelCr
       end
       object rldbtDescricao: TRLDBText
         Left = 47
-        Top = 0
+        Top = 1
         Width = 194
         Height = 18
-        Align = faTopOnly
         AutoSize = False
         DataField = 'DESCRICAO'
         DataSource = DataSourceCr
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
-        Font.Height = -16
+        Font.Height = -13
+        Font.Name = 'Arial'
+        Font.Style = []
+        ParentFont = False
+        Text = ''
+      end
+      object rldbDataVenda: TRLDBText
+        Left = 307
+        Top = 1
+        Width = 88
+        Height = 18
+        Alignment = taCenter
+        AutoSize = False
+        DataField = 'DATA_VENDA'
+        DataSource = DataSourceCr
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -13
         Font.Name = 'Arial'
         Font.Style = []
         ParentFont = False
@@ -241,9 +257,9 @@ inherited frmRelCr: TfrmRelCr
       end
     end
     inherited rlbRodape: TRLBand
-      Top = 181
+      Top = 216
       Borders.DrawBottom = True
-      ExplicitTop = 181
+      ExplicitTop = 216
       inherited rlsiData: TRLSystemInfo
         Top = 21
         ExplicitTop = 21
@@ -259,9 +275,17 @@ inherited frmRelCr: TfrmRelCr
         ExplicitWidth = 4
       end
     end
+    inherited bndFiltros: TRLBand
+      inherited lblFiltros: TLabel
+        Width = 716
+        Height = 34
+        ExplicitWidth = 716
+        ExplicitHeight = 34
+      end
+    end
     object RLBand1: TRLBand
       Left = 39
-      Top = 150
+      Top = 185
       Width = 716
       Height = 31
       BandType = btSummary

@@ -3,7 +3,6 @@ inherited frmContasReceber: TfrmContasReceber
   ClientHeight = 645
   ClientWidth = 1339
   WindowState = wsMaximized
-  ExplicitTop = -144
   ExplicitWidth = 1351
   ExplicitHeight = 683
   TextHeight = 19
@@ -497,12 +496,12 @@ inherited frmContasReceber: TfrmContasReceber
       Height = 645
       ExplicitLeft = 0
       ExplicitTop = 0
-      ExplicitWidth = 1339
-      ExplicitHeight = 645
+      ExplicitWidth = 1335
+      ExplicitHeight = 644
       inherited pnlPesquisa: TPanel
         Width = 1339
         Height = 137
-        ExplicitWidth = 1339
+        ExplicitWidth = 1335
         ExplicitHeight = 137
         inherited lblPesquisar: TLabel
           Left = 213

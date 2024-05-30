@@ -4,7 +4,8 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, RLReport, RLFilters, RLPDFFilter;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, RLReport, RLFilters, RLPDFFilter,
+  Vcl.StdCtrls;
 
 type
   TfrmRelatorioPadrao = class(TForm)
@@ -22,6 +23,8 @@ type
     rlsiLastPage: TRLSystemInfo;
     rllblNomeUser: TRLLabel;
     RLPDFFilter: TRLPDFFilter;
+    bndFiltros: TRLBand;
+    lblFiltros: TLabel;
     procedure RLReportBeforePrint(Sender: TObject;
       var PrintIt: Boolean);
     procedure rlbDadosBeforePrint(Sender: TObject; var PrintIt: Boolean);
@@ -29,12 +32,14 @@ type
     FTracoLinha: Boolean;
     FDestacaLinha: Boolean;
     FHeightDetalhe: Integer;
-    { Private declarations }
+    FFiltros: String;
+    FExibirFiltros: Boolean;
   public
-    { Public declarations }
     property TracoLinha: Boolean read FTracoLinha write FTracoLinha;
     property DestacaLinha: Boolean read FDestacaLinha write FDestacaLinha;
     property HeightDetalhe: Integer read FHeightDetalhe write FHeightDetalhe;
+    property Filtros: String read FFiltros write FFiltros;
+    property ExibirFiltros: Boolean read FExibirFiltros write FExibirFiltros;
   end;
 
 var
@@ -87,6 +92,9 @@ procedure TfrmRelatorioPadrao.RLReportBeforePrint(Sender: TObject;
 begin
 
   rllblNomeUser.Caption := Format('Impresso por %s', [dmUsuarios.GetUsuarioLogado.Nome]);
+
+  bndFiltros.Visible := FExibirFiltros;
+  lblFiltros.Caption := 'Filtros: ' + FFiltros;
 
 end;
 

@@ -79,7 +79,7 @@ object frmRelatorioPadrao: TfrmRelatorioPadrao
     end
     object rlbNomeColunas: TRLBand
       Left = 39
-      Top = 106
+      Top = 141
       Width = 716
       Height = 24
       BandType = btColumnHeader
@@ -91,7 +91,7 @@ object frmRelatorioPadrao: TfrmRelatorioPadrao
     end
     object rlbDados: TRLBand
       Left = 39
-      Top = 130
+      Top = 165
       Width = 716
       Height = 20
       Borders.Sides = sdCustom
@@ -103,7 +103,7 @@ object frmRelatorioPadrao: TfrmRelatorioPadrao
     end
     object rlbRodape: TRLBand
       Left = 39
-      Top = 150
+      Top = 185
       Width = 716
       Height = 38
       BandType = btFooter
@@ -154,6 +154,28 @@ object frmRelatorioPadrao: TfrmRelatorioPadrao
         Width = 121
         Height = 16
         Align = faLeftBottom
+      end
+    end
+    object bndFiltros: TRLBand
+      Left = 39
+      Top = 106
+      Width = 716
+      Height = 35
+      BandType = btColumnHeader
+      Borders.Sides = sdCustom
+      Borders.DrawLeft = False
+      Borders.DrawTop = True
+      Borders.DrawRight = False
+      Borders.DrawBottom = False
+      object lblFiltros: TLabel
+        AlignWithMargins = True
+        Left = 0
+        Top = 1
+        Width = 49
+        Height = 16
+        Align = alClient
+        Caption = 'lblFiltros'
+        WordWrap = True
       end
     end
   end

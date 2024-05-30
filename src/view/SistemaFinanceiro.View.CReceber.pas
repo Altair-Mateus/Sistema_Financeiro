@@ -154,6 +154,7 @@ type
     procedure GeraParcelas;
     procedure CalcCrGrid;
     procedure CalcQtdCrGrid;
+    function GeraFiltrosRelatorio : String;
 
   public
     { Public declarations }
@@ -279,22 +280,30 @@ begin
 end;
 
 procedure TfrmContasReceber.btnImprimirClick(Sender: TObject);
+var
+  lformularioRelatorio : TfrmRelCr;
+  lFiltrosRelatorio : String;
 begin
 
-  //  Cria o form
-  frmRelCr := TfrmRelCr.Create(Self);
-
+  lFiltrosRelatorio := GeraFiltrosRelatorio;
+  lformularioRelatorio := TfrmRelCr.Create(Self);
   try
     // Desativa a atualização visual do grid
     DataSourceCReceber.DataSet.DisableControls;
-    frmRelCr.DataSourceCr.DataSet := DataSourceCReceber.DataSet;
+
+    if not(Trim(lFiltrosRelatorio).IsEmpty) then
+    begin
+      lformularioRelatorio.Filtros := lFiltrosRelatorio;
+      lformularioRelatorio.ExibirFiltros := True;
+    end;
+    lformularioRelatorio.DataSourceCr.DataSet := DataSourceCReceber.DataSet;
 
     //  Mostra a pre vizualizacao
-    frmRelCr.RLReport.Preview;
+    lformularioRelatorio.RLReport.Preview;
 
   finally
 
-    FreeAndNil(frmRelCr);
+    lformularioRelatorio.Free;
      // Ativa a atualização visual do grid novamente
     DataSourceCReceber.DataSet.EnableControls;
   end;
@@ -1116,6 +1125,78 @@ begin
 
 end;
 
+function TfrmContasReceber.GeraFiltrosRelatorio : String;
+var
+  lFiltros : String;
+begin
+
+  lFiltros := '';
+
+  if not (Trim(edtCliente.Text).IsEmpty) then
+  begin
+    lFiltros := lFiltros + ' | Cliente: ' + dmClientes.GetNomeCliente(Trim(edtCliente.Text));
+  end;
+
+  if (cbData.ItemIndex <> 0) then
+  begin
+    lFiltros := lFiltros + cbData.Items[cbData.ItemIndex];
+  end;
+
+  if (dateInicial.Checked) and (dateFinal.Checked) then
+  begin
+    lFiltros := lFiltros + ' Período: ' + DateToStr(dateInicial.DateTime) + ' a ' + DateToStr(dateFinal.DateTime);
+  end;
+
+  if not (Trim(edtFiltroCliente.Text).IsEmpty) then
+  begin
+    lFiltros := lFiltros + ' | Cliente: ' + dmClientes.GetNomeCliente(Trim(edtFiltroCliente.Text));
+  end;
+
+  if (cbStatus.ItemIndex > 0) then
+  begin
+    lFiltros := lFiltros + ' | Status: ' + cbStatus.Items[cbStatus.ItemIndex];
+  end;
+
+  if (checkParciais.Checked) then
+  begin
+    lFiltros := lFiltros + ' | Somente Parciais ';
+  end;
+
+  if (checkVencidas.Checked) then
+  begin
+    lFiltros := lFiltros + ' | Somente Contas Vencidas ';
+  end;
+
+   //  Ordem de pesquisa
+  if rbId.Checked then
+  begin
+    lFiltros := lFiltros + ' | Ordem Registros do relatório: Código da Conta ';
+  end
+  else if rbDataVenc.Checked then
+  begin
+    lFiltros := lFiltros + ' | Ordem Registros do relatório: Data de Vencimento ';
+  end
+  else if rbValorParcela.Checked then
+  begin
+    lFiltros := lFiltros + ' | Ordem Registros do relatório: Valor da Parcela ';
+  end
+  else if rbValorVenda.Checked then
+  begin
+    lFiltros := lFiltros + ' | Ordem Registros do relatório: Valor da Venda ';
+  end
+  else if rbDataVenda.Checked then
+  begin
+    lFiltros := lFiltros + ' | Ordem Registros do relatório: Data da Venda ';
+  end
+  else
+  begin
+    lFiltros := lFiltros + ' | Ordem Registros do relatório: Código da Conta ';
+  end;
+
+  Result := lFiltros;
+
+end;
+
 procedure TfrmContasReceber.GeraParcelas;
 var
   QtdParcelas   : Integer;
@@ -1381,33 +1462,30 @@ begin
   begin
     lOrdem := ' ORDER BY CR.ID DESC';
   end
-    else if rbDataVenc.Checked then
-    begin
-      lOrdem := ' ORDER BY CR.DATA_VENCIMENTO';
-    end
-      else if rbValorParcela.Checked then
-      begin
-        lOrdem := ' ORDER BY CR.VALOR_PARCELA DESC';
-      end
-        else if rbValorVenda.Checked then
-        begin
-          lOrdem := ' ORDER BY CR.VALOR_VENDA DESC';
-        end
-          else if rbDataVenda.Checked then
-          begin
-            lOrdem := ' ORDER BY CR.DATA_VENDA DESC';
-          end
-            else
-            begin
-              lOrdem := ' ORDER BY CR.ID DESC';
-            end;
+  else if rbDataVenc.Checked then
+  begin
+    lOrdem := ' ORDER BY CR.DATA_VENCIMENTO';
+  end
+  else if rbValorParcela.Checked then
+  begin
+    LOrdem := ' ORDER BY CR.VALOR_PARCELA DESC';
+  end
+  else if rbValorVenda.Checked then
+  begin
+    LOrdem := ' ORDER BY CR.VALOR_VENDA DESC';
+  end
+  else if rbDataVenda.Checked then
+  begin
+    LOrdem := ' ORDER BY CR.DATA_VENDA DESC';
+  end
+  else
+  begin
+    LOrdem := ' ORDER BY CR.ID DESC';
+  end;
 
+    dmCReceber.cdsCReceber.Close;
 
-
-
-  dmCReceber.cdsCReceber.Close;
-
-  dmCReceber.cdsCReceber.CommandText := 'SELECT CR.*, CL.NOME FROM CONTAS_RECEBER CR LEFT JOIN CLIENTES CL '
+    dmCReceber.cdsCReceber.CommandText := 'SELECT CR.*, CL.NOME FROM CONTAS_RECEBER CR LEFT JOIN CLIENTES CL '
                                       + ' ON CR.ID_CLIENTE = CL.ID_CLI WHERE 1 = 1'
                                       + LFiltroEdit + LFiltro + LOrdem;
   dmCReceber.cdsCReceber.Open;

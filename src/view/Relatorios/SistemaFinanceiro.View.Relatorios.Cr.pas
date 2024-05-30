@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, SistemaFinanceiro.View.RelatoriosPadrao,
-  RLFilters, RLPDFFilter, RLReport, Data.DB;
+  RLFilters, RLPDFFilter, RLReport, Data.DB, Vcl.StdCtrls;
 
 type
   TfrmRelCr = class(TfrmRelatorioPadrao)
@@ -27,11 +27,13 @@ type
     rldbCodFornec: TRLDBText;
     rllblDescricao: TRLLabel;
     rldbtDescricao: TRLDBText;
+    lblDataVenda: TRLLabel;
+    rldbDataVenda: TRLDBText;
     procedure RLReportBeforePrint(Sender: TObject; var PrintIt: Boolean);
   private
     { Private declarations }
   public
-    { Public declarations }
+
   end;
 
 var
