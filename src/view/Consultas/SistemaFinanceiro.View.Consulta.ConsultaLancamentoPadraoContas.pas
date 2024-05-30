@@ -47,7 +47,7 @@ implementation
 
 {$R *.dfm}
 
-uses SistemaFinanceiro.Utilitarios;
+uses uQueriesSQL, SistemaFinanceiro.Utilitarios;
 
 procedure TfrmLancamentoPadraoContas.btnIncluirClick(Sender: TObject);
 begin
@@ -110,27 +110,27 @@ begin
 end;
 
 procedure TfrmLancamentoPadraoContas.Pesquisar;
-//var
-//  LFiltroEdit, LFiltro : String;
-//  lQuery : TQueriesSQL;
+var
+  LFiltroEdit, LFiltro : String;
+  lQuery : TQueriesSQL;
 begin
-//
-//  LFiltroEdit := TUtilitario.LikeFind(edtPesquisar.Text, DBGrid1);
-//  LFiltro := '';
-//
-//  case cbTipo.ItemIndex of
-//    1 : LFiltro := lFiltro + ' AND TIPO = ''CP'' ';
-//    2 : LFiltro := LFiltro + ' AND TIPO = ''CR'' ';
-//  end;
-//
-//  lQuery := TQueriesSQL.Create;
-//  try
-//    dsLancPadraoContas.DataSet := lQuery.ExecuteQuery('SELECT * FROM LANCAMENTO_PADRAO_CONTAS WHERE 1 = 1' +
-//      LFiltroEdit + LFiltro + 'ORDER BY 1', []);
-//
-//  finally
-//    lQuery.Free;
-//  end;
+
+  LFiltroEdit := TUtilitario.LikeFind(edtPesquisar.Text, DBGrid1);
+  LFiltro := '';
+
+  case cbTipo.ItemIndex of
+    1 : LFiltro := lFiltro + ' AND TIPO = ''CP'' ';
+    2 : LFiltro := LFiltro + ' AND TIPO = ''CR'' ';
+  end;
+
+  lQuery := TQueriesSQL.Create;
+  try
+    dsLancPadraoContas.DataSet := lQuery.ExecuteQuery('SELECT * FROM LANCAMENTO_PADRAO_CONTAS WHERE 1 = 1' +
+      LFiltroEdit + LFiltro + 'ORDER BY 1', []);
+
+  finally
+    lQuery.Free;
+  end;
 
   HabilitaBotoes;
 

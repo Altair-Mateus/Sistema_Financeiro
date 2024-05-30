@@ -61,8 +61,10 @@ uses
   SistemaFinanceiro.View.Relatorios.ResumoMensalCr in 'src\view\Relatorios\SistemaFinanceiro.View.Relatorios.ResumoMensalCr.pas' {frmRelMensalCr},
   SistemaFinanceiro.View.DetalhesOrigemCpCr in 'src\view\SistemaFinanceiro.View.DetalhesOrigemCpCr.pas' {frmDetalhesOrigemCpCr},
   uDaoRTTI in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\model\uDaoRTTI.pas',
-  uDBColumnAttribute in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\model\uDBColumnAttribute.pas',
+  uDBColumnAttribute in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\model\uDBColumnAttribute.pas' {$R *.res},
   SistemaFinanceiro.Model.Entidades.LancamentoPadraoContas in 'src\model\Entidades\SistemaFinanceiro.Model.Entidades.LancamentoPadraoContas.pas',
+  SistemaFinanceiro.View.LancamentoPadraoContas in 'src\view\SistemaFinanceiro.View.LancamentoPadraoContas.pas' {frmCadastroPadrao1},
+  uQueriesSQL in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\model\uQueriesSQL.pas',
   SistemaFinanceiro.View.Consulta.ConsultaLancamentoPadraoContas in 'src\view\Consultas\SistemaFinanceiro.View.Consulta.ConsultaLancamentoPadraoContas.pas' {frmLancamentoPadraoContas},
   SistemaFinanceiro.View.Cadastro.LancamentoPadraoContas in 'src\view\Cadastro\SistemaFinanceiro.View.Cadastro.LancamentoPadraoContas.pas' {frmCadLancamentoPadrao};
 
