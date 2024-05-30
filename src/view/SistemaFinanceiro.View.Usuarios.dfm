@@ -1,13 +1,13 @@
 inherited frmUsuarios: TfrmUsuarios
   Caption = 'Cadastro de Usu'#225'rios'
-  ClientHeight = 510
-  ClientWidth = 811
+  ClientHeight = 509
+  ClientWidth = 807
   ExplicitWidth = 823
   ExplicitHeight = 548
   TextHeight = 19
   inherited CardPanelPrincipal: TCardPanel
-    Width = 811
-    Height = 510
+    Width = 807
+    Height = 509
     ExplicitWidth = 807
     ExplicitHeight = 509
     inherited CardCadastro: TCard
@@ -54,7 +54,7 @@ inherited frmUsuarios: TfrmUsuarios
           AlignWithMargins = True
           Left = 3
           Top = 351
-          Width = 805
+          Width = 797
           Height = 46
           Align = alBottom
           Caption = 
@@ -69,9 +69,6 @@ inherited frmUsuarios: TfrmUsuarios
           ParentFont = False
           Visible = False
           WordWrap = True
-          ExplicitLeft = 4
-          ExplicitTop = 349
-          ExplicitWidth = 797
         end
         object Label5: TLabel
           Left = 80
@@ -202,7 +199,6 @@ inherited frmUsuarios: TfrmUsuarios
           PopupMenu = PopupMenu
           Columns = <
             item
-              Alignment = taLeftJustify
               Expanded = False
               FieldName = 'id'
               Title.Caption = 'C'#243'digo'
@@ -235,7 +231,6 @@ inherited frmUsuarios: TfrmUsuarios
               Expanded = False
               FieldName = 'USER_ADMIN'
               Title.Caption = 'Admin'
-              Width = 64
               Visible = True
             end>
         end
