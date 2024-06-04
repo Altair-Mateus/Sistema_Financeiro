@@ -237,6 +237,7 @@ inherited frmContasReceber: TfrmContasReceber
               Height = 33
               Caption = 'Baixar Conta ao Salvar'
               TabOrder = 3
+              OnClick = chkBaixarAoSalvarClick
             end
           end
           object cardParcelamento: TCard

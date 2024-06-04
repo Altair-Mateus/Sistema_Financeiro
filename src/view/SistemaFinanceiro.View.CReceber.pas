@@ -138,6 +138,7 @@ type
     procedure btnGerarClick(Sender: TObject);
     procedure CancelarBaixa1Click(Sender: TObject);
     procedure btnBxMultiplaClick(Sender: TObject);
+    procedure chkBaixarAoSalvarClick(Sender: TObject);
 
   private
     { Private declarations }
@@ -155,6 +156,7 @@ type
     procedure CalcCrGrid;
     procedure CalcQtdCrGrid;
     function GeraFiltrosRelatorio : String;
+    function DtVencimentoCheckContaPaga : TDate;
 
   public
     { Public declarations }
@@ -663,11 +665,15 @@ begin
 
   if dateVenda.Date > Now then
   begin
-
     dateVenda.SetFocus;
     Application.MessageBox('Data de venda não pode ser maior que a data atual!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
     abort;
+  end;
 
+  if chkBaixarAoSalvar.Checked then
+  begin
+    FCodCR := dmCReceber.cdsCReceberID.AsInteger;
+    dateVencimento.Date := DtVencimentoCheckContaPaga;
   end;
 
   //  Passando os dados para o dataset
@@ -680,9 +686,6 @@ begin
   dmCReceber.cdsCReceberDATA_VENCIMENTO.AsDateTime := dateVencimento.Date;
   dmCReceber.cdsCReceberDATA_VENDA.AsDateTime      := dateVenda.Date;
   dmCReceber.cdsCReceberPARCIAL.AsString           := 'N';
-
-  if chkBaixarAoSalvar.Checked then
-    FCodCR := dmCReceber.cdsCReceberID.AsInteger;
 
   //  Gravando no BD
   dmCReceber.cdsCReceber.Post;
@@ -852,6 +855,11 @@ begin
 
 end;
 
+procedure TfrmContasReceber.chkBaixarAoSalvarClick(Sender: TObject);
+begin
+  dateVencimento.Date := DtVencimentoCheckContaPaga;
+end;
+
 procedure TfrmContasReceber.DataSourceCReceberDataChange(Sender: TObject;
   Field: TField);
 begin
@@ -917,6 +925,17 @@ begin
 
   inherited;
 
+end;
+
+function TfrmContasReceber.DtVencimentoCheckContaPaga: TDate;
+begin
+  Result := dateVencimento.Date;
+
+  if (chkBaixarAoSalvar.Checked) and (DataSourceCReceber.State = dsInsert) then
+    Result := now;
+
+  if (not chkBaixarAoSalvar.Checked) and (DataSourceCReceber.State = dsInsert) then
+    Result := dateVenda.Date + 7;
 end;
 
 procedure TfrmContasReceber.EditarRegCReceber;

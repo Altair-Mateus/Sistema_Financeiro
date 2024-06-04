@@ -160,6 +160,7 @@ type
     procedure CheckFatViradaClick(Sender: TObject);
     procedure CancelarBaixa1Click(Sender: TObject);
     procedure checkNaoConsideraFaturaClick(Sender: TObject);
+    procedure chkBaixarAoSalvarClick(Sender: TObject);
 
   private
     { Private declarations }
@@ -180,6 +181,7 @@ type
     procedure FatCartaoAtiva;
     procedure CalcCpGrid;
     procedure CalcQtdCpGrid;
+    function DtVencimentoCheckContaPaga : TDate;
 
   public
     { Public declarations }
@@ -746,56 +748,44 @@ begin
 
   if not TryStrToInt(edtFornecedor.Text, IdFornecedor) then
   begin
-
     edtFornecedor.SetFocus;
     Application.MessageBox('Campo FORNECEDOR não pode estar vazio!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
     abort;
-
   end;
 
   if (not TryStrToCurr(edtValorCompra.Text, ValorCompra)) or (ValorCompra <= 0) then
   begin
-
     edtValorCompra.SetFocus;
     Application.MessageBox('Valor da compra Inválido!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
     abort;
-
   end;
 
   if (not TryStrToInt(edtParcela.Text, Parcela)) or (Parcela <= 0) then
   begin
-
     edtParcela.SetFocus;
     Application.MessageBox('Número da parcela Inválido!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
     abort;
-
   end;
 
   if dateVencimento.Date < dateCompra.Date then
   begin
-
     dateVencimento.SetFocus;
     Application.MessageBox('Data de vencimento não pode ser inferior a data de compra!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
     abort;
-
   end;
 
   if dateCompra.Date > Now then
   begin
-
     dateCompra.SetFocus;
     Application.MessageBox('Data de compra não pode ser maior que a data atual!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
     abort;
-
   end;
 
   if not TryStrToCurr(edtValorParcela.Text, ValorParcela) then
   begin
-
     edtValorParcela.SetFocus;
     Application.MessageBox('Valor da parcela Inválido!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
     abort;
-
   end;
 
   //  Passando os dados para o dataset
@@ -808,39 +798,29 @@ begin
   dmCPagar.cdsCPagarPARCIAL.AsString           := 'N';
   dmCPagar.cdsCPagarID_FORNECEDOR.AsInteger    := IdFornecedor;
 
+  if chkBaixarAoSalvar.Checked then
+  begin
+    FCodCP := dmCPagar.cdsCPagarID.AsInteger;
+    dateVencimento.Date := DtVencimentoCheckContaPaga;
+  end;
+
   //  Verifica se é fatura, se for a data de vcto
   //  será pega a da fatura
   if (toggleFatura.State = tssOn) and (edtCodFatCartao.Text <> '') then
   begin
-
-    dmCPagar.cdsCPagarDATA_VENCIMENTO.AsDateTime := EncodeDate(YearOf(dateVencimento.Date), MonthOf(dateVencimento.Date), DataVctoFat);
-
-  end
-  else
-  begin
-
-    dmCPagar.cdsCPagarDATA_VENCIMENTO.AsDateTime := dateVencimento.Date;
-
+    dateVencimento.Date := EncodeDate(YearOf(dateVencimento.Date), MonthOf(dateVencimento.Date), DataVctoFat);
   end;
-
-
+  dmCPagar.cdsCPagarDATA_VENCIMENTO.AsDateTime := dateVencimento.Date;
 
   if toggleFatura.State = tssOff then
   begin
-
     dmCPagar.cdsCPagarFATURA_CART.AsString := 'N';
-
   end
-    else
-    begin
-
-      dmCPagar.cdsCPagarFATURA_CART.AsString := 'S';
-      dmCPagar.cdsCPagarID_FATURA.AsString   := Trim(edtCodFatCartao.Text);
-
-    end;
-
-   if chkBaixarAoSalvar.Checked then
-    FCodCP := dmCPagar.cdsCPagarID.AsInteger;
+  else
+  begin
+    dmCPagar.cdsCPagarFATURA_CART.AsString := 'S';
+    dmCPagar.cdsCPagarID_FATURA.AsString := Trim(edtCodFatCartao.Text);
+  end;
 
   //  Gravando no BD
   dmCPagar.cdsCPagar.Post;
@@ -1052,6 +1032,11 @@ begin
 
   Pesquisar;
 
+end;
+
+procedure TfrmContasPagar.chkBaixarAoSalvarClick(Sender: TObject);
+begin
+  dateVencimento.Date := DtVencimentoCheckContaPaga;
 end;
 
 procedure TfrmContasPagar.DataSourceCPagarDataChange(Sender: TObject;
@@ -1770,6 +1755,18 @@ begin
 
   inherited;
 
+end;
+
+function TfrmContasPagar.DtVencimentoCheckContaPaga : TDate;
+begin
+
+  Result := dateVencimento.Date;
+
+  if (chkBaixarAoSalvar.Checked) and (DataSourceCPagar.State = dsInsert) then
+    Result := now;
+
+  if (not chkBaixarAoSalvar.Checked) and (DataSourceCPagar.State = dsInsert) then
+    Result := dateCompra.Date + 7;
 end;
 
 procedure TfrmContasPagar.rbDataCompraClick(Sender: TObject);
