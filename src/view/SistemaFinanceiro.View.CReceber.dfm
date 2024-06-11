@@ -497,12 +497,12 @@ inherited frmContasReceber: TfrmContasReceber
       Height = 645
       ExplicitLeft = 0
       ExplicitTop = 0
-      ExplicitWidth = 1335
-      ExplicitHeight = 644
+      ExplicitWidth = 1339
+      ExplicitHeight = 645
       inherited pnlPesquisa: TPanel
         Width = 1339
         Height = 137
-        ExplicitWidth = 1335
+        ExplicitWidth = 1339
         ExplicitHeight = 137
         inherited lblPesquisar: TLabel
           Left = 213

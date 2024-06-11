@@ -671,10 +671,7 @@ begin
   end;
 
   if chkBaixarAoSalvar.Checked then
-  begin
     FCodCR := dmCReceber.cdsCReceberID.AsInteger;
-    dateVencimento.Date := DtVencimentoCheckContaPaga;
-  end;
 
   //  Passando os dados para o dataset
   dmCReceber.cdsCReceberID_CLIENTE.AsInteger       := IdCliente;
@@ -932,10 +929,8 @@ begin
   Result := dateVencimento.Date;
 
   if (chkBaixarAoSalvar.Checked) and (DataSourceCReceber.State = dsInsert) then
-    Result := now;
+    Result := dateVenda.Date;
 
-  if (not chkBaixarAoSalvar.Checked) and (DataSourceCReceber.State = dsInsert) then
-    Result := dateVenda.Date + 7;
 end;
 
 procedure TfrmContasReceber.EditarRegCReceber;

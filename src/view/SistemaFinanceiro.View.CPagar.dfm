@@ -26,8 +26,6 @@ inherited frmContasPagar: TfrmContasPagar
         inherited btnSalvar: TButton
           ImageIndex = 7
           OnClick = btnSalvarClick
-          ExplicitLeft = -5
-          ExplicitTop = 6
         end
         inherited btnCancelar: TButton
           ImageIndex = 4
@@ -700,12 +698,12 @@ inherited frmContasPagar: TfrmContasPagar
       Height = 643
       ExplicitLeft = 0
       ExplicitTop = 0
-      ExplicitWidth = 1389
-      ExplicitHeight = 643
+      ExplicitWidth = 1385
+      ExplicitHeight = 642
       inherited pnlPesquisa: TPanel
         Width = 1389
         Height = 153
-        ExplicitWidth = 1389
+        ExplicitWidth = 1385
         ExplicitHeight = 153
         inherited lblPesquisar: TLabel
           Left = 192

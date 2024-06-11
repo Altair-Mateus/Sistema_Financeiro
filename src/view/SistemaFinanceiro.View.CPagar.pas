@@ -799,10 +799,7 @@ begin
   dmCPagar.cdsCPagarID_FORNECEDOR.AsInteger    := IdFornecedor;
 
   if chkBaixarAoSalvar.Checked then
-  begin
     FCodCP := dmCPagar.cdsCPagarID.AsInteger;
-    dateVencimento.Date := DtVencimentoCheckContaPaga;
-  end;
 
   //  Verifica se é fatura, se for a data de vcto
   //  será pega a da fatura
@@ -1763,10 +1760,8 @@ begin
   Result := dateVencimento.Date;
 
   if (chkBaixarAoSalvar.Checked) and (DataSourceCPagar.State = dsInsert) then
-    Result := now;
+    Result := dateCompra.Date;
 
-  if (not chkBaixarAoSalvar.Checked) and (DataSourceCPagar.State = dsInsert) then
-    Result := dateCompra.Date + 7;
 end;
 
 procedure TfrmContasPagar.rbDataCompraClick(Sender: TObject);
