@@ -1,59 +1,99 @@
 unit SistemaFinanceiro.Model.Entidades.CR;
 
 interface
+
+uses
+  uDBColumnAttribute,
+  uDaoRTTI, SistemaFinanceiro.Model.uSFQuery, Vcl.Dialogs, System.SysUtils,
+  Vcl.Forms, Winapi.Windows;
+
 type
+
+  [TDBTable('CONTAS_RECEBER')]
   TModelCR = class
 
-    private
-      FDataVenda: TDate;
-      FValorParcela: Currency;
-      FValorVenda: Currency;
-      FDataVencimento: TDate;
-      FDataRecebimento: TDate;
-      FID: String;
-      FValorAbatido: Currency;
-      FStatus: String;
-      FDataCadastro: TDate;
-      FDoc: String;
-      FDesc: String;
-      FParcela: Integer;
-      FParcial: String;
-      FCrOrigem: Integer;
-      FIdCliente: Integer;
+  private
+    FDaoRTTI: TDaoRTTI;
+    FDataVenda: TDate;
+    FValorParcela: Double;
+    FValorVenda: Double;
+    FDataVencimento: TDate;
+    FDataRecebimento: TDate;
+    FID: Integer;
+    FValorAbatido: Double;
+    FStatus: String;
+    FDataCadastro: TDate;
+    FDoc: String;
+    FDesc: String;
+    FParcela: Integer;
+    FParcial: String;
+    FCrOrigem: Integer;
+    FIdCliente: Integer;
+    FNumTotalParcelas: Integer;
+    FIdGrupoParcelas: Integer;
 
-      procedure SetDataCadastro(const Value: TDate);
-      procedure SetDataRecebimento(const Value: TDate);
-      procedure SetDataVencimento(const Value: TDate);
-      procedure SetDataVenda(const Value: TDate);
-      procedure SetDesc(const Value: String);
-      procedure SetDoc(const Value: String);
-      procedure SetID(const Value: String);
-      procedure SetParcela(const Value: Integer);
-      procedure SetStatus(const Value: String);
-      procedure SetValorAbatido(const Value: Currency);
-      procedure SetValorParcela(const Value: Currency);
-      procedure SetValorVenda(const Value: Currency);
-      procedure SetParcial(const Value: String);
-      procedure SetCrOrigem(const Value: Integer);
-      procedure SetIdCliente(const Value: Integer);
+  public
+    [TDBColumn('ID', True)]
+    property ID: Integer read FID write FID;
+    [TDBColumn('NUMERO_DOCUMENTO')]
+    property Doc: String read FDoc write FDoc;
+    [TDBColumn('DESCRICAO')]
+    property Desc: String read FDesc write FDesc;
+    [TDBColumn('PARCELA')]
+    property Parcela: Integer read FParcela write FParcela;
+    [TDBColumn('VALOR_PARCELA')]
+    property ValorParcela: Double read FValorParcela write FValorParcela;
+    [TDBColumn('VALOR_VENDA')]
+    property ValorVenda: Double read FValorVenda write FValorVenda;
+    [TDBColumn('VALOR_ABATIDO')]
+    property ValorAbatido: Double read FValorAbatido write FValorAbatido;
+    [TDBColumn('DATA_VENDA')]
+    property DataVenda: TDate read FDataVenda write FDataVenda;
+    [TDBColumn('DATA_CADASTRO')]
+    property DataCadastro: TDate read FDataCadastro write FDataCadastro;
+    [TDBColumn('DATA_VENCIMENTO')]
+    property DataVencimento: TDate read FDataVencimento write FDataVencimento;
+    [TDBColumn('DATA_RECEBIMENTO')]
+    property DataRecebimento: TDate read FDataRecebimento
+      write FDataRecebimento;
+    [TDBColumn('STATUS')]
+    property Status: String read FStatus write FStatus;
+    [TDBColumn('PARCIAL')]
+    property Parcial: String read FParcial write FStatus;
+    [TDBColumn('CR_ORIGEM')]
+    property CrOrigem: Integer read FCrOrigem write FCrOrigem;
+    [TDBColumn('ID_CLIENTE')]
+    property IdCliente: Integer read FIdCliente write FIdCliente;
+    [TDBColumn('NUM_TOT_PARCELAS')]
+    property NumTotalParcelas: Integer read FNumTotalParcelas write FNumTotalParcelas;
+    [TDBColumn('ID_GRUPO_PARCELAS')]
+    property IdGrupoParcelas: Integer read FIdGrupoParcelas write FIdGrupoParcelas;
 
+    constructor Create;
+    destructor Destroy; override;
 
-    public
-      property ID              : String read FID write SetID;
-      property Doc             : String read FDoc write SetDoc;
-      property Desc            : String read FDesc write SetDesc;
-      property Parcela         : Integer read FParcela write SetParcela;
-      property ValorParcela    : Currency read FValorParcela write SetValorParcela;
-      property ValorVenda      : Currency read FValorVenda write SetValorVenda;
-      property ValorAbatido    : Currency read FValorAbatido write SetValorAbatido;
-      property DataVenda       : TDate read FDataVenda write SetDataVenda;
-      property DataCadastro    : TDate read FDataCadastro write SetDataCadastro;
-      property DataVencimento  : TDate read FDataVencimento write SetDataVencimento;
-      property DataRecebimento : TDate read FDataRecebimento write SetDataRecebimento;
-      property Status          : String read FStatus write SetStatus;
-      property Parcial         : String read FParcial write SetParcial;
-      property CrOrigem        : Integer read FCrOrigem write SetCrOrigem;
-      property IdCliente       : Integer read FIdCliente write SetIdCliente;
+    function Insert: Boolean;
+    function UpdateBySQLText(const pWhereClause: string = ''): Boolean;
+    function UpdateByPK: Boolean;
+    function UpdateByProp: Boolean;
+    function DeleteBySQLText(const pWhere: String = ''): Boolean;
+    function DeleteByPk: Boolean;
+    function DeleteByProp: Boolean;
+    function Load: Boolean;
+
+    function GetIdGrupoParcelas : Integer;
+    function Existe(const pId : Integer; const pCarrega : Boolean = false) : Boolean;
+
+    procedure AddPropertyToWhere(const APropertyName: String);
+    procedure GeraCodigo;
+
+    class function TotalCR(pDtIni, pDtFim: TDate) : Double;
+
+//    procedure BaixarCR(BaixaCR: TModelCrDetalhe);
+ //    function CancBxCr(pId: Integer) : Boolean;
+//
+//    function GeraCodigoCRDetalhe: Integer;
+//    function GetCrDet(ID: Integer): TModelCrDetalhe;
 
 
   end;
@@ -62,79 +102,175 @@ implementation
 
 { TModelCR }
 
-procedure TModelCR.SetCrOrigem(const Value: Integer);
+procedure TModelCR.AddPropertyToWhere(const APropertyName: String);
 begin
-  FCrOrigem := Value;
+  FDaoRTTI.AddPropertyToWhere(APropertyName);
 end;
 
-procedure TModelCR.SetDataCadastro(const Value: TDate);
+constructor TModelCR.Create;
 begin
-  FDataCadastro := Value;
+  FDaoRTTI := TDaoRTTI.Create;
 end;
 
-procedure TModelCR.SetDataRecebimento(const Value: TDate);
+function TModelCR.DeleteByPk: Boolean;
 begin
-  FDataRecebimento := Value;
+  Result := FDaoRTTI.DeleteByPk(Self);
 end;
 
-procedure TModelCR.SetDataVencimento(const Value: TDate);
+function TModelCR.DeleteByProp: Boolean;
 begin
-  FDataVencimento := Value;
+  Result := FDaoRTTI.DeleteByProp(Self);
 end;
 
-procedure TModelCR.SetDataVenda(const Value: TDate);
+function TModelCR.DeleteBySQLText(const pWhere: String): Boolean;
 begin
-  FDataVenda := Value;
+  Result := FDaoRTTI.DeleteBySQLText(Self, pWhere);
 end;
 
-procedure TModelCR.SetDesc(const Value: String);
+destructor TModelCR.Destroy;
 begin
-  FDesc := Value;
+  FDaoRTTI.Free;
+  inherited;
 end;
 
-procedure TModelCR.SetDoc(const Value: String);
+function TModelCR.Existe(const pId: Integer; const pCarrega : Boolean = false): Boolean;
+var
+  lQuery : TSFQuery;
 begin
-  FDoc := Value;
+  Result := False;
+  lQuery := TSFQuery.Create(nil);
+  try
+    try
+      lQuery.Close;
+      lQuery.SQL.Clear;
+      lQuery.SQL.Add(' SELECT ID FROM CONTAS_RECEBER ');
+      lQuery.SQL.Add(' WHERE ID = :ID                ');
+      lQuery.ParamByName('ID').AsInteger := pId;
+      lQuery.Open;
+
+      if (lQuery.RecordCount > 0) then
+      begin
+        Result := True;
+        if pCarrega then
+        begin
+          FID := pId;
+          Load;
+        end;
+      end;
+
+    except
+      on E : Exception do
+      begin
+        Application.MessageBox(PWideChar('Erro ao realizar a consulta: ' + E.Message), 'Atenção', MB_OK + MB_ICONERROR);
+      end;
+    end;
+  finally
+    lQuery.Free;
+  end;
 end;
 
-procedure TModelCR.SetID(const Value: String);
+procedure TModelCR.GeraCodigo;
+var
+  lQuery : TSFQuery;
 begin
-  FID := Value;
+  lQuery := TSFQuery.Create(nil);
+  try
+    try
+      lQuery.Close;
+      lQuery.SQL.Clear;
+      lQuery.Open('SELECT MAX(ID) AS ID FROM CONTAS_RECEBER');
+
+      //  Ultimo codigo usado + 1
+      FID := lQuery.FieldByName('ID').AsInteger + 1;
+
+      //  Insere o registro no final da tabela
+      lQuery.Append;
+    except
+      on E : Exception do
+      begin
+        Application.MessageBox(PWideChar('Erro ao obter próximo ID de CR: ' + E.Message), 'Atenção', MB_OK + MB_ICONERROR);
+      end;
+    end;
+  finally
+    lQuery.Free;
+  end;
 end;
 
-procedure TModelCR.SetIdCliente(const Value: Integer);
+function TModelCR.GetIdGrupoParcelas: Integer;
+var
+  lQuery: TSFQuery;
 begin
-  FIdCliente := Value;
+  Result := 0;
+
+  lQuery := TSFQuery.Create(nil);
+  try
+    try
+      lQuery.Close;
+      lQuery.SQL.Clear;
+      lQuery.Open('SELECT NEXT VALUE FOR GEN_ID_GRUPO_PARCELAS FROM RDB$DATABASE');
+      Result := lQuery.Fields[0].AsInteger;
+    except
+      on E: Exception do
+      begin
+               Application.MessageBox(PWideChar('Erro ao obter próximo ID de grupo de parcelas: ' + E.Message), 'Atenção', MB_OK + MB_ICONERROR)
+      end;
+    end;
+  finally
+    lQuery.Free;
+  end;
 end;
 
-procedure TModelCR.SetParcela(const Value: Integer);
+function TModelCR.Insert: Boolean;
 begin
-  FParcela := Value;
+  Result := FDaoRTTI.Insert(Self);
 end;
 
-procedure TModelCR.SetParcial(const Value: String);
+function TModelCR.Load: Boolean;
 begin
-  FParcial := Value;
+  Result := FDaoRTTI.LoadObjectByPK(Self);
 end;
 
-procedure TModelCR.SetStatus(const Value: String);
+class function TModelCR.TotalCR(pDtIni, pDtFim: TDate): Double;
+var
+  lQuery: TSFQuery;
 begin
-  FStatus := Value;
+  Result := 0;
+  lQuery := TSFQuery.Create(nil);
+  try
+    try
+      lQuery.Close;
+      lQuery.SQL.Clear;
+      lQuery.SQL.Add(' SELECT COALESCE(SUM(VALOR_PARCELA), 0) AS VALOR FROM CONTAS_RECEBER ');
+      lQuery.SQL.Add(' WHERE STATUS = ''A'' AND DATA_VENCIMENTO BETWEEN :DTINI AND :DTFIM  ');
+      lQuery.ParamByName('DTINI').AsDate := pDtIni;
+      lQuery.ParamByName('DTFIM').AsDate := pDtFim;
+      lQuery.Open;
+
+      Result := lQuery.FieldByName('VALOR').AsFloat;
+    except
+      on E: Exception do
+      begin
+        Application.MessageBox(PWideChar('Erro ao obter próximo ID de grupo de parcelas: ' + E.Message), 'Atenção', MB_OK + MB_ICONERROR)
+      end;
+    end;
+  finally
+    lQuery.Free;
+  end;
 end;
 
-procedure TModelCR.SetValorAbatido(const Value: Currency);
+function TModelCR.UpdateByPK: Boolean;
 begin
-  FValorAbatido := Value;
+  Result := FDaoRTTI.UpdateByPK(Self);
 end;
 
-procedure TModelCR.SetValorParcela(const Value: Currency);
+function TModelCR.UpdateByProp: Boolean;
 begin
-  FValorParcela := Value;
+  Result := FDaoRTTI.UpdateByProp(Self);
 end;
 
-procedure TModelCR.SetValorVenda(const Value: Currency);
+function TModelCR.UpdateBySQLText(const pWhereClause: string): Boolean;
 begin
-  FValorVenda := Value;
+  Result := FDaoRTTI.UpdateBySQLText(Self, pWhereClause);
 end;
 
 end.
