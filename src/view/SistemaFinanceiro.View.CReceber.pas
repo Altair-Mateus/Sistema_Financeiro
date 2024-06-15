@@ -171,10 +171,7 @@ uses
 
 procedure TfrmContasReceber.btnAlterarClick(Sender: TObject);
 begin
-
-  inherited;
   EditarRegCReceber;
-
 end;
 
 procedure TfrmContasReceber.btnBaixarCRClick(Sender: TObject);
@@ -312,17 +309,7 @@ begin
   //  Atualiza titulo
   lblTitulo.Caption := 'Inserindo novo Lançamento no Contas a Receber';
 
-  if not (dmCReceber.cdsCReceber.State in [dsInsert, dsEdit]) then
-  begin
-
-    //  Coloca o dataset em modo de inserção de dados
-    dmCReceber.cdsCReceber.Insert;
-
-  end;
-
-
-  //  Gera a id
-  dmCReceber.GeraCodigo;
+  FOpCad := TOperacaoCadastro.ocIncluir;
 
   //  Posiciona o foco no 1 campo
   memDesc.SetFocus;
@@ -435,8 +422,8 @@ begin
   if toggleParcelamento.State = tssOff then
   begin
       CadParcelaUnica;
-      if (chkBaixarAoSalvar.Checked) and (FCodCR > 0) then
-        ExibeTelaBaixar(FCodCR);
+//      if (chkBaixarAoSalvar.Checked) and (FCodCR > 0) then
+//        ExibeTelaBaixar(FCodCR);
   end
     else
     begin
@@ -580,103 +567,119 @@ end;
 
 procedure TfrmContasReceber.CadParcelaUnica;
 var
-  Parcela : Integer;
-  IdCliente : Integer;
-  ValorVenda : Currency;
-  ValorParcela : Currency;
-
+  lParcela : Integer;
+  lIdCliente : Integer;
+  lValorVenda : Currency;
+  lValorParcela : Currency;
+  lCr : TModelCR;
+  lRegGravado: Boolean;
 begin
 
+  lRegGravado := False;
+  lCr := TModelCR.Create;
+  try
   //  Se for um novo registro irá gerar o código, status em aberto
-  //  e setar 0 no valor abatido
-  if dsCR.State in [dsInsert] then
-  begin
+    // e setar 0 no valor abatido
+    if FOpCad = TOperacaoCadastro.ocIncluir then
+    begin
+      lCr.GeraCodigo;
+      lCr.DataCadastro := Now;
+      lCr.ValorAbatido := 0;
+      lCr.Status := 'A';
+      edtValorParcela.Text := edtValorVenda.Text;
+    end;
 
-    //  gera a id
-    dmCReceber.GeraCodigo;
+    // Valida Campos obrigatórios
+    if not TryStrToInt(edtCliente.Text, lIdCliente) then
+    begin
+      edtCliente.SetFocus;
+      Application.MessageBox('Campo CLIENTE não pode estar vazio!', 'Atenção',
+        MB_OK + MB_ICONEXCLAMATION);
+      abort;
+    end;
 
-    dmCReceber.cdsCReceberDATA_CADASTRO.AsDateTime := now;
-    dmCReceber.cdsCReceberSTATUS.AsString := 'A';
-    dmCReceber.cdsCReceberVALOR_ABATIDO.AsCurrency := 0;
+    if Trim(memDesc.Text) = '' then
+    begin
+      memDesc.SetFocus;
+      Application.MessageBox('Campo Descrição não pode estar vazio!', 'Atenção',
+        MB_OK + MB_ICONEXCLAMATION);
+      abort;
+    end;
 
-    //  Se for parcela unica pega o mesmo valor da compra
-    edtValorParcela.Text := edtValorVenda.Text;
+    if not TryStrToCurr(edtValorVenda.Text, lValorVenda) then
+    begin
+      edtValorVenda.SetFocus;
+      Application.MessageBox('Valor da Venda inválido!', 'Atenção',
+        MB_OK + MB_ICONEXCLAMATION);
+      abort;
+    end;
 
+    if dateVencimento.Date < dateVenda.Date then
+    begin
+      dateVencimento.SetFocus;
+      Application.MessageBox
+        ('Data de vencimento não pode ser inferior a data de venda!', 'Atenção',
+        MB_OK + MB_ICONEXCLAMATION);
+      abort;
+    end;
+
+    if not TryStrToCurr(edtValorParcela.Text, lValorParcela) then
+    begin
+      edtValorParcela.SetFocus;
+      Application.MessageBox('Valor da Parcela inválido!', 'Atenção',
+        MB_OK + MB_ICONEXCLAMATION);
+      abort;
+    end;
+
+    if not TryStrToInt(edtParcela.Text, lParcela) then
+    begin
+      edtParcela.SetFocus;
+      Application.MessageBox('Número da Parcela inválido!', 'Atenção',
+        MB_OK + MB_ICONEXCLAMATION);
+      abort;
+    end;
+
+    if dateVenda.Date > now then
+    begin
+      dateVenda.SetFocus;
+      Application.MessageBox
+        ('Data de venda não pode ser maior que a data atual!', 'Atenção',
+        MB_OK + MB_ICONEXCLAMATION);
+      abort;
+    end;
+
+    lCr.IdCliente := lIdCliente;
+    lCr.Doc := Trim(edtNDoc.Text);
+    lCr.Desc:= Trim(memDesc.Text);
+    lCr.Parcela := lParcela;
+    lCr.ValorParcela := lValorParcela;
+    lCr.ValorVenda := lValorVenda;
+    lCr.DataVencimento := dateVencimento.Date;
+    lCr.DataVenda := dateVenda.Date;
+    lCr.Parcial := 'N';
+
+    // Gravando no BD
+    if FOpCad = TOperacaoCadastro.ocIncluir then
+      lRegGravado := lCr.Insert;
+
+    if FOpCad = TOperacaoCadastro.ocAlterar then
+    begin
+      lCr.ID := FCodCR;
+      lRegGravado := lCr.UpdateByPK;
+    end;
+
+    //  Baixa apos salvar a conta
+    if (lRegGravado and chkBaixarAoSalvar.Checked) then
+      ExibeTelaBaixar(lCr.Id);
+
+  finally
+    lCr.Free;
   end;
-
-  //  Valida Campos obrigatórios
-  if not TryStrToInt(edtCliente.Text, IdCliente) then
-  begin
-    edtCliente.SetFocus;
-    Application.MessageBox('Campo CLIENTE não pode estar vazio!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
-    abort;
-  end;
-
-  if Trim(memDesc.text) = '' then
-  begin
-    memDesc.SetFocus;
-    Application.MessageBox('Campo Descrição não pode estar vazio!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
-    abort;
-  end;
-
-  if not TryStrToCurr(edtValorVenda.Text, ValorVenda) then
-  begin
-    edtValorVenda.SetFocus;
-    Application.MessageBox('Valor da Venda inválido!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
-    abort;
-  end;
-
-  if dateVencimento.Date < dateVenda.Date then
-  begin
-    dateVencimento.SetFocus;
-    Application.MessageBox('Data de vencimento não pode ser inferior a data de venda!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
-    abort;
-  end;
-
-  if not TryStrToCurr(edtValorParcela.Text, ValorParcela) then
-  begin
-    edtValorParcela.SetFocus;
-    Application.MessageBox('Valor da Parcela inválido!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
-    abort;
-  end;
-
-  if not TryStrToInt(edtParcela.Text, Parcela) then
-  begin
-    edtParcela.SetFocus;
-    Application.MessageBox('Número da Parcela inválido!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
-    abort;
-  end;
-
-  if dateVenda.Date > Now then
-  begin
-    dateVenda.SetFocus;
-    Application.MessageBox('Data de venda não pode ser maior que a data atual!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
-    abort;
-  end;
-
-  if chkBaixarAoSalvar.Checked then
-    FCodCR := dmCReceber.cdsCReceberID.AsInteger;
-
-  //  Passando os dados para o dataset
-  dmCReceber.cdsCReceberID_CLIENTE.AsInteger       := IdCliente;
-  dmCReceber.cdsCReceberNUMERO_DOCUMENTO.AsString  := Trim(edtNDoc.text);
-  dmCReceber.cdsCReceberDESCRICAO.AsString         := Trim(memDesc.Text);
-  dmCReceber.cdsCReceberPARCELA.AsInteger          := Parcela;
-  dmCReceber.cdsCReceberVALOR_PARCELA.AsCurrency   := ValorParcela;
-  dmCReceber.cdsCReceberVALOR_VENDA.AsCurrency     := ValorVenda;
-  dmCReceber.cdsCReceberDATA_VENCIMENTO.AsDateTime := dateVencimento.Date;
-  dmCReceber.cdsCReceberDATA_VENDA.AsDateTime      := dateVenda.Date;
-  dmCReceber.cdsCReceberPARCIAL.AsString           := 'N';
-
-  //  Gravando no BD
-  dmCReceber.cdsCReceber.Post;
-  dmCReceber.cdsCReceber.ApplyUpdates(0);
-
 end;
 
 procedure TfrmContasReceber.CalcCrGrid;
 var
-  TotalCr: Currency;
+  TotalCR: Currency;
 
 begin
 
@@ -909,6 +912,11 @@ begin
     lCr.ID := DBGrid1.DataSource.DataSet.FieldByName('ID').AsInteger;
     if lCr.Load then
     begin
+
+      // Ajusta o tipo de opercao de cadastro para alterar
+      FOpCad := TOperacaoCadastro.ocAlterar;
+      FCodCR := lCr.ID;
+
       // Coloca o numero do registro no titulo
       lblTitulo.Caption := 'Alterando Registro Nº ' + IntToStr(lCr.ID);
 
@@ -931,6 +939,10 @@ begin
       edtValorParcela.Text := TUtilitario.FormatarValor(lCr.ValorParcela);
       dateVencimento.Date := lCr.DataVencimento;
       BuscaNomeCliente;
+    end
+    else
+    begin
+      Application.MessageBox('Erro ao carregar dados da Conta!', 'Erro!', MB_OK + MB_ICONERROR);
     end;
   finally
     lCr.Free;
@@ -974,13 +986,8 @@ begin
   inherited;
   edtValorVenda.Text := TUtilitario.FormatarValor(edtValorVenda.Text);
 
-  if dmCReceber.cdsCReceber.State in [dsInsert] then
-  begin
-
-    //  Se ao inserir Parcela unica pega o mesmo valor da venda
+  if FOpCad = TOperacaoCadastro.ocIncluir then
     edtValorParcela.Text := TUtilitario.FormatarValor(edtValorVenda.Text);
-
-  end;
 
 end;
 
@@ -1416,7 +1423,6 @@ begin
 
 
       lQuery.Open;
-
 
       // Configurações do DataSet para o DBGrid
       dsCR.DataSet := lQuery;
