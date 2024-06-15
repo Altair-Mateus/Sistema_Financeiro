@@ -13,7 +13,8 @@ uses
   SistemaFinanceiro.View.CadAdmin, System.IOUtils, SistemaFinanceiro.View.Ajuda,
   SistemaFinanceiro.View.FaturaCartao,
   SistemaFinanceiro.View.GeraRelResumoMensalCp,
-  SistemaFinanceiro.View.GeraRelResumoMensalCr, Vcl.Buttons;
+  SistemaFinanceiro.View.GeraRelResumoMensalCr, Vcl.Buttons,
+  SistemaFinanceiro.Model.Entidades.CR;
 
 type
   TfrmPrincipal = class(TForm)
@@ -101,7 +102,8 @@ type
 
 
   private
-    { Private declarations }
+    FDtIni : TDate;
+    FDtFim : TDate;
     procedure ExibeTelaUsuario;
     procedure ExibeTelaCPagar;
     procedure ExibeTelaCReceber;
@@ -171,7 +173,7 @@ begin
         ShowMessage('Erro ao copiar a imagem: ' + E.Message);
 
     end;
- 
+
 
   end;
 
@@ -383,22 +385,20 @@ begin
 end;
 
 procedure TfrmPrincipal.ExibeTelaCReceber;
+var
+  lFormulario : TfrmContasReceber;
 begin
 
   //  Cria o Form
-  frmContasReceber := TfrmContasReceber.Create(Self);
-
+  lFormulario := TfrmContasReceber.Create(Self);
   try
-
     //  Exibe o Form
-    frmContasReceber.ShowModal;
-
+    lFormulario.ShowModal;
   finally
-
     //  Libera da memoria
-    FreeAndNil(frmContasReceber);
-
+    lFormulario.Free;
   end
+
 end;
 
 procedure TfrmPrincipal.ExibeTelaFaturaCartao;
@@ -572,15 +572,11 @@ begin
   end;
 
   //  Mostra o Usuario logado
-  lblUserLogado.Caption := dmUsuarios.GetUsuarioLogado.Nome;
-
-  ResumoMensalCaixa;
-  TotalCP;
-  TotalCR;
   KeyPreview := True;
 
-  CarregaImgPrincipal;
-
+  //  Pega as datas do mês para os relatorios iniciais
+  FDtIni := StartOfTheMonth(Now);
+  FDtFim := EndOfTheMonth(Now);
 
 end;
 
@@ -603,7 +599,11 @@ procedure TfrmPrincipal.FormShow(Sender: TObject);
 begin
 
   Self.Caption := 'Sistema Financeiro ' + GetVesaoArq + ' - Desenvolvido por Altair Mateus T. Alencastro';
-
+  CarregaImgPrincipal;
+  ResumoMensalCaixa;
+  TotalCP;
+  TotalCR;
+  lblUserLogado.Caption := dmUsuarios.GetUsuarioLogado.Nome;
 end;
 
 procedure TfrmPrincipal.Fornecedores1Click(Sender: TObject);
@@ -677,38 +677,38 @@ var
 
 begin
 
-  DataInicial := StartOfTheMonth(IncMonth(Now, -2));
-  DataFinal   := EndOfTheMonth(Now);
+  DataInicial := IncMonth(FDtIni, -2);
+  DataFinal   := FDtFim;
   ResumoCaixa := dmCaixa.ResumoCaixa(DataInicial, DataFinal);
   lblValor.Caption := TUtilitario.FormatoMoeda(ResumoCaixa.SaldoFinal);
 
   if ResumoCaixa.SaldoFinal > 0 then
   begin
 
-    imgLucro.Visible  := True;
-    imgPerda.Visible  := False;
+    imgLucro.Visible := True;
+    imgPerda.Visible := False;
     imgNormal.Visible := False;
-    pnlSaldoParcial.Color :=  $006FE76E;
+    pnlSaldoParcial.Color := $006FE76E;
 
   end
-    else if ResumoCaixa.SaldoFinal < 0 then
-    begin
+  else if ResumoCaixa.SaldoFinal < 0 then
+  begin
 
-      imgLucro.Visible  := False;
-      imgPerda.Visible  := True;
-      imgNormal.Visible := False;
-      pnlSaldoParcial.Color :=  $003838F7;
+    imgLucro.Visible := False;
+    imgPerda.Visible := True;
+    imgNormal.Visible := False;
+    pnlSaldoParcial.Color := $003838F7;
 
-    end
-      else
-      begin
+  end
+  else
+  begin
 
-        imgLucro.Visible  := False;
-        imgPerda.Visible  := False;
-        imgNormal.Visible := True;
-        pnlSaldoParcial.Color :=  $0000CAE6;
+    imgLucro.Visible := False;
+    imgPerda.Visible := False;
+    imgNormal.Visible := True;
+    pnlSaldoParcial.Color := $0000CAE6;
 
-      end;
+  end;
 end;
 
 procedure TfrmPrincipal.SaldodoCaixa1Click(Sender: TObject);
@@ -717,30 +717,13 @@ begin
 end;
 
 procedure TfrmPrincipal.TotalCP;
-var
-  DataInicial : TDateTime;
-  DataFinal   : TDateTime;
 begin
-
-  DataInicial := StartOfTheMonth(Now);
-  DataFinal   := EndOfTheMonth(Now);
-
-  lblValorCP.Caption := TUtilitario.FormatoMoeda(dmCPagar.TotalCP(DataInicial, DataFinal));
-
+  lblValorCP.Caption := TUtilitario.FormatoMoeda(dmCPagar.TotalCP(FDtIni, FDtFim));
 end;
 
 procedure TfrmPrincipal.TotalCR;
-var
-  DataInicial : TDateTime;
-  DataFinal   : TDateTime;
-
 begin
-
-  DataInicial := StartOfTheMonth(Now);
-  DataFinal   := EndOfTheMonth(Now);
-
-  lblValorCR.Caption := TUtilitario.FormatoMoeda(dmCReceber.TotalCR(DataInicial, DataFinal));
-
+  lblValorCR.Caption := TUtilitario.FormatoMoeda(TModelCR.TotalCR(FDtIni, FDtFim));
 end;
 
 end.

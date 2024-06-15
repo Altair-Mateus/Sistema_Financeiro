@@ -2,8 +2,8 @@ object frmPrincipal: TfrmPrincipal
   Left = 0
   Top = 0
   Caption = 'Sistema Financeiro'
-  ClientHeight = 730
-  ClientWidth = 1198
+  ClientHeight = 729
+  ClientWidth = 1194
   Color = 5737262
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -21,7 +21,7 @@ object frmPrincipal: TfrmPrincipal
     AlignWithMargins = True
     Left = 10
     Top = 10
-    Width = 1178
+    Width = 1174
     Height = 191
     Margins.Left = 10
     Margins.Top = 10
@@ -31,7 +31,6 @@ object frmPrincipal: TfrmPrincipal
     Color = clWhite
     ParentBackground = False
     TabOrder = 0
-    ExplicitWidth = 1174
     object pnlSaldoParcial: TPanel
       AlignWithMargins = True
       Left = 14
@@ -10849,8 +10848,8 @@ object frmPrincipal: TfrmPrincipal
     AlignWithMargins = True
     Left = 10
     Top = 214
-    Width = 1178
-    Height = 412
+    Width = 1174
+    Height = 411
     Margins.Left = 10
     Margins.Right = 10
     Align = alClient
@@ -10858,8 +10857,6 @@ object frmPrincipal: TfrmPrincipal
     ParentBackground = False
     TabOrder = 1
     StyleElements = [seFont, seClient]
-    ExplicitWidth = 1174
-    ExplicitHeight = 411
     object pnlBtn: TPanel
       Left = 1
       Top = 1
@@ -14634,8 +14631,8 @@ object frmPrincipal: TfrmPrincipal
   object pnlInfos: TPanel
     AlignWithMargins = True
     Left = 10
-    Top = 639
-    Width = 1178
+    Top = 638
+    Width = 1174
     Height = 81
     Margins.Left = 10
     Margins.Top = 10
@@ -14645,8 +14642,6 @@ object frmPrincipal: TfrmPrincipal
     Color = clWhite
     ParentBackground = False
     TabOrder = 2
-    ExplicitTop = 638
-    ExplicitWidth = 1174
     object lblUserLogado: TLabel
       AlignWithMargins = True
       Left = 1070

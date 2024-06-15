@@ -1,9 +1,13 @@
 unit SistemaFinanceiro.View.CadastroPadrao;
+
 interface
+
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Data.DB, System.ImageList, Vcl.ImgList,
   Vcl.ExtCtrls, Vcl.StdCtrls, Vcl.Grids, Vcl.DBGrids, Vcl.WinXPanels;
+
 type
   TfrmCadastroPadrao = class(TForm)
     CardPanelPrincipal: TCardPanel;
@@ -37,6 +41,7 @@ type
       DataCol: Integer; Column: TColumn; State: TGridDrawState);
     procedure DBGrid1DblClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
 
   private
     { Private declarations }
@@ -56,6 +61,7 @@ var
   frmCadastroPadrao: TfrmCadastroPadrao;
 
 implementation
+
 uses
   Vcl.WinXCtrls, Vcl.Mask, Vcl.ComCtrls;
 {$R *.dfm}
@@ -65,7 +71,7 @@ begin
 
   ValidaSelecao;
 
-  //  Abre a tela de cadastro
+  // Abre a tela de cadastro
   CardPanelPrincipal.ActiveCard := CardCadastro;
 
 end;
@@ -73,7 +79,7 @@ end;
 procedure TfrmCadastroPadrao.btnCancelarClick(Sender: TObject);
 begin
 
-   //  Abre a tela de Pesquisa
+  // Abre a tela de Pesquisa
   CardPanelPrincipal.ActiveCard := CardPesquisa;
 
 end;
@@ -81,10 +87,10 @@ end;
 procedure TfrmCadastroPadrao.btnIncluirClick(Sender: TObject);
 begin
 
-  //  Abre a tela de cadastro
+  // Abre a tela de cadastro
   CardPanelPrincipal.ActiveCard := CardCadastro;
 
-  //  Limpa Campos
+  // Limpa Campos
   LimpaCampos;
 end;
 
@@ -98,12 +104,13 @@ begin
 
   ValidaSelecao;
 
-  //  Abre a tela de cadastro
+  // Abre a tela de cadastro
   CardPanelPrincipal.ActiveCard := CardCadastro;
 
 end;
 
-procedure TfrmCadastroPadrao.DBGrid1DrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+procedure TfrmCadastroPadrao.DBGrid1DrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
 begin
 
   if not Odd(DBGrid1.DataSource.DataSet.RecNo) then
@@ -117,13 +124,14 @@ begin
 
     end;
 
-
   end;
 
   if (gdSelected in State) then
   begin
-    DBGrid1.Canvas.Brush.Color := $00578B2E;  // Define a cor de fundo da célula selecionada
-    DBGrid1.Canvas.Font.Color := clWhite;  // Define a cor do texto da célula selecionada
+    DBGrid1.Canvas.Brush.Color := $00578B2E;
+    // Define a cor de fundo da célula selecionada
+    DBGrid1.Canvas.Font.Color := clWhite;
+    // Define a cor do texto da célula selecionada
   end;
 
   // Desenha a célula com as propriedades de cor atualizadas
@@ -136,10 +144,10 @@ begin
 
   if Key = #13 then
   begin
-    //  Verifica se a tecla pressionada é o Enter
-    //  Cancela o efeito do enter
+    // Verifica se a tecla pressionada é o Enter
+    // Cancela o efeito do enter
     Key := #0;
-    //  Pula para o proximo
+    // Pula para o proximo
     Perform(WM_NEXTDLGCTL, 0, 0);
   end;
 
@@ -147,45 +155,55 @@ end;
 
 procedure TfrmCadastroPadrao.FormCreate(Sender: TObject);
 var
-  I : Integer;
+  I: Integer;
 begin
 
-  //  Percorre os componentes TEdit
-  for I := 0 to ComponentCount - 1 do
+  // //  Percorre os componentes TEdit
+  // for I := 0 to ComponentCount - 1 do
+  // begin
+  //
+  // if (Components[I] is TEdit) or (Components[I] is TDateTimePicker) then
+  // begin
+  // //  Cria o evento OnKeyPress para cada Edit encontrado
+  // TEdit(Components[I]).OnKeyPress := EditKeyPress;
+  // end
+  // else if Components[I] is TMaskEdit then
+  // begin
+  // // Cria o evento OnKeyPress para cada MaskEdit encontrado
+  // TMaskEdit(Components[I]).OnKeyPress := EditKeyPress;
+  // end;
+  //
+  // end;
+
+end;
+
+procedure TfrmCadastroPadrao.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = #13 then
   begin
-
-    if (Components[I] is TEdit) or (Components[I] is TDateTimePicker) then
-    begin
-      //  Cria o evento OnKeyPress para cada Edit encontrado
-      TEdit(Components[I]).OnKeyPress := EditKeyPress;
-    end
-    else if Components[I] is TMaskEdit then
-    begin
-      // Cria o evento OnKeyPress para cada MaskEdit encontrado
-      TMaskEdit(Components[I]).OnKeyPress := EditKeyPress;
-    end;
-
+    // Verifica se a tecla pressionada é o Enter
+    // Cancela o efeito do enter
+    Key := #0;
+    // Pula para o proximo
+    Perform(WM_NEXTDLGCTL, 0, 0);
   end;
-
 end;
 
 procedure TfrmCadastroPadrao.FormShow(Sender: TObject);
 begin
 
-  //  Exibe o card de pesquisa primeiro
+  // Exibe o card de pesquisa primeiro
   CardPanelPrincipal.ActiveCard := CardPesquisa;
-
   Pesquisar;
-
 end;
 
 procedure TfrmCadastroPadrao.LimpaCampos;
 var
-  Contador: integer;
+  Contador: Integer;
 
 begin
 
-  for contador := 0 to Pred(ComponentCount) do
+  for Contador := 0 to Pred(ComponentCount) do
   begin
 
     if Components[Contador] is TCustomEdit then
@@ -214,11 +232,11 @@ begin
 
   if DBGrid1.SelectedIndex < 0 then
   begin
-    Application.MessageBox('Selecione um cadastro!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+    Application.MessageBox('Selecione um cadastro!', 'Atenção',
+      MB_OK + MB_ICONEXCLAMATION);
     abort;
   end;
 
 end;
 
 end.
-

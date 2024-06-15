@@ -97,7 +97,7 @@ begin
 
   try
 
-    if CR.ID.IsEmpty then
+    if CR.ID <= 0 then
     begin
       raise Exception.Create('Conta a Receber não encontrado!');
     end;

@@ -1,16 +1,15 @@
 inherited frmContasPagar: TfrmContasPagar
   Caption = 'Contas a Pagar'
-  ClientHeight = 643
-  ClientWidth = 1389
+  ClientHeight = 642
+  ClientWidth = 1385
   Position = poDesigned
   WindowState = wsMaximized
-  ExplicitTop = -142
   ExplicitWidth = 1401
   ExplicitHeight = 681
   TextHeight = 19
   inherited CardPanelPrincipal: TCardPanel
-    Width = 1389
-    Height = 643
+    Width = 1385
+    Height = 642
     ExplicitWidth = 1385
     ExplicitHeight = 642
     inherited CardCadastro: TCard
@@ -685,7 +684,7 @@ inherited frmContasPagar: TfrmContasPagar
         end
       end
       inherited PanelTitulo: TPanel
-        Width = 1389
+        Width = 1385
         ExplicitWidth = 1385
         inherited lblTitulo: TLabel
           Left = 23
@@ -694,8 +693,8 @@ inherited frmContasPagar: TfrmContasPagar
       end
     end
     inherited CardPesquisa: TCard
-      Width = 1389
-      Height = 643
+      Width = 1385
+      Height = 642
       ExplicitLeft = 0
       ExplicitTop = 0
       ExplicitWidth = 1385
@@ -3777,8 +3776,8 @@ inherited frmContasPagar: TfrmContasPagar
         end
       end
       inherited pnlBotoes: TPanel
-        Top = 574
-        Width = 1389
+        Top = 573
+        Width = 1385
         BevelOuter = bvNone
         ExplicitTop = 574
         ExplicitWidth = 1389
@@ -3957,8 +3956,8 @@ inherited frmContasPagar: TfrmContasPagar
       end
       inherited pnlGrid: TPanel
         Top = 153
-        Width = 1389
-        Height = 392
+        Width = 1385
+        Height = 391
         ExplicitTop = 153
         ExplicitWidth = 1389
         ExplicitHeight = 392
@@ -4062,13 +4061,15 @@ inherited frmContasPagar: TfrmContasPagar
       end
       object pnlTotais: TPanel
         Left = 0
-        Top = 545
-        Width = 1389
+        Top = 544
+        Width = 1385
         Height = 29
         Align = alBottom
         Color = clWindow
         ParentBackground = False
         TabOrder = 3
+        ExplicitTop = 545
+        ExplicitWidth = 1389
         object lblQtdCp: TLabel
           AlignWithMargins = True
           Left = 980

@@ -16,13 +16,13 @@ inherited frmContasReceber: TfrmContasReceber
     inherited CardCadastro: TCard
       Width = 1339
       Height = 645
-      ExplicitWidth = 1335
-      ExplicitHeight = 644
+      ExplicitWidth = 1339
+      ExplicitHeight = 645
       inherited pnlBotoesCad: TPanel
         Top = 576
         Width = 1339
-        ExplicitTop = 575
-        ExplicitWidth = 1335
+        ExplicitTop = 576
+        ExplicitWidth = 1339
         inherited btnSalvar: TButton
           OnClick = btnSalvarClick
         end
@@ -30,8 +30,8 @@ inherited frmContasReceber: TfrmContasReceber
       inherited PanelCampos: TPanel
         Width = 1339
         Height = 535
-        ExplicitWidth = 1335
-        ExplicitHeight = 534
+        ExplicitWidth = 1339
+        ExplicitHeight = 535
         object lblDataVend: TLabel
           Left = 258
           Top = 159
@@ -211,6 +211,7 @@ inherited frmContasReceber: TfrmContasReceber
               Height = 27
               Color = clWhite
               MaxLength = 10
+              NumbersOnly = True
               TabOrder = 0
             end
             object edtValorParcela: TEdit
@@ -379,6 +380,7 @@ inherited frmContasReceber: TfrmContasReceber
               Height = 27
               Color = clWhite
               MaxLength = 10
+              NumbersOnly = True
               TabOrder = 2
               Visible = False
             end
@@ -398,6 +400,7 @@ inherited frmContasReceber: TfrmContasReceber
               Height = 27
               Color = clWhite
               MaxLength = 10
+              NumbersOnly = True
               TabOrder = 1
             end
             object edtQtdParcelas: TEdit
@@ -407,6 +410,7 @@ inherited frmContasReceber: TfrmContasReceber
               Height = 27
               Color = clWhite
               MaxLength = 10
+              NumbersOnly = True
               TabOrder = 0
             end
           end
@@ -474,6 +478,7 @@ inherited frmContasReceber: TfrmContasReceber
           Height = 27
           Color = clWhite
           MaxLength = 20
+          NumbersOnly = True
           TabOrder = 1
           TextHint = 'Clique no bot'#227'o ao lado'
           OnExit = edtClienteExit
@@ -491,7 +496,7 @@ inherited frmContasReceber: TfrmContasReceber
       end
       inherited PanelTitulo: TPanel
         Width = 1339
-        ExplicitWidth = 1335
+        ExplicitWidth = 1339
       end
     end
     inherited CardPesquisa: TCard
@@ -499,12 +504,12 @@ inherited frmContasReceber: TfrmContasReceber
       Height = 645
       ExplicitLeft = 0
       ExplicitTop = 0
-      ExplicitWidth = 1339
-      ExplicitHeight = 645
+      ExplicitWidth = 1335
+      ExplicitHeight = 644
       inherited pnlPesquisa: TPanel
         Width = 1339
         Height = 137
-        ExplicitWidth = 1339
+        ExplicitWidth = 1335
         ExplicitHeight = 137
         inherited lblPesquisar: TLabel
           Left = 213
@@ -4683,7 +4688,7 @@ inherited frmContasReceber: TfrmContasReceber
           Left = 213
           Top = 39
           Width = 297
-          OnChange = edtPesquisarChange
+          OnChange = PesquisaClick
           ExplicitLeft = 213
           ExplicitTop = 39
           ExplicitWidth = 297
@@ -4694,8 +4699,8 @@ inherited frmContasReceber: TfrmContasReceber
           Height = 77
           Margins.Top = 30
           Margins.Bottom = 30
-          OnClick = btnPesquisaeClick
-          ExplicitLeft = 1215
+          OnClick = PesquisaClick
+          ExplicitLeft = 1211
           ExplicitTop = 30
           ExplicitHeight = 77
         end
@@ -4708,7 +4713,7 @@ inherited frmContasReceber: TfrmContasReceber
           ItemIndex = 0
           TabOrder = 2
           Text = 'TODAS'
-          OnClick = cbStatusClick
+          OnClick = PesquisaClick
           Items.Strings = (
             'TODAS'
             'PAGA'
@@ -4752,7 +4757,7 @@ inherited frmContasReceber: TfrmContasReceber
             ParentColor = False
             ParentFont = False
             TabOrder = 0
-            OnClick = rbDataVencClick
+            OnClick = PesquisaClick
           end
           object rbValorParcela: TRadioButton
             Left = 127
@@ -4769,7 +4774,7 @@ inherited frmContasReceber: TfrmContasReceber
             ParentColor = False
             ParentFont = False
             TabOrder = 1
-            OnClick = rbValorParcelaClick
+            OnClick = PesquisaClick
           end
           object rbValorVenda: TRadioButton
             Left = 127
@@ -4786,7 +4791,7 @@ inherited frmContasReceber: TfrmContasReceber
             ParentColor = False
             ParentFont = False
             TabOrder = 2
-            OnClick = rbValorVendaClick
+            OnClick = PesquisaClick
           end
           object rbDataVenda: TRadioButton
             Left = 3
@@ -4803,7 +4808,7 @@ inherited frmContasReceber: TfrmContasReceber
             ParentColor = False
             ParentFont = False
             TabOrder = 3
-            OnClick = rbDataVendaClick
+            OnClick = PesquisaClick
           end
           object rbId: TRadioButton
             Left = 3
@@ -4822,7 +4827,7 @@ inherited frmContasReceber: TfrmContasReceber
             ParentFont = False
             TabOrder = 4
             TabStop = True
-            OnClick = rbIdClick
+            OnClick = PesquisaClick
           end
         end
         object dateInicial: TDateTimePicker
@@ -4834,7 +4839,7 @@ inherited frmContasReceber: TfrmContasReceber
           Time = 0.872988819442980500
           ShowCheckbox = True
           TabOrder = 4
-          OnChange = dateInicialChange
+          OnChange = PesquisaClick
         end
         object dateFinal: TDateTimePicker
           Left = 373
@@ -4845,7 +4850,7 @@ inherited frmContasReceber: TfrmContasReceber
           Time = 0.872988819442980500
           ShowCheckbox = True
           TabOrder = 5
-          OnChange = dateFinalChange
+          OnChange = PesquisaClick
         end
         object cbData: TComboBox
           Left = 550
@@ -4856,7 +4861,7 @@ inherited frmContasReceber: TfrmContasReceber
           ItemIndex = 1
           TabOrder = 6
           Text = 'DATA VENCIMENTO'
-          OnClick = cbDataClick
+          OnClick = PesquisaClick
           Items.Strings = (
             'DATA VENDA'
             'DATA VENCIMENTO'
@@ -4883,7 +4888,7 @@ inherited frmContasReceber: TfrmContasReceber
             Font.Style = []
             ParentFont = False
             TabOrder = 0
-            OnClick = checkParciaisClick
+            OnClick = PesquisaClick
           end
           object checkVencidas: TCheckBox
             Left = 8
@@ -4898,7 +4903,7 @@ inherited frmContasReceber: TfrmContasReceber
             Font.Style = []
             ParentFont = False
             TabOrder = 1
-            OnClick = checkParciaisClick
+            OnClick = PesquisaClick
           end
         end
         object edtFiltroCliente: TEdit
@@ -4910,7 +4915,6 @@ inherited frmContasReceber: TfrmContasReceber
           MaxLength = 10
           NumbersOnly = True
           TabOrder = 8
-          OnChange = edtFiltroClienteChange
           OnExit = edtClienteExit
         end
         object btnPesqCliente: TButton
@@ -4927,8 +4931,8 @@ inherited frmContasReceber: TfrmContasReceber
       inherited pnlBotoes: TPanel
         Top = 576
         Width = 1339
-        ExplicitTop = 576
-        ExplicitWidth = 1339
+        ExplicitTop = 575
+        ExplicitWidth = 1335
         inherited btnExcluir: TButton
           OnClick = btnExcluirClick
         end
@@ -4938,7 +4942,7 @@ inherited frmContasReceber: TfrmContasReceber
         inherited btnSair: TButton
           Left = 1215
           ImageIndex = 12
-          ExplicitLeft = 1215
+          ExplicitLeft = 1211
         end
         object btnBaixarCR: TButton
           AlignWithMargins = True
@@ -4985,6 +4989,7 @@ inherited frmContasReceber: TfrmContasReceber
           Font.Style = []
           ParentFont = False
           TabOrder = 7
+          ExplicitLeft = 1015
           object lblPagas: TLabel
             Left = 31
             Top = 16
@@ -5070,12 +5075,12 @@ inherited frmContasReceber: TfrmContasReceber
         Width = 1339
         Height = 410
         ExplicitTop = 137
-        ExplicitWidth = 1339
-        ExplicitHeight = 410
+        ExplicitWidth = 1335
+        ExplicitHeight = 409
         inherited DBGrid1: TDBGrid
           Width = 1337
           Height = 408
-          DataSource = DataSourceCReceber
+          DataSource = dsCR
           PopupMenu = PopupMenu
           Columns = <
             item
@@ -5114,9 +5119,8 @@ inherited frmContasReceber: TfrmContasReceber
             end
             item
               Expanded = False
-              FieldName = 'PARCELA'
+              FieldName = 'Parcela'
               Title.Alignment = taCenter
-              Title.Caption = 'Parcela'
               Width = 75
               Visible = True
             end
@@ -5181,6 +5185,8 @@ inherited frmContasReceber: TfrmContasReceber
         Color = clWindow
         ParentBackground = False
         TabOrder = 3
+        ExplicitTop = 546
+        ExplicitWidth = 1335
         object lblQtdCp: TLabel
           AlignWithMargins = True
           Left = 935
@@ -5246,8 +5252,8 @@ inherited frmContasReceber: TfrmContasReceber
     end
   end
   inherited ImageList1: TImageList
-    Left = 816
-    Top = 256
+    Left = 16
+    Top = 200
     Bitmap = {
       494C01010F001800040020002000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000800000008000000001002000000000000000
@@ -7368,11 +7374,10 @@ inherited frmContasReceber: TfrmContasReceber
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000}
   end
-  object DataSourceCReceber: TDataSource
-    DataSet = dmCReceber.cdsCReceber
-    OnDataChange = DataSourceCReceberDataChange
-    Left = 817
-    Top = 330
+  object dsCR: TDataSource
+    OnDataChange = dsCRDataChange
+    Left = 17
+    Top = 258
   end
   object cdsParcelas: TClientDataSet
     PersistDataPacket.Data = {
@@ -7385,8 +7390,8 @@ inherited frmContasReceber: TfrmContasReceber
     Aggregates = <>
     IndexFieldNames = 'Parcela'
     Params = <>
-    Left = 769
-    Top = 442
+    Left = 17
+    Top = 362
     object cdsParcelasParcela: TIntegerField
       FieldName = 'Parcela'
     end
@@ -7403,13 +7408,13 @@ inherited frmContasReceber: TfrmContasReceber
   end
   object dsParcelas: TDataSource
     DataSet = cdsParcelas
-    Left = 769
-    Top = 506
+    Left = 17
+    Top = 418
   end
   object PopupMenu: TPopupMenu
     Images = ImageList1
-    Left = 873
-    Top = 410
+    Left = 17
+    Top = 322
     object CancelarBaixa1: TMenuItem
       Caption = 'Cancelar Baixa'
       ImageIndex = 13

@@ -138,7 +138,7 @@ begin
     FDQueryCrDet.Connection := DataModule1.FDConnection;
     FDQueryCaixa.Connection := DataModule1.FDConnection;
 
-    if ContaReceber.ID = '' then
+    if ContaReceber.ID <= 0 then
     begin
       raise Exception.Create('Conta a receber não encontrada!');
     end;
@@ -193,7 +193,7 @@ begin
           cdsCReceberVALOR_PARCELA.AsCurrency   := ((ContaReceber.ValorParcela - BaixaCR.Valor) - BaixaCR.ValorDesc);
           cdsCReceberDATA_VENCIMENTO.AsDateTime := ContaReceber.DataVencimento;
           cdsCReceberPARCIAL.AsString           := 'S';
-          cdsCReceberCR_ORIGEM.AsString         := ContaReceber.Id;
+          cdsCReceberCR_ORIGEM.AsString         := IntToStr(ContaReceber.Id);
           cdsCReceberID_CLIENTE.AsInteger       := ContaReceber.IdCliente;
 
           //  Gravando no BD
@@ -216,7 +216,7 @@ begin
         FDQueryCR.ParamByName('VALORPARCELA').AsCurrency := ContaReceber.ValorParcela;
         FDQueryCR.ParamByName('STATUS').AsString         := 'P';
         FDQueryCR.ParamByName('DATAREC').AsDate          := BaixaCR.Data;
-        FDQueryCR.ParamByName('IDCR').AsString           := ContaReceber.ID;
+        FDQueryCR.ParamByName('IDCR').AsString           := IntToStr(ContaReceber.ID);
 
         FDQueryCR.Prepare;
         FDQueryCR.ExecSQL;
@@ -250,7 +250,7 @@ begin
         LancarCaixa.Tipo         := 'R';
         LancarCaixa.DataCadastro := BaixaCR.Data;
         LancarCaixa.Origem       := 'CR';
-        LancarCaixa.IdOrigem     := StrToInt(ContaReceber.ID);
+        LancarCaixa.IdOrigem     := ContaReceber.ID;
 
         try
           DataModule1.FDConnection.StartTransaction;
@@ -442,7 +442,7 @@ begin
 
     try
 
-      Result.ID              := FDQueryCR.FieldByName('ID').AsString;
+      Result.ID              := FDQueryCR.FieldByName('ID').AsInteger;
       Result.Doc             := FDQueryCR.FieldByName('NUMERO_DOCUMENTO').AsString;
       Result.Desc            := FDQueryCR.FieldByName('DESCRICAO').AsString;
       Result.Parcela         := FDQueryCR.FieldByName('PARCELA').AsInteger;

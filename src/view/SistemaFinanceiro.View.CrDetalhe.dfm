@@ -4,8 +4,8 @@ object frmCrDetalhe: TfrmCrDetalhe
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'Detalhes Conta Paga'
-  ClientHeight = 673
-  ClientWidth = 841
+  ClientHeight = 672
+  ClientWidth = 837
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -17,12 +17,11 @@ object frmCrDetalhe: TfrmCrDetalhe
   object pnlPrincipal: TPanel
     Left = 0
     Top = 0
-    Width = 841
-    Height = 673
+    Width = 837
+    Height = 672
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitWidth = 837
     ExplicitHeight = 603
     object pnlPesquisa: TPanel
       Left = 0
@@ -394,7 +393,7 @@ object frmCrDetalhe: TfrmCrDetalhe
         object lblFrPgto: TLabel
           Left = 5
           Top = 5
-          Width = 831
+          Width = 182
           Height = 19
           Align = alTop
           Caption = 'Formas de Pagamento'
@@ -406,7 +405,6 @@ object frmCrDetalhe: TfrmCrDetalhe
           Font.Style = [fsBold]
           ParentColor = False
           ParentFont = False
-          ExplicitWidth = 182
         end
         object DBGridPgto: TDBGrid
           AlignWithMargins = True
@@ -466,7 +464,7 @@ object frmCrDetalhe: TfrmCrDetalhe
         object lblParciais: TLabel
           Left = 5
           Top = 5
-          Width = 831
+          Width = 203
           Height = 19
           Align = alTop
           Caption = 'Contas Parciais Geradas:'
@@ -478,7 +476,6 @@ object frmCrDetalhe: TfrmCrDetalhe
           Font.Style = [fsBold]
           ParentColor = False
           ParentFont = False
-          ExplicitWidth = 203
         end
         object DBGridParciais: TDBGrid
           AlignWithMargins = True
