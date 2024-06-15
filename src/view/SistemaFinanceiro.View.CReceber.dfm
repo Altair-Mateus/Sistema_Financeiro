@@ -3,12 +3,14 @@ inherited frmContasReceber: TfrmContasReceber
   ClientHeight = 645
   ClientWidth = 1339
   WindowState = wsMaximized
+  ExplicitTop = -144
   ExplicitWidth = 1351
   ExplicitHeight = 683
   TextHeight = 19
   inherited CardPanelPrincipal: TCardPanel
     Width = 1339
     Height = 645
+    ActiveCard = CardPesquisa
     ExplicitWidth = 1335
     ExplicitHeight = 644
     inherited CardCadastro: TCard

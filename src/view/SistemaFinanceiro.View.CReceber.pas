@@ -358,6 +358,7 @@ begin
   toggleParcelamento.Enabled := True;
   edtParcela.ReadOnly        := True;
   edtValorParcela.ReadOnly   := True;
+  chkBaixarAoSalvar.Checked  := False;
 
   //  Oculta o nome do cliente
   lblNomeCliente.Visible := False;
