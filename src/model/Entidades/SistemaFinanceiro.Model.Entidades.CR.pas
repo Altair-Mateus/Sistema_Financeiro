@@ -4,8 +4,12 @@ interface
 
 uses
   uDBColumnAttribute,
-  uDaoRTTI, SistemaFinanceiro.Model.uSFQuery, Vcl.Dialogs, System.SysUtils,
-  Vcl.Forms, Winapi.Windows;
+  uDaoRTTI,
+  SistemaFinanceiro.Model.uSFQuery,
+  Vcl.Dialogs,
+  System.SysUtils,
+  Vcl.Forms,
+  Winapi.Windows;
 
 type
 
@@ -33,11 +37,11 @@ type
     FIdGrupoParcelas: Integer;
 
   public
-    [TDBColumn('ID', True)]
+    [TDBColumn('ID', True, False)]
     property ID: Integer read FID write FID;
-    [TDBColumn('NUMERO_DOCUMENTO')]
+    [TDBColumn('NUMERO_DOCUMENTO', False, False, True)]
     property Doc: String read FDoc write FDoc;
-    [TDBColumn('DESCRICAO')]
+    [TDBColumn('DESCRICAO', False, False, True)]
     property Desc: String read FDesc write FDesc;
     [TDBColumn('PARCELA')]
     property Parcela: Integer read FParcela write FParcela;
@@ -53,20 +57,19 @@ type
     property DataCadastro: TDate read FDataCadastro write FDataCadastro;
     [TDBColumn('DATA_VENCIMENTO')]
     property DataVencimento: TDate read FDataVencimento write FDataVencimento;
-    [TDBColumn('DATA_RECEBIMENTO')]
-    property DataRecebimento: TDate read FDataRecebimento
-      write FDataRecebimento;
+    [TDBColumn('DATA_RECEBIMENTO', False, False, True)]
+    property DataRecebimento: TDate read FDataRecebimento write FDataRecebimento;
     [TDBColumn('STATUS')]
     property Status: String read FStatus write FStatus;
     [TDBColumn('PARCIAL')]
-    property Parcial: String read FParcial write FStatus;
-    [TDBColumn('CR_ORIGEM')]
+    property Parcial: String read FParcial write FParcial;
+    [TDBColumn('CR_ORIGEM', False, False, True)]
     property CrOrigem: Integer read FCrOrigem write FCrOrigem;
     [TDBColumn('ID_CLIENTE')]
     property IdCliente: Integer read FIdCliente write FIdCliente;
-    [TDBColumn('NUM_TOT_PARCELAS')]
+    [TDBColumn('NUM_TOT_PARCELAS', False, False, True)]
     property NumTotalParcelas: Integer read FNumTotalParcelas write FNumTotalParcelas;
-    [TDBColumn('ID_GRUPO_PARCELAS')]
+    [TDBColumn('ID_GRUPO_PARCELAS', False, False, True)]
     property IdGrupoParcelas: Integer read FIdGrupoParcelas write FIdGrupoParcelas;
 
     constructor Create;
@@ -80,14 +83,16 @@ type
     function DeleteByPk: Boolean;
     function DeleteByProp: Boolean;
     function Load: Boolean;
+    procedure ResetPropertiesToDefault;
 
-    function GetIdGrupoParcelas : Integer;
+
     function Existe(const pId : Integer; const pCarrega : Boolean = false) : Boolean;
 
     procedure AddPropertyToWhere(const APropertyName: String);
     procedure GeraCodigo;
 
     class function TotalCR(pDtIni, pDtFim: TDate) : Double;
+    class function GetIdGrupoParcelas : Integer;
 
 //    procedure BaixarCR(BaixaCR: TModelCrDetalhe);
  //    function CancBxCr(pId: Integer) : Boolean;
@@ -110,6 +115,7 @@ end;
 constructor TModelCR.Create;
 begin
   FDaoRTTI := TDaoRTTI.Create;
+  ResetPropertiesToDefault;
 end;
 
 function TModelCR.DeleteByPk: Boolean;
@@ -196,7 +202,7 @@ begin
   end;
 end;
 
-function TModelCR.GetIdGrupoParcelas: Integer;
+class function TModelCR.GetIdGrupoParcelas: Integer;
 var
   lQuery: TSFQuery;
 begin
@@ -212,7 +218,7 @@ begin
     except
       on E: Exception do
       begin
-               Application.MessageBox(PWideChar('Erro ao obter próximo ID de grupo de parcelas: ' + E.Message), 'Atenção', MB_OK + MB_ICONERROR)
+        Application.MessageBox(PWideChar('Erro ao obter próximo ID de grupo de parcelas: ' + E.Message), 'Atenção', MB_OK + MB_ICONERROR)
       end;
     end;
   finally
@@ -228,6 +234,11 @@ end;
 function TModelCR.Load: Boolean;
 begin
   Result := FDaoRTTI.LoadObjectByPK(Self);
+end;
+
+procedure TModelCR.ResetPropertiesToDefault;
+begin
+  FDaoRTTI.ResetPropertiesToDefault(Self);
 end;
 
 class function TModelCR.TotalCR(pDtIni, pDtFim: TDate): Double;
