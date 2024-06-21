@@ -10,7 +10,7 @@ uses
   Vcl.StdCtrls, Vcl.WinXPanels, Vcl.WinXCtrls, Vcl.ComCtrls, Datasnap.DBClient,
   Vcl.Menus, SistemaFinanceiro.View.BaixarCR, SistemaFinanceiro.View.CrDetalhe,
   Vcl.Imaging.pngimage, SistemaFinanceiro.View.Clientes,
-  SistemaFinanceiro.View.BxMultiplaCr, uEnumsUtils;
+  SistemaFinanceiro.View.BxMultiplaCr, uEnumsUtils, SistemaFinanceiro.Model.Entidades.Cr;
 
 type
   TfrmContasReceber = class(TfrmCadastroPadrao)
@@ -136,6 +136,7 @@ type
     FTelaAtiva: Boolean;
     FCodCR: Integer;
     FOpCad: TOperacaoCadastro;
+    FCr : TModelCR;
     procedure HabilitaBotoes;
     procedure EditarRegCReceber;
     procedure CadParcelaUnica;
@@ -172,7 +173,7 @@ uses
   SistemaFinanceiro.View.Relatorios.Cr,
   SistemaFinanceiro.Model.dmClientes,
   SistemaFinanceiro.Model.dmUsuarios,
-  SistemaFinanceiro.Model.uSFQuery, SistemaFinanceiro.Model.Entidades.Cr;
+  SistemaFinanceiro.Model.uSFQuery;
 
 { TfrmContasReceber }
 
@@ -353,6 +354,11 @@ begin
 
   // Oculta o nome do cliente
   lblNomeCliente.Visible := False;
+
+  if Assigned(FCr) then
+    FreeAndNil(Fcr);
+
+  Fcr := TModelCR.Create;
 
 end;
 
@@ -596,119 +602,120 @@ var
   lIdCliente: Integer;
   lValorVenda: Double;
   lValorParcela: Double;
-  lCr: TModelCR;
   lRegGravado: Boolean;
 begin
 
   lRegGravado := False;
-  lCr := TModelCR.Create;
-  try
-    // Se for um novo registro irá gerar o código, status em aberto
-    // e setar 0 no valor abatido
-    if (FOpCad = ocIncluir) then
-    begin
-      lCr.GeraCodigo;
-      lCr.DataCadastro := now;
-      edtValorParcela.Text := edtValorVenda.Text;
+
+  if Assigned(FCr) then
+  begin
+    try
+      // Se for um novo registro irá gerar o código, status em aberto
+      // e setar 0 no valor abatido
+      if (FOpCad = ocIncluir) then
+      begin
+        FCr.GeraCodigo;
+        FCr.DataCadastro := now;
+        edtValorParcela.Text := edtValorVenda.Text;
+      end;
+
+      // Valida Campos obrigatórios
+      if not TryStrToInt(edtCliente.Text, lIdCliente) then
+      begin
+        edtCliente.SetFocus;
+        Application.MessageBox('Campo CLIENTE não pode estar vazio!', 'Atenção',
+          MB_OK + MB_ICONEXCLAMATION);
+        abort;
+      end;
+
+      if Trim(memDesc.Text) = '' then
+      begin
+        memDesc.SetFocus;
+        Application.MessageBox('Campo Descrição não pode estar vazio!', 'Atenção',
+          MB_OK + MB_ICONEXCLAMATION);
+        abort;
+      end;
+
+      if not TryStrToFloat(edtValorVenda.Text, lValorVenda) then
+      begin
+        edtValorVenda.SetFocus;
+        Application.MessageBox('Valor da Venda inválido!', 'Atenção',
+          MB_OK + MB_ICONEXCLAMATION);
+        abort;
+      end;
+
+      if dateVencimento.Date < dateVenda.Date then
+      begin
+        dateVencimento.SetFocus;
+        Application.MessageBox
+          ('Data de vencimento não pode ser inferior a data de venda!', 'Atenção',
+          MB_OK + MB_ICONEXCLAMATION);
+        abort;
+      end;
+
+      if not TryStrToFloat(edtValorParcela.Text, lValorParcela) then
+      begin
+        edtValorParcela.SetFocus;
+        Application.MessageBox('Valor da Parcela inválido!', 'Atenção',
+          MB_OK + MB_ICONEXCLAMATION);
+        abort;
+      end;
+
+      if not TryStrToInt(edtParcela.Text, lParcela) then
+      begin
+        edtParcela.SetFocus;
+        Application.MessageBox('Número da Parcela inválido!', 'Atenção',
+          MB_OK + MB_ICONEXCLAMATION);
+        abort;
+      end;
+
+      if dateVenda.Date > now then
+      begin
+        dateVenda.SetFocus;
+        Application.MessageBox
+          ('Data de venda não pode ser maior que a data atual!', 'Atenção',
+          MB_OK + MB_ICONEXCLAMATION);
+        abort;
+      end;
+
+      if (lValorParcela > lValorVenda) then
+      begin
+        edtValorParcela.SetFocus;
+        Application.MessageBox
+          ('Valor da parcela não pode ser maior que o valor da venda!', 'Atenção',
+          MB_OK + MB_ICONEXCLAMATION);
+        abort;
+      end;
+
+      FCr.IdCliente := lIdCliente;
+      FCr.Doc := Trim(edtNDoc.Text);
+      FCr.Desc := Trim(memDesc.Text);
+      FCr.Parcela := lParcela;
+      FCr.ValorParcela := lValorParcela;
+      FCr.ValorVenda := lValorVenda;
+      FCr.DataVencimento := dateVencimento.Date;
+      FCr.DataVenda := dateVenda.Date;
+      FCr.Parcial := 'N';
+      FCr.ValorAbatido := 0;
+      FCr.Status := 'A';
+
+      // Gravando no BD
+      if (FOpCad = ocIncluir) then
+        lRegGravado := FCr.Insert;
+
+      if (FOpCad = ocAlterar) then
+        lRegGravado := FCr.UpdateByPK;
+
+
+      // Baixa apos salvar a conta
+      if (lRegGravado and chkBaixarAoSalvar.Checked) then
+        ExibeTelaBaixar(FCr.ID);
+
+    finally
+      FreeAndNil(FCr)
     end;
-
-    // Valida Campos obrigatórios
-    if not TryStrToInt(edtCliente.Text, lIdCliente) then
-    begin
-      edtCliente.SetFocus;
-      Application.MessageBox('Campo CLIENTE não pode estar vazio!', 'Atenção',
-        MB_OK + MB_ICONEXCLAMATION);
-      abort;
-    end;
-
-    if Trim(memDesc.Text) = '' then
-    begin
-      memDesc.SetFocus;
-      Application.MessageBox('Campo Descrição não pode estar vazio!', 'Atenção',
-        MB_OK + MB_ICONEXCLAMATION);
-      abort;
-    end;
-
-    if not TryStrToFloat(edtValorVenda.Text, lValorVenda) then
-    begin
-      edtValorVenda.SetFocus;
-      Application.MessageBox('Valor da Venda inválido!', 'Atenção',
-        MB_OK + MB_ICONEXCLAMATION);
-      abort;
-    end;
-
-    if dateVencimento.Date < dateVenda.Date then
-    begin
-      dateVencimento.SetFocus;
-      Application.MessageBox
-        ('Data de vencimento não pode ser inferior a data de venda!', 'Atenção',
-        MB_OK + MB_ICONEXCLAMATION);
-      abort;
-    end;
-
-    if not TryStrToFloat(edtValorParcela.Text, lValorParcela) then
-    begin
-      edtValorParcela.SetFocus;
-      Application.MessageBox('Valor da Parcela inválido!', 'Atenção',
-        MB_OK + MB_ICONEXCLAMATION);
-      abort;
-    end;
-
-    if not TryStrToInt(edtParcela.Text, lParcela) then
-    begin
-      edtParcela.SetFocus;
-      Application.MessageBox('Número da Parcela inválido!', 'Atenção',
-        MB_OK + MB_ICONEXCLAMATION);
-      abort;
-    end;
-
-    if dateVenda.Date > now then
-    begin
-      dateVenda.SetFocus;
-      Application.MessageBox
-        ('Data de venda não pode ser maior que a data atual!', 'Atenção',
-        MB_OK + MB_ICONEXCLAMATION);
-      abort;
-    end;
-
-    if (lValorParcela > lValorVenda) then
-    begin
-      edtValorParcela.SetFocus;
-      Application.MessageBox
-        ('Valor da parcela não pode ser maior que o valor da venda!', 'Atenção',
-        MB_OK + MB_ICONEXCLAMATION);
-      abort;
-    end;
-
-    lCr.IdCliente := lIdCliente;
-    lCr.Doc := Trim(edtNDoc.Text);
-    lCr.Desc := Trim(memDesc.Text);
-    lCr.Parcela := lParcela;
-    lCr.ValorParcela := lValorParcela;
-    lCr.ValorVenda := lValorVenda;
-    lCr.DataVencimento := dateVencimento.Date;
-    lCr.DataVenda := dateVenda.Date;
-    lCr.Parcial := 'N';
-    lCr.ValorAbatido := 0;
-    lCr.Status := 'A';
-
-    // Gravando no BD
-    if (FOpCad = ocIncluir) then
-      lRegGravado := lCr.Insert;
-
-    if (FOpCad = ocAlterar) then
-    begin
-      lCr.ID := FCodCR;
-      lRegGravado := lCr.UpdateByPK;
-    end;
-
-    // Baixa apos salvar a conta
-    if (lRegGravado and chkBaixarAoSalvar.Checked) then
-      ExibeTelaBaixar(lCr.ID);
-
-  finally
-    lCr.Free;
   end;
+
 end;
 
 procedure TfrmContasReceber.CalcCrGrid;
@@ -927,8 +934,6 @@ begin
 end;
 
 procedure TfrmContasReceber.EditarRegCReceber;
-var
-  lCr: TModelCR;
 begin
 
   edtParcela.Enabled := True;
@@ -955,18 +960,21 @@ begin
     abort;
   end;
 
-  lCr := TModelCR.Create;
+  if Assigned(FCr) then
+    FreeAndNil(Fcr);
+
+  Fcr := TModelCR.Create;
   try
-    lCr.ID := DBGrid1.DataSource.DataSet.FieldByName('ID').AsInteger;
-    if lCr.Load then
+    Fcr.ID := DBGrid1.DataSource.DataSet.FieldByName('ID').AsInteger;
+    if Fcr.LoadObjectByPK then
     begin
 
       // Ajusta o tipo de opercao de cadastro para alterar
       FOpCad := ocAlterar;
-      FCodCR := lCr.ID;
+      FCodCR := Fcr.ID;
 
       // Coloca o numero do registro no titulo
-      lblTitulo.Caption := 'Alterando Registro Nº ' + IntToStr(lCr.ID);
+      lblTitulo.Caption := 'Alterando Registro Nº ' + IntToStr(Fcr.ID);
 
       // Bloqueia o toogle
       toggleParcelamento.Enabled := False;
@@ -978,14 +986,14 @@ begin
       chkBaixarAoSalvar.Checked := False;
 
       // Carrega os dados
-      edtCliente.Text := IntToStr(lCr.IdCliente);
-      memDesc.Text := lCr.Desc;
-      edtValorVenda.Text := TUtilitario.FormatarValor(lCr.ValorVenda);
-      dateVenda.Date := lCr.DataVenda;
-      edtNDoc.Text := lCr.Doc;
-      edtParcela.Text := IntToStr(lCr.Parcela);
-      edtValorParcela.Text := TUtilitario.FormatarValor(lCr.ValorParcela);
-      dateVencimento.Date := lCr.DataVencimento;
+      edtCliente.Text := IntToStr(Fcr.IdCliente);
+      memDesc.Text := Fcr.Desc;
+      edtValorVenda.Text := TUtilitario.FormatarValor(Fcr.ValorVenda);
+      dateVenda.Date := Fcr.DataVenda;
+      edtNDoc.Text := Fcr.Doc;
+      edtParcela.Text := IntToStr(Fcr.Parcela);
+      edtValorParcela.Text := TUtilitario.FormatarValor(Fcr.ValorParcela);
+      dateVencimento.Date := Fcr.DataVencimento;
       BuscaNomeCliente;
     end
     else
@@ -993,8 +1001,10 @@ begin
       Application.MessageBox('Erro ao carregar dados da Conta!', 'Erro!',
         MB_OK + MB_ICONERROR);
     end;
-  finally
-    lCr.Free;
+  except
+    on E : Exception do
+      Application.MessageBox('Erro ao Criar Objeto ao alterar os dados da Conta!', 'Erro!',
+        MB_OK + MB_ICONERROR);
   end;
 
 end;

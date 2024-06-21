@@ -82,13 +82,11 @@ type
     function DeleteBySQLText(const pWhere: String = ''): Boolean;
     function DeleteByPk: Boolean;
     function DeleteByProp: Boolean;
-    function Load: Boolean;
+    function LoadObjectByPK: Boolean;
     procedure ResetPropertiesToDefault;
-
+    procedure AddPropertyToWhere(const APropertyName: String);
 
     function Existe(const pId : Integer; const pCarrega : Boolean = false) : Boolean;
-
-    procedure AddPropertyToWhere(const APropertyName: String);
     procedure GeraCodigo;
 
     class function TotalCR(pDtIni, pDtFim: TDate) : Double;
@@ -160,7 +158,7 @@ begin
         if pCarrega then
         begin
           FID := pId;
-          Load;
+          LoadObjectByPK;
         end;
       end;
 
@@ -231,7 +229,7 @@ begin
   Result := FDaoRTTI.Insert(Self);
 end;
 
-function TModelCR.Load: Boolean;
+function TModelCR.LoadObjectByPK: Boolean;
 begin
   Result := FDaoRTTI.LoadObjectByPK(Self);
 end;

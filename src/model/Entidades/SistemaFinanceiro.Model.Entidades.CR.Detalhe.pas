@@ -1,84 +1,194 @@
 unit SistemaFinanceiro.Model.Entidades.CR.Detalhe;
 
 interface
+
+uses
+  uDBColumnAttribute,
+  uDaoRTTI,
+  SistemaFinanceiro.Model.uSFQuery,
+  System.SysUtils,
+  Vcl.Forms,
+  Winapi.Windows;
+
 type
+  [TDBTable('CONTAS_RECEBER_DETALHE')]
   TModelCrDetalhe = class
 
-    private
-      FValor: Currency;
-      FDetalhes: String;
-      FIdCR: Integer;
-      FId: Integer;
-      FUsuario: String;
-      FData: TDate;
-      FValorDesc: Currency;
-      FValorJuros: Currency;
+  private
+    FDaoRTTI: TDaoRTTI;
+    FValor: Currency;
+    FDetalhes: String;
+    FIdCR: Integer;
+    FId: Integer;
+    FUsuario: String;
+    FData: TDate;
+    FValorDesc: Double;
+  public
+    [TDBColumn('ID', True, False)]
+    property Id: Integer read FId write FId;
+    [TDBColumn('ID_CONTA_RECEBER')]
+    property IdCR: Integer read FIdCR write FIdCR;
+    [TDBColumn('DETALHES', False, False, True)]
+    property Detalhes: String read FDetalhes write FDetalhes;
+    [TDBColumn('VALOR')]
+    property Valor: Currency read FValor write FValor;
+    [TDBColumn('DATA')]
+    property Data: TDate read FData write FData;
+    [TDBColumn('USUARIO')]
+    property Usuario: String read FUsuario write FUsuario;
+    [TDBColumn('DESCONTO_BX', False, False, True)]
+    property ValorDesc: Double read FValorDesc write FValorDesc;
 
-      procedure SetData(const Value: TDate);
-      procedure SetDetalhes(const Value: String);
-      procedure SetId(const Value: Integer);
-      procedure SetIdCR(const Value: Integer);
-      procedure SetUsuario(const Value: String);
-      procedure SetValor(const Value: Currency);
-      procedure SetValorDesc(const Value: Currency);
-      procedure SetValorJuros(const Value: Currency);
+    constructor Create;
+    destructor Destroy; override;
 
+    function Insert: Boolean;
+    function UpdateBySQLText(const pWhereClause: string = ''): Boolean;
+    function UpdateByPK: Boolean;
+    function UpdateByProp: Boolean;
+    function DeleteBySQLText(const pWhere: String = ''): Boolean;
+    function DeleteByPk: Boolean;
+    function DeleteByProp: Boolean;
+    function LoadObjectByPK: Boolean;
+    procedure ResetPropertiesToDefault;
+    procedure AddPropertyToWhere(const APropertyName: String);
 
-    public
-      property Id         : Integer read FId write SetId;
-      property IdCR       : Integer read FIdCR write SetIdCR;
-      property Detalhes   : String read FDetalhes write SetDetalhes;
-      property Valor      : Currency read FValor write SetValor;
-      property Data       : TDate read FData write SetData;
-      property Usuario    : String read FUsuario write SetUsuario;
-      property ValorDesc  : Currency read FValorDesc write SetValorDesc;
-      property ValorJuros : Currency read FValorJuros write SetValorJuros;
-
+    function Existe(const pId : Integer; const pCarrega : Boolean = false) : Boolean;
+    procedure GeraCodigo;
 
   end;
 
 implementation
 
+
 { TModelCrDetalhe }
 
-procedure TModelCrDetalhe.SetData(const Value: TDate);
+procedure TModelCrDetalhe.AddPropertyToWhere(const APropertyName: String);
 begin
-  FData := Value;
+  FDaoRTTI.AddPropertyToWhere(APropertyName);
 end;
 
-procedure TModelCrDetalhe.SetDetalhes(const Value: String);
+constructor TModelCrDetalhe.Create;
 begin
-  FDetalhes := Value;
+  FDaoRTTI := TDaoRTTI.Create;
+  ResetPropertiesToDefault;
 end;
 
-procedure TModelCrDetalhe.SetId(const Value: Integer);
+function TModelCrDetalhe.DeleteByPk: Boolean;
 begin
-  FId := Value;
+  Result := FDaoRTTI.DeleteByPK(Self);
 end;
 
-procedure TModelCrDetalhe.SetIdCR(const Value: Integer);
+function TModelCrDetalhe.DeleteByProp: Boolean;
 begin
-  FIdCR := Value;
+  Result := FDaoRTTI.DeleteByProp(Self);
 end;
 
-procedure TModelCrDetalhe.SetUsuario(const Value: String);
+function TModelCrDetalhe.DeleteBySQLText(const pWhere: String): Boolean;
 begin
-  FUsuario := Value;
+  Result := FDaoRTTI.DeleteBySQLText(Self, pWhere);
 end;
 
-procedure TModelCrDetalhe.SetValor(const Value: Currency);
+destructor TModelCrDetalhe.Destroy;
 begin
-  FValor := Value;
+  FDaoRTTI.Free;
+  inherited;
 end;
 
-procedure TModelCrDetalhe.SetValorDesc(const Value: Currency);
+function TModelCrDetalhe.Existe(const pId: Integer;
+  const pCarrega: Boolean): Boolean;
+var
+  lQuery : TSFQuery;
 begin
-  FValorDesc := Value;
+  Result := False;
+  lQuery := TSFQuery.Create(nil);
+  try
+    try
+      lQuery.Close;
+      lQuery.SQL.Clear;
+      lQuery.SQL.Add(' SELECT ID FROM CONTAS_RECEBER_DETALHE ');
+      lQuery.SQL.Add(' WHERE ID = :ID                        ');
+      lQuery.ParamByName('ID').AsInteger := pId;
+      lQuery.Open;
+
+      if (lQuery.RecordCount > 0) then
+      begin
+        Result := True;
+        if pCarrega then
+        begin
+          FID := pId;
+          LoadObjectByPK;
+        end;
+      end;
+
+    except
+      on E : Exception do
+      begin
+        Application.MessageBox(PWideChar('Erro ao realizar a consulta: ' + E.Message), 'Atenção', MB_OK + MB_ICONERROR);
+      end;
+    end;
+  finally
+    lQuery.Free;
+  end;
+
 end;
 
-procedure TModelCrDetalhe.SetValorJuros(const Value: Currency);
+procedure TModelCrDetalhe.GeraCodigo;
+var
+  lQuery : TSFQuery;
 begin
-  FValorJuros := Value;
+  lQuery := TSFQuery.Create(nil);
+  try
+    try
+      lQuery.Close;
+      lQuery.SQL.Clear;
+      lQuery.Open('SELECT MAX(ID) AS ID FROM CONTAS_RECEBER_DETALHE');
+
+      //  Ultimo codigo usado + 1
+      FID := lQuery.FieldByName('ID').AsInteger + 1;
+
+      //  Insere o registro no final da tabela
+      lQuery.Append;
+    except
+      on E : Exception do
+      begin
+        Application.MessageBox(PWideChar('Erro ao obter próximo ID de CR_Detalhe: ' + E.Message), 'Atenção', MB_OK + MB_ICONERROR);
+      end;
+    end;
+  finally
+    lQuery.Free;
+  end;
+
+end;
+
+function TModelCrDetalhe.Insert: Boolean;
+begin
+  Result := FDaoRTTI.Insert(Self);
+end;
+
+function TModelCrDetalhe.LoadObjectByPK: Boolean;
+begin
+  Result := FDaoRTTI.LoadObjectByPK(Self);
+end;
+
+procedure TModelCrDetalhe.ResetPropertiesToDefault;
+begin
+  FDaoRTTI.ResetPropertiesToDefault(Self);
+end;
+
+function TModelCrDetalhe.UpdateByPK: Boolean;
+begin
+  Result := FDaoRTTI.UpdateByPK(Self);
+end;
+
+function TModelCrDetalhe.UpdateByProp: Boolean;
+begin
+  Result := FDaoRTTI.UpdateByProp(Self);
+end;
+
+function TModelCrDetalhe.UpdateBySQLText(const pWhereClause: string): Boolean;
+begin
+  Result := FDaoRTTI.UpdateBySQLText(Self, pWhereClause);
 end;
 
 end.
