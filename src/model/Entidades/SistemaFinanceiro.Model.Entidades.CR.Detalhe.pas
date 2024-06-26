@@ -20,7 +20,7 @@ type
     FDetalhes: String;
     FIdCR: Integer;
     FId: Integer;
-    FUsuario: String;
+    FUsuario: Integer;
     FData: TDate;
     FValorDesc: Double;
   public
@@ -35,7 +35,7 @@ type
     [TDBColumn('DATA')]
     property Data: TDate read FData write FData;
     [TDBColumn('USUARIO')]
-    property Usuario: String read FUsuario write FUsuario;
+    property Usuario: Integer read FUsuario write FUsuario;
     [TDBColumn('DESCONTO_BX', False, False, True)]
     property ValorDesc: Double read FValorDesc write FValorDesc;
 
