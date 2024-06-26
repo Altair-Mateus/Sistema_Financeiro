@@ -9,7 +9,9 @@ uses
   Vcl.Dialogs,
   System.SysUtils,
   Vcl.Forms,
-  Winapi.Windows;
+  Winapi.Windows,
+  SistemaFinanceiro.Model.Entidades.CR.Detalhe,
+  SistemaFinanceiro.Model.Entidades.LancamentoCaixa;
 
 type
 
@@ -92,7 +94,7 @@ type
     class function TotalCR(pDtIni, pDtFim: TDate) : Double;
     class function GetIdGrupoParcelas : Integer;
 
-//    procedure BaixarCR(BaixaCR: TModelCrDetalhe);
+    function BaixarCR(pBaixaCR: TModelCrDetalhe) : Boolean;
  //    function CancBxCr(pId: Integer) : Boolean;
 //
 //    function GeraCodigoCRDetalhe: Integer;
@@ -108,6 +110,108 @@ implementation
 procedure TModelCR.AddPropertyToWhere(const APropertyName: String);
 begin
   FDaoRTTI.AddPropertyToWhere(APropertyName);
+end;
+
+function TModelCR.BaixarCR(pBaixaCR: TModelCrDetalhe) : Boolean;
+var
+  lCaixa  : TModelLancamentoCaixa;
+  lCrParcial : TModelCR;
+const
+  TOLERANCIAVALORCR : Currency = 0.01;
+begin
+
+  Result := False;
+  FValorAbatido := FValorAbatido + pBaixaCR.Valor;
+
+  //  Caso o valor abatido já seja igual ao valor da parcela
+  if (FValorAbatido >= FValorParcela) then
+  begin
+    FStatus := 'P';
+    FDataRecebimento := pBaixaCR.Data;
+  end;
+
+  // Inclui conta parcial
+  if ((Abs(FValorParcela - pBaixaCR.Valor) - pBaixaCR.ValorDesc) > TOLERANCIAVALORCR) then
+  begin
+    lCrParcial := TModelCR.Create;
+    try
+      //  gera a id
+      GeraCodigo;
+      lCrParcial.DataCadastro := now;
+      lCrParcial.Status := 'A';
+      lCrParcial.ValorAbatido := 0;
+
+
+      //  Passando os dados para o dataset
+      if (FDoc = '') or (FParcial = 'S' ) then
+        lCrParcial.Doc := FDoc
+      else
+        lCrParcial.Doc  := Format('%s-P', [FDoc]);
+
+      lCrParcial.Desc := Format('Parcial - Restante da Conta ID Nº %s - Doc Nº %s', [FID, FDoc]);
+      lCrParcial.ValorVenda := FValorVenda;
+      lCrParcial.DataVenda := FDataVenda;
+      lCrParcial.Parcela := FParcela;
+      lCrParcial.ValorParcela := ((FValorParcela - pBaixaCR.Valor) - pBaixaCR.ValorDesc);
+      lCrParcial.DataVencimento := FDataVencimento;
+      lCrParcial.Parcial := 'S';
+      lCrParcial.CrOrigem := FID;
+      lCrParcial.IdCliente := FIdCliente;
+
+      //  Gravando no BD
+      if not lCrParcial.Insert then
+      begin
+        Application.MessageBox(PWideChar('Erro ao realizar a baixa: Erro ao gerar a conta parcial!'), 'Erro', MB_OK + MB_ICONERROR);
+        exit;
+      end;
+
+    finally
+      lCrParcial.Free;
+    end;
+
+  end;
+
+  //  Atualizando a conta baixada
+  FStatus := 'P';
+  FDataRecebimento := pBaixaCR.Data;
+  if not UpdateByPK then
+  begin
+    Application.MessageBox(PWideChar('Erro ao realizar a baixa: Erro ao gravar a baixa!'), 'Erro', MB_OK + MB_ICONERROR);
+    exit;
+  end;
+
+  //  Grava os detalhes da baixa
+  pBaixaCR.GeraCodigo;
+  if not pBaixaCR.Insert then
+  begin
+    Application.MessageBox(PWideChar('Erro ao realizar a baixa: Erro ao gravar os detalhes da baixa!'), 'Erro', MB_OK + MB_ICONERROR);
+    exit;
+  end;
+
+  //  Lançando a baixa no caixa
+  lCaixa := TModelLancamentoCaixa.Create;
+  try
+    lCaixa.GeraCodigo;
+    lCaixa.NumDoc       := FDoc;
+    lCaixa.Desc         := Format('Baixa Conta ID Nº %d a Receber - Nº Documento: %s - Parcela: %d', [FID, FDoc, FParcela]);
+    lCaixa.Valor        := pBaixaCR.Valor;
+    lCaixa.Tipo         := 'R';
+    lCaixa.DataCadastro := pBaixaCR.Data;
+    lCaixa.Origem       := 'CR';
+    lCaixa.IdOrigem     := FID;
+
+    //  Gravando no BD
+    if not lCaixa.Insert then
+    begin
+      Application.MessageBox(PWideChar('Erro ao realizar a baixa: Erro ao ggravar lançamento no caixa!'), 'Erro', MB_OK + MB_ICONERROR);
+      exit;
+    end;
+  finally
+    lCaixa.Free;
+  end;
+
+  Result := True;
+
 end;
 
 constructor TModelCR.Create;
