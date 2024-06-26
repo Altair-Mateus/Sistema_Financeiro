@@ -22,18 +22,19 @@ object frmCrDetalhe: TfrmCrDetalhe
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitHeight = 603
+    ExplicitWidth = 833
+    ExplicitHeight = 671
     object pnlPesquisa: TPanel
       Left = 0
       Top = 0
-      Width = 841
+      Width = 837
       Height = 129
       Align = alTop
       BevelOuter = bvNone
       Color = 5737262
       ParentBackground = False
       TabOrder = 0
-      ExplicitWidth = 837
+      ExplicitWidth = 833
       object lblTNDoc: TLabel
         Left = 16
         Top = 16
@@ -249,14 +250,14 @@ object frmCrDetalhe: TfrmCrDetalhe
       AlignWithMargins = True
       Left = 3
       Top = 132
-      Width = 835
+      Width = 831
       Height = 137
       Align = alTop
       BevelOuter = bvNone
       Color = clWhite
       ParentBackground = False
       TabOrder = 1
-      ExplicitWidth = 831
+      ExplicitWidth = 827
       object lblDtPag: TLabel
         Left = 16
         Top = 6
@@ -364,19 +365,19 @@ object frmCrDetalhe: TfrmCrDetalhe
     object pnlGrids: TPanel
       Left = 0
       Top = 272
-      Width = 841
-      Height = 332
+      Width = 837
+      Height = 331
       Align = alClient
       BevelOuter = bvNone
       Color = 5737262
       ParentBackground = False
       TabOrder = 2
-      ExplicitWidth = 837
-      ExplicitHeight = 331
+      ExplicitWidth = 833
+      ExplicitHeight = 330
       object pnlGridFormasPagamento: TPanel
         Left = 0
         Top = 0
-        Width = 841
+        Width = 837
         Height = 160
         Margins.Left = 0
         Margins.Right = 0
@@ -389,11 +390,11 @@ object frmCrDetalhe: TfrmCrDetalhe
         Padding.Bottom = 5
         ParentBackground = False
         TabOrder = 0
-        ExplicitWidth = 837
+        ExplicitWidth = 833
         object lblFrPgto: TLabel
           Left = 5
           Top = 5
-          Width = 182
+          Width = 827
           Height = 19
           Align = alTop
           Caption = 'Formas de Pagamento'
@@ -405,12 +406,13 @@ object frmCrDetalhe: TfrmCrDetalhe
           Font.Style = [fsBold]
           ParentColor = False
           ParentFont = False
+          ExplicitWidth = 182
         end
         object DBGridPgto: TDBGrid
           AlignWithMargins = True
           Left = 8
           Top = 34
-          Width = 825
+          Width = 821
           Height = 118
           Margins.Top = 10
           Align = alClient
@@ -449,7 +451,7 @@ object frmCrDetalhe: TfrmCrDetalhe
       object pnlGridParciais: TPanel
         Left = 0
         Top = 160
-        Width = 841
+        Width = 837
         Height = 160
         Align = alTop
         BevelOuter = bvNone
@@ -460,11 +462,11 @@ object frmCrDetalhe: TfrmCrDetalhe
         Padding.Bottom = 5
         ParentBackground = False
         TabOrder = 1
-        ExplicitWidth = 837
+        ExplicitWidth = 833
         object lblParciais: TLabel
           Left = 5
           Top = 5
-          Width = 203
+          Width = 827
           Height = 19
           Align = alTop
           Caption = 'Contas Parciais Geradas:'
@@ -476,12 +478,13 @@ object frmCrDetalhe: TfrmCrDetalhe
           Font.Style = [fsBold]
           ParentColor = False
           ParentFont = False
+          ExplicitWidth = 203
         end
         object DBGridParciais: TDBGrid
           AlignWithMargins = True
           Left = 5
           Top = 34
-          Width = 831
+          Width = 827
           Height = 118
           Margins.Left = 0
           Margins.Top = 10
@@ -536,17 +539,18 @@ object frmCrDetalhe: TfrmCrDetalhe
     end
     object pnlBotoes: TPanel
       Left = 0
-      Top = 604
-      Width = 841
+      Top = 603
+      Width = 837
       Height = 69
       Align = alBottom
       Color = clWindow
       ParentBackground = False
       TabOrder = 3
-      ExplicitTop = 437
+      ExplicitTop = 602
+      ExplicitWidth = 833
       object btnVoltar: TButton
         AlignWithMargins = True
-        Left = 717
+        Left = 713
         Top = 4
         Width = 120
         Height = 61
@@ -556,6 +560,7 @@ object frmCrDetalhe: TfrmCrDetalhe
         Images = ImageList1
         TabOrder = 0
         OnClick = btnVoltarClick
+        ExplicitLeft = 709
       end
     end
   end

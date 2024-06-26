@@ -185,9 +185,7 @@ end;
 procedure TfrmContasReceber.btnBaixarCRClick(Sender: TObject);
 begin
   inherited;
-
   ExibeTelaBaixar(dsCR.DataSet.FieldByName('ID').AsInteger);
-
 end;
 
 procedure TfrmContasReceber.btnBxMultiplaClick(Sender: TObject);
@@ -1072,22 +1070,17 @@ begin
 end;
 
 procedure TfrmContasReceber.ExibeTelaBaixar(pCodCr: Integer);
+var
+  lFormulario : TfrmBaixarCR;
 begin
 
   // Cria o form
-  frmBaixarCR := TfrmBaixarCR.Create(Self);
-
+  lFormulario := TfrmBaixarCR.Create(Self);
   try
-
-    frmBaixarCR.BaixarCR(pCodCr);
-
-    // Exibe o form
-    frmBaixarCR.ShowModal;
-
+    lFormulario.BaixarCR(pCodCr);
+    lFormulario.ShowModal;
   finally
-
-    FreeAndNil(frmBaixarCR);
-
+    lFormulario.Free;
   end;
 
   Pesquisar;

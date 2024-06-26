@@ -2,8 +2,8 @@ object frmPrincipal: TfrmPrincipal
   Left = 0
   Top = 0
   Caption = 'Sistema Financeiro'
-  ClientHeight = 729
-  ClientWidth = 1194
+  ClientHeight = 728
+  ClientWidth = 1190
   Color = 5737262
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -21,7 +21,7 @@ object frmPrincipal: TfrmPrincipal
     AlignWithMargins = True
     Left = 10
     Top = 10
-    Width = 1174
+    Width = 1170
     Height = 191
     Margins.Left = 10
     Margins.Top = 10
@@ -31,6 +31,7 @@ object frmPrincipal: TfrmPrincipal
     Color = clWhite
     ParentBackground = False
     TabOrder = 0
+    ExplicitWidth = 1174
     object pnlSaldoParcial: TPanel
       AlignWithMargins = True
       Left = 14
@@ -51,7 +52,7 @@ object frmPrincipal: TfrmPrincipal
         AlignWithMargins = True
         Left = 3
         Top = 15
-        Width = 293
+        Width = 123
         Height = 23
         Margins.Top = 15
         Align = alTop
@@ -65,7 +66,6 @@ object frmPrincipal: TfrmPrincipal
         Font.Style = []
         ParentColor = False
         ParentFont = False
-        ExplicitWidth = 123
       end
       object lblValor: TLabel
         Left = 190
@@ -3975,7 +3975,7 @@ object frmPrincipal: TfrmPrincipal
         AlignWithMargins = True
         Left = 3
         Top = 15
-        Width = 293
+        Width = 173
         Height = 23
         Margins.Top = 15
         Align = alTop
@@ -3989,7 +3989,6 @@ object frmPrincipal: TfrmPrincipal
         Font.Style = []
         ParentColor = False
         ParentFont = False
-        ExplicitWidth = 173
       end
       object lblValorCP: TLabel
         Left = 190
@@ -6721,7 +6720,7 @@ object frmPrincipal: TfrmPrincipal
         AlignWithMargins = True
         Left = 3
         Top = 15
-        Width = 293
+        Width = 194
         Height = 23
         Margins.Top = 15
         Align = alTop
@@ -6735,7 +6734,6 @@ object frmPrincipal: TfrmPrincipal
         Font.Style = []
         ParentColor = False
         ParentFont = False
-        ExplicitWidth = 194
       end
       object lblValorCR: TLabel
         Left = 190
@@ -10848,8 +10846,8 @@ object frmPrincipal: TfrmPrincipal
     AlignWithMargins = True
     Left = 10
     Top = 214
-    Width = 1174
-    Height = 411
+    Width = 1170
+    Height = 410
     Margins.Left = 10
     Margins.Right = 10
     Align = alClient
@@ -10857,6 +10855,8 @@ object frmPrincipal: TfrmPrincipal
     ParentBackground = False
     TabOrder = 1
     StyleElements = [seFont, seClient]
+    ExplicitWidth = 1174
+    ExplicitHeight = 411
     object pnlBtn: TPanel
       Left = 1
       Top = 1
@@ -11008,8 +11008,8 @@ object frmPrincipal: TfrmPrincipal
         AlignWithMargins = True
         Left = 0
         Top = 15
-        Width = 288
-        Height = 260
+        Width = 1000
+        Height = 1000
         Margins.Left = 0
         Margins.Top = 15
         Margins.Right = 15
@@ -14623,16 +14623,14 @@ object frmPrincipal: TfrmPrincipal
           61696376DFE4D5FCFF3DDE617533775AA30000000049454E44AE426082}
         Proportional = True
         ShowHint = False
-        ExplicitWidth = 1000
-        ExplicitHeight = 1000
       end
     end
   end
   object pnlInfos: TPanel
     AlignWithMargins = True
     Left = 10
-    Top = 638
-    Width = 1174
+    Top = 637
+    Width = 1170
     Height = 81
     Margins.Left = 10
     Margins.Top = 10
@@ -14642,6 +14640,8 @@ object frmPrincipal: TfrmPrincipal
     Color = clWhite
     ParentBackground = False
     TabOrder = 2
+    ExplicitTop = 638
+    ExplicitWidth = 1174
     object lblUserLogado: TLabel
       AlignWithMargins = True
       Left = 1070
@@ -14855,7 +14855,7 @@ object frmPrincipal: TfrmPrincipal
       Left = 11
       Top = 21
       Width = 239
-      Height = 56
+      Height = 35
       Margins.Left = 10
       Margins.Top = 20
       Align = alLeft
@@ -14869,7 +14869,6 @@ object frmPrincipal: TfrmPrincipal
       Font.Style = []
       ParentBiDiMode = False
       ParentFont = False
-      ExplicitHeight = 35
     end
   end
   object MainMenu1: TMainMenu

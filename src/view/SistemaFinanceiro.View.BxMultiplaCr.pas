@@ -197,7 +197,7 @@ begin
         CrDetalhe.IdCR      := DBGrid1.DataSource.DataSet.FieldByName('ID').AsInteger;
         CrDetalhe.Detalhes  := 'CR baixada pela rotina de Baixa Múltipla';
         CrDetalhe.Data      := DtPgto;
-        CrDetalhe.Usuario   :=  IntToStr(dmUsuarios.GetUsuarioLogado.Id);
+        CrDetalhe.Usuario   := dmUsuarios.GetUsuarioLogado.Id;
         CrDetalhe.ValorDesc := CalcDescBx(ValorCrSel, ValorTotCrSel, ValorDesc);
 
 

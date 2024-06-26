@@ -14,7 +14,8 @@ uses
   SistemaFinanceiro.View.FaturaCartao,
   SistemaFinanceiro.View.GeraRelResumoMensalCp,
   SistemaFinanceiro.View.GeraRelResumoMensalCr, Vcl.Buttons,
-  SistemaFinanceiro.Model.Entidades.CR;
+  SistemaFinanceiro.Model.Entidades.CR,
+  SistemaFinanceiro.Model.Entidades.LancamentoCaixa;
 
 type
   TfrmPrincipal = class(TForm)
@@ -134,7 +135,6 @@ implementation
 {$R *.dfm}
 uses
   SistemaFinanceiro.Model.dmUsuarios,
-  SistemaFinanceiro.Model.dmCaixa,
   System.DateUtils,
   SistemaFinanceiro.Model.Entidades.ResumoCaixa,
   SistemaFinanceiro.Utilitarios,
@@ -671,18 +671,18 @@ end;
 
 procedure TfrmPrincipal.ResumoMensalCaixa;
 var
-  ResumoCaixa : TModelResumoCaixa;
-  DataInicial : TDateTime;
-  DataFinal   : TDateTime;
+  lResumoCaixa : TModelResumoCaixa;
+  lDtIni : TDateTime;
+  lDtFim   : TDateTime;
 
 begin
 
-  DataInicial := IncMonth(FDtIni, -2);
-  DataFinal   := FDtFim;
-  ResumoCaixa := dmCaixa.ResumoCaixa(DataInicial, DataFinal);
-  lblValor.Caption := TUtilitario.FormatoMoeda(ResumoCaixa.SaldoFinal);
+  lDtIni := IncMonth(FDtIni, -2);
+  lDtFim   := FDtFim;
+  lResumoCaixa := TModelLancamentoCaixa.ResumoCaixa(lDtIni, lDtFim);
+  lblValor.Caption := TUtilitario.FormatoMoeda(lResumoCaixa.SaldoFinal);
 
-  if ResumoCaixa.SaldoFinal > 0 then
+  if lResumoCaixa.SaldoFinal > 0 then
   begin
 
     imgLucro.Visible := True;
@@ -691,24 +691,21 @@ begin
     pnlSaldoParcial.Color := $006FE76E;
 
   end
-  else if ResumoCaixa.SaldoFinal < 0 then
+  else if lResumoCaixa.SaldoFinal < 0 then
   begin
-
     imgLucro.Visible := False;
     imgPerda.Visible := True;
     imgNormal.Visible := False;
     pnlSaldoParcial.Color := $003838F7;
-
   end
   else
   begin
-
     imgLucro.Visible := False;
     imgPerda.Visible := False;
     imgNormal.Visible := True;
     pnlSaldoParcial.Color := $0000CAE6;
-
   end;
+
 end;
 
 procedure TfrmPrincipal.SaldodoCaixa1Click(Sender: TObject);

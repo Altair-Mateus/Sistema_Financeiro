@@ -20,11 +20,12 @@ object frmDetalhesOrigemCpCr: TfrmDetalhesOrigemCpCr
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitHeight = 605
+    ExplicitWidth = 1180
+    ExplicitHeight = 759
     object pnlTitulo: TPanel
       Left = 0
       Top = 0
-      Width = 1188
+      Width = 1184
       Height = 57
       Align = alTop
       BevelOuter = bvNone
@@ -38,20 +39,20 @@ object frmDetalhesOrigemCpCr: TfrmDetalhesOrigemCpCr
       ParentBackground = False
       ParentFont = False
       TabOrder = 0
-      ExplicitWidth = 1184
+      ExplicitWidth = 1180
     end
     object pnlBotoes: TPanel
       Left = 0
-      Top = 692
-      Width = 1188
+      Top = 691
+      Width = 1184
       Height = 69
       Align = alBottom
       TabOrder = 1
-      ExplicitTop = 536
-      ExplicitWidth = 1184
+      ExplicitTop = 690
+      ExplicitWidth = 1180
       object btnSair: TButton
         AlignWithMargins = True
-        Left = 1064
+        Left = 1060
         Top = 4
         Width = 120
         Height = 61
@@ -61,20 +62,20 @@ object frmDetalhesOrigemCpCr: TfrmDetalhesOrigemCpCr
         Images = ImageList1
         TabOrder = 0
         OnClick = btnSairClick
-        ExplicitLeft = 1060
+        ExplicitLeft = 1056
       end
     end
     object pnlInfo: TPanel
       Left = 0
       Top = 57
-      Width = 1188
-      Height = 635
+      Width = 1184
+      Height = 634
       Align = alClient
       Color = clWhite
       ParentBackground = False
       TabOrder = 2
-      ExplicitWidth = 1184
-      ExplicitHeight = 479
+      ExplicitWidth = 1180
+      ExplicitHeight = 633
       object lblDesc: TLabel
         Left = 44
         Top = 88

@@ -140,7 +140,7 @@ begin
       edtDtPag.Text     := FormatDateTime('DD/MM/YYYY', CrDet.Data);
       edtValPago.Text   := TUtilitario.FormatoMoeda(CrDet.Valor);
       edtValorDesc.Text := TUtilitario.FormatoMoeda(CrDet.ValorDesc);
-      edtUser.Text      := CrDet.Usuario;
+//      edtUser.Text      := CrDet.Usuario;
       memObsPag.Text    := CrDet.Detalhes;
 
 
