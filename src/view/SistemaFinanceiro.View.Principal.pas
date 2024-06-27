@@ -140,7 +140,6 @@ uses
   SistemaFinanceiro.Utilitarios,
   Winapi.Windows,
   SistemaFinanceiro.Model.dmCPagar,
-  SistemaFinanceiro.Model.dmCReceber,
   MidasLib;
 
 procedure TfrmPrincipal.AlterarImagemPrincipal1Click(Sender: TObject);

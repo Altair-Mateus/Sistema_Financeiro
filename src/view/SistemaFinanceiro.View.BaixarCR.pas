@@ -256,7 +256,7 @@ begin
      try
 
       // Verifica se deu baixa na conta
-      if FCr.BaixarCR(lCrDetalhe) then
+      if FCr.BaixarCR(lCrDetalhe, FCr) then
       begin
         Application.MessageBox('Conta baixada com sucesso!', 'Atenção', MB_OK + MB_ICONINFORMATION);
         ModalResult := mrOk;

@@ -32,18 +32,18 @@ type
     cdsCReceberCR_ORIGEM: TIntegerField;
     cdsCReceberID_CLIENTE: TIntegerField;
     cdsCReceberNOME: TWideStringField;
-    FDQueryPgtoCr: TFDQuery;
-    FDQueryPgtoCrID_FR_PGTO: TIntegerField;
-    FDQueryPgtoCrNR_FR: TIntegerField;
-    FDQueryPgtoCrDATA_HORA: TSQLTimeStampField;
-    FDQueryPgtoCrID: TIntegerField;
-    FDQueryPgtoCrID_CR: TIntegerField;
-    FDQueryPgtoCrNOME: TWideStringField;
+    lQueryPgtoCr: TFDQuery;
+    lQueryPgtoCrID_FR_PGTO: TIntegerField;
+    lQueryPgtoCrNR_FR: TIntegerField;
+    lQueryPgtoCrDATA_HORA: TSQLTimeStampField;
+    lQueryPgtoCrID: TIntegerField;
+    lQueryPgtoCrID_CR: TIntegerField;
+    lQueryPgtoCrNOME: TWideStringField;
     cdsCReceberVALOR_PARCELA: TBCDField;
     cdsCReceberVALOR_VENDA: TBCDField;
     cdsCReceberVALOR_ABATIDO: TBCDField;
     FDQueryCrDetalheVALOR: TBCDField;
-    FDQueryPgtoCrVALOR_PAGO: TBCDField;
+    lQueryPgtoCrVALOR_PAGO: TBCDField;
     FDQueryCrDetalheDESCONTO_BX: TBCDField;
     FDQueryCrDetalheUSUARIO: TIntegerField;
     FDQueryCrParciais: TFDQuery;
@@ -233,7 +233,7 @@ begin
       FDQueryCrDet.ParamByName('DETALHES').AsString := BaixaCR.Detalhes;
       FDQueryCrDet.ParamByName('VALOR').AsCurrency  := BaixaCR.Valor;
       FDQueryCrDet.ParamByName('DATA').AsDate       := BaixaCR.Data;
-      FDQueryCrDet.ParamByName('USUARIO').AsString  := BaixaCR.Usuario;
+      FDQueryCrDet.ParamByName('USUARIO').AsInteger := BaixaCR.Usuario;
       FDQueryCrDet.ParamByName('DESC').AsCurrency   := BaixaCR.ValorDesc;
 
       FDQueryCrDet.Prepare;
@@ -507,7 +507,7 @@ begin
       Result.Detalhes  := FDQueryCrDet.FieldByName('DETALHES').AsString;
       Result.Valor     := FDQueryCrDet.FieldByName('VALOR').AsCurrency;
       Result.Data      := FDQueryCrDet.FieldByName('DATA').AsDateTime;
-      Result.Usuario   := FDQueryCrDet.FieldByName('NOME').AsString;
+//      Result.Usuario   := FDQueryCrDet.FieldByName('NOME').AsString;
       Result.ValorDesc := FDQueryCrDet.FieldByName('DESCONTO_BX').AsCurrency;
 
     except

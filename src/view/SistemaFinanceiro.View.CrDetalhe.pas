@@ -165,8 +165,13 @@ begin
     //  Se Existir Parcial Gerada irá informar na tela
     if not (FQueryParciais.IsEmpty) then
     begin
-      pnlGridParciais.Visible := FQueryParciais.IsEmpty;
-      pnlGridParciais.Height := 170;
+      pnlGridParciais.Visible := True;
+      pnlGrids.Height := 331;
+    end
+    else
+    begin
+      pnlGridParciais.Visible := False;
+      pnlGrids.Height := 170;
     end;
 
   finally

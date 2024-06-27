@@ -63,6 +63,7 @@ type
 
     procedure GeraCodigo;
     function Existe(const pId : Integer; const pCarrega : Boolean = false) : Boolean;
+    function ExistePorCr(const pIdCr : Integer; const pCarrega : Boolean = false) : Boolean;
     class function  ResumoCaixa(pDtIni, pDtFim : TDate ) : TModelResumoCaixa;
 
   end;
@@ -125,6 +126,45 @@ begin
         if pCarrega then
         begin
           FID := pId;
+          LoadObjectByPK;
+        end;
+      end;
+
+    except
+      on E : Exception do
+      begin
+        Application.MessageBox(PWideChar('Erro ao realizar a consulta: ' + E.Message), 'Atenção', MB_OK + MB_ICONERROR);
+      end;
+    end;
+  finally
+    lQuery.Free;
+  end;
+
+end;
+
+function TModelLancamentoCaixa.ExistePorCr(const pIdCr: Integer;
+  const pCarrega: Boolean): Boolean;
+var
+  lQuery : TSFQuery;
+begin
+  Result := False;
+  lQuery := TSFQuery.Create(nil);
+  try
+    try
+      lQuery.Close;
+      lQuery.SQL.Clear;
+      lQuery.SQL.Add(' SELECT ID FROM CAIXA         ');
+      lQuery.SQL.Add(' WHERE ID_ORIGEM = :ID_ORIGEM ');
+      lQuery.SQL.Add(' AND ORIGEM = ''CR''          ');
+      lQuery.ParamByName('ID_ORIGEM').AsInteger := pIdCr;
+      lQuery.Open;
+
+      if (lQuery.RecordCount > 0) then
+      begin
+        Result := True;
+        if pCarrega then
+        begin
+          FID := lQuery.FieldByName('ID').AsInteger;
           LoadObjectByPK;
         end;
       end;

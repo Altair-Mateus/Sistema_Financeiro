@@ -2,8 +2,8 @@ object frmDetalhesOrigemCpCr: TfrmDetalhesOrigemCpCr
   Left = 0
   Top = 0
   Caption = 'Detalhes da Origem do Lan'#231'amento no Caixa'
-  ClientHeight = 759
-  ClientWidth = 1180
+  ClientHeight = 757
+  ClientWidth = 1172
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -11,19 +11,22 @@ object frmDetalhesOrigemCpCr: TfrmDetalhesOrigemCpCr
   Font.Name = 'Tahoma'
   Font.Style = []
   WindowState = wsMaximized
+  OnDestroy = FormDestroy
   TextHeight = 19
   object pnlPrincipal: TPanel
     Left = 0
     Top = 0
-    Width = 1180
-    Height = 759
+    Width = 1172
+    Height = 757
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
+    ExplicitWidth = 1168
+    ExplicitHeight = 756
     object pnlTitulo: TPanel
       Left = 0
       Top = 0
-      Width = 1184
+      Width = 1172
       Height = 57
       Align = alTop
       BevelOuter = bvNone
@@ -37,20 +40,20 @@ object frmDetalhesOrigemCpCr: TfrmDetalhesOrigemCpCr
       ParentBackground = False
       ParentFont = False
       TabOrder = 0
-      ExplicitWidth = 1180
+      ExplicitWidth = 1168
     end
     object pnlBotoes: TPanel
       Left = 0
-      Top = 691
-      Width = 1184
+      Top = 688
+      Width = 1172
       Height = 69
       Align = alBottom
       TabOrder = 1
-      ExplicitTop = 690
-      ExplicitWidth = 1180
+      ExplicitTop = 687
+      ExplicitWidth = 1168
       object btnSair: TButton
         AlignWithMargins = True
-        Left = 1060
+        Left = 1048
         Top = 4
         Width = 120
         Height = 61
@@ -60,20 +63,20 @@ object frmDetalhesOrigemCpCr: TfrmDetalhesOrigemCpCr
         Images = ImageList1
         TabOrder = 0
         OnClick = btnSairClick
-        ExplicitLeft = 1056
+        ExplicitLeft = 1044
       end
     end
     object pnlInfo: TPanel
       Left = 0
       Top = 57
-      Width = 1184
-      Height = 634
+      Width = 1172
+      Height = 631
       Align = alClient
       Color = clWhite
       ParentBackground = False
       TabOrder = 2
-      ExplicitWidth = 1180
-      ExplicitHeight = 633
+      ExplicitWidth = 1168
+      ExplicitHeight = 630
       object lblDesc: TLabel
         Left = 44
         Top = 88

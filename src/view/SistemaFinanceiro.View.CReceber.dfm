@@ -1,37 +1,38 @@
 inherited frmContasReceber: TfrmContasReceber
   Caption = 'Contas a Receber'
-  ClientHeight = 644
-  ClientWidth = 1335
+  ClientHeight = 642
+  ClientWidth = 1327
   WindowState = wsMaximized
   OnClose = FormClose
-  ExplicitWidth = 1347
-  ExplicitHeight = 682
+  OnDestroy = FormDestroy
+  ExplicitWidth = 1339
+  ExplicitHeight = 680
   TextHeight = 19
   inherited CardPanelPrincipal: TCardPanel
-    Width = 1335
-    Height = 644
+    Width = 1327
+    Height = 642
     ActiveCard = CardPesquisa
-    ExplicitWidth = 1331
-    ExplicitHeight = 643
+    ExplicitWidth = 1323
+    ExplicitHeight = 641
     inherited CardCadastro: TCard
-      Width = 1335
-      Height = 644
-      ExplicitWidth = 1331
-      ExplicitHeight = 643
+      Width = 1327
+      Height = 642
+      ExplicitWidth = 1327
+      ExplicitHeight = 642
       inherited pnlBotoesCad: TPanel
-        Top = 575
-        Width = 1335
-        ExplicitTop = 574
-        ExplicitWidth = 1331
+        Top = 573
+        Width = 1327
+        ExplicitTop = 573
+        ExplicitWidth = 1327
         inherited btnSalvar: TButton
           OnClick = btnSalvarClick
         end
       end
       inherited PanelCampos: TPanel
-        Width = 1335
-        Height = 534
-        ExplicitWidth = 1331
-        ExplicitHeight = 533
+        Width = 1327
+        Height = 532
+        ExplicitWidth = 1327
+        ExplicitHeight = 532
         object lblDataVend: TLabel
           Left = 258
           Top = 159
@@ -495,21 +496,21 @@ inherited frmContasReceber: TfrmContasReceber
         end
       end
       inherited PanelTitulo: TPanel
-        Width = 1335
-        ExplicitWidth = 1331
+        Width = 1327
+        ExplicitWidth = 1327
       end
     end
     inherited CardPesquisa: TCard
-      Width = 1335
-      Height = 644
+      Width = 1327
+      Height = 642
       ExplicitLeft = 0
       ExplicitTop = 0
-      ExplicitWidth = 1335
-      ExplicitHeight = 644
+      ExplicitWidth = 1323
+      ExplicitHeight = 641
       inherited pnlPesquisa: TPanel
-        Width = 1335
+        Width = 1327
         Height = 137
-        ExplicitWidth = 1335
+        ExplicitWidth = 1323
         ExplicitHeight = 137
         inherited lblPesquisar: TLabel
           Left = 213
@@ -4694,13 +4695,13 @@ inherited frmContasReceber: TfrmContasReceber
           ExplicitWidth = 297
         end
         inherited btnPesquisae: TButton
-          Left = 1211
+          Left = 1203
           Top = 30
           Height = 77
           Margins.Top = 30
           Margins.Bottom = 30
           OnClick = PesquisaClick
-          ExplicitLeft = 1211
+          ExplicitLeft = 1199
           ExplicitTop = 30
           ExplicitHeight = 77
         end
@@ -4929,10 +4930,10 @@ inherited frmContasReceber: TfrmContasReceber
         end
       end
       inherited pnlBotoes: TPanel
-        Top = 575
-        Width = 1335
-        ExplicitTop = 575
-        ExplicitWidth = 1335
+        Top = 573
+        Width = 1327
+        ExplicitTop = 572
+        ExplicitWidth = 1323
         inherited btnExcluir: TButton
           OnClick = btnExcluirClick
         end
@@ -4940,9 +4941,9 @@ inherited frmContasReceber: TfrmContasReceber
           OnClick = btnImprimirClick
         end
         inherited btnSair: TButton
-          Left = 1211
+          Left = 1203
           ImageIndex = 12
-          ExplicitLeft = 1211
+          ExplicitLeft = 1199
         end
         object btnBaixarCR: TButton
           AlignWithMargins = True
@@ -4976,7 +4977,7 @@ inherited frmContasReceber: TfrmContasReceber
         end
         object gbLegenda: TGroupBox
           AlignWithMargins = True
-          Left = 1015
+          Left = 1007
           Top = 4
           Width = 190
           Height = 61
@@ -4989,6 +4990,7 @@ inherited frmContasReceber: TfrmContasReceber
           Font.Style = []
           ParentFont = False
           TabOrder = 7
+          ExplicitLeft = 1003
           object lblPagas: TLabel
             Left = 31
             Top = 16
@@ -5071,14 +5073,14 @@ inherited frmContasReceber: TfrmContasReceber
       end
       inherited pnlGrid: TPanel
         Top = 137
-        Width = 1335
-        Height = 409
+        Width = 1327
+        Height = 407
         ExplicitTop = 137
-        ExplicitWidth = 1335
-        ExplicitHeight = 409
+        ExplicitWidth = 1323
+        ExplicitHeight = 406
         inherited DBGrid1: TDBGrid
-          Width = 1333
-          Height = 407
+          Width = 1325
+          Height = 405
           DataSource = dsCR
           PopupMenu = PopupMenu
           Columns = <
@@ -5126,7 +5128,6 @@ inherited frmContasReceber: TfrmContasReceber
               Visible = True
             end
             item
-              Alignment = taCenter
               Expanded = False
               FieldName = 'STATUS'
               Title.Alignment = taCenter
@@ -5183,16 +5184,18 @@ inherited frmContasReceber: TfrmContasReceber
       end
       object pnlTotais: TPanel
         Left = 0
-        Top = 546
-        Width = 1335
+        Top = 544
+        Width = 1327
         Height = 29
         Align = alBottom
         Color = clWindow
         ParentBackground = False
         TabOrder = 3
+        ExplicitTop = 543
+        ExplicitWidth = 1323
         object lblQtdCp: TLabel
           AlignWithMargins = True
-          Left = 931
+          Left = 923
           Top = 6
           Width = 70
           Height = 19
@@ -5210,7 +5213,7 @@ inherited frmContasReceber: TfrmContasReceber
         end
         object lblTotalCpGrid: TLabel
           AlignWithMargins = True
-          Left = 1201
+          Left = 1193
           Top = 6
           Width = 118
           Height = 19
@@ -5229,7 +5232,7 @@ inherited frmContasReceber: TfrmContasReceber
         end
         object lblTQtdCo: TLabel
           AlignWithMargins = True
-          Left = 763
+          Left = 755
           Top = 6
           Width = 162
           Height = 19
@@ -5241,7 +5244,7 @@ inherited frmContasReceber: TfrmContasReceber
         end
         object lblTValorCp: TLabel
           AlignWithMargins = True
-          Left = 1034
+          Left = 1026
           Top = 6
           Width = 161
           Height = 19

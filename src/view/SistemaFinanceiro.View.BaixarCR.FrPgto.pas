@@ -52,7 +52,7 @@ type
 
   public
     { Public declarations }
-    procedure FrPgtoCr(Id : Integer; ValorCr : Currency);
+    procedure FrPgtoCr(pId : Integer; pValorCr : Double);
 
   end;
 
@@ -66,30 +66,29 @@ implementation
 uses
 
   SistemaFinanceiro.Model.dmFrPgto, SistemaFinanceiro.Utilitarios,
-  SistemaFinanceiro.Model.dmPgtoBxCr;
+  SistemaFinanceiro.Model.Entidades.PgtoBxCr;
 
 procedure TfrmFrPgtoBaixaCr.btnAdicionaClick(Sender: TObject);
 var
-  ValorForma : Currency;
-  ValorRest  : Currency;
-  ValorCr    : Currency;
-
+  lValorForma : Double;
+  lValorRest  : Double;
+  ValorCr    : Double;
 begin
 
   //  Valida Campos
-  if (not TryStrToCurr(edtValorCr.Text, ValorCr)) or (ValorCr <= 0) then
+  if (not TryStrToFloat(edtValorCr.Text, ValorCr)) or (ValorCr <= 0) then
   begin
     Application.MessageBox('Valor da Conta a Receber Inválido!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
     abort;
   end;
 
-  if not TryStrToCurr(edtValorRest.Text, ValorRest) then
+  if not TryStrToFloat(edtValorRest.Text, lValorRest) then
   begin
     Application.MessageBox('Valor Restante Inválido!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
     abort;
   end;
 
-  if (not TryStrToCurr(edtValorForma.Text, ValorForma)) or (ValorForma <= 0) then
+  if (not TryStrToFloat(edtValorForma.Text, lValorForma)) or (lValorForma <= 0) then
   begin
     edtValorForma.SetFocus;
     Application.MessageBox('Valor da Forma Inválido!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
@@ -98,26 +97,22 @@ begin
 
   if Trim(edtCodFrPgto.Text) = '' then
   begin
-
     edtCodFrPgto.SetFocus;
     Application.MessageBox('Forma de Pagamento não informada!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
     abort;
-
   end;
 
-  if (ValorForma > ValorCr) or (ValorForma > ValorRest) then
+  if (lValorForma > ValorCr) or (lValorForma > lValorRest) then
   begin
-
     edtValorForma.Clear;
     edtValorForma.SetFocus;
     Application.MessageBox('Valor da Forma não pode ser maior que o valor da conta!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
     abort;
-
   end;
 
   //  Calculando o valor restante
-  ValorRest         := ValorRest - ValorForma;
-  edtValorRest.Text := CurrToStr(ValorRest);
+  lValorRest         := lValorRest - lValorForma;
+  edtValorRest.Text := FloatToStr(lValorRest);
 
   //  Coloca o dataset em modo de inserção
   cdsFrPgto.Insert;
@@ -125,7 +120,7 @@ begin
   //  Alimenta as colunas
   cdsFrPgtoid_fr.AsString       := Trim(edtCodFrPgto.Text);
   cdsFrPgtoNome.AsString        := lblNomeFrPgto.Caption;
-  cdsFrPgtovalorpago.AsCurrency := ValorForma;
+  cdsFrPgtovalorpago.AsCurrency := lValorForma;
 
   // Salva no data set
   cdsFrPgto.Post;
@@ -136,7 +131,7 @@ begin
   edtCodFrPgto.SetFocus;
   lblNomeFrPgto.Caption:= '';
 
-  if ValorRest = 0 then
+  if lValorRest = 0 then
   begin
     btnConfirmar.SetFocus;
   end;
@@ -150,17 +145,17 @@ end;
 
 procedure TfrmFrPgtoBaixaCr.btnConfirmarClick(Sender: TObject);
 var
-  Contador   : Integer;
-  TotalPgtos : Currency;
-  ValorCr    : Currency;
-
+  lContador   : Integer;
+  lTotalPgtos : Double;
+  lValorCr    : Double;
+  lFrPgtoCr : TModelPgtoBxCr;
 begin
 
-  TotalPgtos := 0;
-  Contador   := 0;
+  lTotalPgtos := 0;
+  lContador   := 0;
 
   //  Valida valor CR
-  if (not TryStrToCurr(edtValorCr.Text, ValorCr)) or (ValorCr <= 0) then
+  if (not TryStrToFloat(edtValorCr.Text, lValorCr)) or (lValorCr <= 0) then
   begin
     Application.MessageBox('Valor da Conta a Receber Inválido!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
     abort;
@@ -168,10 +163,8 @@ begin
 
   if cdsFrPgto.IsEmpty then
   begin
-
     Application.MessageBox('Nenhuma forma de pagamento informada!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
     abort;
-
   end;
 
   // Coloca na primeira posição do dataset
@@ -180,24 +173,17 @@ begin
   //  Soma o valor de todas as formas de pagamento
   while not cdsFrPgto.Eof do
   begin
-
-    TotalPgtos := TotalPgtos + cdsFrPgto.FieldByName('VALORPAGO').AsCurrency;
-
+    lTotalPgtos := lTotalPgtos + cdsFrPgto.FieldByName('VALORPAGO').AsFloat;
     //  Avança para o proximo
     cdsFrPgto.Next;
-
   end;
 
   //  Compara com o valor total do CR
-  if TotalPgtos < ValorCr then
+  if lTotalPgtos < lValorCr then
   begin
-
     Application.MessageBox('Valor das formas de pagamento menor que o valor da conta!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
     abort;
-
   end;
-
-
 
   // Coloca na primeira posição do dataset
   cdsFrPgto.First;
@@ -205,29 +191,24 @@ begin
   //  Gravando as formas de pagamento
   while not cdsFrPgto.Eof do
   begin
+    lFrPgtoCr := TModelPgtoBxCr.Create;
+    try
+      lContador := lContador + 1;
 
-    Contador := Contador + 1;
+      lFrPgtoCr.GeraCodigo;
+      lFrPgtoCr.IdCr      := FId;
+      lFrPgtoCr.IdFrPgto  := cdsFrPgtoid_fr.AsInteger;
+      lFrPgtoCr.NrPgto    := lContador;
+      lFrPgtoCr.DataHora  := Now;
+      lFrPgtoCr.ValorPago := cdsFrPgtovalorpago.AsCurrency;
 
-    //  Atualiza as info do dataset
-    dmPgtoBxCr.cdsPgtoBxCr.Refresh;
+      //  Gravando no banco
+      lFrPgtoCr.Insert;
 
-    if dmPgtoBxCr.cdsPgtoBxCr.State in [dsBrowse, dsInactive] then
-    begin
-      dmPgtoBxCr.cdsPgtoBxCr.Insert;
+      cdsFrPgto.Next;
+    finally
+      lFrPgtoCr.Free;
     end;
-
-    dmPgtoBxCr.GeraCodigo;
-    dmPgtoBxCr.cdsPgtoBxCrID_CR.AsInteger       := FId;
-    dmPgtoBxCr.cdsPgtoBxCrID_FR_PGTO.AsInteger  := cdsFrPgtoid_fr.AsInteger;
-    dmPgtoBxCr.cdsPgtoBxCrNR_FR.AsInteger       := Contador;
-    dmPgtoBxCr.cdsPgtoBxCrDATA_HORA.AsDateTime  := Now;
-    dmPgtoBxCr.cdsPgtoBxCrVALOR_PAGO.AsCurrency := cdsFrPgtovalorpago.AsCurrency;
-
-    //  Gravando no banco
-    dmPgtoBxCr.cdsPgtoBxCr.Post;
-    dmPgtoBxCr.cdsPgtoBxCr.ApplyUpdates(0);
-
-    cdsFrPgto.Next;
 
   end;
 
@@ -367,10 +348,10 @@ begin
   edtCodFrPgto.SetFocus;
 end;
 
-procedure TfrmFrPgtoBaixaCr.FrPgtoCr(Id: Integer; ValorCr : Currency);
+procedure TfrmFrPgtoBaixaCr.FrPgtoCr(pId: Integer; pValorCr : Double);
 begin
 
-  FID := Id;
+  FID := pId;
 
   //  Valida ID do CR
   if FID < 0 then
@@ -378,14 +359,14 @@ begin
     raise Exception.Create('ID do contas a receber Inválido!');
   end;
 
-  if ValorCr <= 0 then
+  if pValorCr <= 0 then
   begin
     raise Exception.Create('Valor da Conta a Receber Inválido!');
   end;
 
   // Puxa o valor da CR
-  edtValorCr.Text   := CurrToStr(ValorCr);
-  edtValorRest.Text := CurrToStr(ValorCr);
+  edtValorCr.Text   := FloatToStr(pValorCr);
+  edtValorRest.Text := FloatToStr(pValorCr);
 
   edtValorForma.Clear;
 

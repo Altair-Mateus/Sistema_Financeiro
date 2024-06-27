@@ -64,7 +64,6 @@ begin
       if not Assigned(JSON) then
         JSON := TJSONObject.Create;
     end;
-
     // Criar JSONArray para as colunas do grid atual
     JSONArray := TJSONArray.Create;
     for I := 0 to pGrid.Columns.Count - 1 do
@@ -75,19 +74,14 @@ begin
       ColumnData.AddPair('Width', TJSONNumber.Create(Column.Width));
       JSONArray.AddElement(ColumnData);
     end;
-
     // Adicionar ou substituir o grid específico no JSON principal
     GridJSONObject := TJSONObject.Create;
     GridJSONObject.AddPair('ColumnConfigs', JSONArray);
-
     if JSON.Values[pGridName] <> nil then
       JSON.RemovePair(pGridName).Free; // Remove o par existente antes de adicionar o novo
-
     JSON.AddPair(pGridName, GridJSONObject);
-
     // Formatar o JSON de maneira legível
     JSONString := JSON.Format(4); // Indentação de 4 espaços
-
     // Salvar o JSON formatado
     TFile.WriteAllText(pNomeArquivo + '.json', JSONString, TEncoding.UTF8);
   finally
@@ -228,12 +222,13 @@ begin
     exit;
   end;
 
-  // Função upper converte a string em letras maiusculas
+  // Função upper converte a string em letras maiúsculas
   // Função QuotedStr trata o texto e o coloca dentro aspas simples
-  // Função trim remove os espaços no inicio e fim do texto
+  // Função trim remove os espaços no início e fim do texto
   for LContador := 0 to Pred(Grid.Columns.Count) do
   begin
-    if (Grid.Columns.Items[LContador].Field.DataType = ftWideString) then
+    if (Grid.Columns.Items[LContador].Field <> nil) and
+       (Grid.Columns.Items[LContador].Field.DataType = ftWideString) then
     begin
       Result := Result + 'upper(trim(' + Grid.Columns.Items[LContador].FieldName
         + '))' + ' LIKE ' + QuotedStr('%' + AnsiUpperCase(Trim(Pesquisa)) +
@@ -241,10 +236,10 @@ begin
     end;
   end;
 
-  Result := ' AND (' + Copy(Result, 1, Length(Result) - 4) + ')';
-
+  // Remove o último ' OR ' e encapsula a condição entre parênteses
+  if not Result.IsEmpty then
+    Result := ' AND (' + Copy(Result, 1, Length(Result) - 4) + ')';
 end;
-
 
 class function TUtilitario.TruncarValor(Valor: Currency; Decimais: Integer)
   : Currency;

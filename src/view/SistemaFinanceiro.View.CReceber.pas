@@ -3,14 +3,36 @@ unit SistemaFinanceiro.View.CReceber;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
-  System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, SistemaFinanceiro.View.CadastroPadrao,
-  Data.DB, System.ImageList, Vcl.ImgList, Vcl.Grids, Vcl.DBGrids, Vcl.ExtCtrls,
-  Vcl.StdCtrls, Vcl.WinXPanels, Vcl.WinXCtrls, Vcl.ComCtrls, Datasnap.DBClient,
-  Vcl.Menus, SistemaFinanceiro.View.BaixarCR, SistemaFinanceiro.View.CrDetalhe,
-  Vcl.Imaging.pngimage, SistemaFinanceiro.View.Clientes,
-  SistemaFinanceiro.View.BxMultiplaCr, uEnumsUtils, SistemaFinanceiro.Model.Entidades.Cr;
+  Winapi.Windows,
+  Winapi.Messages,
+  System.SysUtils,
+  System.Variants,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  SistemaFinanceiro.View.CadastroPadrao,
+  Data.DB,
+  System.ImageList,
+  Vcl.ImgList,
+  Vcl.Grids,
+  Vcl.DBGrids,
+  Vcl.ExtCtrls,
+  Vcl.StdCtrls,
+  Vcl.WinXPanels,
+  Vcl.WinXCtrls,
+  Vcl.ComCtrls,
+  Datasnap.DBClient,
+  Vcl.Menus,
+  SistemaFinanceiro.View.BaixarCR,
+  SistemaFinanceiro.View.CrDetalhe,
+  Vcl.Imaging.pngimage,
+  SistemaFinanceiro.View.Clientes,
+  SistemaFinanceiro.View.BxMultiplaCr,
+  uEnumsUtils,
+  SistemaFinanceiro.Model.Entidades.Cr,
+  SistemaFinanceiro.Model.uSFQuery;
 
 type
   TfrmContasReceber = class(TfrmCadastroPadrao)
@@ -107,7 +129,6 @@ type
     chkBaixarAoSalvar: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure btnIncluirClick(Sender: TObject);
-    procedure btnCancelarClick(Sender: TObject);
     procedure toggleParcelamentoClick(Sender: TObject);
     procedure edtValorVendaExit(Sender: TObject);
     procedure edtValorParcelaExit(Sender: TObject);
@@ -133,11 +154,13 @@ type
     procedure PesquisaClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormDestroy(Sender: TObject);
   private
     FTelaAtiva: Boolean;
     FCodCR: Integer;
     FOpCad: TOperacaoCadastro;
     FCr : TModelCR;
+    FQueryPesquisa: TSFQuery;
     procedure HabilitaBotoes;
     procedure EditarRegCReceber;
     procedure CadParcelaUnica;
@@ -167,14 +190,12 @@ implementation
 {$R *.dfm}
 
 uses
-  SistemaFinanceiro.Model.dmCReceber,
   SistemaFinanceiro.Utilitarios,
   System.DateUtils,
   SistemaFinanceiro.View.Principal,
   SistemaFinanceiro.View.Relatorios.Cr,
   SistemaFinanceiro.Model.dmClientes,
-  SistemaFinanceiro.Model.dmUsuarios,
-  SistemaFinanceiro.Model.uSFQuery;
+  SistemaFinanceiro.Model.dmUsuarios;
 
 { TfrmContasReceber }
 
@@ -193,16 +214,6 @@ procedure TfrmContasReceber.btnBxMultiplaClick(Sender: TObject);
 begin
 
   ExibeTelaBxMultipla;
-
-end;
-
-procedure TfrmContasReceber.btnCancelarClick(Sender: TObject);
-begin
-
-  inherited;
-
-  // Cancelando inclusão
-  dmCReceber.cdsCReceber.Cancel;
 
 end;
 
@@ -227,54 +238,53 @@ end;
 procedure TfrmContasReceber.btnExcluirClick(Sender: TObject);
 var
   Option: Word;
+  lCr : TModelCR;
+  lIdCr : Integer;
 begin
 
-  // Se o documento já foi baixado cancela a exclusão
-  if dmCReceber.cdsCReceberSTATUS.AsString = 'P' then
-  begin
-    CardPanelPrincipal.ActiveCard := CardPesquisa;
-    Application.MessageBox('Documento já baixado não pode ser cancelado!',
-      'Atenção', MB_OK + MB_ICONEXCLAMATION);
-    abort;
-  end;
-
-  // Se o documento foi cancelado, a exclusão é cancelada
-  if dmCReceber.cdsCReceberSTATUS.AsString = 'C' then
-  begin
-    CardPanelPrincipal.ActiveCard := CardPesquisa;
-    Application.MessageBox('Documento já cancelado não pode ser cancelado!',
-      'Atenção', MB_OK + MB_ICONEXCLAMATION);
-    abort;
-  end;
-
-  Option := Application.MessageBox('Deseja cancelar o registro? ',
-    'Confirmação', MB_YESNO + MB_ICONQUESTION);
-
-  if Option = IDNO then
-  begin
-    exit;
-  end;
-
+  lIdCr := DBGrid1.DataSource.DataSet.FieldByName('ID').AsInteger;
+  lCr := TModelCR.Create;
   try
-    dmCReceber.cdsCReceber.Edit;
-    dmCReceber.cdsCReceberSTATUS.AsString := 'C';
-    dmCReceber.cdsCReceber.Post;
-    dmCReceber.cdsCReceber.ApplyUpdates(0);
 
-    Application.MessageBox('Documento cancelado com sucesso!', 'Atenção',
-      MB_OK + MB_ICONINFORMATION);
-    Pesquisar;
+    if not lCr.Existe(lIdCr, True) then
+    begin
+      raise Exception.Create('ID do contas a receber Inválido!');
+    end;
 
-    // Atualiza o relatorio na tela inicial
-    frmPrincipal.TotalCR;
+    // Se o documento já foi baixado cancela a exclusão
+    if lCr.Status = 'P' then
+    begin
+      Application.MessageBox('Documento já baixado não pode ser cancelado!',
+        'Atenção', MB_OK + MB_ICONEXCLAMATION);
+      exit;
+    end;
 
-  except
-    on e: Exception do
-      Application.MessageBox(PWidechar(e.Message),
-        'Erro ao cancelar documento!', MB_OK + MB_ICONERROR);
+    // Se o documento foi cancelado, a exclusão é cancelada
+    if lCr.Status = 'C' then
+    begin
+      Application.MessageBox('Documento já cancelado não pode ser cancelado!',
+        'Atenção', MB_OK + MB_ICONEXCLAMATION);
+      exit;
+    end;
+
+    Option := Application.MessageBox('Deseja cancelar o registro? ',
+      'Confirmação', MB_YESNO + MB_ICONQUESTION);
+
+    if Option = IDNO then
+      exit;
+
+    lCr.Status := 'C';
+    if lCr.UpdateByPK then
+      Application.MessageBox('Documento cancelado com sucesso!', 'Atenção',
+        MB_OK + MB_ICONINFORMATION)
+    else
+      Application.MessageBox('Erro ao cancelar a CR!', 'Erro', MB_OK + MB_ICONERROR);
+
+  finally
+    lCr.Free;
   end;
 
-  inherited;
+  Pesquisar;
 end;
 
 procedure TfrmContasReceber.btnGerarClick(Sender: TObject);
@@ -772,54 +782,55 @@ end;
 procedure TfrmContasReceber.CancelarBaixa1Click(Sender: TObject);
 var
   Option: Word;
-  IdCr: Integer;
-
+  lIdCr: Integer;
+  lCr : TModelCR;
 begin
 
-  // Valida se o user logado é adm
-  if not(dmUsuarios.GetUsuarioLogado.User_Admin = 'S') then
-  begin
+  // Pega a id da conta
+  lIdCr := dsCR.DataSet.FieldByName('ID').AsInteger;
+  lCr := TModelCR.Create;
+  try
 
-    Application.MessageBox('Somente Administradores podem cancelar uma Baixa!',
-      'Erro', MB_OK + MB_ICONERROR);
-    abort;
+    if not lCr.Existe(lIdCr, True) then
+    begin
+      raise Exception.Create('ID do contas a receber Inválido!');
+    end;
 
-  end;
-
-  if not dsCR.DataSet.IsEmpty then
-  begin
+    // Valida se o user logado é adm
+    if not(dmUsuarios.GetUsuarioLogado.User_Admin = 'S') then
+    begin
+      Application.MessageBox('Somente Administradores podem cancelar uma Baixa!',
+        'Erro', MB_OK + MB_ICONERROR);
+      exit;
+    end;
 
     // Bloqueia o cancelamento se a conta não estiver como PAGA
-    if dsCR.DataSet.FieldByName('STATUS').AsString <> 'P' then
+    if lCr.Status <> 'P' then
     begin
-
       Application.MessageBox('Conta não baixada!!', 'Erro',
         MB_OK + MB_ICONERROR);
-      abort;
-
+      exit;
     end;
 
     Option := Application.MessageBox('Deseja cancelar o registro? ',
       'Confirmação', MB_YESNO + MB_ICONQUESTION);
 
     if Option = IDNO then
-    begin
       exit;
-    end;
-
-    // Pega a id da conta
-    IdCr := dsCR.DataSet.FieldByName('ID').AsInteger;
 
     // Chama a procedure que fara o trabalho
-    dmCReceber.CancBxCR(IdCr);
+    if lCr.CancBxCr then
+      Application.MessageBox('Conta cancelada com Sucesso!!', 'Atenção', MB_OK + MB_ICONINFORMATION);
 
-    Pesquisar;
-
-    // Atualiza relatorio tela principal
-    frmPrincipal.TotalCR;
-    frmPrincipal.ResumoMensalCaixa;
-
+  finally
+    lCr.Free;
   end;
+
+  Pesquisar;
+
+  // Atualiza relatorio tela principal
+  frmPrincipal.TotalCR;
+  frmPrincipal.ResumoMensalCaixa;
 
 end;
 
@@ -1120,13 +1131,19 @@ begin
   inherited;
 
   FTelaAtiva := False;
-  dmCReceber.cdsCReceber.Active := True;
 
   // Define as datas da consulta
   dateInicial.Date := StartOfTheMonth(now);
   dateFinal.Date := EndOfTheMonth(now);
   edtValorVenda.OnKeyPress := KeyPressValor;
   edtValorParcela.OnKeyPress := KeyPressValor;
+end;
+
+procedure TfrmContasReceber.FormDestroy(Sender: TObject);
+begin
+  inherited;
+  if Assigned(FQueryPesquisa) then
+    FQueryPesquisa.Free;
 end;
 
 procedure TfrmContasReceber.FormShow(Sender: TObject);
@@ -1393,13 +1410,12 @@ var
   LFiltroEdit: String;
   LFiltro: String;
   LOrdem: String;
-  lQuery: TSFQuery;
 begin
 
-  if Assigned(lQuery) then
-    FreeAndNil(lQuery);
+  if Assigned(FQueryPesquisa) then
+    FreeAndNil(FQueryPesquisa);
 
-  lQuery := TSFQuery.Create(nil);
+  FQueryPesquisa := TSFQuery.Create(nil);
 
   try
     // Validações
@@ -1427,6 +1443,16 @@ begin
         MB_OK + MB_ICONEXCLAMATION);
       exit;
     end;
+
+    // Pré pesquisa para funcionar o likefind
+    FQueryPesquisa.Close;
+    FQueryPesquisa.SQL.Clear;
+    FQueryPesquisa.SQL.Add(' SELECT FIRST 1 CR.*, CL.NOME FROM CONTAS_RECEBER CR LEFT JOIN CLIENTES CL ');
+    FQueryPesquisa.SQL.Add(' ON CR.ID_CLIENTE = CL.ID_CLI');
+    FQueryPesquisa.Open;
+
+    // Configurações do DataSet para o DBGrid
+    DBGrid1.DataSource.DataSet := FQueryPesquisa;
 
     LFiltroEdit := TUtilitario.LikeFind(edtPesquisar.Text, DBGrid1);
     LFiltro := '';
@@ -1485,31 +1511,29 @@ begin
     else
       LOrdem := ' ORDER BY CR.ID DESC';
 
-    lQuery.Close;
-    lQuery.SQL.Clear;
-    lQuery.SQL.Add
+    FQueryPesquisa.Close;
+    FQueryPesquisa.SQL.Clear;
+    FQueryPesquisa.SQL.Add
       ('SELECT CR.*, CL.NOME FROM CONTAS_RECEBER CR LEFT JOIN CLIENTES CL ');
-    lQuery.SQL.Add(' ON CR.ID_CLIENTE = CL.ID_CLI WHERE 1 = 1');
-    lQuery.SQL.Add(LFiltroEdit + LFiltro + LOrdem);
+    FQueryPesquisa.SQL.Add(' ON CR.ID_CLIENTE = CL.ID_CLI WHERE 1 = 1');
+    FQueryPesquisa.SQL.Add(LFiltroEdit + LFiltro + LOrdem);
 
     if Trim(edtFiltroCliente.Text) <> '' then
-      lQuery.ParamByName('ID').AsString := Trim(edtFiltroCliente.Text);
+      FQueryPesquisa.ParamByName('ID').AsString := Trim(edtFiltroCliente.Text);
 
     if checkVencidas.Checked then
-      lQuery.ParamByName('DATUAL').AsDate := now;
+      FQueryPesquisa.ParamByName('DATUAL').AsDate := now;
 
     if (dateInicial.Checked) and (dateFinal.Checked) then
     begin
-      lQuery.ParamByName('DTINI').AsDate := dateInicial.Date;
-      lQuery.ParamByName('DTFIM').AsDate := dateFinal.Date;
+      FQueryPesquisa.ParamByName('DTINI').AsDate := dateInicial.Date;
+      FQueryPesquisa.ParamByName('DTFIM').AsDate := dateFinal.Date;
     end;
 
-    lQuery.Open;
+    FQueryPesquisa.Open;
 
-    lQuery.FieldByName('STATUS').OnGetText := QuerySTATUSGetText;
-
-    // Configurações do DataSet para o DBGrid
-    dsCR.DataSet := lQuery;
+    // Formata visualmente o campo de STATUS
+    FQueryPesquisa.FieldByName('STATUS').OnGetText := QuerySTATUSGetText;
 
     HabilitaBotoes;
 

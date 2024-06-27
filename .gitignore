@@ -70,3 +70,4 @@ modules/
 *.ini
 src/view/uTeste.dfm
 src/view/uTeste.pas
+*.json

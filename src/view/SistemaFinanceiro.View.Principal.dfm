@@ -31,7 +31,7 @@ object frmPrincipal: TfrmPrincipal
     Color = clWhite
     ParentBackground = False
     TabOrder = 0
-    ExplicitWidth = 1174
+    ExplicitWidth = 1166
     object pnlSaldoParcial: TPanel
       AlignWithMargins = True
       Left = 14
@@ -52,7 +52,7 @@ object frmPrincipal: TfrmPrincipal
         AlignWithMargins = True
         Left = 3
         Top = 15
-        Width = 123
+        Width = 293
         Height = 23
         Margins.Top = 15
         Align = alTop
@@ -66,6 +66,7 @@ object frmPrincipal: TfrmPrincipal
         Font.Style = []
         ParentColor = False
         ParentFont = False
+        ExplicitWidth = 123
       end
       object lblValor: TLabel
         Left = 190
@@ -3975,7 +3976,7 @@ object frmPrincipal: TfrmPrincipal
         AlignWithMargins = True
         Left = 3
         Top = 15
-        Width = 173
+        Width = 293
         Height = 23
         Margins.Top = 15
         Align = alTop
@@ -3989,6 +3990,7 @@ object frmPrincipal: TfrmPrincipal
         Font.Style = []
         ParentColor = False
         ParentFont = False
+        ExplicitWidth = 173
       end
       object lblValorCP: TLabel
         Left = 190
@@ -6720,7 +6722,7 @@ object frmPrincipal: TfrmPrincipal
         AlignWithMargins = True
         Left = 3
         Top = 15
-        Width = 194
+        Width = 293
         Height = 23
         Margins.Top = 15
         Align = alTop
@@ -6734,6 +6736,7 @@ object frmPrincipal: TfrmPrincipal
         Font.Style = []
         ParentColor = False
         ParentFont = False
+        ExplicitWidth = 194
       end
       object lblValorCR: TLabel
         Left = 190
@@ -10855,17 +10858,17 @@ object frmPrincipal: TfrmPrincipal
     ParentBackground = False
     TabOrder = 1
     StyleElements = [seFont, seClient]
-    ExplicitWidth = 1174
-    ExplicitHeight = 411
+    ExplicitWidth = 1166
+    ExplicitHeight = 409
     object pnlBtn: TPanel
       Left = 1
       Top = 1
-      Width = 1176
+      Width = 1168
       Height = 120
       Align = alTop
       BevelOuter = bvNone
       TabOrder = 0
-      ExplicitWidth = 1172
+      ExplicitWidth = 1164
       object btnCaixa: TButton
         Left = 813
         Top = 22
@@ -10995,21 +10998,21 @@ object frmPrincipal: TfrmPrincipal
       end
     end
     object pnlLogo: TPanel
-      Left = 874
+      Left = 866
       Top = 121
       Width = 303
-      Height = 290
+      Height = 288
       Align = alRight
       BevelOuter = bvNone
       TabOrder = 1
-      ExplicitLeft = 870
-      ExplicitHeight = 289
+      ExplicitLeft = 862
+      ExplicitHeight = 287
       object imgLogo: TImage
         AlignWithMargins = True
         Left = 0
         Top = 15
-        Width = 1000
-        Height = 1000
+        Width = 288
+        Height = 258
         Margins.Left = 0
         Margins.Top = 15
         Margins.Right = 15
@@ -14623,6 +14626,8 @@ object frmPrincipal: TfrmPrincipal
           61696376DFE4D5FCFF3DDE617533775AA30000000049454E44AE426082}
         Proportional = True
         ShowHint = False
+        ExplicitWidth = 1000
+        ExplicitHeight = 1000
       end
     end
   end
@@ -14640,11 +14645,11 @@ object frmPrincipal: TfrmPrincipal
     Color = clWhite
     ParentBackground = False
     TabOrder = 2
-    ExplicitTop = 638
-    ExplicitWidth = 1174
+    ExplicitTop = 636
+    ExplicitWidth = 1166
     object lblUserLogado: TLabel
       AlignWithMargins = True
-      Left = 1070
+      Left = 1062
       Top = 31
       Width = 97
       Height = 19
@@ -14665,7 +14670,7 @@ object frmPrincipal: TfrmPrincipal
     end
     object Image1: TImage
       AlignWithMargins = True
-      Left = 1007
+      Left = 999
       Top = 16
       Width = 50
       Height = 49
@@ -14855,7 +14860,7 @@ object frmPrincipal: TfrmPrincipal
       Left = 11
       Top = 21
       Width = 239
-      Height = 35
+      Height = 56
       Margins.Left = 10
       Margins.Top = 20
       Align = alLeft
@@ -14869,6 +14874,7 @@ object frmPrincipal: TfrmPrincipal
       Font.Style = []
       ParentBiDiMode = False
       ParentFont = False
+      ExplicitHeight = 35
     end
   end
   object MainMenu1: TMainMenu

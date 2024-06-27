@@ -23,6 +23,8 @@ object frmCrDetalhe: TfrmCrDetalhe
     Height = 672
     Align = alClient
     BevelOuter = bvNone
+    Color = 5737262
+    ParentBackground = False
     TabOrder = 0
     ExplicitWidth = 833
     ExplicitHeight = 671

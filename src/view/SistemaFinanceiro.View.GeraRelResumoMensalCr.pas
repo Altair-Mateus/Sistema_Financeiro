@@ -6,7 +6,8 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ComCtrls,
   Vcl.ExtCtrls, System.ImageList, Vcl.ImgList, SistemaFinanceiro.View.Clientes,
-  SistemaFinanceiro.View.Relatorios.ResumoMensalCr;
+  SistemaFinanceiro.View.Relatorios.ResumoMensalCr,
+  SistemaFinanceiro.Model.uSFQuery;
 
 type
   TfrmGeraRelResumoMensalCr = class(TForm)
@@ -41,8 +42,9 @@ type
     procedure btnVisualizarClick(Sender: TObject);
     procedure btnImprimirClick(Sender: TObject);
     procedure btnCancelarClick(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
-    { Private declarations }
+    FQuery : TSFQuery;
     procedure GeraRelatorio;
     procedure GeraConsulta;
     procedure GeraImpressao;
@@ -57,7 +59,7 @@ var
 implementation
 
 uses
-  System.DateUtils, SistemaFinanceiro.Model.dmCReceber;
+  System.DateUtils;
 
 {$R *.dfm}
 
@@ -117,6 +119,12 @@ begin
 
 end;
 
+procedure TfrmGeraRelResumoMensalCr.FormDestroy(Sender: TObject);
+begin
+  if Assigned(FQuery) then
+    FQuery.Free;
+end;
+
 procedure TfrmGeraRelResumoMensalCr.GeraConsulta;
 var
   SQL            : String;
@@ -124,26 +132,21 @@ var
   LExtract       : String;
   LSelectExtract : String;
   LOrdem         : String;
-
 begin
 
   //  Validações
   if dateIni.Date > dateFinal.Date then
   begin
-
     dateFinal.SetFocus;
     Application.MessageBox('Data Inicial não pode ser maior que a data Final!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
     abort;
-
   end;
 
   if cbStatus.ItemIndex < 0 then
   begin
-
     cbStatus.SetFocus;
     Application.MessageBox('Selecione um tipo de STATUS!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
     abort;
-
   end;
 
   LFiltro        := '';
@@ -152,33 +155,32 @@ begin
   LSelectExtract := '';
   LOrdem         := '';
 
+  if Assigned(FQuery) then
+    FreeAndNil(FQuery);
+
+  FQuery := TSFQuery.Create(nil);
+
   //  Pesquisa por data
   if rbDtVenda.Checked then
   begin
-
     LFiltro        := LFiltro + ' AND CR.DATA_VENDA BETWEEN :DTINI AND :DTFIM ';
     LExtract       := ' EXTRACT(MONTH FROM CR.DATA_VENDA), EXTRACT(YEAR FROM CR.DATA_VENDA) ';
     LSelectExtract := ' EXTRACT(MONTH FROM CR.DATA_VENDA) || ''/'' || EXTRACT(YEAR FROM CR.DATA_VENDA) AS ano_mes ';
     LOrdem         := ' EXTRACT(YEAR FROM CR.DATA_VENDA), EXTRACT(MONTH FROM CR.DATA_VENDA) ';
-
   end
   else if rbDtVenc.Checked then
   begin
-
     LFiltro        := LFiltro + ' AND CR.DATA_VENCIMENTO BETWEEN :DTINI AND :DTFIM ';
     LExtract       := ' EXTRACT(MONTH FROM CR.DATA_VENCIMENTO), EXTRACT(YEAR FROM CR.DATA_VENCIMENTO) ';
     LSelectExtract := ' EXTRACT(MONTH FROM CR.DATA_VENCIMENTO) || ''/'' || EXTRACT(YEAR FROM CR.DATA_VENCIMENTO) AS ano_mes ';
     LOrdem         := ' EXTRACT(YEAR FROM CR.DATA_VENCIMENTO), EXTRACT(MONTH FROM CR.DATA_VENCIMENTO) ';
-
   end
   else
   begin
-
     LFiltro        := LFiltro + ' AND CR.DATA_RECEBIMENTO BETWEEN :DTINI AND :DTFIM ';
     LExtract       := ' EXTRACT(MONTH FROM CR.DATA_RECEBIMENTO), EXTRACT(YEAR FROM CR.DATA_RECEBIMENTO) ';
     LSelectExtract := ' EXTRACT(MONTH FROM CR.DATA_RECEBIMENTO) || ''/'' || EXTRACT(YEAR FROM CR.DATA_RECEBIMENTO) AS ano_mes ';
     LOrdem         := ' EXTRACT(YEAR FROM CR.DATA_RECEBIMENTO), EXTRACT(MONTH FROM CR.DATA_RECEBIMENTO) ';
-
   end;
 
   //  Pesquisa por status
@@ -208,24 +210,21 @@ begin
          'GROUP BY ' + LExtract +
          'ORDER BY ' + LOrdem;
 
-  dmCReceber.FDQueryRelatorios.Close;
-  dmCReceber.FDQueryRelatorios.SQL.Clear;
-  dmCReceber.FDQueryRelatorios.Params.Clear;
-  dmCReceber.FDQueryRelatorios.SQL.Add(SQL);
+  FQuery.Close;
+  FQuery.SQL.Clear;
+  FQuery.SQL.Add(SQL);
 
   //  Criando os parametros
-  dmCReceber.FDQueryRelatorios.ParamByName('DTINI').AsDate := dateIni.Date;
-  dmCReceber.FDQueryRelatorios.ParamByName('DTFIM').AsDate := dateFinal.Date;
+  FQuery.ParamByName('DTINI').AsDate := dateIni.Date;
+  FQuery.ParamByName('DTFIM').AsDate := dateFinal.Date;
 
   if Trim(edtCodCliente.Text) <> '' then
-    dmCReceber.FDQueryRelatorios.ParamByName('ID_CLI').AsInteger := StrToInt(Trim(edtCodCliente.Text));
+    FQuery.ParamByName('ID_CLI').AsInteger := StrToInt(Trim(edtCodCliente.Text));
 
   if checkVencidas.Checked then
-    dmCReceber.FDQueryRelatorios.ParamByName('DTATUAL').AsDate:= Now;
+    FQuery.ParamByName('DTATUAL').AsDate:= Now;
 
-
-  dmCReceber.FDQueryRelatorios.Prepare;
-  dmCReceber.FDQueryRelatorios.Open();
+  FQuery.Open();
 
 end;
 
@@ -237,7 +236,7 @@ begin
 
   try
 
-    frmRelMensalCr.dsRelResumoMensal.DataSet := dmCReceber.FDQueryRelatorios;
+    frmRelMensalCr.dsRelResumoMensal.DataSet := FQuery;
 
     //  Imprime
     frmRelMensalCr.RLReport.Print;
@@ -264,7 +263,7 @@ begin
 
   try
 
-    frmRelMensalCr.dsRelResumoMensal.DataSet := dmCReceber.FDQueryRelatorios;
+    frmRelMensalCr.dsRelResumoMensal.DataSet := FQuery;
 
     //  Mostra a pre visualização
     frmRelMensalCr.RLReport.Preview();
