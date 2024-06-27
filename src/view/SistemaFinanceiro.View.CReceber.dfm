@@ -3,25 +3,26 @@ inherited frmContasReceber: TfrmContasReceber
   ClientHeight = 644
   ClientWidth = 1335
   WindowState = wsMaximized
-  ExplicitTop = -221
+  OnClose = FormClose
   ExplicitWidth = 1347
   ExplicitHeight = 682
   TextHeight = 19
   inherited CardPanelPrincipal: TCardPanel
     Width = 1335
     Height = 644
+    ActiveCard = CardPesquisa
     ExplicitWidth = 1331
     ExplicitHeight = 643
     inherited CardCadastro: TCard
       Width = 1335
       Height = 644
-      ExplicitWidth = 1335
-      ExplicitHeight = 644
+      ExplicitWidth = 1331
+      ExplicitHeight = 643
       inherited pnlBotoesCad: TPanel
         Top = 575
         Width = 1335
-        ExplicitTop = 575
-        ExplicitWidth = 1335
+        ExplicitTop = 574
+        ExplicitWidth = 1331
         inherited btnSalvar: TButton
           OnClick = btnSalvarClick
         end
@@ -29,8 +30,8 @@ inherited frmContasReceber: TfrmContasReceber
       inherited PanelCampos: TPanel
         Width = 1335
         Height = 534
-        ExplicitWidth = 1335
-        ExplicitHeight = 534
+        ExplicitWidth = 1331
+        ExplicitHeight = 533
         object lblDataVend: TLabel
           Left = 258
           Top = 159
@@ -495,7 +496,7 @@ inherited frmContasReceber: TfrmContasReceber
       end
       inherited PanelTitulo: TPanel
         Width = 1335
-        ExplicitWidth = 1335
+        ExplicitWidth = 1331
       end
     end
     inherited CardPesquisa: TCard
@@ -503,12 +504,12 @@ inherited frmContasReceber: TfrmContasReceber
       Height = 644
       ExplicitLeft = 0
       ExplicitTop = 0
-      ExplicitWidth = 1331
-      ExplicitHeight = 643
+      ExplicitWidth = 1335
+      ExplicitHeight = 644
       inherited pnlPesquisa: TPanel
         Width = 1335
         Height = 137
-        ExplicitWidth = 1331
+        ExplicitWidth = 1335
         ExplicitHeight = 137
         inherited lblPesquisar: TLabel
           Left = 213
@@ -4699,7 +4700,7 @@ inherited frmContasReceber: TfrmContasReceber
           Margins.Top = 30
           Margins.Bottom = 30
           OnClick = PesquisaClick
-          ExplicitLeft = 1207
+          ExplicitLeft = 1211
           ExplicitTop = 30
           ExplicitHeight = 77
         end
@@ -4930,8 +4931,8 @@ inherited frmContasReceber: TfrmContasReceber
       inherited pnlBotoes: TPanel
         Top = 575
         Width = 1335
-        ExplicitTop = 574
-        ExplicitWidth = 1331
+        ExplicitTop = 575
+        ExplicitWidth = 1335
         inherited btnExcluir: TButton
           OnClick = btnExcluirClick
         end
@@ -4941,7 +4942,7 @@ inherited frmContasReceber: TfrmContasReceber
         inherited btnSair: TButton
           Left = 1211
           ImageIndex = 12
-          ExplicitLeft = 1207
+          ExplicitLeft = 1211
         end
         object btnBaixarCR: TButton
           AlignWithMargins = True
@@ -4988,7 +4989,6 @@ inherited frmContasReceber: TfrmContasReceber
           Font.Style = []
           ParentFont = False
           TabOrder = 7
-          ExplicitLeft = 1011
           object lblPagas: TLabel
             Left = 31
             Top = 16
@@ -5074,8 +5074,8 @@ inherited frmContasReceber: TfrmContasReceber
         Width = 1335
         Height = 409
         ExplicitTop = 137
-        ExplicitWidth = 1331
-        ExplicitHeight = 408
+        ExplicitWidth = 1335
+        ExplicitHeight = 409
         inherited DBGrid1: TDBGrid
           Width = 1333
           Height = 407
@@ -5190,8 +5190,6 @@ inherited frmContasReceber: TfrmContasReceber
         Color = clWindow
         ParentBackground = False
         TabOrder = 3
-        ExplicitTop = 545
-        ExplicitWidth = 1331
         object lblQtdCp: TLabel
           AlignWithMargins = True
           Left = 931

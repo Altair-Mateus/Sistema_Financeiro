@@ -3,9 +3,24 @@ unit SistemaFinanceiro.View.CrDetalhe;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
-  System.ImageList, Vcl.ImgList, Data.DB, Vcl.Grids, Vcl.DBGrids, Vcl.ComCtrls,SistemaFinanceiro.Model.Entidades.CR.Detalhe;
+  Winapi.Windows,
+  Winapi.Messages,
+  System.SysUtils,
+  System.Variants,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  Vcl.StdCtrls,
+  Vcl.ExtCtrls,
+  System.ImageList,
+  Vcl.ImgList,
+  Data.DB,
+  Vcl.Grids,
+  Vcl.DBGrids,
+  Vcl.ComCtrls,
+  SistemaFinanceiro.Model.uSFQuery;
 
 type
   TfrmCrDetalhe = class(TForm)
@@ -28,8 +43,8 @@ type
     lblTDesc: TLabel;
     lblTCodCliente: TLabel;
     lblCodCliente: TLabel;
-    DataSourcePgto: TDataSource;
-    DataSourceParciais: TDataSource;
+    dsPgtos: TDataSource;
+    dsParciais: TDataSource;
     pnlInfopag: TPanel;
     lblDtPag: TLabel;
     lblNomeUser: TLabel;
@@ -45,13 +60,19 @@ type
     pnlGrids: TPanel;
     pnlGridFormasPagamento: TPanel;
     lblFrPgto: TLabel;
-    DBGridPgto: TDBGrid;
+    grdPgtos: TDBGrid;
     pnlGridParciais: TPanel;
     lblParciais: TLabel;
-    DBGridParciais: TDBGrid;
+    grdParciais: TDBGrid;
     procedure btnVoltarClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+    procedure grdPgtosDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure grdParciaisDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
   private
-    { Private declarations }
+    FQueryParciais, FQueryPgto : TSFQuery;
   public
     { Public declarations }
     procedure ExibirCRDetalhes(IDCR : integer);
@@ -66,10 +87,10 @@ implementation
 {$R *.dfm}
 
 uses
-
-
-  SistemaFinanceiro.Model.dmCReceber, SistemaFinanceiro.Model.Entidades.CR,
-  SistemaFinanceiro.Utilitarios;
+  SistemaFinanceiro.Model.Entidades.CR,
+  SistemaFinanceiro.Utilitarios,
+  SistemaFinanceiro.Model.Entidades.Usuario,
+  SistemaFinanceiro.Model.Entidades.CR.Detalhe;
 
 { TfrmConsultarCr }
 
@@ -80,104 +101,105 @@ end;
 
 procedure TfrmCrDetalhe.ExibirCRDetalhes(IDCR: integer);
 var
-  CR          : TModelCr;
-  cRdET       : TModelCrDetalhe;
-  SQL         : String;
-  SQLPgto     : String;
-  SQLParciais : String;
-
+  lCr          : TModelCr;
+  lCrDetalhe   : TModelCrDetalhe;
+  lUsuario : TModelUsuario;
 begin
 
-  if IDCR <= 0 then
-  begin
-    raise Exception.Create('ID do contas a receber inválido!');
-  end;
-
-  CR := dmCReceber.GetCR(IDCR);
-
+  lCr := TModelCR.Create;
+  lCrDetalhe := TModelCrDetalhe.Create;
+  lUsuario := TModelUsuario.Create;
   try
-
-    if CR.ID <= 0 then
-    begin
-      raise Exception.Create('Conta a Receber não encontrado!');
-    end;
 
     //  Carrega os dados da CR
-    if CR.Doc <> '' then
+    if not lCr.Existe(IDCR, True) then
     begin
-      lblNumDoc.Caption := CR.Doc;
-    end
-      else
-      begin
-        lblNumDoc.Caption := 'Não Informado';
-      end;
+      raise Exception.Create('ID do contas a receber Inválido!');
+    end;
 
-    lblDesc.Caption         := Cr.Desc;
-    lblVencimento.Caption   := FormatDateTime('DD/MM/YYYY', Cr.DataVencimento);
-    lblNumParcela.Caption   := IntToStr(Cr.Parcela);
-    lblValorVenda.Caption   := TUtilitario.FormatoMoeda(Cr.ValorVenda);
-    lblValorParcela.Caption := TUtilitario.FormatoMoeda(Cr.ValorParcela);
-    lblCodCliente.Caption   := IntToStr(Cr.IdCliente);
+    if lCr.Doc <> '' then
+      lblNumDoc.Caption := lCr.Doc
+    else
+      lblNumDoc.Caption := 'Não Informado';
+
+    lblDesc.Caption         := lCr.Desc;
+    lblVencimento.Caption   := FormatDateTime('DD/MM/YYYY', lCr.DataVencimento);
+    lblNumParcela.Caption   := IntToStr(lCr.Parcela);
+    lblValorVenda.Caption   := TUtilitario.FormatoMoeda(lCr.ValorVenda);
+    lblValorParcela.Caption := TUtilitario.FormatoMoeda(lCr.ValorParcela);
+    lblCodCliente.Caption   := IntToStr(lCr.IdCliente);
+
+    //  Carrega os detalhes da CR
+    if not lCrDetalhe.ExistePorCr(lCr.ID, True) then
+    begin
+      raise Exception.Create('ID do contas a receber Inválido!');
+    end;
+
+    lUsuario.Existe(lCrDetalhe.Usuario, True);
+
+    edtDtPag.Text   := FormatDateTime('DD/MM/YYYY', lCrDetalhe.Data);
+    edtValPago.Text := TUtilitario.FormatoMoeda(lCrDetalhe.Valor);
+    edtValDesc.Text := TUtilitario.FormatoMoeda(lCrDetalhe.ValorDesc);
+    edtUser.Text    := lUsuario.Nome;
+    edtObsPag.Text  := lCrDetalhe.Detalhes;
+
+    //  Carrega os pagamentos
+    FQueryPgto.Close;
+    FQueryPgto.SQL.Clear;
+    FQueryPgto.SQL.Add(' SELECT PG.*, FR.NOME_FR FROM PGTO_BX_CR PG       ');
+    FQueryPgto.SQL.Add(' LEFT JOIN FR_PGTO FR ON PG.ID_FR_PGTO = FR.ID_FR ');
+    FQueryPgto.SQL.Add(' WHERE ID_CR = :IDCR                              ');
+    FQueryPgto.ParamByName('IDCR').AsInteger := lCr.ID;
+    FQueryPgto.Open;
+    grdPgtos.DataSource.DataSet := FQueryPgto;
+
+    //  Carrega as parciais
+    FQueryParciais.Close;
+    FQueryParciais.SQL.Clear;
+    FQueryParciais.SQL.Add(' SELECT * FROM CONTAS_RECEBER WHERE PARCIAL = ''S'' ');
+    FQueryParciais.SQL.Add(' AND CR_ORIGEM = :IDCR                              ');
+    FQueryParciais.ParamByName('IDCR').AsInteger := lCr.ID;
+    FQueryParciais.Open;
+    grdParciais.DataSource.DataSet := FQueryParciais;
+
+    //  Se Existir Parcial Gerada irá informar na tela
+    if not (FQueryParciais.IsEmpty) then
+    begin
+      pnlGridParciais.Visible := FQueryParciais.IsEmpty;
+      pnlGridParciais.Height := 170;
+    end;
 
   finally
-
-    Cr.Free;
-
+    lCr.Free;
+    lCrDetalhe.Free;
+    lUsuario.Free;
   end;
 
+end;
 
-  CrDet := dmCReceber.GetCrDet(IdCr);
+procedure TfrmCrDetalhe.FormCreate(Sender: TObject);
+begin
+  FQueryParciais := TSFQuery.Create(nil);
+  FQueryPgto := TSFQuery.Create(nil);
+end;
 
-  try
+procedure TfrmCrDetalhe.FormDestroy(Sender: TObject);
+begin
+  FQueryParciais.Free;
+  FQueryPgto.Free;
+end;
 
-    edtDtPag.Text   := FormatDateTime('DD/MM/YYYY', CrDet.Data);
-    edtValPago.Text := TUtilitario.FormatoMoeda(CrDet.Valor);
-    edtValDesc.Text := TUtilitario.FormatoMoeda(CrDet.ValorDesc);
-//    edtUser.Text    := CrDet.Usuario;
-    edtObsPag.Text  := CrDet.Detalhes;
-
-  finally
-    CrDet.Free;
-  end;
-
-
-  //  Montando o SQL dos pagamentos
-  SQLPgto := 'SELECT PG.*, FR.NOME_FR FROM PGTO_BX_CR PG ' +
-             'LEFT JOIN FR_PGTO FR ON PG.ID_FR_PGTO = FR.ID_FR ' +
-             ' WHERE ID_CR = :IDCR';
-
-  dmCReceber.FDQueryPgtoCr.Close;
-  dmCReceber.FDQueryPgtoCr.SQL.Clear;
-  dmCReceber.FDQueryPgtoCr.Params.Clear;
-  dmCReceber.FDQueryPgtoCr.SQL.Add(SQLPgto);
-
-  dmCReceber.FDQueryPgtoCr.ParamByName('IDCR').AsInteger := IDCR;
-  dmCReceber.FDQueryPgtoCr.Prepare;
-  dmCReceber.FDQueryPgtoCr.Open();
+procedure TfrmCrDetalhe.grdParciaisDrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+  TUtilitario.FormatoMoedaGrid(TDBGrid(Sender), Column, Rect, State);
+end;
 
 
-  //  Montando SQL das Parciais
-  SQLParciais := 'SELECT * FROM CONTAS_RECEBER WHERE PARCIAL = ''S'' ' +
-                  ' AND CR_ORIGEM = :IDCR';
-
-  dmCReceber.FDQueryCrParciais.Close;
-  dmCReceber.FDQueryCrParciais.SQL.Clear;
-  dmCReceber.FDQueryCrParciais.Params.Clear;
-  dmCReceber.FDQueryCrParciais.SQL.Add(SQLParciais);
-
-  dmCReceber.FDQueryCrParciais.ParamByName('IDCR').AsInteger := IDCR;
-  dmCReceber.FDQueryCrParciais.Prepare;
-  dmCReceber.FDQueryCrParciais.Open;
-
-
-  //  Se Existir Parcial Gerada irá informar na tela
-  if not (dmCReceber.FDQueryCrParciais.IsEmpty) then
-  begin
-    pnlGridParciais.Visible := False;
-    frmCrDetalhe.Height := 540;
-  end;
-
-
+procedure TfrmCrDetalhe.grdPgtosDrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+  TUtilitario.FormatoMoedaGrid(TDBGrid(Sender), Column, Rect, State);
 end;
 
 end.

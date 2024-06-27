@@ -13,6 +13,8 @@ object frmCrDetalhe: TfrmCrDetalhe
   Font.Name = 'Tahoma'
   Font.Style = []
   Position = poScreenCenter
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
   TextHeight = 19
   object pnlPrincipal: TPanel
     Left = 0
@@ -408,7 +410,7 @@ object frmCrDetalhe: TfrmCrDetalhe
           ParentFont = False
           ExplicitWidth = 182
         end
-        object DBGridPgto: TDBGrid
+        object grdPgtos: TDBGrid
           AlignWithMargins = True
           Left = 8
           Top = 34
@@ -416,7 +418,7 @@ object frmCrDetalhe: TfrmCrDetalhe
           Height = 118
           Margins.Top = 10
           Align = alClient
-          DataSource = DataSourcePgto
+          DataSource = dsPgtos
           Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgConfirmDelete, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
           TabOrder = 0
           TitleFont.Charset = DEFAULT_CHARSET
@@ -424,6 +426,7 @@ object frmCrDetalhe: TfrmCrDetalhe
           TitleFont.Height = -16
           TitleFont.Name = 'Tahoma'
           TitleFont.Style = []
+          OnDrawColumnCell = grdPgtosDrawColumnCell
           Columns = <
             item
               Expanded = False
@@ -480,7 +483,7 @@ object frmCrDetalhe: TfrmCrDetalhe
           ParentFont = False
           ExplicitWidth = 203
         end
-        object DBGridParciais: TDBGrid
+        object grdParciais: TDBGrid
           AlignWithMargins = True
           Left = 5
           Top = 34
@@ -490,7 +493,7 @@ object frmCrDetalhe: TfrmCrDetalhe
           Margins.Top = 10
           Margins.Right = 0
           Align = alClient
-          DataSource = DataSourceParciais
+          DataSource = dsParciais
           ReadOnly = True
           TabOrder = 0
           TitleFont.Charset = DEFAULT_CHARSET
@@ -498,6 +501,7 @@ object frmCrDetalhe: TfrmCrDetalhe
           TitleFont.Height = -16
           TitleFont.Name = 'Tahoma'
           TitleFont.Style = []
+          OnDrawColumnCell = grdParciaisDrawColumnCell
           Columns = <
             item
               Expanded = False
@@ -2164,17 +2168,15 @@ object frmCrDetalhe: TfrmCrDetalhe
   end
   object DataSourceCrDetalhe: TDataSource
     DataSet = dmCReceber.FDQueryCrDetalhe
-    Left = 680
+    Left = 656
     Top = 233
   end
-  object DataSourcePgto: TDataSource
-    DataSet = dmCReceber.FDQueryPgtoCr
-    Left = 552
+  object dsPgtos: TDataSource
+    Left = 544
     Top = 233
   end
-  object DataSourceParciais: TDataSource
-    DataSet = dmCReceber.FDQueryCrParciais
-    Left = 568
-    Top = 401
+  object dsParciais: TDataSource
+    Left = 416
+    Top = 233
   end
 end

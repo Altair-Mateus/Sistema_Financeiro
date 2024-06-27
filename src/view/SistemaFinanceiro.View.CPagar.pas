@@ -161,6 +161,8 @@ type
     procedure CancelarBaixa1Click(Sender: TObject);
     procedure checkNaoConsideraFaturaClick(Sender: TObject);
     procedure chkBaixarAoSalvarClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
 
   private
     { Private declarations }
@@ -1385,6 +1387,12 @@ begin
 
 end;
 
+procedure TfrmContasPagar.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  inherited;
+  TUtilitario.SalvarOrdemColunasParaJSON(DBGrid1, 'ConfigGrids', 'grdCP');
+end;
+
 procedure TfrmContasPagar.FormCreate(Sender: TObject);
 begin
   inherited;
@@ -1396,6 +1404,12 @@ begin
   dateInicial.Date := StartOfTheMonth(Now);
   dateFinal.Date   := EndOfTheMonth(Now);
 
+end;
+
+procedure TfrmContasPagar.FormShow(Sender: TObject);
+begin
+  inherited;
+  TUtilitario.CarregarOrdemColunasJSON(DBGrid1, 'ConfigGrids', 'grdCP');
 end;
 
 procedure TfrmContasPagar.GeraParcelas;

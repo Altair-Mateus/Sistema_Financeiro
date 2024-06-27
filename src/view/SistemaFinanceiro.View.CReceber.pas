@@ -132,6 +132,7 @@ type
     procedure chkBaixarAoSalvarClick(Sender: TObject);
     procedure PesquisaClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     FTelaAtiva: Boolean;
     FCodCR: Integer;
@@ -909,16 +910,7 @@ begin
 
   inherited;
 
-  // Verifica se a coluna atual é uma das colunas de moeda
-  if (Column.Field.DataType in [ftCurrency, ftFloat, ftBCD]) and
-    (Column.Field.AsFloat <> 0) then
-  begin
-    // Formata o valor como moeda
-    lDisplayText := FormatFloat('R$ #,##0.00', Column.Field.AsFloat);
-    // Desenha a célula com a formatação personalizada
-    DBGrid1.Canvas.FillRect(Rect);
-    DBGrid1.Canvas.TextRect(Rect, Rect.Left + 2, Rect.Top + 2, lDisplayText);
-  end;
+  TUtilitario.FormatoMoedaGrid(TDBGrid(Sender), Column, Rect, State);
 
 end;
 
@@ -1116,6 +1108,13 @@ begin
 
 end;
 
+procedure TfrmContasReceber.FormClose(Sender: TObject;
+  var Action: TCloseAction);
+begin
+  inherited;
+  TUtilitario.SalvarOrdemColunasParaJSON(DBGrid1, 'ConfigGrids', 'grdCr');
+end;
+
 procedure TfrmContasReceber.FormCreate(Sender: TObject);
 begin
   inherited;
@@ -1133,6 +1132,7 @@ end;
 procedure TfrmContasReceber.FormShow(Sender: TObject);
 begin
   inherited;
+  TUtilitario.CarregarOrdemColunasJSON(DBGrid1, 'ConfigGrids', 'grdCr');
   FTelaAtiva := True;
 end;
 
@@ -1395,136 +1395,137 @@ var
   LOrdem: String;
   lQuery: TSFQuery;
 begin
+
+  if Assigned(lQuery) then
+    FreeAndNil(lQuery);
+
   lQuery := TSFQuery.Create(nil);
+
   try
-    try
-      // Validações
-      if dateInicial.Date > dateFinal.Date then
-      begin
-        dateFinal.SetFocus;
-        Application.MessageBox
-          ('Data Inicial não pode ser maior que a data Final!', 'Atenção',
-          MB_OK + MB_ICONEXCLAMATION);
-        exit;
-      end;
+    // Validações
+    if dateInicial.Date > dateFinal.Date then
+    begin
+      dateFinal.SetFocus;
+      Application.MessageBox
+        ('Data Inicial não pode ser maior que a data Final!', 'Atenção',
+        MB_OK + MB_ICONEXCLAMATION);
+      exit;
+    end;
 
-      if cbStatus.ItemIndex < 0 then
-      begin
-        cbStatus.SetFocus;
-        Application.MessageBox('Selecione um tipo de STATUS!', 'Atenção',
-          MB_OK + MB_ICONEXCLAMATION);
-        exit;
-      end;
+    if cbStatus.ItemIndex < 0 then
+    begin
+      cbStatus.SetFocus;
+      Application.MessageBox('Selecione um tipo de STATUS!', 'Atenção',
+        MB_OK + MB_ICONEXCLAMATION);
+      exit;
+    end;
 
-      if cbData.ItemIndex < 0 then
-      begin
-        cbData.SetFocus;
-        Application.MessageBox('Selecione um tipo de DATA!', 'Atenção',
-          MB_OK + MB_ICONEXCLAMATION);
-        exit;
-      end;
+    if cbData.ItemIndex < 0 then
+    begin
+      cbData.SetFocus;
+      Application.MessageBox('Selecione um tipo de DATA!', 'Atenção',
+        MB_OK + MB_ICONEXCLAMATION);
+      exit;
+    end;
 
-      LFiltroEdit := TUtilitario.LikeFind(edtPesquisar.Text, DBGrid1);
-      LFiltro := '';
-      LOrdem := '';
+    LFiltroEdit := TUtilitario.LikeFind(edtPesquisar.Text, DBGrid1);
+    LFiltro := '';
+    LOrdem := '';
 
-      // Pesquisa por tipo
-      case cbStatus.ItemIndex of
+    // Pesquisa por tipo
+    case cbStatus.ItemIndex of
+      1:
+        LFiltro := LFiltro + ' AND CR.STATUS = ''P'' ';
+      2:
+        LFiltro := LFiltro + ' AND CR.STATUS = ''A'' ';
+      3:
+        LFiltro := LFiltro + ' AND CR.STATUS = ''C'' ';
+    end;
+
+    // Pesquisa por data
+    if (dateInicial.Checked) and (dateFinal.Checked) then
+    begin
+      case cbData.ItemIndex of
+        0:
+          LFiltro := LFiltro +
+            ' AND CR.DATA_VENDA BETWEEN :DTINI AND :DTFIM ';
         1:
-          LFiltro := LFiltro + ' AND CR.STATUS = ''P'' ';
+          LFiltro := LFiltro +
+            ' AND CR.DATA_VENCIMENTO BETWEEN :DTINI AND :DTFIM ';
         2:
-          LFiltro := LFiltro + ' AND CR.STATUS = ''A'' ';
-        3:
-          LFiltro := LFiltro + ' AND CR.STATUS = ''C'' ';
-      end;
-
-      // Pesquisa por data
-      if (dateInicial.Checked) and (dateFinal.Checked) then
-      begin
-        case cbData.ItemIndex of
-          0:
-            LFiltro := LFiltro +
-              ' AND CR.DATA_VENDA BETWEEN :DTINI AND :DTFIM ';
-          1:
-            LFiltro := LFiltro +
-              ' AND CR.DATA_VENCIMENTO BETWEEN :DTINI AND :DTFIM ';
-          2:
-            LFiltro := LFiltro +
-              ' AND CR.DATA_RECEBIMENTO BETWEEN :DTINI AND :DTFIM ';
-        end;
-      end;
-
-      // Pesquisa parciais
-      if checkParciais.Checked then
-        LFiltro := LFiltro + ' AND CR.PARCIAL = ''S'' ';
-
-      // Pesquisa vencidas
-      if checkVencidas.Checked then
-        LFiltro := LFiltro +
-          ' AND CR.STATUS = ''A'' AND CR.DATA_VENCIMENTO < :DATUAL ';
-
-      // Pesquisa por cliente
-      if Trim(edtFiltroCliente.Text) <> '' then
-        LFiltro := LFiltro + ' AND CR.ID_CLIENTE = :ID';
-
-      // Ordem de pesquisa
-      if rbId.Checked then
-        LOrdem := ' ORDER BY CR.ID DESC'
-      else if rbDataVenc.Checked then
-        LOrdem := ' ORDER BY CR.DATA_VENCIMENTO'
-      else if rbValorParcela.Checked then
-        LOrdem := ' ORDER BY CR.VALOR_PARCELA DESC'
-      else if rbValorVenda.Checked then
-        LOrdem := ' ORDER BY CR.VALOR_VENDA DESC'
-      else if rbDataVenda.Checked then
-        LOrdem := ' ORDER BY CR.DATA_VENDA DESC'
-      else
-        LOrdem := ' ORDER BY CR.ID DESC';
-
-      lQuery.Close;
-      lQuery.SQL.Clear;
-      lQuery.SQL.Add
-        ('SELECT CR.*, CL.NOME FROM CONTAS_RECEBER CR LEFT JOIN CLIENTES CL ');
-      lQuery.SQL.Add(' ON CR.ID_CLIENTE = CL.ID_CLI WHERE 1 = 1');
-      lQuery.SQL.Add(LFiltroEdit + LFiltro + LOrdem);
-
-      if Trim(edtFiltroCliente.Text) <> '' then
-        lQuery.ParamByName('ID').AsString := Trim(edtFiltroCliente.Text);
-
-      if checkVencidas.Checked then
-        lQuery.ParamByName('DATUAL').AsDate := now;
-
-      if (dateInicial.Checked) and (dateFinal.Checked) then
-      begin
-        lQuery.ParamByName('DTINI').AsDate := dateInicial.Date;
-        lQuery.ParamByName('DTFIM').AsDate := dateFinal.Date;
-      end;
-
-      lQuery.Open;
-
-      lQuery.FieldByName('STATUS').OnGetText := QuerySTATUSGetText;
-
-      // Configurações do DataSet para o DBGrid
-      dsCR.DataSet := lQuery;
-
-      HabilitaBotoes;
-
-      // Calcula a quantidade e valor
-      CalcCrGrid;
-      CalcQtdCrGrid;
-
-      // Posiciona no primeiro registro
-      dsCR.DataSet.First;
-
-    except
-      on e: Exception do
-      begin
-        Application.MessageBox(PWidechar('Erro ao realizar a consulta: ' +
-          e.Message), 'Atenção', MB_OK + MB_ICONERROR);
+          LFiltro := LFiltro +
+            ' AND CR.DATA_RECEBIMENTO BETWEEN :DTINI AND :DTFIM ';
       end;
     end;
-  finally
-    // lQuery.Free;
+
+    // Pesquisa parciais
+    if checkParciais.Checked then
+      LFiltro := LFiltro + ' AND CR.PARCIAL = ''S'' ';
+
+    // Pesquisa vencidas
+    if checkVencidas.Checked then
+      LFiltro := LFiltro +
+        ' AND CR.STATUS = ''A'' AND CR.DATA_VENCIMENTO < :DATUAL ';
+
+    // Pesquisa por cliente
+    if Trim(edtFiltroCliente.Text) <> '' then
+      LFiltro := LFiltro + ' AND CR.ID_CLIENTE = :ID';
+
+    // Ordem de pesquisa
+    if rbId.Checked then
+      LOrdem := ' ORDER BY CR.ID DESC'
+    else if rbDataVenc.Checked then
+      LOrdem := ' ORDER BY CR.DATA_VENCIMENTO'
+    else if rbValorParcela.Checked then
+      LOrdem := ' ORDER BY CR.VALOR_PARCELA DESC'
+    else if rbValorVenda.Checked then
+      LOrdem := ' ORDER BY CR.VALOR_VENDA DESC'
+    else if rbDataVenda.Checked then
+      LOrdem := ' ORDER BY CR.DATA_VENDA DESC'
+    else
+      LOrdem := ' ORDER BY CR.ID DESC';
+
+    lQuery.Close;
+    lQuery.SQL.Clear;
+    lQuery.SQL.Add
+      ('SELECT CR.*, CL.NOME FROM CONTAS_RECEBER CR LEFT JOIN CLIENTES CL ');
+    lQuery.SQL.Add(' ON CR.ID_CLIENTE = CL.ID_CLI WHERE 1 = 1');
+    lQuery.SQL.Add(LFiltroEdit + LFiltro + LOrdem);
+
+    if Trim(edtFiltroCliente.Text) <> '' then
+      lQuery.ParamByName('ID').AsString := Trim(edtFiltroCliente.Text);
+
+    if checkVencidas.Checked then
+      lQuery.ParamByName('DATUAL').AsDate := now;
+
+    if (dateInicial.Checked) and (dateFinal.Checked) then
+    begin
+      lQuery.ParamByName('DTINI').AsDate := dateInicial.Date;
+      lQuery.ParamByName('DTFIM').AsDate := dateFinal.Date;
+    end;
+
+    lQuery.Open;
+
+    lQuery.FieldByName('STATUS').OnGetText := QuerySTATUSGetText;
+
+    // Configurações do DataSet para o DBGrid
+    dsCR.DataSet := lQuery;
+
+    HabilitaBotoes;
+
+    // Calcula a quantidade e valor
+    CalcCrGrid;
+    CalcQtdCrGrid;
+
+    // Posiciona no primeiro registro
+    dsCR.DataSet.First;
+
+  except
+    on e: Exception do
+    begin
+      Application.MessageBox(PWidechar('Erro ao realizar a consulta: ' +
+        e.Message), 'Atenção', MB_OK + MB_ICONERROR);
+    end;
   end;
 end;
 
