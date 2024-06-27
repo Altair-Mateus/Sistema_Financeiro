@@ -54,6 +54,7 @@ type
     procedure AddPropertyToWhere(const APropertyName: String);
 
     function Existe(const pId : Integer; const pCarrega : Boolean = false) : Boolean;
+    function ExistePorCr(const pIdCr : Integer; const pCarrega : Boolean = false) : Boolean;
     procedure GeraCodigo;
 
   end;
@@ -117,6 +118,44 @@ begin
         if pCarrega then
         begin
           FID := pId;
+          LoadObjectByPK;
+        end;
+      end;
+
+    except
+      on E : Exception do
+      begin
+        Application.MessageBox(PWideChar('Erro ao realizar a consulta: ' + E.Message), 'Atenção', MB_OK + MB_ICONERROR);
+      end;
+    end;
+  finally
+    lQuery.Free;
+  end;
+
+end;
+
+function TModelCrDetalhe.ExistePorCr(const pIdCr: Integer;
+  const pCarrega: Boolean): Boolean;
+var
+  lQuery : TSFQuery;
+begin
+  Result := False;
+  lQuery := TSFQuery.Create(nil);
+  try
+    try
+      lQuery.Close;
+      lQuery.SQL.Clear;
+      lQuery.SQL.Add(' SELECT ID FROM CONTAS_RECEBER_DETALHE ');
+      lQuery.SQL.Add(' WHERE ID_CONTA_RECEBER = :IDCR        ');
+      lQuery.ParamByName('IDCR').AsInteger := pIdCr;
+      lQuery.Open;
+
+      if (lQuery.RecordCount > 0) then
+      begin
+        Result := True;
+        if pCarrega then
+        begin
+          FID := lQuery.FieldByName('ID').AsInteger;
           LoadObjectByPK;
         end;
       end;
