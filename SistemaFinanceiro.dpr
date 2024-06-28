@@ -70,11 +70,10 @@ uses
 
 begin
   Application.Initialize;
-  Application.MainFormOnTaskbar := True;
+  Application.MainFormOnTaskbar := False;
   Application.CreateForm(TDataModule1, DataModule1);
   Application.CreateForm(TdmUsuarios, dmUsuarios);
   Application.CreateForm(TdmCaixa, dmCaixa);
-  Application.CreateForm(TfrmPrincipal, frmPrincipal);
   Application.CreateForm(TdmCPagar, dmCPagar);
   Application.CreateForm(TdmClientes, dmClientes);
   Application.CreateForm(TdmFornecedores, dmFornecedores);
@@ -82,5 +81,6 @@ begin
   Application.CreateForm(TdmPgtoBxCr, dmPgtoBxCr);
   Application.CreateForm(TdmPgtoBxCp, dmPgtoBxCp);
   Application.CreateForm(TdmFaturaCartao, dmFaturaCartao);
+  Application.CreateForm(TfrmPrincipal, frmPrincipal);
   Application.Run;
 end.

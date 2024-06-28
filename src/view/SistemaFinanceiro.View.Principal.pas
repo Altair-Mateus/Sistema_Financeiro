@@ -490,86 +490,6 @@ end;
 procedure TfrmPrincipal.FormCreate(Sender: TObject);
 begin
 
-  //  Cria o Form do splash
-  frmSplash := TfrmSplash.Create(Self);
-
-  try
-
-    //  Exibe o form
-    frmSplash.ShowModal;
-
-  finally
-
-    //  Libera da memoria
-    FreeAndNil(frmSplash);
-
-  end;
-
-
-  if dmUsuarios.TblUsuariosVazia = True then
-  begin
-
-    //  Cria o form
-    frmCadAdmin := TfrmCadAdmin.Create(Self);
-
-    try
-
-      //  Exibe o form
-      frmCadAdmin.ShowModal;
-
-      if frmCadAdmin.ModalResult <> mrOk then
-      begin
-        Application.Terminate;
-      end;
-
-    finally
-
-      FreeAndNil(frmCadAdmin);
-
-    end;
-
-  end;
-
-  //  Cria o Form do Login
-  frmLogin := TfrmLogin.Create(Self);
-
-  try
-
-    //  Exibe o form
-    frmLogin.ShowModal;
-
-    if frmLogin.ModalResult <> mrOk then
-    begin
-      Application.Terminate;
-    end;
-
-  finally
-
-    //  Libera da memoria
-    FreeAndNil(frmLogin);
-
-  end;
-
-  if dmUsuarios.GetUsuarioLogado.Senha_Temp = 'S' then
-  begin
-
-    frmRedefinirSenha := TfrmRedefinirSenha.Create(nil);
-
-    try
-
-      frmRedefinirSenha.Usuario := dmUsuarios.GetUsuarioLogado;
-      frmRedefinirSenha.ShowModal;
-
-      if frmRedefinirSenha.ModalResult <> mrOk then
-      begin
-        Application.Terminate;
-      end;
-
-    finally
-      FreeAndNil(frmRedefinirSenha);
-    end;
-  end;
-
   //  Mostra o Usuario logado
   KeyPreview := True;
 
@@ -596,6 +516,69 @@ end;
 
 procedure TfrmPrincipal.FormShow(Sender: TObject);
 begin
+
+  //  Cria o Form do splash
+  frmSplash := TfrmSplash.Create(Self);
+  try
+    //  Exibe o form
+    frmSplash.ShowModal;
+  finally
+    //  Libera da memoria
+    FreeAndNil(frmSplash);
+  end;
+
+
+  if dmUsuarios.TblUsuariosVazia = True then
+  begin
+    //  Cria o form
+    frmCadAdmin := TfrmCadAdmin.Create(Self);
+    try
+
+      //  Exibe o form
+      frmCadAdmin.ShowModal;
+
+      if frmCadAdmin.ModalResult <> mrOk then
+        Application.Terminate;
+
+    finally
+      FreeAndNil(frmCadAdmin);
+    end;
+
+  end;
+
+  //  Cria o Form do Login
+  frmLogin := TfrmLogin.Create(Self);
+  try
+
+    //  Exibe o form
+    frmLogin.ShowModal;
+
+    if frmLogin.ModalResult <> mrOk then
+      Application.Terminate;
+
+  finally
+
+    //  Libera da memoria
+    FreeAndNil(frmLogin);
+
+  end;
+
+  if dmUsuarios.GetUsuarioLogado.Senha_Temp = 'S' then
+  begin
+
+    frmRedefinirSenha := TfrmRedefinirSenha.Create(nil);
+    try
+
+      frmRedefinirSenha.Usuario := dmUsuarios.GetUsuarioLogado;
+      frmRedefinirSenha.ShowModal;
+
+      if frmRedefinirSenha.ModalResult <> mrOk then
+        Application.Terminate;
+
+    finally
+      FreeAndNil(frmRedefinirSenha);
+    end;
+  end;
 
   Self.Caption := 'Sistema Financeiro ' + GetVesaoArq + ' - Desenvolvido por Altair Mateus T. Alencastro';
   CarregaImgPrincipal;
