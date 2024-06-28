@@ -5,14 +5,12 @@ inherited frmContasReceber: TfrmContasReceber
   WindowState = wsMaximized
   OnClose = FormClose
   OnDestroy = FormDestroy
-  ExplicitLeft = -309
   ExplicitWidth = 1339
   ExplicitHeight = 680
   TextHeight = 19
   inherited CardPanelPrincipal: TCardPanel
     Width = 1327
     Height = 642
-    ActiveCard = CardPesquisa
     ExplicitWidth = 1323
     ExplicitHeight = 641
     inherited CardCadastro: TCard
@@ -27,10 +25,6 @@ inherited frmContasReceber: TfrmContasReceber
         ExplicitWidth = 1327
         inherited btnSalvar: TButton
           OnClick = btnSalvarClick
-        end
-        inherited btnCancelar: TButton
-          ExplicitLeft = 225
-          ExplicitTop = 6
         end
       end
       inherited PanelCampos: TPanel

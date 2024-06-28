@@ -941,7 +941,7 @@ function TfrmContasReceber.DtVencimentoCheckContaPaga: TDate;
 begin
   Result := dateVencimento.Date;
 
-  if (chkBaixarAoSalvar.Checked) and (dsCR.State = dsInsert) then
+  if (chkBaixarAoSalvar.Checked) and (FOpCad = ocIncluir) then
     Result := dateVenda.Date;
 
 end;
