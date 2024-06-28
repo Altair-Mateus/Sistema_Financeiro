@@ -1,5 +1,7 @@
 inherited frmRelCr: TfrmRelCr
   Caption = 'frmRelCr'
+  ClientHeight = 441
+  ClientWidth = 774
   TextHeight = 15
   inherited RLReport: TRLReport
     Borders.Sides = sdCustom
@@ -130,6 +132,7 @@ inherited frmRelCr: TfrmRelCr
         AutoSize = False
         DataField = 'valor_parcela'
         DataSource = DataSourceCr
+        DisplayMask = 'R$ #,##0.00'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
         Font.Height = -13
@@ -179,7 +182,7 @@ inherited frmRelCr: TfrmRelCr
         Height = 18
         Alignment = taCenter
         AutoSize = False
-        DataField = 'parcela'
+        DataField = 'QTDPARC'
         DataSource = DataSourceCr
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
@@ -273,14 +276,6 @@ inherited frmRelCr: TfrmRelCr
         Width = 4
         ExplicitTop = 21
         ExplicitWidth = 4
-      end
-    end
-    inherited bndFiltros: TRLBand
-      inherited lblFiltros: TLabel
-        Width = 716
-        Height = 34
-        ExplicitWidth = 716
-        ExplicitHeight = 34
       end
     end
     object RLBand1: TRLBand

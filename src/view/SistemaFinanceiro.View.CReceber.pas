@@ -127,6 +127,10 @@ type
     CancelarBaixa1: TMenuItem;
     btnBxMultipla: TButton;
     chkBaixarAoSalvar: TCheckBox;
+    lblGrupoParcelas: TLabel;
+    dsGrupoParcelas: TDataSource;
+    grdGrupoParcelas: TDBGrid;
+    pnlFundoGrupoParcelas: TPanel;
     procedure FormCreate(Sender: TObject);
     procedure btnIncluirClick(Sender: TObject);
     procedure toggleParcelamentoClick(Sender: TObject);
@@ -155,12 +159,14 @@ type
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormDestroy(Sender: TObject);
+    procedure grdGrupoParcelasDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
   private
     FTelaAtiva: Boolean;
     FCodCR: Integer;
     FOpCad: TOperacaoCadastro;
     FCr : TModelCR;
-    FQueryPesquisa: TSFQuery;
+    FQueryPesquisa, FQueryGrupoParcelas: TSFQuery;
     procedure HabilitaBotoes;
     procedure EditarRegCReceber;
     procedure CadParcelaUnica;
@@ -173,6 +179,7 @@ type
     procedure GeraParcelas;
     procedure CalcCrGrid;
     procedure CalcQtdCrGrid;
+    procedure ExibeGrupoParcelas;
     function GeraFiltrosRelatorio: String;
     function DtVencimentoCheckContaPaga: TDate;
     procedure QuerySTATUSGetText(Sender: TField; var Text: string; DisplayText: Boolean);
@@ -201,6 +208,7 @@ uses
 
 procedure TfrmContasReceber.btnAlterarClick(Sender: TObject);
 begin
+  inherited;
   EditarRegCReceber;
 end;
 
@@ -360,6 +368,7 @@ begin
   edtParcela.ReadOnly := True;
   edtValorParcela.ReadOnly := True;
   chkBaixarAoSalvar.Checked := False;
+  pnlFundoGrupoParcelas.Visible := False;
 
   // Oculta o nome do cliente
   lblNomeCliente.Visible := False;
@@ -710,7 +719,10 @@ begin
 
       // Gravando no BD
       if (FOpCad = ocIncluir) then
+      begin
+        FCr.NumTotalParcelas := 1;
         lRegGravado := FCr.Insert;
+      end;
 
       if (FOpCad = ocAlterar) then
         lRegGravado := FCr.UpdateByPK;
@@ -996,6 +1008,17 @@ begin
       edtValorParcela.Text := TUtilitario.FormatarValor(Fcr.ValorParcela);
       dateVencimento.Date := Fcr.DataVencimento;
       BuscaNomeCliente;
+
+      if FCr.IdGrupoParcelas > 0 then
+      begin
+        ExibeGrupoParcelas;
+        pnlFundoGrupoParcelas.Visible := True;
+      end
+      else
+      begin
+        pnlFundoGrupoParcelas.Visible := False;
+      end;
+
     end
     else
     begin
@@ -1072,6 +1095,28 @@ begin
 
 end;
 
+procedure TfrmContasReceber.ExibeGrupoParcelas;
+begin
+
+  if Assigned(FQueryGrupoParcelas) then
+    FreeAndNil(FQueryGrupoParcelas);
+
+  FQueryGrupoParcelas := TSFQuery.Create(nil);
+
+  FQueryGrupoParcelas.Close;
+  FQueryGrupoParcelas.SQL.Clear;
+  FQueryGrupoParcelas.SQL.Add(' SELECT ID, VALOR_PARCELA, DATA_VENCIMENTO, STATUS,  ');
+  FQueryGrupoParcelas.SQL.Add(' CAST(PARCELA AS VARCHAR(10)) || ''/''               ');
+  FQueryGrupoParcelas.SQL.Add(' || CAST(NUM_TOT_PARCELAS AS VARCHAR(10)) AS QTDPARC ');
+  FQueryGrupoParcelas.SQL.Add(' FROM CONTAS_RECEBER                                 ');
+  FQueryGrupoParcelas.SQL.Add(' WHERE ID_GRUPO_PARCELAS = :ID_GRUPO_PARCELAS        ');
+  FQueryGrupoParcelas.ParamByName('ID_GRUPO_PARCELAS').AsInteger := FCr.IdGrupoParcelas;
+  FQueryGrupoParcelas.Open;
+
+  grdGrupoParcelas.DataSource.DataSet := FQueryGrupoParcelas;
+
+end;
+
 procedure TfrmContasReceber.ExibeTelaBaixar(pCodCr: Integer);
 var
   lFormulario : TfrmBaixarCR;
@@ -1144,6 +1189,9 @@ begin
   inherited;
   if Assigned(FQueryPesquisa) then
     FQueryPesquisa.Free;
+
+  if Assigned(FQueryGrupoParcelas) then
+    FQueryGrupoParcelas.Free;
 end;
 
 procedure TfrmContasReceber.FormShow(Sender: TObject);
@@ -1354,6 +1402,12 @@ begin
 
 end;
 
+procedure TfrmContasReceber.grdGrupoParcelasDrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+ TUtilitario.FormatoMoedaGrid(TDBGrid(Sender), Column, Rect, State);
+end;
+
 procedure TfrmContasReceber.HabilitaBotoes;
 begin
 
@@ -1513,8 +1567,9 @@ begin
 
     FQueryPesquisa.Close;
     FQueryPesquisa.SQL.Clear;
-    FQueryPesquisa.SQL.Add
-      ('SELECT CR.*, CL.NOME FROM CONTAS_RECEBER CR LEFT JOIN CLIENTES CL ');
+    FQueryPesquisa.SQL.Add('SELECT CR.*, CAST(CR.PARCELA AS VARCHAR(10)) || ''/'' ');
+    FQueryPesquisa.SQL.Add(' || CAST(CR.NUM_TOT_PARCELAS AS VARCHAR(10)) AS QTDPARC, ');
+    FQueryPesquisa.SQL.Add(' CL.NOME FROM CONTAS_RECEBER CR LEFT JOIN CLIENTES CL ');
     FQueryPesquisa.SQL.Add(' ON CR.ID_CLIENTE = CL.ID_CLI WHERE 1 = 1');
     FQueryPesquisa.SQL.Add(LFiltroEdit + LFiltro + LOrdem);
 
