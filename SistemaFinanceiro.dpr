@@ -61,7 +61,10 @@ uses
   SistemaFinanceiro.View.Relatorios.ResumoMensalCr in 'src\view\Relatorios\SistemaFinanceiro.View.Relatorios.ResumoMensalCr.pas' {frmRelMensalCr},
   SistemaFinanceiro.View.DetalhesOrigemCpCr in 'src\view\SistemaFinanceiro.View.DetalhesOrigemCpCr.pas' {frmDetalhesOrigemCpCr},
   uDaoRTTI in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\model\uDaoRTTI.pas',
-  uDBColumnAttribute in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\model\uDBColumnAttribute.pas' {$R *.res};
+  uDBColumnAttribute in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\model\uDBColumnAttribute.pas' {$R *.res},
+  SistemaFinanceiro.Model.uSFQuery in 'src\model\SistemaFinanceiro.Model.uSFQuery.pas',
+  uEnumsUtils in '..\New Delphi\Classes_Compartilhadas\Enums\uEnumsUtils.pas',
+  SistemaFinanceiro.Model.Entidades.PgtoBxCr in 'src\model\Entidades\SistemaFinanceiro.Model.Entidades.PgtoBxCr.pas';
 
 {$R *.res}
 
@@ -73,7 +76,6 @@ begin
   Application.CreateForm(TdmCaixa, dmCaixa);
   Application.CreateForm(TfrmPrincipal, frmPrincipal);
   Application.CreateForm(TdmCPagar, dmCPagar);
-  Application.CreateForm(TdmCReceber, dmCReceber);
   Application.CreateForm(TdmClientes, dmClientes);
   Application.CreateForm(TdmFornecedores, dmFornecedores);
   Application.CreateForm(TdmFrPgto, dmFrPgto);

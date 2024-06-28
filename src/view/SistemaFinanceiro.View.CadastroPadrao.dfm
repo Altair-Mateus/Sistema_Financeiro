@@ -16,8 +16,10 @@ object frmCadastroPadrao: TfrmCadastroPadrao
   Font.Height = -16
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   Position = poScreenCenter
   OnCreate = FormCreate
+  OnKeyPress = FormKeyPress
   OnShow = FormShow
   TextHeight = 19
   object CardPanelPrincipal: TCardPanel
@@ -41,6 +43,8 @@ object frmCadastroPadrao: TfrmCadastroPadrao
       Caption = 'Cadastro'
       CardIndex = 0
       TabOrder = 0
+      ExplicitWidth = 783
+      ExplicitHeight = 505
       object pnlBotoesCad: TPanel
         Left = 0
         Top = 437
@@ -50,6 +54,8 @@ object frmCadastroPadrao: TfrmCadastroPadrao
         Color = 5934638
         ParentBackground = False
         TabOrder = 0
+        ExplicitTop = 436
+        ExplicitWidth = 783
         object btnSalvar: TButton
           Left = 1
           Top = 1
@@ -87,6 +93,8 @@ object frmCadastroPadrao: TfrmCadastroPadrao
         Color = clWhite
         ParentBackground = False
         TabOrder = 1
+        ExplicitWidth = 783
+        ExplicitHeight = 395
       end
       object PanelTitulo: TPanel
         Left = 0
@@ -102,6 +110,7 @@ object frmCadastroPadrao: TfrmCadastroPadrao
         Color = 5737262
         ParentBackground = False
         TabOrder = 2
+        ExplicitWidth = 783
         object lblTitulo: TLabel
           Left = 16
           Top = 9

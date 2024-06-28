@@ -4,8 +4,8 @@ object frmCrDetalhe: TfrmCrDetalhe
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'Detalhes Conta Paga'
-  ClientHeight = 673
-  ClientWidth = 841
+  ClientHeight = 672
+  ClientWidth = 837
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -13,28 +13,32 @@ object frmCrDetalhe: TfrmCrDetalhe
   Font.Name = 'Tahoma'
   Font.Style = []
   Position = poScreenCenter
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
   TextHeight = 19
   object pnlPrincipal: TPanel
     Left = 0
     Top = 0
-    Width = 841
-    Height = 673
+    Width = 837
+    Height = 672
     Align = alClient
     BevelOuter = bvNone
+    Color = 5737262
+    ParentBackground = False
     TabOrder = 0
-    ExplicitWidth = 837
-    ExplicitHeight = 603
+    ExplicitWidth = 833
+    ExplicitHeight = 671
     object pnlPesquisa: TPanel
       Left = 0
       Top = 0
-      Width = 841
+      Width = 837
       Height = 129
       Align = alTop
       BevelOuter = bvNone
       Color = 5737262
       ParentBackground = False
       TabOrder = 0
-      ExplicitWidth = 837
+      ExplicitWidth = 833
       object lblTNDoc: TLabel
         Left = 16
         Top = 16
@@ -250,14 +254,14 @@ object frmCrDetalhe: TfrmCrDetalhe
       AlignWithMargins = True
       Left = 3
       Top = 132
-      Width = 835
+      Width = 831
       Height = 137
       Align = alTop
       BevelOuter = bvNone
       Color = clWhite
       ParentBackground = False
       TabOrder = 1
-      ExplicitWidth = 831
+      ExplicitWidth = 827
       object lblDtPag: TLabel
         Left = 16
         Top = 6
@@ -365,19 +369,19 @@ object frmCrDetalhe: TfrmCrDetalhe
     object pnlGrids: TPanel
       Left = 0
       Top = 272
-      Width = 841
-      Height = 332
+      Width = 837
+      Height = 331
       Align = alClient
       BevelOuter = bvNone
       Color = 5737262
       ParentBackground = False
       TabOrder = 2
-      ExplicitWidth = 837
-      ExplicitHeight = 331
+      ExplicitWidth = 833
+      ExplicitHeight = 330
       object pnlGridFormasPagamento: TPanel
         Left = 0
         Top = 0
-        Width = 841
+        Width = 837
         Height = 160
         Margins.Left = 0
         Margins.Right = 0
@@ -390,11 +394,11 @@ object frmCrDetalhe: TfrmCrDetalhe
         Padding.Bottom = 5
         ParentBackground = False
         TabOrder = 0
-        ExplicitWidth = 837
+        ExplicitWidth = 833
         object lblFrPgto: TLabel
           Left = 5
           Top = 5
-          Width = 831
+          Width = 827
           Height = 19
           Align = alTop
           Caption = 'Formas de Pagamento'
@@ -408,15 +412,15 @@ object frmCrDetalhe: TfrmCrDetalhe
           ParentFont = False
           ExplicitWidth = 182
         end
-        object DBGridPgto: TDBGrid
+        object grdPgtos: TDBGrid
           AlignWithMargins = True
           Left = 8
           Top = 34
-          Width = 825
+          Width = 821
           Height = 118
           Margins.Top = 10
           Align = alClient
-          DataSource = DataSourcePgto
+          DataSource = dsPgtos
           Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgConfirmDelete, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
           TabOrder = 0
           TitleFont.Charset = DEFAULT_CHARSET
@@ -424,6 +428,7 @@ object frmCrDetalhe: TfrmCrDetalhe
           TitleFont.Height = -16
           TitleFont.Name = 'Tahoma'
           TitleFont.Style = []
+          OnDrawColumnCell = grdPgtosDrawColumnCell
           Columns = <
             item
               Expanded = False
@@ -451,7 +456,7 @@ object frmCrDetalhe: TfrmCrDetalhe
       object pnlGridParciais: TPanel
         Left = 0
         Top = 160
-        Width = 841
+        Width = 837
         Height = 160
         Align = alTop
         BevelOuter = bvNone
@@ -462,11 +467,11 @@ object frmCrDetalhe: TfrmCrDetalhe
         Padding.Bottom = 5
         ParentBackground = False
         TabOrder = 1
-        ExplicitWidth = 837
+        ExplicitWidth = 833
         object lblParciais: TLabel
           Left = 5
           Top = 5
-          Width = 831
+          Width = 827
           Height = 19
           Align = alTop
           Caption = 'Contas Parciais Geradas:'
@@ -480,17 +485,17 @@ object frmCrDetalhe: TfrmCrDetalhe
           ParentFont = False
           ExplicitWidth = 203
         end
-        object DBGridParciais: TDBGrid
+        object grdParciais: TDBGrid
           AlignWithMargins = True
           Left = 5
           Top = 34
-          Width = 831
+          Width = 827
           Height = 118
           Margins.Left = 0
           Margins.Top = 10
           Margins.Right = 0
           Align = alClient
-          DataSource = DataSourceParciais
+          DataSource = dsParciais
           ReadOnly = True
           TabOrder = 0
           TitleFont.Charset = DEFAULT_CHARSET
@@ -498,6 +503,7 @@ object frmCrDetalhe: TfrmCrDetalhe
           TitleFont.Height = -16
           TitleFont.Name = 'Tahoma'
           TitleFont.Style = []
+          OnDrawColumnCell = grdParciaisDrawColumnCell
           Columns = <
             item
               Expanded = False
@@ -539,17 +545,18 @@ object frmCrDetalhe: TfrmCrDetalhe
     end
     object pnlBotoes: TPanel
       Left = 0
-      Top = 604
-      Width = 841
+      Top = 603
+      Width = 837
       Height = 69
       Align = alBottom
       Color = clWindow
       ParentBackground = False
       TabOrder = 3
-      ExplicitTop = 437
+      ExplicitTop = 602
+      ExplicitWidth = 833
       object btnVoltar: TButton
         AlignWithMargins = True
-        Left = 717
+        Left = 713
         Top = 4
         Width = 120
         Height = 61
@@ -559,6 +566,7 @@ object frmCrDetalhe: TfrmCrDetalhe
         Images = ImageList1
         TabOrder = 0
         OnClick = btnVoltarClick
+        ExplicitLeft = 709
       end
     end
   end
@@ -2162,17 +2170,15 @@ object frmCrDetalhe: TfrmCrDetalhe
   end
   object DataSourceCrDetalhe: TDataSource
     DataSet = dmCReceber.FDQueryCrDetalhe
-    Left = 680
+    Left = 656
     Top = 233
   end
-  object DataSourcePgto: TDataSource
-    DataSet = dmCReceber.FDQueryPgtoCr
-    Left = 552
+  object dsPgtos: TDataSource
+    Left = 544
     Top = 233
   end
-  object DataSourceParciais: TDataSource
-    DataSet = dmCReceber.FDQueryCrParciais
-    Left = 568
-    Top = 401
+  object dsParciais: TDataSource
+    Left = 416
+    Top = 233
   end
 end

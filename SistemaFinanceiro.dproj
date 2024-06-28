@@ -4,7 +4,7 @@
         <ProjectVersion>19.5</ProjectVersion>
         <FrameworkType>VCL</FrameworkType>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Release</Config>
+        <Config Condition="'$(Config)'==''">Debug</Config>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
         <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Application</AppType>
@@ -342,6 +342,9 @@
         <DCCReference Include="..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\model\uDBColumnAttribute.pas">
             <Form>$R *.res</Form>
         </DCCReference>
+        <DCCReference Include="src\model\SistemaFinanceiro.Model.uSFQuery.pas"/>
+        <DCCReference Include="..\New Delphi\Classes_Compartilhadas\Enums\uEnumsUtils.pas"/>
+        <DCCReference Include="src\model\Entidades\SistemaFinanceiro.Model.Entidades.PgtoBxCr.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

@@ -1,16 +1,42 @@
 unit SistemaFinanceiro.View.CReceber;
+
 interface
+
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, SistemaFinanceiro.View.CadastroPadrao,
-  Data.DB, System.ImageList, Vcl.ImgList, Vcl.Grids, Vcl.DBGrids, Vcl.ExtCtrls,
-  Vcl.StdCtrls, Vcl.WinXPanels, Vcl.WinXCtrls, Vcl.ComCtrls, Datasnap.DBClient,
-  Vcl.Menus, SistemaFinanceiro.View.BaixarCR, SistemaFinanceiro.View.CrDetalhe,
-  Vcl.Imaging.pngimage, SistemaFinanceiro.View.Clientes,
-  SistemaFinanceiro.View.BxMultiplaCr;
+  Winapi.Windows,
+  Winapi.Messages,
+  System.SysUtils,
+  System.Variants,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  SistemaFinanceiro.View.CadastroPadrao,
+  Data.DB,
+  System.ImageList,
+  Vcl.ImgList,
+  Vcl.Grids,
+  Vcl.DBGrids,
+  Vcl.ExtCtrls,
+  Vcl.StdCtrls,
+  Vcl.WinXPanels,
+  Vcl.WinXCtrls,
+  Vcl.ComCtrls,
+  Datasnap.DBClient,
+  Vcl.Menus,
+  SistemaFinanceiro.View.BaixarCR,
+  SistemaFinanceiro.View.CrDetalhe,
+  Vcl.Imaging.pngimage,
+  SistemaFinanceiro.View.Clientes,
+  SistemaFinanceiro.View.BxMultiplaCr,
+  uEnumsUtils,
+  SistemaFinanceiro.Model.Entidades.Cr,
+  SistemaFinanceiro.Model.uSFQuery;
+
 type
   TfrmContasReceber = class(TfrmCadastroPadrao)
-    DataSourceCReceber: TDataSource;
+    dsCR: TDataSource;
     CardPanelParcela: TCardPanel;
     cardParcelaUnica: TCard;
     lblParcela: TLabel;
@@ -101,10 +127,12 @@ type
     CancelarBaixa1: TMenuItem;
     btnBxMultipla: TButton;
     chkBaixarAoSalvar: TCheckBox;
+    lblGrupoParcelas: TLabel;
+    dsGrupoParcelas: TDataSource;
+    grdGrupoParcelas: TDBGrid;
+    pnlFundoGrupoParcelas: TPanel;
     procedure FormCreate(Sender: TObject);
-    procedure btnPesquisaeClick(Sender: TObject);
     procedure btnIncluirClick(Sender: TObject);
-    procedure btnCancelarClick(Sender: TObject);
     procedure toggleParcelamentoClick(Sender: TObject);
     procedure edtValorVendaExit(Sender: TObject);
     procedure edtValorParcelaExit(Sender: TObject);
@@ -117,37 +145,33 @@ type
       DataCol: Integer; Column: TColumn; State: TGridDrawState);
     procedure btnBaixarCRClick(Sender: TObject);
     procedure btnDetalhesClick(Sender: TObject);
-    procedure DataSourceCReceberDataChange(Sender: TObject; Field: TField);
-    procedure cbStatusClick(Sender: TObject);
-    procedure cbDataClick(Sender: TObject);
-    procedure rbDataVencClick(Sender: TObject);
-    procedure rbDataVendaClick(Sender: TObject);
-    procedure rbIdClick(Sender: TObject);
-    procedure rbValorParcelaClick(Sender: TObject);
-    procedure rbValorVendaClick(Sender: TObject);
+    procedure dsCRDataChange(Sender: TObject; Field: TField);
     procedure btnImprimirClick(Sender: TObject);
-    procedure checkParciaisClick(Sender: TObject);
     procedure checkDiaFixoVctoClick(Sender: TObject);
     procedure edtClienteExit(Sender: TObject);
     procedure btnPesquisaClienteClick(Sender: TObject);
     procedure btnPesqClienteClick(Sender: TObject);
-    procedure edtFiltroClienteChange(Sender: TObject);
-    procedure edtPesquisarChange(Sender: TObject);
-    procedure dateInicialChange(Sender: TObject);
-    procedure dateFinalChange(Sender: TObject);
     procedure btnGerarClick(Sender: TObject);
     procedure CancelarBaixa1Click(Sender: TObject);
     procedure btnBxMultiplaClick(Sender: TObject);
     procedure chkBaixarAoSalvarClick(Sender: TObject);
-
+    procedure PesquisaClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormDestroy(Sender: TObject);
+    procedure grdGrupoParcelasDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
   private
-    { Private declarations }
-    FCodCR : Integer;
+    FTelaAtiva: Boolean;
+    FCodCR: Integer;
+    FOpCad: TOperacaoCadastro;
+    FCr : TModelCR;
+    FQueryPesquisa, FQueryGrupoParcelas: TSFQuery;
     procedure HabilitaBotoes;
     procedure EditarRegCReceber;
     procedure CadParcelaUnica;
     procedure CadParcelamento;
-    procedure ExibeTelaBaixar(pCodCr : Integer);
+    procedure ExibeTelaBaixar(pCodCr: Integer);
     procedure ExibeTelaBxMultipla;
     procedure ExibeDetalhe;
     procedure BuscaNomeCliente;
@@ -155,11 +179,11 @@ type
     procedure GeraParcelas;
     procedure CalcCrGrid;
     procedure CalcQtdCrGrid;
-    function GeraFiltrosRelatorio : String;
-    function DtVencimentoCheckContaPaga : TDate;
-
+    procedure ExibeGrupoParcelas;
+    function GeraFiltrosRelatorio: String;
+    function DtVencimentoCheckContaPaga: TDate;
+    procedure QuerySTATUSGetText(Sender: TField; var Text: string; DisplayText: Boolean);
   public
-    { Public declarations }
 
   protected
     procedure Pesquisar; override;
@@ -169,29 +193,29 @@ var
   frmContasReceber: TfrmContasReceber;
 
 implementation
+
 {$R *.dfm}
+
 uses
-  SistemaFinanceiro.Model.dmCReceber,
-  SistemaFinanceiro.Utilitarios, System.DateUtils,
-  SistemaFinanceiro.View.Principal, SistemaFinanceiro.View.Relatorios.Cr,
-  SistemaFinanceiro.Model.dmClientes, SistemaFinanceiro.Model.dmUsuarios;
+  SistemaFinanceiro.Utilitarios,
+  System.DateUtils,
+  SistemaFinanceiro.View.Principal,
+  SistemaFinanceiro.View.Relatorios.Cr,
+  SistemaFinanceiro.Model.dmClientes,
+  SistemaFinanceiro.Model.dmUsuarios;
 
 { TfrmContasReceber }
 
 procedure TfrmContasReceber.btnAlterarClick(Sender: TObject);
 begin
-
   inherited;
   EditarRegCReceber;
-
 end;
 
 procedure TfrmContasReceber.btnBaixarCRClick(Sender: TObject);
 begin
   inherited;
-
-  ExibeTelaBaixar(DataSourceCReceber.DataSet.FieldByName('ID').AsInteger);
-
+  ExibeTelaBaixar(dsCR.DataSet.FieldByName('ID').AsInteger);
 end;
 
 procedure TfrmContasReceber.btnBxMultiplaClick(Sender: TObject);
@@ -201,27 +225,19 @@ begin
 
 end;
 
-procedure TfrmContasReceber.btnCancelarClick(Sender: TObject);
-begin
-
-  inherited;
-
-  //  Cancelando inclusão
-  dmCReceber.cdsCReceber.Cancel;
-
-end;
 procedure TfrmContasReceber.btnDetalhesClick(Sender: TObject);
 begin
   inherited;
 
-  if DataSourceCReceber.DataSet.FieldByName('STATUS').AsString <> 'P' then
+  if dsCR.DataSet.FieldByName('STATUS').AsString <> 'P' then
   begin
 
-    Application.MessageBox('Conta não paga, realize a baixa para ver os detalhes!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+    Application.MessageBox
+      ('Conta não paga, realize a baixa para ver os detalhes!', 'Atenção',
+      MB_OK + MB_ICONEXCLAMATION);
     abort;
 
   end;
-
 
   ExibeDetalhe;
 
@@ -229,85 +245,88 @@ end;
 
 procedure TfrmContasReceber.btnExcluirClick(Sender: TObject);
 var
-  Option : Word;
+  Option: Word;
+  lCr : TModelCR;
+  lIdCr : Integer;
 begin
 
-  //  Se o documento já foi baixado cancela a exclusão
-  if dmCReceber.cdsCReceberSTATUS.AsString = 'P' then
-  begin
-    CardPanelPrincipal.ActiveCard := CardPesquisa;
-    Application.MessageBox('Documento já baixado não pode ser cancelado!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
-    abort;
-  end;
-
-  //  Se o documento foi cancelado, a exclusão é cancelada
-  if dmCReceber.cdsCReceberSTATUS.AsString = 'C' then
-  begin
-    CardPanelPrincipal.ActiveCard := CardPesquisa;
-    Application.MessageBox('Documento já cancelado não pode ser cancelado!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
-    abort;
-  end;
-
-
-  option := Application.MessageBox('Deseja cancelar o registro? ', 'Confirmação', MB_YESNO + MB_ICONQUESTION);
-
-  if option = IDNO then
-  begin
-    exit;
-  end;
-
+  lIdCr := DBGrid1.DataSource.DataSet.FieldByName('ID').AsInteger;
+  lCr := TModelCR.Create;
   try
-    dmCReceber.cdsCReceber.Edit;
-    dmCReceber.cdsCReceberSTATUS.AsString := 'C';
-    dmCReceber.cdsCReceber.Post;
-    dmCReceber.cdsCReceber.ApplyUpdates(0);
 
-    Application.MessageBox('Documento cancelado com sucesso!', 'Atenção', MB_OK + MB_ICONINFORMATION);
-    Pesquisar;
+    if not lCr.Existe(lIdCr, True) then
+    begin
+      raise Exception.Create('ID do contas a receber Inválido!');
+    end;
 
-    //  Atualiza o relatorio na tela inicial
-    frmPrincipal.TotalCR;
+    // Se o documento já foi baixado cancela a exclusão
+    if lCr.Status = 'P' then
+    begin
+      Application.MessageBox('Documento já baixado não pode ser cancelado!',
+        'Atenção', MB_OK + MB_ICONEXCLAMATION);
+      exit;
+    end;
 
-  except on e: Exception do
-    Application.MessageBox(PWidechar(E.Message), 'Erro ao cancelar documento!', MB_OK + MB_ICONERROR);
+    // Se o documento foi cancelado, a exclusão é cancelada
+    if lCr.Status = 'C' then
+    begin
+      Application.MessageBox('Documento já cancelado não pode ser cancelado!',
+        'Atenção', MB_OK + MB_ICONEXCLAMATION);
+      exit;
+    end;
+
+    Option := Application.MessageBox('Deseja cancelar o registro? ',
+      'Confirmação', MB_YESNO + MB_ICONQUESTION);
+
+    if Option = IDNO then
+      exit;
+
+    lCr.Status := 'C';
+    if lCr.UpdateByPK then
+      Application.MessageBox('Documento cancelado com sucesso!', 'Atenção',
+        MB_OK + MB_ICONINFORMATION)
+    else
+      Application.MessageBox('Erro ao cancelar a CR!', 'Erro', MB_OK + MB_ICONERROR);
+
+  finally
+    lCr.Free;
   end;
 
-  inherited;
+  Pesquisar;
 end;
 
 procedure TfrmContasReceber.btnGerarClick(Sender: TObject);
 begin
-  inherited;
   GeraParcelas;
 end;
 
 procedure TfrmContasReceber.btnImprimirClick(Sender: TObject);
 var
-  lformularioRelatorio : TfrmRelCr;
-  lFiltrosRelatorio : String;
+  lformularioRelatorio: TfrmRelCr;
+  lFiltrosRelatorio: String;
 begin
 
   lFiltrosRelatorio := GeraFiltrosRelatorio;
   lformularioRelatorio := TfrmRelCr.Create(Self);
   try
     // Desativa a atualização visual do grid
-    DataSourceCReceber.DataSet.DisableControls;
+    dsCR.DataSet.DisableControls;
 
     if not(Trim(lFiltrosRelatorio).IsEmpty) then
     begin
       lformularioRelatorio.Filtros := lFiltrosRelatorio;
       lformularioRelatorio.ExibirFiltros := True;
     end;
-    lformularioRelatorio.DataSourceCr.DataSet := DataSourceCReceber.DataSet;
+    lformularioRelatorio.DataSourceCr.DataSet := dsCR.DataSet;
 
-    //  Mostra a pre vizualizacao
+    // Mostra a pre vizualizacao
     lformularioRelatorio.RLReport.Preview;
 
   finally
 
     lformularioRelatorio.Free;
-     // Ativa a atualização visual do grid novamente
-    DataSourceCReceber.DataSet.EnableControls;
+    // Ativa a atualização visual do grid novamente
+    dsCR.DataSet.EnableControls;
   end;
 
   Pesquisar;
@@ -318,50 +337,46 @@ procedure TfrmContasReceber.btnIncluirClick(Sender: TObject);
 begin
   inherited;
 
-  //  Atualiza titulo
+  // Atualiza titulo
   lblTitulo.Caption := 'Inserindo novo Lançamento no Contas a Receber';
 
-  if not (dmCReceber.cdsCReceber.State in [dsInsert, dsEdit]) then
-  begin
+  FOpCad := ocIncluir;
 
-    //  Coloca o dataset em modo de inserção de dados
-    dmCReceber.cdsCReceber.Insert;
-
-  end;
-
-
-  //  Gera a id
-  dmCReceber.GeraCodigo;
-
-  //  Posiciona o foco no 1 campo
+  // Posiciona o foco no 1 campo
   memDesc.SetFocus;
 
-  //  Seta previamente as datas
+  // Seta previamente as datas
   dateVenda.Date := now;
   dateVencimento.Date := now + 7;
 
-  //  Seta previamente a parcela
+  // Seta previamente a parcela
   edtParcela.Text := '1';
 
-  //  Esvazia o dataset das parcelas
+  // Esvazia o dataset das parcelas
   cdsParcelas.EmptyDataSet;
 
-  //  Liberacoes
-  edtQtdParcelas.Enabled     := True;
-  edtIntervaloDias.Enabled   := True;
-  edtDiaFixoVcto.Enabled     := False;
-  checkDiaFixoVcto.Checked   := False;
-  checkDiaFixoVcto.Enabled   := True;
-  btnGerar.Enabled           := True;
-  btnLimpar.Enabled          := False;
-  toggleParcelamento.State   := tssOff;
+  // Liberacoes
+  edtQtdParcelas.Enabled := True;
+  edtIntervaloDias.Enabled := True;
+  edtDiaFixoVcto.Enabled := False;
+  checkDiaFixoVcto.Checked := False;
+  checkDiaFixoVcto.Enabled := True;
+  btnGerar.Enabled := True;
+  btnLimpar.Enabled := False;
+  toggleParcelamento.State := tssOff;
   toggleParcelamento.Enabled := True;
-  edtParcela.ReadOnly        := True;
-  edtValorParcela.ReadOnly   := True;
-  chkBaixarAoSalvar.Checked  := False;
+  edtParcela.ReadOnly := True;
+  edtValorParcela.ReadOnly := True;
+  chkBaixarAoSalvar.Checked := False;
+  pnlFundoGrupoParcelas.Visible := False;
 
-  //  Oculta o nome do cliente
+  // Oculta o nome do cliente
   lblNomeCliente.Visible := False;
+
+  if Assigned(FCr) then
+    FreeAndNil(Fcr);
+
+  Fcr := TModelCR.Create;
 
 end;
 
@@ -369,16 +384,16 @@ procedure TfrmContasReceber.btnLimparClick(Sender: TObject);
 begin
   inherited;
 
-  //  Esvazia o dataset das parcelas
+  // Esvazia o dataset das parcelas
   cdsParcelas.EmptyDataSet;
 
-   //  Liberações
-  edtQtdParcelas.Enabled   := True;
+  // Liberações
+  edtQtdParcelas.Enabled := True;
   edtIntervaloDias.Enabled := True;
-  edtDiaFixoVcto.Enabled   := True;
+  edtDiaFixoVcto.Enabled := True;
   checkDiaFixoVcto.Enabled := True;
-  btnGerar.Enabled         := True;
-  btnLimpar.Enabled        := False;
+  btnGerar.Enabled := True;
+  btnLimpar.Enabled := False;
 
   edtQtdParcelas.Clear;
   edtIntervaloDias.Clear;
@@ -391,20 +406,21 @@ end;
 procedure TfrmContasReceber.btnPesqClienteClick(Sender: TObject);
 begin
 
-  //  Cria o form
+  // Cria o form
   frmCliente := TfrmCliente.Create(Self);
 
   try
 
-    //  Exibe o form
+    // Exibe o form
     frmCliente.ShowModal;
 
   finally
 
-    //  Pega a ID do cliente selecionado
-    edtFiltroCliente.Text := frmCliente.DataSourceCliente.DataSet.FieldByName('ID_CLI').AsString;
+    // Pega a ID do cliente selecionado
+    edtFiltroCliente.Text := frmCliente.DataSourceCliente.DataSet.FieldByName
+      ('ID_CLI').AsString;
 
-    //  Libera da  memoria
+    // Libera da  memoria
     FreeAndNil(frmCliente);
 
   end;
@@ -416,20 +432,21 @@ end;
 procedure TfrmContasReceber.btnPesquisaClienteClick(Sender: TObject);
 begin
 
-  //  Cria o form
+  // Cria o form
   frmCliente := TfrmCliente.Create(Self);
 
   try
 
-    //  Exibe o form
+    // Exibe o form
     frmCliente.ShowModal;
 
   finally
 
-    //  Pega a ID do cliente selecionado
-    edtCliente.Text := frmCliente.DataSourceCliente.DataSet.FieldByName('ID_CLI').AsString;
+    // Pega a ID do cliente selecionado
+    edtCliente.Text := frmCliente.DataSourceCliente.DataSet.FieldByName
+      ('ID_CLI').AsString;
 
-    //  Libera da  memoria
+    // Libera da  memoria
     FreeAndNil(frmCliente);
 
   end;
@@ -438,35 +455,21 @@ begin
 
 end;
 
-procedure TfrmContasReceber.btnPesquisaeClick(Sender: TObject);
-begin
-  inherited;
-
-  Pesquisar;
-
-end;
-
 procedure TfrmContasReceber.btnSalvarClick(Sender: TObject);
 begin
 
   if toggleParcelamento.State = tssOff then
-  begin
-      CadParcelaUnica;
-      if (chkBaixarAoSalvar.Checked) and (FCodCR > 0) then
-        ExibeTelaBaixar(FCodCR);
-  end
-    else
-    begin
-      CadParcelamento;
-    end;
+    CadParcelaUnica
+  else
+    CadParcelamento;
 
-  //  Retorna ao card de pesquisa
+  // Retorna ao card de pesquisa
   CardPanelPrincipal.ActiveCard := CardPesquisa;
 
-  //  Atualiza a lista
+  // Atualiza a lista
   Pesquisar;
 
-  //  Atualiza o relatorio na tela inicial
+  // Atualiza o relatorio na tela inicial
   frmPrincipal.TotalCR;
 
   inherited;
@@ -474,7 +477,7 @@ end;
 
 procedure TfrmContasReceber.BuscaNomeCliente;
 var
-  NomeCliente : String;
+  NomeCliente: String;
 
 begin
 
@@ -486,7 +489,8 @@ begin
     if NomeCliente = '' then
     begin
 
-      Application.MessageBox('Cliente não encontrado!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+      Application.MessageBox('Cliente não encontrado!', 'Atenção',
+        MB_OK + MB_ICONEXCLAMATION);
       edtCliente.SetFocus;
       edtCliente.Clear;
 
@@ -501,52 +505,50 @@ end;
 
 procedure TfrmContasReceber.CadParcelamento;
 var
-  ValorVenda : Currency;
-  IdCliente : Integer;
-
+  lValorVenda: Currency;
+  lIdCliente: Integer;
+  lCr: TModelCR;
+  lQtdParcelas, lIdGrupoParcelas: Integer;
 begin
 
-  //  Valida valor da venda
-  if not TryStrToCurr(edtValorVenda.Text, ValorVenda) then
+  lQtdParcelas := 0;
+  lIdGrupoParcelas := 0;
+
+  // Valida valor da venda
+  if not TryStrToCurr(edtValorVenda.Text, lValorVenda) then
   begin
     edtValorVenda.SetFocus;
-    Application.MessageBox('Valor da Venda inválido!', 'Atenção', MB_OK + MB_ICONWARNING);
+    Application.MessageBox('Valor da Venda inválido!', 'Atenção',
+      MB_OK + MB_ICONWARNING);
     abort;
   end;
 
-  if not TryStrToInt(edtCliente.Text, IdCliente) then
+  if not TryStrToInt(edtCliente.Text, lIdCliente) then
   begin
     begin
-    edtCliente.SetFocus;
-    Application.MessageBox('Campo CLIENTE não pode estar vazio', 'Atenção', MB_OK + MB_ICONWARNING);
-    abort;
-  end;
+      edtCliente.SetFocus;
+      Application.MessageBox('Campo CLIENTE não pode estar vazio', 'Atenção',
+        MB_OK + MB_ICONWARNING);
+      abort;
+    end;
   end;
 
-  //  Posiciona no reg 1 do cds
+  // Posiciona no reg 1 do cds
   cdsParcelas.First;
-
-  if cdsParcelas.IsEmpty then
-  begin
-
-    edtQtdParcelas.SetFocus;
-    Application.MessageBox('Parcelas não geradas!', 'Atenção', MB_OK + MB_ICONWARNING);
-    abort;
-
-  end;
-
-  //  Valida todos os reg do cds
+  // Valida todos os reg do cds
   while not cdsParcelas.Eof do
   begin
     if cdsParcelasParcela.AsInteger < 0 then
     begin
-      Application.MessageBox('Número de Parcela inválido!', 'Atenção', MB_OK + MB_ICONWARNING);
+      Application.MessageBox('Número de Parcela inválido!', 'Atenção',
+        MB_OK + MB_ICONWARNING);
       abort;
     end;
 
     if cdsParcelasValor.AsCurrency < 0.01 then
     begin
-      Application.MessageBox('Valor da Parcela inválido!', 'Atenção', MB_OK + MB_ICONWARNING);
+      Application.MessageBox('Valor da Parcela inválido!', 'Atenção',
+        MB_OK + MB_ICONWARNING);
       abort
     end;
 
@@ -554,41 +556,58 @@ begin
 
   end;
 
-  //  Posiciona no reg 1 do cds
-  cdsParcelas.First;
+  lQtdParcelas := cdsParcelas.RecordCount;
+  lIdGrupoParcelas := TModelCR.GetIdGrupoParcelas;
 
-  //  Gravando Parcelas
-  while not cdsParcelas.Eof do
+  if (lIdGrupoParcelas <= 0) then
   begin
-
-    if dmCReceber.cdsCReceber.State in [dsBrowse, dsInactive] then
-    begin
-      dmCReceber.cdsCReceber.Insert;
-    end;
-
-    dmCReceber.GeraCodigo;
-    dmCReceber.cdsCReceberID_CLIENTE.AsInteger       := IdCliente;
-    dmCReceber.cdsCReceberDATA_CADASTRO.AsDateTime   := now;
-    dmCReceber.cdsCReceberSTATUS.AsString            := 'A';
-    dmCReceber.cdsCReceberVALOR_ABATIDO.AsCurrency   := 0;
-    dmCReceber.cdsCReceberNUMERO_DOCUMENTO.AsString  := cdsParcelasDOCUMENTO.AsString;
-    dmCReceber.cdsCReceberDESCRICAO.AsString         := Format('%s - Parcela %d', [memDesc.Text, cdsParcelasPARCELA.AsInteger]);
-    dmCReceber.cdsCReceberVALOR_VENDA.AsCurrency     := ValorVenda;
-    dmCReceber.cdsCReceberDATA_VENDA.AsDateTime      := dateVenda.Date;
-    dmCReceber.cdsCReceberPARCELA.AsInteger          := cdsParcelasPARCELA.AsInteger;
-    dmCReceber.cdsCReceberVALOR_PARCELA.AsCurrency   := cdsParcelasVALOR.AsCurrency;
-    dmCReceber.cdsCReceberDATA_VENCIMENTO.AsDateTime := cdsParcelasVENCIMENTO.AsDateTime;
-    dmCReceber.cdsCReceberPARCIAL.AsString           := 'N';
-
-    //  Gravando no banco
-    dmCReceber.cdsCReceber.Post;
-    dmCReceber.cdsCReceber.ApplyUpdates(0);
-
-    cdsParcelas.Next;
-
+    Application.MessageBox('ID do grupo de Parcelas inválido!', 'Atenção',  MB_OK + MB_ICONWARNING);
+    abort
   end;
 
-  Application.MessageBox('Parcelas Cadastradas com Sucesso!!', 'Atenção', MB_OK + MB_ICONINFORMATION);
+  if (lQtdParcelas <= 0) then
+  begin
+    edtQtdParcelas.SetFocus;
+    Application.MessageBox('Parcelas não geradas!', 'Atenção', MB_OK + MB_ICONWARNING);
+    abort;
+  end;
+
+  // Posiciona no reg 1 do cds
+  cdsParcelas.First;
+
+  // Gravando Parcelas
+  while not cdsParcelas.Eof do
+  begin
+    lCr := TModelCR.Create;
+    try
+      lCr.GeraCodigo;
+      lCr.IdCliente := lIdCliente;
+      lCr.DataCadastro := now;
+      lCr.Status := 'A';
+      lCr.ValorAbatido := 0;
+      lCr.Doc := cdsParcelasDocumento.AsString;
+      lCr.Desc := Format('%s - Parcela %d', [memDesc.Text, cdsParcelasParcela.AsInteger]);
+      lCr.ValorVenda := lValorVenda;
+      lCr.DataVenda := dateVenda.Date;
+      lCr.Parcela := cdsParcelasParcela.AsInteger;
+      lCr.ValorParcela := cdsParcelasValor.AsCurrency;
+      lCr.DataVencimento := cdsParcelasVencimento.AsDateTime;
+      lCr.Parcial := 'N';
+      lCr.NumTotalParcelas := lQtdParcelas;
+      lCr.IdGrupoParcelas := lIdGrupoParcelas;
+
+      // Gravando no BD
+      if (FOpCad = ocIncluir) then
+        lCr.Insert;
+
+      cdsParcelas.Next;
+    finally
+      lCr.Free;
+    end;
+  end;
+
+  Application.MessageBox('Parcelas Cadastradas com Sucesso!!', 'Atenção',
+    MB_OK + MB_ICONINFORMATION);
 
   Pesquisar;
 
@@ -597,131 +616,160 @@ end;
 
 procedure TfrmContasReceber.CadParcelaUnica;
 var
-  Parcela : Integer;
-  IdCliente : Integer;
-  ValorVenda : Currency;
-  ValorParcela : Currency;
-
+  lParcela: Integer;
+  lIdCliente: Integer;
+  lValorVenda: Double;
+  lValorParcela: Double;
+  lRegGravado: Boolean;
 begin
 
-  //  Se for um novo registro irá gerar o código, status em aberto
-  //  e setar 0 no valor abatido
-  if DataSourceCReceber.State in [dsInsert] then
+  lRegGravado := False;
+
+  if Assigned(FCr) then
   begin
+    try
+      // Se for um novo registro irá gerar o código, status em aberto
+      // e setar 0 no valor abatido
+      if (FOpCad = ocIncluir) then
+      begin
+        FCr.GeraCodigo;
+        FCr.DataCadastro := now;
+        edtValorParcela.Text := edtValorVenda.Text;
+      end;
 
-    //  gera a id
-    dmCReceber.GeraCodigo;
+      // Valida Campos obrigatórios
+      if not TryStrToInt(edtCliente.Text, lIdCliente) then
+      begin
+        edtCliente.SetFocus;
+        Application.MessageBox('Campo CLIENTE não pode estar vazio!', 'Atenção',
+          MB_OK + MB_ICONEXCLAMATION);
+        abort;
+      end;
 
-    dmCReceber.cdsCReceberDATA_CADASTRO.AsDateTime := now;
-    dmCReceber.cdsCReceberSTATUS.AsString := 'A';
-    dmCReceber.cdsCReceberVALOR_ABATIDO.AsCurrency := 0;
+      if Trim(memDesc.Text) = '' then
+      begin
+        memDesc.SetFocus;
+        Application.MessageBox('Campo Descrição não pode estar vazio!', 'Atenção',
+          MB_OK + MB_ICONEXCLAMATION);
+        abort;
+      end;
 
-    //  Se for parcela unica pega o mesmo valor da compra
-    edtValorParcela.Text := edtValorVenda.Text;
+      if not TryStrToFloat(edtValorVenda.Text, lValorVenda) then
+      begin
+        edtValorVenda.SetFocus;
+        Application.MessageBox('Valor da Venda inválido!', 'Atenção',
+          MB_OK + MB_ICONEXCLAMATION);
+        abort;
+      end;
 
+      if dateVencimento.Date < dateVenda.Date then
+      begin
+        dateVencimento.SetFocus;
+        Application.MessageBox
+          ('Data de vencimento não pode ser inferior a data de venda!', 'Atenção',
+          MB_OK + MB_ICONEXCLAMATION);
+        abort;
+      end;
+
+      if not TryStrToFloat(edtValorParcela.Text, lValorParcela) then
+      begin
+        edtValorParcela.SetFocus;
+        Application.MessageBox('Valor da Parcela inválido!', 'Atenção',
+          MB_OK + MB_ICONEXCLAMATION);
+        abort;
+      end;
+
+      if not TryStrToInt(edtParcela.Text, lParcela) then
+      begin
+        edtParcela.SetFocus;
+        Application.MessageBox('Número da Parcela inválido!', 'Atenção',
+          MB_OK + MB_ICONEXCLAMATION);
+        abort;
+      end;
+
+      if dateVenda.Date > now then
+      begin
+        dateVenda.SetFocus;
+        Application.MessageBox
+          ('Data de venda não pode ser maior que a data atual!', 'Atenção',
+          MB_OK + MB_ICONEXCLAMATION);
+        abort;
+      end;
+
+      if (lValorParcela > lValorVenda) then
+      begin
+        edtValorParcela.SetFocus;
+        Application.MessageBox
+          ('Valor da parcela não pode ser maior que o valor da venda!', 'Atenção',
+          MB_OK + MB_ICONEXCLAMATION);
+        abort;
+      end;
+
+      FCr.IdCliente := lIdCliente;
+      FCr.Doc := Trim(edtNDoc.Text);
+      FCr.Desc := Trim(memDesc.Text);
+      FCr.Parcela := lParcela;
+      FCr.ValorParcela := lValorParcela;
+      FCr.ValorVenda := lValorVenda;
+      FCr.DataVencimento := dateVencimento.Date;
+      FCr.DataVenda := dateVenda.Date;
+      FCr.Parcial := 'N';
+      FCr.ValorAbatido := 0;
+      FCr.Status := 'A';
+
+      // Gravando no BD
+      if (FOpCad = ocIncluir) then
+      begin
+        FCr.NumTotalParcelas := 1;
+        lRegGravado := FCr.Insert;
+      end;
+
+      if (FOpCad = ocAlterar) then
+        lRegGravado := FCr.UpdateByPK;
+
+
+      // Baixa apos salvar a conta
+      if (lRegGravado and chkBaixarAoSalvar.Checked) then
+        ExibeTelaBaixar(FCr.ID);
+
+    finally
+      FreeAndNil(FCr)
+    end;
   end;
-
-  //  Valida Campos obrigatórios
-  if not TryStrToInt(edtCliente.Text, IdCliente) then
-  begin
-    edtCliente.SetFocus;
-    Application.MessageBox('Campo CLIENTE não pode estar vazio!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
-    abort;
-  end;
-
-  if Trim(memDesc.text) = '' then
-  begin
-    memDesc.SetFocus;
-    Application.MessageBox('Campo Descrição não pode estar vazio!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
-    abort;
-  end;
-
-  if not TryStrToCurr(edtValorVenda.Text, ValorVenda) then
-  begin
-    edtValorVenda.SetFocus;
-    Application.MessageBox('Valor da Venda inválido!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
-    abort;
-  end;
-
-  if dateVencimento.Date < dateVenda.Date then
-  begin
-    dateVencimento.SetFocus;
-    Application.MessageBox('Data de vencimento não pode ser inferior a data de venda!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
-    abort;
-  end;
-
-  if not TryStrToCurr(edtValorParcela.Text, ValorParcela) then
-  begin
-    edtValorParcela.SetFocus;
-    Application.MessageBox('Valor da Parcela inválido!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
-    abort;
-  end;
-
-  if not TryStrToInt(edtParcela.Text, Parcela) then
-  begin
-    edtParcela.SetFocus;
-    Application.MessageBox('Número da Parcela inválido!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
-    abort;
-  end;
-
-  if dateVenda.Date > Now then
-  begin
-    dateVenda.SetFocus;
-    Application.MessageBox('Data de venda não pode ser maior que a data atual!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
-    abort;
-  end;
-
-  if chkBaixarAoSalvar.Checked then
-    FCodCR := dmCReceber.cdsCReceberID.AsInteger;
-
-  //  Passando os dados para o dataset
-  dmCReceber.cdsCReceberID_CLIENTE.AsInteger       := IdCliente;
-  dmCReceber.cdsCReceberNUMERO_DOCUMENTO.AsString  := Trim(edtNDoc.text);
-  dmCReceber.cdsCReceberDESCRICAO.AsString         := Trim(memDesc.Text);
-  dmCReceber.cdsCReceberPARCELA.AsInteger          := Parcela;
-  dmCReceber.cdsCReceberVALOR_PARCELA.AsCurrency   := ValorParcela;
-  dmCReceber.cdsCReceberVALOR_VENDA.AsCurrency     := ValorVenda;
-  dmCReceber.cdsCReceberDATA_VENCIMENTO.AsDateTime := dateVencimento.Date;
-  dmCReceber.cdsCReceberDATA_VENDA.AsDateTime      := dateVenda.Date;
-  dmCReceber.cdsCReceberPARCIAL.AsString           := 'N';
-
-  //  Gravando no BD
-  dmCReceber.cdsCReceber.Post;
-  dmCReceber.cdsCReceber.ApplyUpdates(0);
 
 end;
 
 procedure TfrmContasReceber.CalcCrGrid;
 var
-  TotalCr: Currency;
+  TotalCR: Currency;
 
 begin
 
-  TotalCr := 0;
+  TotalCR := 0;
 
-  //  Percorre e soma
+  // Percorre e soma
   with DBGrid1.DataSource.DataSet do
   begin
 
-    //  Desativa o controle
+    // Desativa o controle
     DisableControls;
 
-    //  Posiciona no primeiro reg
+    // Posiciona no primeiro reg
     First;
 
     while not Eof do
     begin
 
-      TotalCr := TotalCr + FieldByName('VALOR_PARCELA').AsCurrency;
+      TotalCR := TotalCR + FieldByName('VALOR_PARCELA').AsCurrency;
 
       Next;
 
     end;
 
-    //  Reativa o controle
+    // Reativa o controle
     EnableControls;
 
-    lblTotalCpGrid.Caption := TUtilitario.FormatoMoeda(TotalCr);
+    lblTotalCpGrid.Caption := TUtilitario.FormatoMoeda(TotalCR);
 
   end;
 
@@ -735,81 +783,66 @@ begin
 
   QtdCr := 0;
 
-  //  Realiza a conta
+  // Realiza a conta
   QtdCr := DBGrid1.DataSource.DataSet.RecordCount;
 
-  //  Exibe na label
+  // Exibe na label
   lblQtdCp.Caption := IntToStr(QtdCr);
-
 
 end;
 
 procedure TfrmContasReceber.CancelarBaixa1Click(Sender: TObject);
 var
-  Option : Word;
-  IdCr   : Integer;
-
+  Option: Word;
+  lIdCr: Integer;
+  lCr : TModelCR;
 begin
 
-  //  Valida se o user logado é adm
-  if not (dmUsuarios.GetUsuarioLogado.User_Admin = 'S') then
-  begin
+  // Pega a id da conta
+  lIdCr := dsCR.DataSet.FieldByName('ID').AsInteger;
+  lCr := TModelCR.Create;
+  try
 
-  Application.MessageBox('Somente Administradores podem cancelar uma Baixa!', 'Erro', MB_OK + MB_ICONERROR);
-    abort;
-
-  end;
-
-
-  if not DataSourceCReceber.DataSet.IsEmpty then
-  begin
-
-    //  Bloqueia o cancelamento se a conta não estiver como PAGA
-    if DataSourceCReceber.DataSet.FieldByName('STATUS').AsString <> 'P' then
+    if not lCr.Existe(lIdCr, True) then
     begin
-
-      Application.MessageBox('Conta não baixada!!', 'Erro', MB_OK + MB_ICONERROR);
-      abort;
-
+      raise Exception.Create('ID do contas a receber Inválido!');
     end;
 
-    Option := Application.MessageBox('Deseja cancelar o registro? ', 'Confirmação', MB_YESNO + MB_ICONQUESTION);
-
-    if Option = IDNO then
+    // Valida se o user logado é adm
+    if not(dmUsuarios.GetUsuarioLogado.User_Admin = 'S') then
     begin
+      Application.MessageBox('Somente Administradores podem cancelar uma Baixa!',
+        'Erro', MB_OK + MB_ICONERROR);
       exit;
     end;
 
-    //  Pega a id da conta
-    IdCr := DataSourceCReceber.DataSet.FieldByName('ID').AsInteger;
+    // Bloqueia o cancelamento se a conta não estiver como PAGA
+    if lCr.Status <> 'P' then
+    begin
+      Application.MessageBox('Conta não baixada!!', 'Erro',
+        MB_OK + MB_ICONERROR);
+      exit;
+    end;
 
-    //  Chama a procedure que fara o trabalho
-    dmCReceber.CancBxCR(IdCr);
+    Option := Application.MessageBox('Deseja cancelar o registro? ',
+      'Confirmação', MB_YESNO + MB_ICONQUESTION);
 
-    Pesquisar;
+    if Option = IDNO then
+      exit;
 
-    //  Atualiza relatorio tela principal
-    frmPrincipal.TotalCr;
-    frmPrincipal.ResumoMensalCaixa;
+    // Chama a procedure que fara o trabalho
+    if lCr.CancBxCr then
+      Application.MessageBox('Conta cancelada com Sucesso!!', 'Atenção', MB_OK + MB_ICONINFORMATION);
 
+  finally
+    lCr.Free;
   end;
 
-
-end;
-
-procedure TfrmContasReceber.cbDataClick(Sender: TObject);
-begin
-  inherited;
-
   Pesquisar;
 
-end;
-
-procedure TfrmContasReceber.cbStatusClick(Sender: TObject);
-begin
-  inherited;
-
-  Pesquisar;
+  // Atualiza relatorio tela principal
+  frmPrincipal.TotalCR;
+  frmPrincipal.ResumoMensalCaixa;
 
 end;
 
@@ -820,12 +853,12 @@ begin
   if checkDiaFixoVcto.Checked then
   begin
 
-    edtDiaFixoVcto.Visible   := True;
-    edtDiaFixoVcto.Enabled   := True;
-    lblDiaFixo.Visible       := True;
+    edtDiaFixoVcto.Visible := True;
+    edtDiaFixoVcto.Enabled := True;
+    lblDiaFixo.Visible := True;
     edtIntervaloDias.Enabled := False;
-    edtIntervaloDias.Text    := '30';
-    Label9.Visible           := True;
+    edtIntervaloDias.Text := '30';
+    Label9.Visible := True;
 
     edtDiaFixoVcto.SetFocus;
 
@@ -833,23 +866,14 @@ begin
   else
   begin
 
-    edtDiaFixoVcto.Visible   := False;
-    edtDiaFixoVcto.Enabled   := False;
-    lblDiaFixo.Visible       := False;
+    edtDiaFixoVcto.Visible := False;
+    edtDiaFixoVcto.Enabled := False;
+    lblDiaFixo.Visible := False;
     edtIntervaloDias.Enabled := True;
-    label9.Visible           := False;
+    Label9.Visible := False;
     edtIntervaloDias.Clear;
 
   end;
-
-
-end;
-
-procedure TfrmContasReceber.checkParciaisClick(Sender: TObject);
-begin
-  inherited;
-
-  Pesquisar;
 
 end;
 
@@ -858,29 +882,12 @@ begin
   dateVencimento.Date := DtVencimentoCheckContaPaga;
 end;
 
-procedure TfrmContasReceber.DataSourceCReceberDataChange(Sender: TObject;
-  Field: TField);
+procedure TfrmContasReceber.dsCRDataChange(Sender: TObject; Field: TField);
 begin
   inherited;
 
-  btnDetalhes.Enabled := DataSourceCReceber.DataSet.FieldByName('STATUS').AsString = 'P';
-  btnBaixarCR.Enabled := DataSourceCReceber.DataSet.FieldByName('STATUS').AsString = 'A';
-
-end;
-
-procedure TfrmContasReceber.dateFinalChange(Sender: TObject);
-begin
-  inherited;
-
-  Pesquisar;
-
-end;
-
-procedure TfrmContasReceber.dateInicialChange(Sender: TObject);
-begin
-  inherited;
-
-  Pesquisar;
+  btnDetalhes.Enabled := dsCR.DataSet.FieldByName('STATUS').AsString = 'P';
+  btnBaixarCR.Enabled := dsCR.DataSet.FieldByName('STATUS').AsString = 'A';
 
 end;
 
@@ -894,28 +901,31 @@ end;
 
 procedure TfrmContasReceber.DBGrid1DrawColumnCell(Sender: TObject;
   const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+var
+  lDisplayText: String;
 begin
 
-  //  Altera a cor das duplicatas vencidas
+  // Altera a cor das duplicatas vencidas
   if (not DBGrid1.DataSource.DataSet.IsEmpty) and
-      (DBGrid1.DataSource.DataSet.FieldByName('DATA_VENCIMENTO').AsDateTime < Date)
-      and (DBGrid1.DataSource.DataSet.FieldByName('STATUS').AsString = 'A')then
+    (DBGrid1.DataSource.DataSet.FieldByName('DATA_VENCIMENTO').AsDateTime <
+    Date) and (DBGrid1.DataSource.DataSet.FieldByName('STATUS').AsString = 'A')
+  then
   begin
-    DBGrid1.Canvas.Font.Color := clRed;  // Define a cor do texto da célula
+    DBGrid1.Canvas.Font.Color := clRed; // Define a cor do texto da célula
   end;
 
-  //  Altera a cor das duplicatas pagas
+  // Altera a cor das duplicatas pagas
   if (not DBGrid1.DataSource.DataSet.IsEmpty) and
-     (DBGrid1.DataSource.DataSet.FieldByName('STATUS').AsString = 'P')then
+    (DBGrid1.DataSource.DataSet.FieldByName('STATUS').AsString = 'P') then
   begin
-    DBGrid1.Canvas.Font.Color := clHotLight;  // Define a cor do texto da célula
+    DBGrid1.Canvas.Font.Color := clHotLight; // Define a cor do texto da célula
   end;
 
-  //  Altera a cor das duplicatas canceladas
+  // Altera a cor das duplicatas canceladas
   if (not DBGrid1.DataSource.DataSet.IsEmpty) and
-     (DBGrid1.DataSource.DataSet.FieldByName('STATUS').AsString = 'C')then
+    (DBGrid1.DataSource.DataSet.FieldByName('STATUS').AsString = 'C') then
   begin
-    DBGrid1.Canvas.Font.Color := $00E68AE5;  // Define a cor do texto da célula
+    DBGrid1.Canvas.Font.Color := $00E68AE5; // Define a cor do texto da célula
   end;
 
   // Desenha a célula com as propriedades de cor atualizadas
@@ -923,13 +933,15 @@ begin
 
   inherited;
 
+  TUtilitario.FormatoMoedaGrid(TDBGrid(Sender), Column, Rect, State);
+
 end;
 
 function TfrmContasReceber.DtVencimentoCheckContaPaga: TDate;
 begin
   Result := dateVencimento.Date;
 
-  if (chkBaixarAoSalvar.Checked) and (DataSourceCReceber.State = dsInsert) then
+  if (chkBaixarAoSalvar.Checked) and (dsCR.State = dsInsert) then
     Result := dateVenda.Date;
 
 end;
@@ -940,50 +952,84 @@ begin
   edtParcela.Enabled := True;
   edtValorParcela.Enabled := True;
 
-  //  Esvazia o cds
+  // Esvazia o cds
   cdsParcelas.EmptyDataSet;
 
-  //  Se o documento já foi baixado cancela a edição
-  if dmCReceber.cdsCReceberSTATUS.AsString = 'P' then
+  // Se o documento já foi baixado cancela a edição
+  if DBGrid1.DataSource.DataSet.FieldByName('STATUS').AsString = 'P' then
   begin
     CardPanelPrincipal.ActiveCard := CardPesquisa;
-    Application.MessageBox('Documento já baixado não pode ser alterado!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+    Application.MessageBox('Documento já baixado não pode ser alterado!',
+      'Atenção', MB_OK + MB_ICONEXCLAMATION);
     abort;
   end;
 
-  //  Se o documento foi cancelado, a edição é cancelada
-  if dmCReceber.cdsCReceberSTATUS.AsString = 'C' then
+  // Se o documento foi cancelado, a edição é cancelada
+  if DBGrid1.DataSource.DataSet.FieldByName('STATUS').AsString = 'C' then
   begin
     CardPanelPrincipal.ActiveCard := CardPesquisa;
-    Application.MessageBox('Documento já cancelado não pode ser alterado!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+    Application.MessageBox('Documento já cancelado não pode ser alterado!',
+      'Atenção', MB_OK + MB_ICONEXCLAMATION);
     abort;
   end;
 
-  // Coloca o dataset em modo de edição
-  dmCReceber.cdsCReceber.Edit;
+  if Assigned(FCr) then
+    FreeAndNil(Fcr);
 
-  // Coloca o numero do registro no titulo
-  lblTitulo.Caption := 'Alterando Registro Nº ' + dmCReceber.cdsCReceberID.AsString;
+  Fcr := TModelCR.Create;
+  try
+    Fcr.ID := DBGrid1.DataSource.DataSet.FieldByName('ID').AsInteger;
+    if Fcr.LoadObjectByPK then
+    begin
 
-  //  Bloqueia o toogle
-  toggleParcelamento.Enabled  := False;
-  toggleParcelamento.State    := tssOff;
-  CardPanelParcela.ActiveCard := cardParcelaUnica;
-  edtParcela.ReadOnly         := True;
+      // Ajusta o tipo de opercao de cadastro para alterar
+      FOpCad := ocAlterar;
+      FCodCR := Fcr.ID;
 
-  edtValorParcela.ReadOnly := False;
-  chkBaixarAoSalvar.Checked := False;
+      // Coloca o numero do registro no titulo
+      lblTitulo.Caption := 'Alterando Registro Nº ' + IntToStr(Fcr.ID);
 
-  //  Carrega os dados
-  edtCliente.Text      := dmCReceber.cdsCReceberID_CLIENTE.AsString;
-  memDesc.Text         := dmCReceber.cdsCReceberDESCRICAO.AsString;
-  edtValorVenda.Text   := TUtilitario.FormatarValor(dmCReceber.cdsCReceberVALOR_VENDA.AsCurrency);
-  dateVenda.Date       := dmCReceber.cdsCReceberDATA_VENDA.AsDateTime;
-  edtNDoc.Text         := dmCReceber.cdsCReceberNUMERO_DOCUMENTO.AsString;
-  edtParcela.Text      := dmCReceber.cdsCReceberPARCELA.AsString;
-  edtValorParcela.Text := TUtilitario.FormatarValor(dmCReceber.cdsCReceberVALOR_PARCELA.AsCurrency);
-  dateVencimento.Date  := dmCReceber.cdsCReceberDATA_VENCIMENTO.AsDateTime;
-  BuscaNomeCliente;
+      // Bloqueia o toogle
+      toggleParcelamento.Enabled := False;
+      toggleParcelamento.State := tssOff;
+      CardPanelParcela.ActiveCard := cardParcelaUnica;
+      edtParcela.ReadOnly := True;
+      edtValorVenda.ReadOnly := False;
+      edtValorParcela.ReadOnly := False;
+      chkBaixarAoSalvar.Checked := False;
+
+      // Carrega os dados
+      edtCliente.Text := IntToStr(Fcr.IdCliente);
+      memDesc.Text := Fcr.Desc;
+      edtValorVenda.Text := TUtilitario.FormatarValor(Fcr.ValorVenda);
+      dateVenda.Date := Fcr.DataVenda;
+      edtNDoc.Text := Fcr.Doc;
+      edtParcela.Text := IntToStr(Fcr.Parcela);
+      edtValorParcela.Text := TUtilitario.FormatarValor(Fcr.ValorParcela);
+      dateVencimento.Date := Fcr.DataVencimento;
+      BuscaNomeCliente;
+
+      if FCr.IdGrupoParcelas > 0 then
+      begin
+        ExibeGrupoParcelas;
+        pnlFundoGrupoParcelas.Visible := True;
+      end
+      else
+      begin
+        pnlFundoGrupoParcelas.Visible := False;
+      end;
+
+    end
+    else
+    begin
+      Application.MessageBox('Erro ao carregar dados da Conta!', 'Erro!',
+        MB_OK + MB_ICONERROR);
+    end;
+  except
+    on E : Exception do
+      Application.MessageBox('Erro ao Criar Objeto ao alterar os dados da Conta!', 'Erro!',
+        MB_OK + MB_ICONERROR);
+  end;
 
 end;
 
@@ -1001,29 +1047,13 @@ begin
       edtCliente.Clear;
       edtCliente.SetFocus;
       lblNomeCliente.Caption := '';
-      Application.MessageBox('Cliente não está Ativo, verifique o cadastro!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+      Application.MessageBox('Cliente não está Ativo, verifique o cadastro!',
+        'Atenção', MB_OK + MB_ICONEXCLAMATION);
       abort;
 
     end;
 
-
   end;
-
-end;
-
-procedure TfrmContasReceber.edtFiltroClienteChange(Sender: TObject);
-begin
-  inherited;
-
-  Pesquisar;
-
-end;
-
-procedure TfrmContasReceber.edtPesquisarChange(Sender: TObject);
-begin
-  inherited;
-
-  Pesquisar;
 
 end;
 
@@ -1039,13 +1069,8 @@ begin
   inherited;
   edtValorVenda.Text := TUtilitario.FormatarValor(edtValorVenda.Text);
 
-  if dmCReceber.cdsCReceber.State in [dsInsert] then
-  begin
-
-    //  Se ao inserir Parcela unica pega o mesmo valor da venda
+  if (FOpCad = ocIncluir) then
     edtValorParcela.Text := TUtilitario.FormatarValor(edtValorVenda.Text);
-
-  end;
 
 end;
 
@@ -1053,13 +1078,13 @@ procedure TfrmContasReceber.ExibeDetalhe;
 begin
 
   // cria o form
-  frmCrDetalhe := TfrmCrDetalhe.Create(self);
+  frmCrDetalhe := TfrmCrDetalhe.Create(Self);
 
   try
 
-    frmCrDetalhe.ExibirCRDetalhes(DataSourceCReceber.DataSet.FieldByName('ID').AsInteger);
+    frmCrDetalhe.ExibirCRDetalhes(dsCR.DataSet.FieldByName('ID').AsInteger);
 
-    //  exibe o form
+    // exibe o form
     frmCrDetalhe.ShowModal;
 
   finally
@@ -1068,34 +1093,48 @@ begin
 
   end;
 
+end;
 
+procedure TfrmContasReceber.ExibeGrupoParcelas;
+begin
+
+  if Assigned(FQueryGrupoParcelas) then
+    FreeAndNil(FQueryGrupoParcelas);
+
+  FQueryGrupoParcelas := TSFQuery.Create(nil);
+
+  FQueryGrupoParcelas.Close;
+  FQueryGrupoParcelas.SQL.Clear;
+  FQueryGrupoParcelas.SQL.Add(' SELECT ID, VALOR_PARCELA, DATA_VENCIMENTO, STATUS,  ');
+  FQueryGrupoParcelas.SQL.Add(' CAST(PARCELA AS VARCHAR(10)) || ''/''               ');
+  FQueryGrupoParcelas.SQL.Add(' || CAST(NUM_TOT_PARCELAS AS VARCHAR(10)) AS QTDPARC ');
+  FQueryGrupoParcelas.SQL.Add(' FROM CONTAS_RECEBER                                 ');
+  FQueryGrupoParcelas.SQL.Add(' WHERE ID_GRUPO_PARCELAS = :ID_GRUPO_PARCELAS        ');
+  FQueryGrupoParcelas.ParamByName('ID_GRUPO_PARCELAS').AsInteger := FCr.IdGrupoParcelas;
+  FQueryGrupoParcelas.Open;
+
+  grdGrupoParcelas.DataSource.DataSet := FQueryGrupoParcelas;
 
 end;
 
-procedure TfrmContasReceber.ExibeTelaBaixar(pCodCR : Integer);
+procedure TfrmContasReceber.ExibeTelaBaixar(pCodCr: Integer);
+var
+  lFormulario : TfrmBaixarCR;
 begin
 
-  //  Cria o form
-  frmBaixarCR := TfrmBaixarCR.Create(Self);
-
+  // Cria o form
+  lFormulario := TfrmBaixarCR.Create(Self);
   try
-
-    frmBaixarCR.BaixarCR(pCodCR);
-
-    //  Exibe o form
-    frmBaixarCR.ShowModal;
-
+    lFormulario.BaixarCR(pCodCr);
+    lFormulario.ShowModal;
   finally
-
-    FreeAndNil(frmBaixarCR);
-
+    lFormulario.Free;
   end;
-
 
   Pesquisar;
 
-  //  Atualiza relatorio tela principal
-  frmPrincipal.TotalCr;
+  // Atualiza relatorio tela principal
+  frmPrincipal.TotalCR;
   frmPrincipal.ResumoMensalCaixa;
 
 end;
@@ -1103,12 +1142,12 @@ end;
 procedure TfrmContasReceber.ExibeTelaBxMultipla;
 begin
 
-  //  Cria
+  // Cria
   frmBxMultiplaCR := TfrmBxMultiplaCR.Create(Self);
 
   try
 
-    //  Exibe a tela
+    // Exibe a tela
     frmBxMultiplaCR.ShowModal;
 
   finally
@@ -1119,37 +1158,60 @@ begin
 
   Pesquisar;
 
-  //  Atualiza relatorio tela principal
-  frmPrincipal.TotalCr;
+  // Atualiza relatorio tela principal
+  frmPrincipal.TotalCR;
   frmPrincipal.ResumoMensalCaixa;
 
+end;
+
+procedure TfrmContasReceber.FormClose(Sender: TObject;
+  var Action: TCloseAction);
+begin
+  inherited;
+  TUtilitario.SalvarOrdemColunasParaJSON(DBGrid1, 'ConfigGrids', 'grdCr');
 end;
 
 procedure TfrmContasReceber.FormCreate(Sender: TObject);
 begin
   inherited;
 
-  dmCReceber.cdsCReceber.Active := True;
+  FTelaAtiva := False;
 
-  edtValorVenda.OnKeyPress   := KeyPressValor;
+  // Define as datas da consulta
+  dateInicial.Date := StartOfTheMonth(now);
+  dateFinal.Date := EndOfTheMonth(now);
+  edtValorVenda.OnKeyPress := KeyPressValor;
   edtValorParcela.OnKeyPress := KeyPressValor;
-
-  //  Define as datas da consulta
-  dateInicial.Date := StartOfTheMonth(Now);
-  dateFinal.Date   := EndOfTheMonth(Now);
-
 end;
 
-function TfrmContasReceber.GeraFiltrosRelatorio : String;
+procedure TfrmContasReceber.FormDestroy(Sender: TObject);
+begin
+  inherited;
+  if Assigned(FQueryPesquisa) then
+    FQueryPesquisa.Free;
+
+  if Assigned(FQueryGrupoParcelas) then
+    FQueryGrupoParcelas.Free;
+end;
+
+procedure TfrmContasReceber.FormShow(Sender: TObject);
+begin
+  inherited;
+  TUtilitario.CarregarOrdemColunasJSON(DBGrid1, 'ConfigGrids', 'grdCr');
+  FTelaAtiva := True;
+end;
+
+function TfrmContasReceber.GeraFiltrosRelatorio: String;
 var
-  lFiltros : String;
+  lFiltros: String;
 begin
 
   lFiltros := '';
 
-  if not (Trim(edtCliente.Text).IsEmpty) then
+  if not(Trim(edtCliente.Text).IsEmpty) then
   begin
-    lFiltros := lFiltros + ' | Cliente: ' + dmClientes.GetNomeCliente(Trim(edtCliente.Text));
+    lFiltros := lFiltros + ' | Cliente: ' + dmClientes.GetNomeCliente
+      (Trim(edtCliente.Text));
   end;
 
   if (cbData.ItemIndex <> 0) then
@@ -1159,12 +1221,14 @@ begin
 
   if (dateInicial.Checked) and (dateFinal.Checked) then
   begin
-    lFiltros := lFiltros + ' Período: ' + DateToStr(dateInicial.DateTime) + ' a ' + DateToStr(dateFinal.DateTime);
+    lFiltros := lFiltros + ' Período: ' + DateToStr(dateInicial.DateTime) +
+      ' a ' + DateToStr(dateFinal.DateTime);
   end;
 
-  if not (Trim(edtFiltroCliente.Text).IsEmpty) then
+  if not(Trim(edtFiltroCliente.Text).IsEmpty) then
   begin
-    lFiltros := lFiltros + ' | Cliente: ' + dmClientes.GetNomeCliente(Trim(edtFiltroCliente.Text));
+    lFiltros := lFiltros + ' | Cliente: ' + dmClientes.GetNomeCliente
+      (Trim(edtFiltroCliente.Text));
   end;
 
   if (cbStatus.ItemIndex > 0) then
@@ -1182,14 +1246,15 @@ begin
     lFiltros := lFiltros + ' | Somente Contas Vencidas ';
   end;
 
-   //  Ordem de pesquisa
+  // Ordem de pesquisa
   if rbId.Checked then
   begin
     lFiltros := lFiltros + ' | Ordem Registros do relatório: Código da Conta ';
   end
   else if rbDataVenc.Checked then
   begin
-    lFiltros := lFiltros + ' | Ordem Registros do relatório: Data de Vencimento ';
+    lFiltros := lFiltros +
+      ' | Ordem Registros do relatório: Data de Vencimento ';
   end
   else if rbValorParcela.Checked then
   begin
@@ -1214,31 +1279,34 @@ end;
 
 procedure TfrmContasReceber.GeraParcelas;
 var
-  QtdParcelas   : Integer;
-  IntervaloDias : Integer;
-  ValorVenda    : Currency;
-  ValorParcela  : Currency;
-  ValorResiduo  : Currency;
-  Contador      : Integer;
-  DiaFixoVcto   : Integer;
+  QtdParcelas: Integer;
+  IntervaloDias: Integer;
+  ValorVenda: Currency;
+  ValorParcela: Currency;
+  ValorResiduo: Currency;
+  Contador: Integer;
+  DiaFixoVcto: Integer;
 
 begin
 
-  //  Valida Campos
-  if (not TryStrToCurr(edtValorVenda.Text, ValorVenda)) or (ValorVenda <= 0)then
+  // Valida Campos
+  if (not TryStrToCurr(edtValorVenda.Text, ValorVenda)) or (ValorVenda <= 0)
+  then
   begin
 
     edtValorVenda.SetFocus;
-    Application.MessageBox('Valor da Venda Inválido!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+    Application.MessageBox('Valor da Venda Inválido!', 'Atenção',
+      MB_OK + MB_ICONEXCLAMATION);
     abort;
 
   end;
 
-  if dateVenda.Date > Now then
+  if dateVenda.Date > now then
   begin
 
     dateVenda.SetFocus;
-    Application.MessageBox('Data de venda não pode ser maior que a data atual!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+    Application.MessageBox('Data de venda não pode ser maior que a data atual!',
+      'Atenção', MB_OK + MB_ICONEXCLAMATION);
     abort;
 
   end;
@@ -1246,42 +1314,48 @@ begin
   if not TryStrToInt(edtQtdParcelas.Text, QtdParcelas) then
   begin
     edtQtdParcelas.SetFocus;
-    Application.MessageBox('Quantidade de Parcelas Inválido!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+    Application.MessageBox('Quantidade de Parcelas Inválido!', 'Atenção',
+      MB_OK + MB_ICONEXCLAMATION);
     abort;
   end;
 
   if QtdParcelas <= 1 then
   begin
     edtQtdParcelas.SetFocus;
-    Application.MessageBox('Para gerar parcelas a quantidade deve ser maior que 1!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+    Application.MessageBox
+      ('Para gerar parcelas a quantidade deve ser maior que 1!', 'Atenção',
+      MB_OK + MB_ICONEXCLAMATION);
     abort;
   end;
 
   if not TryStrToInt(edtIntervaloDias.Text, IntervaloDias) then
   begin
     edtIntervaloDias.SetFocus;
-    Application.MessageBox('Intervalor de dias Inválido!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+    Application.MessageBox('Intervalor de dias Inválido!', 'Atenção',
+      MB_OK + MB_ICONEXCLAMATION);
     abort;
   end;
 
   if checkDiaFixoVcto.Checked then
   begin
-    if (not TryStrToInt(edtDiaFixoVcto.Text, DiaFixoVcto)) or (DiaFixoVcto > 28) or (DiaFixoVcto < 1) then
+    if (not TryStrToInt(edtDiaFixoVcto.Text, DiaFixoVcto)) or (DiaFixoVcto > 28)
+      or (DiaFixoVcto < 1) then
     begin
-        edtDiaFixoVcto.SetFocus;
-        Application.MessageBox('Dia fixo de vencimento Inválido!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+      edtDiaFixoVcto.SetFocus;
+      Application.MessageBox('Dia fixo de vencimento Inválido!', 'Atenção',
+        MB_OK + MB_ICONEXCLAMATION);
       abort;
     end;
   end;
 
-  //  Calculando valores das parcelas
-  //  Trunca o valor final das parcelas
+  // Calculando valores das parcelas
+  // Trunca o valor final das parcelas
   ValorParcela := (Trunc(ValorVenda / QtdParcelas * 100) / 100);
 
-  //  Calcula o valor do residuo do Trunc para colocar em uma das parcelas
+  // Calcula o valor do residuo do Trunc para colocar em uma das parcelas
   ValorResiduo := ValorVenda - (ValorParcela * QtdParcelas);
 
-  //  Esvaziando data set
+  // Esvaziando data set
   cdsParcelas.IsEmpty;
 
   for Contador := 1 to QtdParcelas do
@@ -1290,52 +1364,58 @@ begin
     cdsParcelas.Insert;
     cdsParcelasParcela.AsInteger := Contador;
 
-    //  Adiciona o valor do residuo na primeira parcela
+    // Adiciona o valor do residuo na primeira parcela
     cdsParcelasValor.AsCurrency := ValorParcela + ValorResiduo;
-    ValorResiduo := 0;  //  Zera o valor de residuo
+    ValorResiduo := 0; // Zera o valor de residuo
 
-    //  Define a data de vencimento
-     //  Define a data de vencimento
+    // Define a data de vencimento
     if checkDiaFixoVcto.Checked then
     begin
-
-      cdsParcelasVENCIMENTO.AsDateTime := EncodeDate(YearOf(IncDay(dateVenda.Date, IntervaloDias *  Contador)), MonthOf(IncDay(dateVenda.Date, IntervaloDias *  Contador)), DiaFixoVcto);
-
+      cdsParcelasVencimento.AsDateTime :=
+        EncodeDate(YearOf(IncDay(dateVenda.Date, IntervaloDias * Contador)),
+        MonthOf(IncDay(dateVenda.Date, IntervaloDias * Contador)), DiaFixoVcto);
     end
     else
     begin
-      cdsParcelasVENCIMENTO.AsDateTime := IncDay(dateVenda.Date, IntervaloDias *  Contador);
+      cdsParcelasVencimento.AsDateTime :=
+        IncDay(dateVenda.Date, IntervaloDias * Contador);
     end;
 
-
-    //  Define o numero do documento
-    if not (edtNDoc.Text = '') then
+    // Define o numero do documento
+    if not(edtNDoc.Text = '') then
     begin
-      cdsParcelasDocumento.AsString := Trim(edtNDoc.Text) + '-' + IntToStr(Contador);
+      cdsParcelasDocumento.AsString := Trim(edtNDoc.Text) + '-' +
+        IntToStr(Contador);
     end;
 
     cdsParcelas.Post;
 
   end;
 
-  //  Bloqueios
-  edtQtdParcelas.Enabled   := False;
+  // Bloqueios
+  edtQtdParcelas.Enabled := False;
   edtIntervaloDias.Enabled := False;
-  edtDiaFixoVcto.Enabled   := False;
+  edtDiaFixoVcto.Enabled := False;
   checkDiaFixoVcto.Enabled := False;
-  btnGerar.Enabled         := False;
-  btnLimpar.Enabled        := True;
+  btnGerar.Enabled := False;
+  btnLimpar.Enabled := True;
 
+end;
+
+procedure TfrmContasReceber.grdGrupoParcelasDrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+ TUtilitario.FormatoMoedaGrid(TDBGrid(Sender), Column, Rect, State);
 end;
 
 procedure TfrmContasReceber.HabilitaBotoes;
 begin
 
-  btnAlterar.Enabled  := not DataSourceCReceber.DataSet.IsEmpty;
-  btnExcluir.Enabled  := not DataSourceCReceber.DataSet.IsEmpty;
-  btnBaixarCR.Enabled := not DataSourceCReceber.DataSet.IsEmpty;
-  btnDetalhes.Enabled := not DataSourceCReceber.DataSet.IsEmpty;
-  btnImprimir.Enabled := not DataSourceCReceber.DataSet.IsEmpty;
+  btnAlterar.Enabled := not dsCR.DataSet.IsEmpty;
+  btnExcluir.Enabled := not dsCR.DataSet.IsEmpty;
+  btnBaixarCR.Enabled := not dsCR.DataSet.IsEmpty;
+  btnDetalhes.Enabled := not dsCR.DataSet.IsEmpty;
+  btnImprimir.Enabled := not dsCR.DataSet.IsEmpty;
 
 end;
 
@@ -1344,217 +1424,199 @@ begin
 
   if Key = #13 then
   begin
-    //  Verifica se a tecla pressionada é o Enter
-    //  Cancela o efeito do enter
+    // Verifica se a tecla pressionada é o Enter
+    // Cancela o efeito do enter
     Key := #0;
-    //  Pula para o proximo
+    // Pula para o proximo
     Perform(WM_NEXTDLGCTL, 0, 0);
   end;
 
-  //  Se for digitado um ponto, será convertido para virgula
+  // Se for digitado um ponto, será convertido para virgula
   if Key = FormatSettings.ThousandSeparator then
-   begin
-      Key := #0;
-    end;
+  begin
+    Key := #0;
+  end;
 
   // Permite apenas digitar os caracteres dentro do charinset
-  if not (CharInSet(Key, ['0'..'9', FormatSettings.DecimalSeparator, #8, #13])) then
+  if not(CharInSet(Key, ['0' .. '9', FormatSettings.DecimalSeparator, #8, #13]))
+  then
   begin
     Key := #0;
   end;
 
   // Valida se já existe o ponto decimal
-  if (Key = FormatSettings.DecimalSeparator) and (pos(Key, TEdit(Sender).Text) > 0) then
+  if (Key = FormatSettings.DecimalSeparator) and
+    (pos(Key, TEdit(Sender).Text) > 0) then
   begin
     Key := #0;
   end;
 
 end;
 
+procedure TfrmContasReceber.PesquisaClick(Sender: TObject);
+begin
+  if (FTelaAtiva) then
+    Pesquisar;
+end;
+
 procedure TfrmContasReceber.Pesquisar;
 var
   LFiltroEdit: String;
-  LFiltro : String;
-  LOrdem : String;
-
+  LFiltro: String;
+  LOrdem: String;
 begin
 
-  //  Validações
-  if dateInicial.Date > dateFinal.Date then
-  begin
+  if Assigned(FQueryPesquisa) then
+    FreeAndNil(FQueryPesquisa);
 
-    dateFinal.SetFocus;
-    Application.MessageBox('Data Inicial não pode ser maior que a data Final!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
-    exit;
+  FQueryPesquisa := TSFQuery.Create(nil);
 
-  end;
-
-  if cbStatus.ItemIndex < 0 then
-  begin
-
-    cbStatus.SetFocus;
-    Application.MessageBox('Selecione um tipo de STATUS!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
-    exit;
-
-  end;
-
-  if cbData.ItemIndex < 0 then
-   begin
-
-    cbData.SetFocus;
-    Application.MessageBox('Selecione um tipo de DATA!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
-    exit;
-
-  end;
-
-
-  LFiltroEdit := TUtilitario.LikeFind(edtPesquisar.Text, DBGrid1);
-  LFiltro := '';
-  LOrdem := '';
-
-  dmCReceber.cdsCReceber.Params.Clear;
-
-  //  Pesquisa por tipo
-  case cbStatus.ItemIndex of
-    1 : LFiltro := LFiltro + ' AND CR.STATUS = ''P'' ';
-    2 : LFiltro := LFiltro + ' AND CR.STATUS = ''A'' ';
-    3 : LFiltro := LFiltro + ' AND CR.STATUS = ''C'' ';
-  end;
-
-  //  Pesquisa por data
-  if (dateInicial.Checked) and (dateFinal.Checked) then
-  begin
-
-    case cbData.ItemIndex of
-
-      0 : LFiltro := LFiltro + ' AND CR.DATA_VENDA BETWEEN :DTINI AND :DTFIM ';
-      1 : LFiltro := LFiltro + ' AND CR.DATA_VENCIMENTO BETWEEN :DTINI AND :DTFIM ';
-      2 : LFiltro := LFiltro + ' AND CR.DATA_RECEBIMENTO BETWEEN :DTINI AND :DTFIM ';
-
+  try
+    // Validações
+    if dateInicial.Date > dateFinal.Date then
+    begin
+      dateFinal.SetFocus;
+      Application.MessageBox
+        ('Data Inicial não pode ser maior que a data Final!', 'Atenção',
+        MB_OK + MB_ICONEXCLAMATION);
+      exit;
     end;
 
-    //  Criando os parametros
-    dmCReceber.cdsCReceber.Params.CreateParam(TFieldType.ftDate, 'DTINI', TParamType.ptInput);
-    dmCReceber.cdsCReceber.ParamByName('DTINI').AsDate := dateInicial.Date;
-    dmCReceber.cdsCReceber.Params.CreateParam(TFieldType.ftDate, 'DTFIM', TParamType.ptInput);
-    dmCReceber.cdsCReceber.ParamByName('DTFIM').AsDate := dateFinal.Date;
+    if cbStatus.ItemIndex < 0 then
+    begin
+      cbStatus.SetFocus;
+      Application.MessageBox('Selecione um tipo de STATUS!', 'Atenção',
+        MB_OK + MB_ICONEXCLAMATION);
+      exit;
+    end;
+
+    if cbData.ItemIndex < 0 then
+    begin
+      cbData.SetFocus;
+      Application.MessageBox('Selecione um tipo de DATA!', 'Atenção',
+        MB_OK + MB_ICONEXCLAMATION);
+      exit;
+    end;
+
+    // Pré pesquisa para funcionar o likefind
+    FQueryPesquisa.Close;
+    FQueryPesquisa.SQL.Clear;
+    FQueryPesquisa.SQL.Add(' SELECT FIRST 1 CR.*, CL.NOME FROM CONTAS_RECEBER CR LEFT JOIN CLIENTES CL ');
+    FQueryPesquisa.SQL.Add(' ON CR.ID_CLIENTE = CL.ID_CLI');
+    FQueryPesquisa.Open;
+
+    // Configurações do DataSet para o DBGrid
+    DBGrid1.DataSource.DataSet := FQueryPesquisa;
+
+    LFiltroEdit := TUtilitario.LikeFind(edtPesquisar.Text, DBGrid1);
+    LFiltro := '';
+    LOrdem := '';
+
+    // Pesquisa por tipo
+    case cbStatus.ItemIndex of
+      1:
+        LFiltro := LFiltro + ' AND CR.STATUS = ''P'' ';
+      2:
+        LFiltro := LFiltro + ' AND CR.STATUS = ''A'' ';
+      3:
+        LFiltro := LFiltro + ' AND CR.STATUS = ''C'' ';
+    end;
+
+    // Pesquisa por data
+    if (dateInicial.Checked) and (dateFinal.Checked) then
+    begin
+      case cbData.ItemIndex of
+        0:
+          LFiltro := LFiltro +
+            ' AND CR.DATA_VENDA BETWEEN :DTINI AND :DTFIM ';
+        1:
+          LFiltro := LFiltro +
+            ' AND CR.DATA_VENCIMENTO BETWEEN :DTINI AND :DTFIM ';
+        2:
+          LFiltro := LFiltro +
+            ' AND CR.DATA_RECEBIMENTO BETWEEN :DTINI AND :DTFIM ';
+      end;
+    end;
+
+    // Pesquisa parciais
+    if checkParciais.Checked then
+      LFiltro := LFiltro + ' AND CR.PARCIAL = ''S'' ';
+
+    // Pesquisa vencidas
+    if checkVencidas.Checked then
+      LFiltro := LFiltro +
+        ' AND CR.STATUS = ''A'' AND CR.DATA_VENCIMENTO < :DATUAL ';
+
+    // Pesquisa por cliente
+    if Trim(edtFiltroCliente.Text) <> '' then
+      LFiltro := LFiltro + ' AND CR.ID_CLIENTE = :ID';
+
+    // Ordem de pesquisa
+    if rbId.Checked then
+      LOrdem := ' ORDER BY CR.ID DESC'
+    else if rbDataVenc.Checked then
+      LOrdem := ' ORDER BY CR.DATA_VENCIMENTO'
+    else if rbValorParcela.Checked then
+      LOrdem := ' ORDER BY CR.VALOR_PARCELA DESC'
+    else if rbValorVenda.Checked then
+      LOrdem := ' ORDER BY CR.VALOR_VENDA DESC'
+    else if rbDataVenda.Checked then
+      LOrdem := ' ORDER BY CR.DATA_VENDA DESC'
+    else
+      LOrdem := ' ORDER BY CR.ID DESC';
+
+    FQueryPesquisa.Close;
+    FQueryPesquisa.SQL.Clear;
+    FQueryPesquisa.SQL.Add('SELECT CR.*, CAST(CR.PARCELA AS VARCHAR(10)) || ''/'' ');
+    FQueryPesquisa.SQL.Add(' || CAST(CR.NUM_TOT_PARCELAS AS VARCHAR(10)) AS QTDPARC, ');
+    FQueryPesquisa.SQL.Add(' CL.NOME FROM CONTAS_RECEBER CR LEFT JOIN CLIENTES CL ');
+    FQueryPesquisa.SQL.Add(' ON CR.ID_CLIENTE = CL.ID_CLI WHERE 1 = 1');
+    FQueryPesquisa.SQL.Add(LFiltroEdit + LFiltro + LOrdem);
+
+    if Trim(edtFiltroCliente.Text) <> '' then
+      FQueryPesquisa.ParamByName('ID').AsString := Trim(edtFiltroCliente.Text);
+
+    if checkVencidas.Checked then
+      FQueryPesquisa.ParamByName('DATUAL').AsDate := now;
+
+    if (dateInicial.Checked) and (dateFinal.Checked) then
+    begin
+      FQueryPesquisa.ParamByName('DTINI').AsDate := dateInicial.Date;
+      FQueryPesquisa.ParamByName('DTFIM').AsDate := dateFinal.Date;
+    end;
+
+    FQueryPesquisa.Open;
+
+    // Formata visualmente o campo de STATUS
+    FQueryPesquisa.FieldByName('STATUS').OnGetText := QuerySTATUSGetText;
+
+    HabilitaBotoes;
+
+    // Calcula a quantidade e valor
+    CalcCrGrid;
+    CalcQtdCrGrid;
+
+    // Posiciona no primeiro registro
+    dsCR.DataSet.First;
+
+  except
+    on e: Exception do
+    begin
+      Application.MessageBox(PWidechar('Erro ao realizar a consulta: ' +
+        e.Message), 'Atenção', MB_OK + MB_ICONERROR);
+    end;
   end;
-
-   //  pesquisa parciais
-   if checkParciais.Checked then
-   begin
-
-    LFiltro := LFiltro + ' AND CR.PARCIAL = ''S'' ';
-
-   end;
-
-  //  Pesquisa vencidas
-  if checkVencidas.Checked then
-  begin
-
-    LFiltro := LFiltro + ' AND CR.STATUS = ''A'' AND CR.DATA_VENCIMENTO < :DATUAL ';
-
-    //  Criando os parametros
-    dmCReceber.cdsCReceber.Params.CreateParam(TFieldType.ftDate, 'DATUAL', TParamType.ptInput);
-    dmCReceber.cdsCReceber.ParamByName('DATUAL').AsDate := NOW;
-
-  end;
-
-  //  Pesquisa por cliente
-  if Trim(edtFiltroCliente.Text) <> '' then
-  begin
-
-    LFiltro := LFiltro + ' AND CR.ID_CLIENTE = :ID';
-
-    //  Criando os parametros
-    dmCReceber.cdsCReceber.Params.CreateParam(TFieldType.ftString, 'ID', TParamType.ptInput);
-    dmCReceber.cdsCReceber.ParamByName('ID').AsString := Trim(edtFiltroCliente.Text);
-
-  end;
-
-  //  Ordem de pesquisa
-  if rbId.Checked then
-  begin
-    lOrdem := ' ORDER BY CR.ID DESC';
-  end
-  else if rbDataVenc.Checked then
-  begin
-    lOrdem := ' ORDER BY CR.DATA_VENCIMENTO';
-  end
-  else if rbValorParcela.Checked then
-  begin
-    LOrdem := ' ORDER BY CR.VALOR_PARCELA DESC';
-  end
-  else if rbValorVenda.Checked then
-  begin
-    LOrdem := ' ORDER BY CR.VALOR_VENDA DESC';
-  end
-  else if rbDataVenda.Checked then
-  begin
-    LOrdem := ' ORDER BY CR.DATA_VENDA DESC';
-  end
-  else
-  begin
-    LOrdem := ' ORDER BY CR.ID DESC';
-  end;
-
-    dmCReceber.cdsCReceber.Close;
-
-    dmCReceber.cdsCReceber.CommandText := 'SELECT CR.*, CL.NOME FROM CONTAS_RECEBER CR LEFT JOIN CLIENTES CL '
-                                      + ' ON CR.ID_CLIENTE = CL.ID_CLI WHERE 1 = 1'
-                                      + LFiltroEdit + LFiltro + LOrdem;
-  dmCReceber.cdsCReceber.Open;
-
-  HabilitaBotoes;
-
-  //  Calcula a quantidade e valor
-  CalcCrGrid;
-  CalcQtdCrGrid;
-
-  //  Posiciona no primeiro registro
-  DataSourceCReceber.DataSet.First;
-
-
 end;
 
-procedure TfrmContasReceber.rbDataVencClick(Sender: TObject);
+procedure TfrmContasReceber.QuerySTATUSGetText(Sender: TField; var Text: string;
+  DisplayText: Boolean);
 begin
-  inherited;
-
-  Pesquisar;
-
-end;
-
-procedure TfrmContasReceber.rbDataVendaClick(Sender: TObject);
-begin
-  inherited;
-
-  Pesquisar;
-
-end;
-
-procedure TfrmContasReceber.rbIdClick(Sender: TObject);
-begin
-  inherited;
-
-  Pesquisar;
-
-end;
-
-procedure TfrmContasReceber.rbValorParcelaClick(Sender: TObject);
-begin
-  inherited;
-
-  Pesquisar;
-
-end;
-
-procedure TfrmContasReceber.rbValorVendaClick(Sender: TObject);
-begin
-  inherited;
-
-  Pesquisar;
-
+  if Sender.AsString = 'A' then
+    Text := 'ABERTA'
+  else if Sender.AsString = 'P' then
+    Text := 'PAGA'
+  else if Sender.AsString = 'C' then
+    Text := 'CANCELADA';
 end;
 
 procedure TfrmContasReceber.toggleParcelamentoClick(Sender: TObject);
@@ -1565,9 +1627,10 @@ begin
   begin
     CardPanelParcela.ActiveCard := cardParcelaUnica;
   end
-    else if toggleParcelamento.State = tssOn then
-         begin
-          CardPanelParcela.ActiveCard := cardParcelamento;
-         end;
+  else if toggleParcelamento.State = tssOn then
+  begin
+    CardPanelParcela.ActiveCard := cardParcelamento;
+  end;
 end;
+
 end.

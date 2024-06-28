@@ -5,7 +5,8 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, SistemaFinanceiro.View.CadastroPadrao,
   Data.DB, System.ImageList, Vcl.ImgList, Vcl.Grids, Vcl.DBGrids, Vcl.ExtCtrls,
   Vcl.StdCtrls, Vcl.WinXPanels, Vcl.ComCtrls, Vcl.Mask, Vcl.Imaging.pngimage, SistemaFinanceiro.Model.Entidades.ResumoCaixa,
-  Vcl.Menus, SistemaFinanceiro.View.DetalhesOrigemCpCr;
+  Vcl.Menus, SistemaFinanceiro.View.DetalhesOrigemCpCr,
+  SistemaFinanceiro.Model.Entidades.LancamentoCaixa;
 type
   TfrmCaixa = class(TfrmCadastroPadrao)
     DataSourceCaixa: TDataSource;
@@ -524,7 +525,7 @@ begin
     FResumoCaixa.Free;
 
   //  Atualiza valores de entrada e saida
-  FResumoCaixa := dmCaixa.ResumoCaixa(dateInicial.Date, dateFinal.Date);
+  FResumoCaixa := TModelLancamentoCaixa.ResumoCaixa(dateInicial.Date, dateFinal.Date);
 
   lblVTotalEnt.Caption := TUtilitario.FormatoMoeda(FResumoCaixa.TotalEntradas);
   lblVTotalSai.Caption := TUtilitario.FormatoMoeda(FResumoCaixa.TotalSaidas);

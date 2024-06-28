@@ -13,6 +13,7 @@ object frmGeraRelResumoMensalCr: TfrmGeraRelResumoMensalCr
   Font.Style = []
   Position = poScreenCenter
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
   TextHeight = 19
   object pnlGeral: TPanel
     Left = 0
@@ -174,7 +175,6 @@ object frmGeraRelResumoMensalCr: TfrmGeraRelResumoMensalCr
           Font.Style = []
           ParentFont = False
           TabOrder = 0
-          ExplicitTop = 55
         end
         object checkParciais: TCheckBox
           Left = 5
@@ -190,7 +190,6 @@ object frmGeraRelResumoMensalCr: TfrmGeraRelResumoMensalCr
           Font.Style = []
           ParentFont = False
           TabOrder = 1
-          ExplicitTop = 30
         end
         object checkTracoLinha: TCheckBox
           Left = 5
@@ -200,7 +199,6 @@ object frmGeraRelResumoMensalCr: TfrmGeraRelResumoMensalCr
           Align = alTop
           Caption = 'Tra'#231'o entre as Linhas'
           TabOrder = 2
-          ExplicitTop = 130
         end
         object checkDestacaLinha: TCheckBox
           Left = 5
@@ -210,7 +208,6 @@ object frmGeraRelResumoMensalCr: TfrmGeraRelResumoMensalCr
           Align = alTop
           Caption = 'Destacar Linha'
           TabOrder = 3
-          ExplicitTop = 105
         end
       end
     end

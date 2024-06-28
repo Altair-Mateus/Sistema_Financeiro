@@ -3,22 +3,25 @@ object frmBaixarCR: TfrmBaixarCR
   Top = 0
   BorderIcons = [biSystemMenu]
   Caption = 'Baixar Conta a Receber'
-  ClientHeight = 539
-  ClientWidth = 651
+  ClientHeight = 538
+  ClientWidth = 647
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -16
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   Position = poScreenCenter
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnKeyPress = FormKeyPress
   TextHeight = 19
   object pnlPrincipal: TPanel
     Left = 0
     Top = 0
-    Width = 651
-    Height = 539
+    Width = 647
+    Height = 538
     Align = alClient
     BevelOuter = bvNone
     Color = 5737262
@@ -28,7 +31,7 @@ object frmBaixarCR: TfrmBaixarCR
       AlignWithMargins = True
       Left = 10
       Top = 10
-      Width = 635
+      Width = 631
       Height = 254
       Margins.Left = 10
       Margins.Top = 10
@@ -38,14 +41,12 @@ object frmBaixarCR: TfrmBaixarCR
       Color = clWhite
       ParentBackground = False
       TabOrder = 0
-      ExplicitLeft = 11
-      ExplicitTop = 11
-      ExplicitWidth = 629
+      ExplicitWidth = 627
       object gbDocInfo: TGroupBox
         AlignWithMargins = True
         Left = 21
         Top = 21
-        Width = 593
+        Width = 589
         Height = 212
         Margins.Left = 20
         Margins.Top = 20
@@ -57,7 +58,7 @@ object frmBaixarCR: TfrmBaixarCR
         ParentBackground = False
         ParentColor = False
         TabOrder = 0
-        ExplicitWidth = 587
+        ExplicitWidth = 585
         object lblNDoc: TLabel
           Left = 290
           Top = 75
@@ -224,7 +225,7 @@ object frmBaixarCR: TfrmBaixarCR
       AlignWithMargins = True
       Left = 10
       Top = 274
-      Width = 635
+      Width = 631
       Height = 184
       Margins.Left = 10
       Margins.Top = 5
@@ -234,14 +235,12 @@ object frmBaixarCR: TfrmBaixarCR
       Color = clWhite
       ParentBackground = False
       TabOrder = 1
-      ExplicitLeft = 11
-      ExplicitTop = 275
-      ExplicitWidth = 629
+      ExplicitWidth = 627
       object gbDetalhes: TGroupBox
         AlignWithMargins = True
         Left = 21
         Top = 21
-        Width = 593
+        Width = 589
         Height = 142
         Margins.Left = 20
         Margins.Top = 20
@@ -250,7 +249,7 @@ object frmBaixarCR: TfrmBaixarCR
         Align = alClient
         Caption = 'Detalhes'
         TabOrder = 0
-        ExplicitWidth = 587
+        ExplicitWidth = 585
         object lblObs: TLabel
           Left = 28
           Top = 32
@@ -272,22 +271,6 @@ object frmBaixarCR: TfrmBaixarCR
           Height = 19
           Caption = 'Data Pgto:'
         end
-        object lblDesconto: TLabel
-          Left = 229
-          Top = 104
-          Width = 92
-          Height = 19
-          Caption = 'Desconto %:'
-          Visible = False
-        end
-        object lblValorDesc: TLabel
-          Left = 425
-          Top = 104
-          Width = 42
-          Height = 19
-          Caption = 'ou R$'
-          Visible = False
-        end
         object edtObs: TEdit
           Left = 136
           Top = 31
@@ -301,7 +284,6 @@ object frmBaixarCR: TfrmBaixarCR
           Width = 87
           Height = 27
           TabOrder = 2
-          OnExit = edtValorExit
         end
         object datePgto: TDateTimePicker
           Left = 136
@@ -311,17 +293,6 @@ object frmBaixarCR: TfrmBaixarCR
           Date = 45133.000000000000000000
           Time = 0.840443912034970700
           TabOrder = 1
-        end
-        object edtValorDesc: TEdit
-          Left = 473
-          Top = 97
-          Width = 87
-          Height = 27
-          Enabled = False
-          TabOrder = 5
-          Visible = False
-          OnKeyDown = edtValorDescKeyDown
-          OnKeyUp = edtValorDescKeyUp
         end
         object checkDesconto: TCheckBox
           Left = 31
@@ -333,31 +304,58 @@ object frmBaixarCR: TfrmBaixarCR
           TabOrder = 3
           OnClick = checkDescontoClick
         end
-        object edtPorcDesc: TEdit
-          Left = 327
+        object pnlDesconto: TPanel
+          Left = 200
           Top = 97
-          Width = 87
-          Height = 27
-          Enabled = False
+          Width = 386
+          Height = 43
+          BevelOuter = bvNone
           TabOrder = 4
           Visible = False
-          OnKeyDown = edtPorcDescKeyDown
-          OnKeyUp = edtPorcDescKeyUp
+          object lblDesconto: TLabel
+            Left = 38
+            Top = 8
+            Width = 92
+            Height = 19
+            Caption = 'Desconto %:'
+          end
+          object lblValorDesc: TLabel
+            Left = 226
+            Top = 8
+            Width = 42
+            Height = 19
+            Caption = 'ou R$'
+          end
+          object edtPorcDesc: TEdit
+            Left = 136
+            Top = 0
+            Width = 87
+            Height = 27
+            TabOrder = 0
+            OnKeyUp = edtPorcDescKeyUp
+          end
+          object edtValorDesc: TEdit
+            Left = 273
+            Top = 0
+            Width = 87
+            Height = 27
+            TabOrder = 1
+            OnKeyUp = edtValorDescKeyUp
+          end
         end
       end
     end
     object pnlBotoes: TPanel
       Left = 0
-      Top = 470
-      Width = 655
+      Top = 469
+      Width = 651
       Height = 70
       Align = alBottom
       Color = clWindow
       ParentBackground = False
       TabOrder = 2
-      ExplicitLeft = 1
       ExplicitTop = 468
-      ExplicitWidth = 649
+      ExplicitWidth = 647
       object btnConfirmar: TButton
         AlignWithMargins = True
         Left = 191
@@ -377,7 +375,7 @@ object frmBaixarCR: TfrmBaixarCR
       end
       object btnCancelar: TButton
         AlignWithMargins = True
-        Left = 344
+        Left = 340
         Top = 1
         Width = 120
         Height = 68
@@ -393,7 +391,7 @@ object frmBaixarCR: TfrmBaixarCR
         ParentBiDiMode = False
         TabOrder = 1
         OnClick = btnCancelarClick
-        ExplicitLeft = 338
+        ExplicitLeft = 336
       end
     end
   end

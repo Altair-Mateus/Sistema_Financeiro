@@ -1,28 +1,28 @@
 inherited frmContasPagar: TfrmContasPagar
   Caption = 'Contas a Pagar'
-  ClientHeight = 643
-  ClientWidth = 1389
+  ClientHeight = 642
+  ClientWidth = 1385
   Position = poDesigned
   WindowState = wsMaximized
-  ExplicitTop = -142
-  ExplicitWidth = 1401
-  ExplicitHeight = 681
+  OnClose = FormClose
+  ExplicitWidth = 1397
+  ExplicitHeight = 680
   TextHeight = 19
   inherited CardPanelPrincipal: TCardPanel
-    Width = 1389
-    Height = 643
-    ExplicitWidth = 1385
-    ExplicitHeight = 642
+    Width = 1385
+    Height = 642
+    ExplicitWidth = 1381
+    ExplicitHeight = 641
     inherited CardCadastro: TCard
-      Width = 1389
-      Height = 643
-      ExplicitWidth = 1385
-      ExplicitHeight = 642
+      Width = 1385
+      Height = 642
+      ExplicitWidth = 1381
+      ExplicitHeight = 641
       inherited pnlBotoesCad: TPanel
-        Top = 574
-        Width = 1389
-        ExplicitTop = 573
-        ExplicitWidth = 1385
+        Top = 573
+        Width = 1385
+        ExplicitTop = 572
+        ExplicitWidth = 1381
         inherited btnSalvar: TButton
           ImageIndex = 7
           OnClick = btnSalvarClick
@@ -32,10 +32,10 @@ inherited frmContasPagar: TfrmContasPagar
         end
       end
       inherited PanelCampos: TPanel
-        Width = 1389
-        Height = 533
-        ExplicitWidth = 1385
-        ExplicitHeight = 532
+        Width = 1385
+        Height = 532
+        ExplicitWidth = 1381
+        ExplicitHeight = 531
         object lblDesc: TLabel
           Left = 44
           Top = 32
@@ -685,8 +685,8 @@ inherited frmContasPagar: TfrmContasPagar
         end
       end
       inherited PanelTitulo: TPanel
-        Width = 1389
-        ExplicitWidth = 1385
+        Width = 1385
+        ExplicitWidth = 1381
         inherited lblTitulo: TLabel
           Left = 23
           ExplicitLeft = 23
@@ -694,16 +694,16 @@ inherited frmContasPagar: TfrmContasPagar
       end
     end
     inherited CardPesquisa: TCard
-      Width = 1389
-      Height = 643
+      Width = 1385
+      Height = 642
       ExplicitLeft = 0
       ExplicitTop = 0
-      ExplicitWidth = 1385
-      ExplicitHeight = 642
+      ExplicitWidth = 1381
+      ExplicitHeight = 641
       inherited pnlPesquisa: TPanel
-        Width = 1389
+        Width = 1381
         Height = 153
-        ExplicitWidth = 1385
+        ExplicitWidth = 1381
         ExplicitHeight = 153
         inherited lblPesquisar: TLabel
           Left = 192
@@ -3502,7 +3502,7 @@ inherited frmContasPagar: TfrmContasPagar
           ExplicitWidth = 297
         end
         inherited btnPesquisae: TButton
-          Left = 1263
+          Left = 1255
           Top = 30
           Height = 93
           Margins.Top = 30
@@ -3777,8 +3777,8 @@ inherited frmContasPagar: TfrmContasPagar
         end
       end
       inherited pnlBotoes: TPanel
-        Top = 574
-        Width = 1389
+        Top = 573
+        Width = 1385
         BevelOuter = bvNone
         ExplicitTop = 574
         ExplicitWidth = 1389
@@ -3957,8 +3957,8 @@ inherited frmContasPagar: TfrmContasPagar
       end
       inherited pnlGrid: TPanel
         Top = 153
-        Width = 1389
-        Height = 392
+        Width = 1385
+        Height = 391
         ExplicitTop = 153
         ExplicitWidth = 1389
         ExplicitHeight = 392
@@ -4062,13 +4062,15 @@ inherited frmContasPagar: TfrmContasPagar
       end
       object pnlTotais: TPanel
         Left = 0
-        Top = 545
-        Width = 1389
+        Top = 544
+        Width = 1385
         Height = 29
         Align = alBottom
         Color = clWindow
         ParentBackground = False
         TabOrder = 3
+        ExplicitTop = 545
+        ExplicitWidth = 1389
         object lblQtdCp: TLabel
           AlignWithMargins = True
           Left = 980

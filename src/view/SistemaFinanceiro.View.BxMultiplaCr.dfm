@@ -2,29 +2,32 @@ object frmBxMultiplaCR: TfrmBxMultiplaCR
   Left = 0
   Top = 0
   Caption = 'Baixar V'#225'rias CRs'
-  ClientHeight = 685
-  ClientWidth = 1301
+  ClientHeight = 684
+  ClientWidth = 1297
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -16
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   WindowState = wsMaximized
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnKeyPress = FormKeyPress
   OnShow = FormShow
   TextHeight = 19
   object pnlBotoes: TPanel
     Left = 0
-    Top = 616
-    Width = 1301
+    Top = 615
+    Width = 1297
     Height = 69
     Align = alBottom
     Color = clWhite
     ParentBackground = False
     TabOrder = 0
-    ExplicitTop = 617
-    ExplicitWidth = 1305
+    ExplicitTop = 614
+    ExplicitWidth = 1293
     object btnConfirmar: TButton
       AlignWithMargins = True
       Left = 6
@@ -53,14 +56,14 @@ object frmBxMultiplaCR: TfrmBxMultiplaCR
       OnClick = btnSairClick
     end
     object pnlValorSelecionadas: TPanel
-      Left = 1119
+      Left = 1111
       Top = 1
       Width = 185
       Height = 67
       Align = alRight
       BevelOuter = bvNone
       TabOrder = 2
-      ExplicitLeft = 1115
+      ExplicitLeft = 1107
       object lblValorSelecionadas: TLabel
         Left = 13
         Top = 6
@@ -91,14 +94,14 @@ object frmBxMultiplaCR: TfrmBxMultiplaCR
       end
     end
     object pnlQtdSelecionadas: TPanel
-      Left = 963
+      Left = 955
       Top = 1
       Width = 156
       Height = 67
       Align = alRight
       BevelOuter = bvNone
       TabOrder = 3
-      ExplicitLeft = 959
+      ExplicitLeft = 951
       object lblQtdSelecionada: TLabel
         Left = 22
         Top = 7
@@ -129,14 +132,14 @@ object frmBxMultiplaCR: TfrmBxMultiplaCR
       end
     end
     object pnlQtdCr: TPanel
-      Left = 575
+      Left = 567
       Top = 1
       Width = 156
       Height = 67
       Align = alRight
       BevelOuter = bvNone
       TabOrder = 4
-      ExplicitLeft = 571
+      ExplicitLeft = 563
       object lblQtdCr: TLabel
         Left = 22
         Top = 7
@@ -167,14 +170,14 @@ object frmBxMultiplaCR: TfrmBxMultiplaCR
       end
     end
     object pnlQtdTotCr: TPanel
-      Left = 731
+      Left = 723
       Top = 1
       Width = 232
       Height = 67
       Align = alRight
       BevelOuter = bvNone
       TabOrder = 5
-      ExplicitLeft = 727
+      ExplicitLeft = 719
       object lblValorCRs: TLabel
         Left = 13
         Top = 6
@@ -208,18 +211,20 @@ object frmBxMultiplaCR: TfrmBxMultiplaCR
   object pnlContas: TPanel
     Left = 0
     Top = 177
-    Width = 1301
-    Height = 439
+    Width = 1297
+    Height = 438
     Align = alClient
     BevelOuter = bvNone
     Color = clWhite
     ParentBackground = False
     TabOrder = 1
+    ExplicitWidth = 1293
+    ExplicitHeight = 437
     object DBGrid1: TDBGrid
       Left = 0
       Top = 0
-      Width = 1305
-      Height = 440
+      Width = 1297
+      Height = 438
       Align = alClient
       Color = clWhite
       DataSource = DataSourceBxMultiplaCr
@@ -236,6 +241,7 @@ object frmBxMultiplaCR: TfrmBxMultiplaCR
       OnKeyDown = DBGrid1KeyDown
       Columns = <
         item
+          Alignment = taCenter
           Expanded = False
           FieldName = 'ID'
           Width = 59
@@ -249,6 +255,7 @@ object frmBxMultiplaCR: TfrmBxMultiplaCR
           Visible = True
         end
         item
+          Alignment = taCenter
           Expanded = False
           FieldName = 'ID_CLIENTE'
           Title.Caption = 'Cod Cli'
@@ -270,6 +277,7 @@ object frmBxMultiplaCR: TfrmBxMultiplaCR
           Visible = True
         end
         item
+          Alignment = taCenter
           Expanded = False
           FieldName = 'PARCELA'
           Title.Caption = 'Parcela'
@@ -302,13 +310,14 @@ object frmBxMultiplaCR: TfrmBxMultiplaCR
   object pnlFiltros: TPanel
     Left = 0
     Top = 0
-    Width = 1301
+    Width = 1297
     Height = 177
     Align = alTop
     BevelOuter = bvNone
     Color = 5737262
     ParentBackground = False
     TabOrder = 2
+    ExplicitWidth = 1293
     object lblDataInicial: TLabel
       Left = 18
       Top = 18
@@ -442,7 +451,7 @@ object frmBxMultiplaCR: TfrmBxMultiplaCR
     end
     object btnVisualizar: TButton
       AlignWithMargins = True
-      Left = 1179
+      Left = 1171
       Top = 45
       Width = 121
       Height = 87
@@ -456,7 +465,7 @@ object frmBxMultiplaCR: TfrmBxMultiplaCR
       TabOrder = 2
       WordWrap = True
       OnClick = btnVisualizarClick
-      ExplicitLeft = 1175
+      ExplicitLeft = 1167
     end
     object edtCliente: TEdit
       Left = 344
@@ -3327,7 +3336,6 @@ object frmBxMultiplaCR: TfrmBxMultiplaCR
       000000000000}
   end
   object DataSourceBxMultiplaCr: TDataSource
-    DataSet = dmCReceber.cdsBxMultipla
     Left = 624
     Top = 313
   end

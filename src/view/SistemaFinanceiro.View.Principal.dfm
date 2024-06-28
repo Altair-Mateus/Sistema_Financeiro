@@ -2,8 +2,8 @@ object frmPrincipal: TfrmPrincipal
   Left = 0
   Top = 0
   Caption = 'Sistema Financeiro'
-  ClientHeight = 730
-  ClientWidth = 1198
+  ClientHeight = 728
+  ClientWidth = 1190
   Color = 5737262
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -21,7 +21,7 @@ object frmPrincipal: TfrmPrincipal
     AlignWithMargins = True
     Left = 10
     Top = 10
-    Width = 1178
+    Width = 1170
     Height = 191
     Margins.Left = 10
     Margins.Top = 10
@@ -31,7 +31,7 @@ object frmPrincipal: TfrmPrincipal
     Color = clWhite
     ParentBackground = False
     TabOrder = 0
-    ExplicitWidth = 1174
+    ExplicitWidth = 1166
     object pnlSaldoParcial: TPanel
       AlignWithMargins = True
       Left = 14
@@ -10849,8 +10849,8 @@ object frmPrincipal: TfrmPrincipal
     AlignWithMargins = True
     Left = 10
     Top = 214
-    Width = 1178
-    Height = 412
+    Width = 1170
+    Height = 410
     Margins.Left = 10
     Margins.Right = 10
     Align = alClient
@@ -10858,17 +10858,17 @@ object frmPrincipal: TfrmPrincipal
     ParentBackground = False
     TabOrder = 1
     StyleElements = [seFont, seClient]
-    ExplicitWidth = 1174
-    ExplicitHeight = 411
+    ExplicitWidth = 1166
+    ExplicitHeight = 409
     object pnlBtn: TPanel
       Left = 1
       Top = 1
-      Width = 1176
+      Width = 1168
       Height = 120
       Align = alTop
       BevelOuter = bvNone
       TabOrder = 0
-      ExplicitWidth = 1172
+      ExplicitWidth = 1164
       object btnCaixa: TButton
         Left = 813
         Top = 22
@@ -10998,21 +10998,21 @@ object frmPrincipal: TfrmPrincipal
       end
     end
     object pnlLogo: TPanel
-      Left = 874
+      Left = 866
       Top = 121
       Width = 303
-      Height = 290
+      Height = 288
       Align = alRight
       BevelOuter = bvNone
       TabOrder = 1
-      ExplicitLeft = 870
-      ExplicitHeight = 289
+      ExplicitLeft = 862
+      ExplicitHeight = 287
       object imgLogo: TImage
         AlignWithMargins = True
         Left = 0
         Top = 15
         Width = 288
-        Height = 260
+        Height = 258
         Margins.Left = 0
         Margins.Top = 15
         Margins.Right = 15
@@ -14634,8 +14634,8 @@ object frmPrincipal: TfrmPrincipal
   object pnlInfos: TPanel
     AlignWithMargins = True
     Left = 10
-    Top = 639
-    Width = 1178
+    Top = 637
+    Width = 1170
     Height = 81
     Margins.Left = 10
     Margins.Top = 10
@@ -14645,11 +14645,11 @@ object frmPrincipal: TfrmPrincipal
     Color = clWhite
     ParentBackground = False
     TabOrder = 2
-    ExplicitTop = 638
-    ExplicitWidth = 1174
+    ExplicitTop = 636
+    ExplicitWidth = 1166
     object lblUserLogado: TLabel
       AlignWithMargins = True
-      Left = 1070
+      Left = 1062
       Top = 31
       Width = 97
       Height = 19
@@ -14670,7 +14670,7 @@ object frmPrincipal: TfrmPrincipal
     end
     object Image1: TImage
       AlignWithMargins = True
-      Left = 1007
+      Left = 999
       Top = 16
       Width = 50
       Height = 49

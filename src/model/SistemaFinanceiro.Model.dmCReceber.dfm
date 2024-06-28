@@ -163,44 +163,44 @@ object dmCReceber: TdmCReceber
       Required = True
     end
   end
-  object FDQueryPgtoCr: TFDQuery
+  object lQueryPgtoCr: TFDQuery
     Connection = DataModule1.FDConnection
     SQL.Strings = (
       'SELECT PG.*, FR.NOME_FR FROM PGTO_BX_CR PG '
       'LEFT JOIN FR_PGTO FR ON PG.ID_FR_PGTO = FR.ID_FR;')
     Left = 232
     Top = 288
-    object FDQueryPgtoCrNR_FR: TIntegerField
+    object lQueryPgtoCrNR_FR: TIntegerField
       FieldName = 'NR_FR'
       Origin = 'NR_FR'
       Required = True
     end
-    object FDQueryPgtoCrID_FR_PGTO: TIntegerField
+    object lQueryPgtoCrID_FR_PGTO: TIntegerField
       FieldName = 'ID_FR_PGTO'
       Origin = 'ID_FR_PGTO'
       Required = True
     end
-    object FDQueryPgtoCrDATA_HORA: TSQLTimeStampField
+    object lQueryPgtoCrDATA_HORA: TSQLTimeStampField
       FieldName = 'DATA_HORA'
       Origin = 'DATA_HORA'
       Required = True
     end
-    object FDQueryPgtoCrID: TIntegerField
+    object lQueryPgtoCrID: TIntegerField
       FieldName = 'ID'
       Origin = 'ID'
       ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
       Required = True
     end
-    object FDQueryPgtoCrID_CR: TIntegerField
+    object lQueryPgtoCrID_CR: TIntegerField
       FieldName = 'ID_CR'
       Origin = 'ID_CR'
       Required = True
     end
-    object FDQueryPgtoCrNOME: TWideStringField
+    object lQueryPgtoCrNOME: TWideStringField
       FieldName = 'NOME_FR'
       Size = 100
     end
-    object FDQueryPgtoCrVALOR_PAGO: TBCDField
+    object lQueryPgtoCrVALOR_PAGO: TBCDField
       FieldName = 'VALOR_PAGO'
       Origin = 'VALOR_PAGO'
       Required = True
