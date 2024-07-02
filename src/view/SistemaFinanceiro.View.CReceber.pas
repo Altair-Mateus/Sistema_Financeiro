@@ -131,6 +131,7 @@ type
     dsGrupoParcelas: TDataSource;
     grdGrupoParcelas: TDBGrid;
     pnlFundoGrupoParcelas: TPanel;
+    rbIdCliente: TRadioButton;
     procedure FormCreate(Sender: TObject);
     procedure btnIncluirClick(Sender: TObject);
     procedure toggleParcelamentoClick(Sender: TObject);
@@ -1248,30 +1249,21 @@ begin
 
   // Ordem de pesquisa
   if rbId.Checked then
-  begin
-    lFiltros := lFiltros + ' | Ordem Registros do relatório: Código da Conta ';
-  end
+    lFiltros := lFiltros + ' | Ordem Registros do relatório: Código da Conta '
   else if rbDataVenc.Checked then
-  begin
     lFiltros := lFiltros +
-      ' | Ordem Registros do relatório: Data de Vencimento ';
-  end
+      ' | Ordem Registros do relatório: Data de Vencimento '
   else if rbValorParcela.Checked then
-  begin
-    lFiltros := lFiltros + ' | Ordem Registros do relatório: Valor da Parcela ';
-  end
+    lFiltros := lFiltros + ' | Ordem Registros do relatório: Valor da Parcela '
   else if rbValorVenda.Checked then
-  begin
-    lFiltros := lFiltros + ' | Ordem Registros do relatório: Valor da Venda ';
-  end
+    lFiltros := lFiltros + ' | Ordem Registros do relatório: Valor da Venda '
   else if rbDataVenda.Checked then
-  begin
-    lFiltros := lFiltros + ' | Ordem Registros do relatório: Data da Venda ';
-  end
+    lFiltros := lFiltros + ' | Ordem Registros do relatório: Data da Venda '
+  else if rbIdCliente.Checked then
+    lFiltros := lFiltros + ' | Ordem Registros do relatório: Cod Cliente '
   else
-  begin
     lFiltros := lFiltros + ' | Ordem Registros do relatório: Código da Conta ';
-  end;
+
 
   Result := lFiltros;
 
@@ -1562,6 +1554,8 @@ begin
       LOrdem := ' ORDER BY CR.VALOR_VENDA DESC'
     else if rbDataVenda.Checked then
       LOrdem := ' ORDER BY CR.DATA_VENDA DESC'
+    else if rbIdCliente.Checked then
+      LOrdem := ' ORDER BY CR.ID_CLIENTE'
     else
       LOrdem := ' ORDER BY CR.ID DESC';
 

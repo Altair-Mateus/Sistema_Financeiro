@@ -29,6 +29,8 @@ type
     rldbtDescricao: TRLDBText;
     lblDataVenda: TRLLabel;
     rldbDataVenda: TRLDBText;
+    rldbtNomeCli: TRLDBText;
+    rlblNomeCli: TRLLabel;
     procedure RLReportBeforePrint(Sender: TObject; var PrintIt: Boolean);
   private
     { Private declarations }
