@@ -30,9 +30,6 @@ type
     lblUserLogado: TLabel;
     Image1: TImage;
     ImageList1: TImageList;
-    btnCP: TButton;
-    btnCR: TButton;
-    btnCaixa: TButton;
     mnuFinanceiro: TMenuItem;
     Caixa1: TMenuItem;
     SaldodoCaixa1: TMenuItem;
@@ -62,13 +59,9 @@ type
     N2: TMenuItem;
     FormasdePagamento1: TMenuItem;
     pnlBtn: TPanel;
-    pnlLogo: TPanel;
     Configuraes1: TMenuItem;
     AlterarImagemPrincipal1: TMenuItem;
     OpenDialog1: TOpenDialog;
-    btnFornec: TButton;
-    btnClientes: TButton;
-    imgLogo: TImage;
     lblNomeSistema: TLabel;
     FaturasdeCarto1: TMenuItem;
     N3: TMenuItem;
@@ -76,6 +69,43 @@ type
     ResumoMensal1: TMenuItem;
     ContasaReceber2: TMenuItem;
     ResumoMensal2: TMenuItem;
+    pnlNomeSistema: TPanel;
+    Panel9: TPanel;
+    imgLogo: TImage;
+    btnFornec: TButton;
+    btnClientes: TButton;
+    btnCR: TButton;
+    btnCP: TButton;
+    btnCaixa: TButton;
+    panel1: TPanel;
+    pnlNomeBtnFornecedore: TPanel;
+    pnlImgBtnFornecedore: TPanel;
+    imgBtnFornecedore: TImage;
+    pnlFundoBtnFornecedores: TPanel;
+    pnlBtnFornecedores: TPanel;
+    pnlNomeBtnFornecedores: TPanel;
+    pnlImgBtnFornecedores: TPanel;
+    imgBtnFornecedores: TImage;
+    pnlFundoBtnClientes: TPanel;
+    pnlBtnClientes: TPanel;
+    pnlNomeBtnClientes: TPanel;
+    pnlImgBtnClientes: TPanel;
+    ImgBtnClientes: TImage;
+    pnlFundoBtnCr: TPanel;
+    pnnlBtnCr: TPanel;
+    pnlNomeBtnCr: TPanel;
+    pnlImgBtnCr: TPanel;
+    imgBtnCr: TImage;
+    pnlFundoBtnCp: TPanel;
+    pnlBtnCp: TPanel;
+    pnlNomeBtnCp: TPanel;
+    pnlImgBtnCp: TPanel;
+    imgBtnCp: TImage;
+    pnlFundoBtnCaixa: TPanel;
+    pnlBtnCaixa: TPanel;
+    pnlNomeBtnCaixa: TPanel;
+    pnlImgBtnCaixa: TPanel;
+    imgBtnCaixa: TImage;
 
     procedure FormCreate(Sender: TObject);
     procedure mnuUsuariosClick(Sender: TObject);
@@ -89,10 +119,8 @@ type
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure btnCRClick(Sender: TObject);
     procedure ContasaReceber1Click(Sender: TObject);
-    procedure Panel1Click(Sender: TObject);
     procedure btnClientesClick(Sender: TObject);
     procedure mnuClientesClick(Sender: TObject);
-    procedure btnFornecClick(Sender: TObject);
     procedure Fornecedores1Click(Sender: TObject);
     procedure FormasdePagamento1Click(Sender: TObject);
     procedure AlterarImagemPrincipal1Click(Sender: TObject);
@@ -100,7 +128,13 @@ type
     procedure FaturasdeCarto1Click(Sender: TObject);
     procedure ResumoMensal1Click(Sender: TObject);
     procedure ResumoMensal2Click(Sender: TObject);
-
+    procedure imgBtnFornecedoreClick(Sender: TObject);
+    procedure pnlNomeBtnFornecedoreClick(Sender: TObject);
+    procedure btnFornecedoresClick(Sender: TObject);
+    procedure btnClienteClick(Sender: TObject);
+    procedure btnContasPagarClick(Sender: TObject);
+    procedure btnContasReceberClick(Sender: TObject);
+    procedure btnFluxoCaixaClick(Sender: TObject);
 
   private
     FDtIni : TDate;
@@ -187,9 +221,24 @@ begin
   ExibeTelaCaixa;
 end;
 
+procedure TfrmPrincipal.btnClienteClick(Sender: TObject);
+begin
+  ExibeTelaClientes;
+end;
+
 procedure TfrmPrincipal.btnClientesClick(Sender: TObject);
 begin
   ExibeTelaClientes;
+end;
+
+procedure TfrmPrincipal.btnContasPagarClick(Sender: TObject);
+begin
+  ExibeTelaCPagar;
+end;
+
+procedure TfrmPrincipal.btnContasReceberClick(Sender: TObject);
+begin
+  ExibeTelaCReceber;
 end;
 
 procedure TfrmPrincipal.btnCPClick(Sender: TObject);
@@ -202,9 +251,14 @@ begin
   ExibeTelaCReceber;
 end;
 
-procedure TfrmPrincipal.btnFornecClick(Sender: TObject);
+procedure TfrmPrincipal.btnFluxoCaixaClick(Sender: TObject);
 begin
-  ExibeTelaFonecedores
+  ExibeTelaCaixa;
+end;
+
+procedure TfrmPrincipal.btnFornecedoresClick(Sender: TObject);
+begin
+  ExibeTelaFonecedores;
 end;
 
 procedure TfrmPrincipal.btnusuariosClick(Sender: TObject);
@@ -219,6 +273,9 @@ begin
 end;
 
 procedure TfrmPrincipal.CarregaImgPrincipal;
+var
+  Png: TPngImage;
+  Bitmap: TBitmap;
 begin
 
   //  Carrega a logo da tela principal
@@ -228,9 +285,9 @@ begin
   end;
 
 
-  //  Mantem sempre no tamanho
-  imgLogo.Width := 300;
-  imgLogo.Height := 300;
+//  //  Mantem sempre no tamanho
+//  imgLogo.Width := 300;
+//  imgLogo.Height := 300;
 
 end;
 
@@ -619,6 +676,11 @@ begin
 
 end;
 
+procedure TfrmPrincipal.imgBtnFornecedoreClick(Sender: TObject);
+begin
+ExibeTelaFonecedores
+end;
+
 procedure TfrmPrincipal.mnuAjudaClick(Sender: TObject);
 begin
   ExibeTelaAjuda;
@@ -634,9 +696,9 @@ begin
   ExibeTelaUsuario;
 end;
 
-procedure TfrmPrincipal.Panel1Click(Sender: TObject);
+procedure TfrmPrincipal.pnlNomeBtnFornecedoreClick(Sender: TObject);
 begin
-  ExibeTelaUsuario;
+ExibeTelaFonecedores
 end;
 
 procedure TfrmPrincipal.ResumoMensal1Click(Sender: TObject);
