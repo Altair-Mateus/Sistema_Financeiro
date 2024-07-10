@@ -94,7 +94,6 @@ type
     lblCodFtCartao: TLabel;
     pnlAviso: TPanel;
     pnlImgAviso: TPanel;
-    lblAvisoFatura: TLabel;
     imgAviso: TImage;
     Label2: TLabel;
     Label1: TLabel;
@@ -116,6 +115,12 @@ type
     CancelarBaixa1: TMenuItem;
     checkNaoConsideraFatura: TCheckBox;
     chkBaixarAoSalvar: TCheckBox;
+    pnlFundoAvisoFatura: TPanel;
+    pnlMensagemAviso: TPanel;
+    lblAvisoFatura: TLabel;
+    pnlFundoGrupoParcelas: TPanel;
+    lblGrupoParcelas: TLabel;
+    grdGrupoParcelas: TDBGrid;
     procedure btnCancelarClick(Sender: TObject);
     procedure btnExcluirClick(Sender: TObject);
     procedure btnPesquisaeClick(Sender: TObject);
@@ -1414,146 +1419,110 @@ end;
 
 procedure TfrmContasPagar.GeraParcelas;
 var
-  QtdParcelas   : Integer;
-  IntervaloDias : Integer;
-  ValorCompra   : Currency;
-  ValorParcela  : Currency;
-  ValorResiduo  : Currency;
-  Contador      : Integer;
-  AuxContador   : Integer;
-  DiaFixoVcto   : Integer;
+  lQtdParcelas: Integer;
+  lIntervaloDias: Integer;
+  lValorCompra: Double;
+  lValorParcela: Double;
+  lValorResiduo: Double;
+  lContador: Integer;
+  lDiaFixoVcto: Integer;
+  lDataPrimeiraParcela: TDateTime;
+
+  function ValidarCampos: Boolean;
+  begin
+    Result := True;
+
+    if (not TryStrToFloat(edtValorCompra.Text, lValorCompra)) or (lValorCompra <= 0) then
+    begin
+      edtValorCompra.SetFocus;
+      Application.MessageBox('Valor da compra Inválido!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+      Result := False;
+    end
+    else if dateCompra.Date > Now then
+    begin
+      dateCompra.SetFocus;
+      Application.MessageBox('Data de compra não pode ser maior que a data atual!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+      Result := False;
+    end
+    else if not TryStrToInt(edtQtdParcelas.Text, lQtdParcelas) or (lQtdParcelas <= 1) then
+    begin
+      edtQtdParcelas.SetFocus;
+      Application.MessageBox('Números de Parcelas Inválido!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+      Result := False;
+    end
+    else if not TryStrToInt(edtIntervaloDias.Text, lIntervaloDias) then
+    begin
+      edtIntervaloDias.SetFocus;
+      Application.MessageBox('Intervalo de dias Inválido!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+      Result := False;
+    end;
+  end;
 
 begin
+  if not ValidarCampos then
+    Exit;
 
-  //  Valida campos
-  if (not TryStrToCurr(edtValorCompra.Text, ValorCompra)) or (ValorCompra <= 0) then
-  begin
-    edtValorCompra.SetFocus;
-    Application.MessageBox('Valor da compra Inválido!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
-    abort;
-  end;
+  // Calculando valores das parcelas
+  lValorParcela := (Trunc(lValorCompra / lQtdParcelas * 100) / 100);
+  lValorResiduo := lValorCompra - (lValorParcela * lQtdParcelas);
 
-  if dateCompra.Date > Now then
-  begin
-
-    dateCompra.SetFocus;
-    Application.MessageBox('Data de compra não pode ser maior que a data atual!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
-    abort;
-
-  end;
-
-  if not TryStrToInt(edtQtdParcelas.Text, QtdParcelas) then
-  begin
-    edtQtdParcelas.SetFocus;
-    Application.MessageBox('Números de Parcelas Inválido!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
-    abort;
-  end;
-
-  if QtdParcelas <= 1 then
-  begin
-    edtQtdParcelas.SetFocus;
-    Application.MessageBox('Para gerar parcelas a quantidade deve ser maior que 1!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
-    abort;
-  end;
-
-
-  if not TryStrToInt(edtIntervaloDias.Text, IntervaloDias) then
-  begin
-    edtIntervaloDias.SetFocus;
-    Application.MessageBox('Intervalo de dias Inválido!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
-    abort;
-  end;
-
-  if checkDiaFixoVcto.Checked then
-  begin
-    if (not TryStrToInt(edtDiaFixoVcto.Text, DiaFixoVcto)) or (DiaFixoVcto > 28)  or (DiaFixoVcto < 1) then
-    begin
-        edtDiaFixoVcto.SetFocus;
-        Application.MessageBox('Dia fixo de vencimento Inválido!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
-      abort;
-    end;
-  end;
-
-  //  Calculando valores das parcelas
-  //  Trunca o valor final das parcelas
-  ValorParcela := (Trunc(ValorCompra / QtdParcelas * 100) / 100);
-
-  //  Calcula o valor do residuo do Trunc para colocar em uma das parcelas
-  ValorResiduo := ValorCompra - (ValorParcela * QtdParcelas);
-
-  //  Esvaziando data set
+  // Inicializando dataset
   cdsParcelas.EmptyDataSet;
 
-  AuxContador := 1;
-
-  for Contador := 1 to QtdParcelas do
+  // Definindo a data da primeira parcela
+  if (toggleFatura.State = tssOn) and (edtCodFatCartao.Text <> '') then
   begin
+    FatCartaoAtiva;
+    lDiaFixoVcto := DataVctoFat;
 
-    cdsParcelas.Insert;
-    cdsParcelasPARCELA.AsInteger := Contador;
-
-    //  Adiciona o valor do residuo na primeira parcela
-    cdsParcelasVALOR.AsCurrency  := ValorParcela + ValorResiduo;
-    ValorResiduo := 0;  //  Zera o valor de residuo
-
-
-
-    //  Define a data de vencimento
-    //  Se for fatura, sera pego o dia de vcto
-    //  a data cadastrada na fatura
-    if (toggleFatura.State = tssOn) and (edtCodFatCartao.Text <> '') then
-    begin
-
-      FatCartaoAtiva;
-
-      if (CheckFatVirada.Checked) and (AuxContador = 1) then
-      begin
-
-        Inc(AuxContador);
-
-      end;
-
-      cdsParcelasVENCIMENTO.AsDateTime := EncodeDate(YearOf(IncDay(dateCompra.Date, IntervaloDias *  AuxContador)), MonthOf(IncDay(dateCompra.Date, 30 *  AuxContador)), DataVctoFat);
-
-    end
+    if CheckFatVirada.Checked then
+      lDataPrimeiraParcela := IncMonth(dateCompra.Date, 2) // Vcto da parcela 1 para dois meses
     else
+      lDataPrimeiraParcela := IncMonth(dateCompra.Date, 1);
+
+    lDataPrimeiraParcela := EncodeDate(YearOf(lDataPrimeiraParcela), MonthOf(lDataPrimeiraParcela), lDiaFixoVcto);
+  end
+  else if checkDiaFixoVcto.Checked then
+  begin
+    if not TryStrToInt(edtDiaFixoVcto.Text, lDiaFixoVcto) or (lDiaFixoVcto > 28) or (lDiaFixoVcto < 1) then
     begin
-
-      //  Se tiver dia de vencimento fixo
-      if checkDiaFixoVcto.Checked then
-      begin
-
-        cdsParcelasVENCIMENTO.AsDateTime := EncodeDate(YearOf(IncDay(dateCompra.Date, IntervaloDias *  AuxContador)), MonthOf(IncDay(dateCompra.Date, 30 *  AuxContador)), DiaFixoVcto);
-
-      end
-      else
-      begin
-        cdsParcelasVENCIMENTO.AsDateTime := IncDay(dateCompra.Date, IntervaloDias *  AuxContador);
-      end;
-
+      edtDiaFixoVcto.SetFocus;
+      Application.MessageBox('Dia fixo de vencimento Inválido!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+      Exit;
     end;
 
-
-    //  Define o numero do doc
-    if not (edtNDoc.Text = '') then
-    begin
-      cdsParcelasDocumento.AsString := Trim(edtNDoc.Text) + '-' + IntToStr(Contador);
-    end;
-
-    cdsParcelas.Post;
-
-    Inc(AuxContador);
-
+    lDataPrimeiraParcela := IncMonth(dateCompra.Date, 1);
+    lDataPrimeiraParcela := EncodeDate(YearOf(lDataPrimeiraParcela), MonthOf(lDataPrimeiraParcela), lDiaFixoVcto);
   end;
 
-  //  Bloqueios
-  edtQtdParcelas.Enabled   := False;
-  edtIntervaloDias.Enabled := False;
-  edtDiaFixoVcto.Enabled   := False;
-  checkDiaFixoVcto.Enabled := False;
-  btnGerar.Enabled         := False;
-  btnLimpar.Enabled        := True;
+  // Gerando parcelas
+  for lContador := 1 to lQtdParcelas do
+  begin
+    cdsParcelas.Insert;
+    cdsParcelasPARCELA.AsInteger := lContador;
+    cdsParcelasVALOR.AsFloat := lValorParcela + lValorResiduo;
+    lValorResiduo := 0;
 
+    if checkDiaFixoVcto.Checked then
+      cdsParcelasVENCIMENTO.AsDateTime := EncodeDate(YearOf(IncMonth(lDataPrimeiraParcela, lContador - 1)),
+                                                     MonthOf(IncMonth(lDataPrimeiraParcela, lContador - 1)),
+                                                     lDiaFixoVcto)
+    else
+      cdsParcelasVENCIMENTO.AsDateTime := IncDay(dateCompra.Date, lIntervaloDias * lContador);
+
+    if not (Trim(edtNDoc.Text).IsEmpty) then
+      cdsParcelasDocumento.AsString := Trim(edtNDoc.Text) + '-' + IntToStr(lContador);
+
+    cdsParcelas.Post;
+  end;
+
+  // Bloqueios
+  edtQtdParcelas.Enabled := False;
+  edtIntervaloDias.Enabled := False;
+  edtDiaFixoVcto.Enabled := False;
+  checkDiaFixoVcto.Enabled := False;
+  btnGerar.Enabled := False;
+  btnLimpar.Enabled := True;
 end;
 
 procedure TfrmContasPagar.HabilitaBotoes;
@@ -1724,29 +1693,17 @@ begin
 
   //  Ordem de pesquisa
   if rbId.Checked then
-  begin
+    lOrdem := ' ORDER BY CP.ID DESC'
+  else if rbDataVenc.Checked then
+    lOrdem := ' ORDER BY CP.DATA_VENCIMENTO'
+  else if rbValorParcela.Checked then
+    lOrdem := ' ORDER BY CP.VALOR_PARCELA DESC'
+  else if rbValorCompra.Checked then
+    lOrdem := ' ORDER BY CP.VALOR_COMPRA DESC'
+  else if rbDataCompra.Checked then
+    lOrdem := ' ORDER BY CP.DATA_COMPRA DESC'
+  else
     lOrdem := ' ORDER BY CP.ID DESC';
-  end
-    else if rbDataVenc.Checked then
-    begin
-      lOrdem := ' ORDER BY CP.DATA_VENCIMENTO';
-    end
-      else if rbValorParcela.Checked then
-      begin
-        lOrdem := ' ORDER BY CP.VALOR_PARCELA DESC';
-      end
-        else if rbValorCompra.Checked then
-        begin
-          lOrdem := ' ORDER BY CP.VALOR_COMPRA DESC';
-        end
-          else if rbDataCompra.Checked then
-          begin
-            lOrdem := ' ORDER BY CP.DATA_COMPRA DESC';
-          end
-            else
-            begin
-              lOrdem := ' ORDER BY CP.ID DESC';
-            end;
 
   dmCPagar.cdsCPagar.Close;
   dmCPagar.cdsCPagar.CommandText := 'SELECT CP.*, F.RAZAO_SOCIAL FROM CONTAS_PAGAR CP ' +
@@ -1843,7 +1800,7 @@ begin
 
     end;
 
-    pnlAviso.Visible := False;
+    pnlFundoAvisoFatura.Visible := False;
     CheckFatVirada.Visible := False;
 
   end
@@ -1857,7 +1814,7 @@ begin
 
     edtCodFatCartao.SetFocus;
 
-    pnlAviso.Visible := True;
+    pnlFundoAvisoFatura.Visible := True;
 
     if not (dmCPagar.cdsCPagar.State in [dsEdit]) then
       CheckFatVirada.Visible := True;

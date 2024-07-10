@@ -1,28 +1,28 @@
 inherited frmContasPagar: TfrmContasPagar
   Caption = 'Contas a Pagar'
   ClientHeight = 642
-  ClientWidth = 1385
+  ClientWidth = 1327
   Position = poDesigned
   WindowState = wsMaximized
   OnClose = FormClose
-  ExplicitWidth = 1397
+  ExplicitWidth = 1339
   ExplicitHeight = 680
   TextHeight = 19
   inherited CardPanelPrincipal: TCardPanel
-    Width = 1385
+    Width = 1327
     Height = 642
-    ExplicitWidth = 1381
+    ExplicitWidth = 1323
     ExplicitHeight = 641
     inherited CardCadastro: TCard
-      Width = 1385
+      Width = 1327
       Height = 642
-      ExplicitWidth = 1381
+      ExplicitWidth = 1323
       ExplicitHeight = 641
       inherited pnlBotoesCad: TPanel
         Top = 573
-        Width = 1385
+        Width = 1327
         ExplicitTop = 572
-        ExplicitWidth = 1381
+        ExplicitWidth = 1323
         inherited btnSalvar: TButton
           ImageIndex = 7
           OnClick = btnSalvarClick
@@ -32,9 +32,9 @@ inherited frmContasPagar: TfrmContasPagar
         end
       end
       inherited PanelCampos: TPanel
-        Width = 1385
+        Width = 1327
         Height = 532
-        ExplicitWidth = 1381
+        ExplicitWidth = 1323
         ExplicitHeight = 531
         object lblDesc: TLabel
           Left = 44
@@ -178,7 +178,7 @@ inherited frmContasPagar: TfrmContasPagar
           Top = 57
           Width = 706
           Height = 64
-          MaxLength = 200
+          MaxLength = 500
           TabOrder = 0
         end
         object dateCompra: TDateTimePicker
@@ -225,7 +225,7 @@ inherited frmContasPagar: TfrmContasPagar
           Top = 296
           Width = 793
           Height = 249
-          ActiveCard = cardParcelaUnica
+          ActiveCard = cardParcelamento
           BevelOuter = bvNone
           Caption = 'CardPanel1'
           TabOrder = 6
@@ -577,116 +577,226 @@ inherited frmContasPagar: TfrmContasPagar
           Visible = False
           OnClick = btnPesqFatClick
         end
-        object pnlAviso: TPanel
-          AlignWithMargins = True
-          Left = 767
-          Top = 359
-          Width = 377
-          Height = 165
-          Margins.Right = 5
-          Margins.Bottom = 5
-          TabOrder = 11
-          Visible = False
-          object lblAvisoFatura: TLabel
-            Left = 87
-            Top = 40
-            Width = 278
-            Height = 76
-            Align = alCustom
-            Caption = 
-              'ATEN'#199#195'O! Se for definido que a conta possui FATURA DE CART'#195'O vin' +
-              'culada, o DIA  de VENCIMENTO ser'#225' o dia cadastrado na mesma.'
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWindowText
-            Font.Height = -16
-            Font.Name = 'Tahoma'
-            Font.Style = [fsBold]
-            ParentFont = False
-            WordWrap = True
-          end
-          object pnlImgAviso: TPanel
-            Left = 1
-            Top = 1
-            Width = 64
-            Height = 163
-            Align = alLeft
-            Color = 5934638
-            ParentBackground = False
-            TabOrder = 0
-            object imgAviso: TImage
-              Left = 8
-              Top = 56
-              Width = 49
-              Height = 44
-              Center = True
-              Picture.Data = {
-                0954506E67496D61676589504E470D0A1A0A0000000D49484452000000400000
-                0040100400000050F0651600000002624B47440000AA8D233200000009704859
-                73000000600000006000F06B42CF0000000774494D4507E70A0A17180297E435
-                DF000005974944415478DAED5B6B885555145E93E6B3A70F4290522195424B73
-                3047C2B048CD297F042AA6319A29A4A1A2F4128BAC341914B5324C4C844A3308
-                1F69498A14A2A3F8C814D3811E5A2A9A94462F2DD97EDFD97327EF997BEE79ED
-                B3CF3D531FACC570679FF5ADF3DD73CFD97BAD7DCAE43F8EB2B413481BA909A0
-                A439FC8DCE5F22E790C885C62F8092CEF08FC32A61B7C39AD6FDE76FD821D806
-                D8722475BC7109A0E41AF8B9B089B0AB7D465F842D81CD44727F645F00FDAD6F
-                82750F79E441D85024F843760550D2017E07AC53C408DFC22A90E4E9EC09A09C
-                D09FC21E8819E933D82044535913A00A7E85A1688F22D1F7B32380926BE18FC2
-                3A188A7802D60DC9FE9E1501E6C13F6D38EACB48F685D217404917F8C3B0E686
-                23FF09BB0D097F5FEA02AC851F663A6C1DD620E111A52B809281F05B133AF91C
-                EE45D29F979E004A9AC0EF87F54858802F617D90F8A552136012FC1B0146F28E
-                BE1BF68FEB734E91FB4AB027C70424BEAC740450D206BE16D6D667E43ED80090
-                FEE611878FCFEDB09E3E71CEC0BA22CEF952116031FC5301464E01E1629F58D3
-                E0170488351FB166A42F807296B5FC5D360D307A2208DFF68937017E6980585C
-                35F640BCDAB405E07C7F50C0D1B341F8A24FBCD9F0B302C6FB18F11E4A4F00E5
-                3CEFD78638620508C7F9C4E4FAA12A44CC0711F313FB022869267ACDDE35C451
-                5B4178BF4FDC2DF0F78588794478D32C73AA4A56057806FEB59047D582B09B4F
-                5CFEA66F0D19772AE22EB22780929B44AFF6AE0F7924E7F3AD8BAEED95B3E26B
-                1532EE2FA21F8B676D09F00EFCD8288702ED3D1355D20EFEA78871DF42DC2793
-                1740492FF83DB0AB2226DA1BA4FB3D62F786DF1B31EEA5BAD85F2527802E7371
-                21724FC424896188B2DE237ED8A78A1BDB107B6092028C827F2F4682C46490BE
-                E9117F32FCEB31E33F82F81F991740494BF8AF61B7C44C701E489FF5E0305149
-                FA4E74E1E42FD302BC046FA224B50AA4A33C3856C18F34C0F13C38E69A134049
-                47D1138ED60692DB0ED2C2F710E5AC04FB1BE0E06A9345D493A604580D6FAA14
-                750CA49D3C788EC1DF6C88672578AAE20BA0A442F41ADD54ED848590160D2A3A
-                BAA2C489925FEF302838D9EA079E5DD10550CEB39E01FA184A2A878E203EE1E2
-                E2CFCC741FB046746BCD7BE6E923C0787833A5A77CF09BA97171F513DD47348D
-                31E07A37BC00E6BB3B57620488D7B8F8788F599D0017AFB4EE9E65B8220254C3
-                C72F3915C60C10CF77F191AB3A21BE57C057B8C8525000E52C47B963A3594209
-                2D02F15417E74261CD30197877953C04E05C3D5EA9A9387682B8C2C5B913FEEE
-                04393F04E7707F0194D3CFDF9C6022394C02F992BA051697B1417A0A71D1B0AB
-                942780722ABB0784978B1DE4D6FEED2DF135EC2AB904E06F70A1A564D2427E69
-                BE5E80E0DD9DAC83571DCB67E7DC02708D1EBEA4141DDF88AE2C11E5B02E16B9
-                17E0C4A7FF2B80723ABAECDB05E9EEC4C5AFB02744DF95F51455DF087987E6A5
-                799D851CD8556229FD684E00EEE31B628198180CD2C24F19E5E4B0C9521E1B91
-                47A594E922E73E4BA45F807440D1110A63E2D51CC3A027054872CAEBC61C0830
-                D3478039F0CF59CAA79A027055D6D712A1E9E6685CD450809F456F5BB781F510
-                A0F8062AE5EC18AFB494CF590AC0A6A28DBB3FC16A502F8870C8E3E4EF10DD18
-                6962299F8B14807DB51B2C11122C5BB33972D075F2DC16B34EA26FAC8E825314
-                801B96CA2D9212BC12364AFE4468A8D8FBE673D84501B81F679A65E252C1AB14
-                80EAEF4E3B939470576E261876574663C0069CFCC33901F83A0B5BD62DD2CECA
-                1258202DC7C91FB97235C8AA2C5F4A88DAF7CF0AB8001B595F957615441E13DD
-                0748AA189A36F816DA389CF407F59F14A809DE297A596AFBD19834580BE44ED5
-                03799F7A5485F9318BA3A385854471DA5659032FF51F45BFB8C5F70CB6141C15
-                B03BCC171F5932B335658E0B163C4E07DA3BF8FFCBD3692790362E03CAD5430D
-                6206C1850000000049454E44AE426082}
-              Stretch = True
-            end
-          end
-        end
         object CheckFatVirada: TCheckBox
           Left = 800
           Top = 224
           Width = 441
           Height = 17
           Caption = 'Fatura Virada (Pula 1 m'#234's no vencimento da 1'#170' Parcela)'
-          TabOrder = 12
+          TabOrder = 11
           Visible = False
           OnClick = CheckFatViradaClick
         end
+        object pnlFundoAvisoFatura: TPanel
+          Left = 800
+          Top = 249
+          Width = 433
+          Height = 106
+          Color = 5934638
+          ParentBackground = False
+          TabOrder = 12
+          Visible = False
+          object pnlAviso: TPanel
+            AlignWithMargins = True
+            Left = 4
+            Top = 4
+            Width = 425
+            Height = 98
+            Align = alClient
+            BevelOuter = bvNone
+            TabOrder = 0
+            object pnlImgAviso: TPanel
+              Left = 0
+              Top = 0
+              Width = 72
+              Height = 98
+              Align = alLeft
+              BevelOuter = bvNone
+              Color = 5934638
+              ParentBackground = False
+              TabOrder = 0
+              object imgAviso: TImage
+                Left = 0
+                Top = 0
+                Width = 72
+                Height = 98
+                Align = alClient
+                Center = True
+                Picture.Data = {
+                  0954506E67496D61676589504E470D0A1A0A0000000D49484452000000400000
+                  0040100400000050F0651600000002624B47440000AA8D233200000009704859
+                  73000000600000006000F06B42CF0000000774494D4507E70A0A17180297E435
+                  DF000005974944415478DAED5B6B885555145E93E6B3A70F4290522195424B73
+                  3047C2B048CD297F042AA6319A29A4A1A2F4128BAC341914B5324C4C844A3308
+                  1F69498A14A2A3F8C814D3811E5A2A9A94462F2DD97EDFD97327EF997BEE79ED
+                  B3CF3D531FACC570679FF5ADF3DD73CFD97BAD7DCAE43F8EB2B413481BA909A0
+                  A439FC8DCE5F22E790C885C62F8092CEF08FC32A61B7C39AD6FDE76FD821D806
+                  D8722475BC7109A0E41AF8B9B089B0AB7D465F842D81CD44727F645F00FDAD6F
+                  82750F79E441D85024F843760550D2017E07AC53C408DFC22A90E4E9EC09A09C
+                  D09FC21E8819E933D82044535913A00A7E85A1688F22D1F7B32380926BE18FC2
+                  3A188A7802D60DC9FE9E1501E6C13F6D38EACB48F685D217404917F8C3B0E686
+                  23FF09BB0D097F5FEA02AC851F663A6C1DD620E111A52B809281F05B133AF91C
+                  EE45D29F979E004A9AC0EF87F54858802F617D90F8A552136012FC1B0146F28E
+                  BE1BF68FEB734E91FB4AB027C70424BEAC740450D206BE16D6D667E43ED80090
+                  FEE611878FCFEDB09E3E71CEC0BA22CEF952116031FC5301464E01E1629F58D3
+                  E0170488351FB166A42F807296B5FC5D360D307A2208DFF68937017E6980585C
+                  35F640BCDAB405E07C7F50C0D1B341F8A24FBCD9F0B302C6FB18F11E4A4F00E5
+                  3CEFD78638620508C7F9C4E4FAA12A44CC0711F313FB022869267ACDDE35C451
+                  5B4178BF4FDC2DF0F78588794478D32C73AA4A56057806FEB59047D582B09B4F
+                  5CFEA66F0D19772AE22EB22780929B44AFF6AE0F7924E7F3AD8BAEED95B3E26B
+                  1532EE2FA21F8B676D09F00EFCD8288702ED3D1355D20EFEA78871DF42DC2793
+                  1740492FF83DB0AB2226DA1BA4FB3D62F786DF1B31EEA5BAD85F2527802E7371
+                  21724FC424896188B2DE237ED8A78A1BDB107B6092028C827F2F4682C46490BE
+                  E9117F32FCEB31E33F82F81F991740494BF8AF61B7C44C701E489FF5E0305149
+                  FA4E74E1E42FD302BC046FA224B50AA4A33C3856C18F34C0F13C38E69A134049
+                  47D1138ED60692DB0ED2C2F710E5AC04FB1BE0E06A9345D493A604580D6FAA14
+                  750CA49D3C788EC1DF6C88672578AAE20BA0A442F41ADD54ED848590160D2A3A
+                  BAA2C489925FEF302838D9EA079E5DD10550CEB39E01FA184A2A878E203EE1E2
+                  E2CFCC741FB046746BCD7BE6E923C0787833A5A77CF09BA97171F513DD47348D
+                  31E07A37BC00E6BB3B57620488D7B8F8788F599D0017AFB4EE9E65B8220254C3
+                  C72F3915C60C10CF77F191AB3A21BE57C057B8C8525000E52C47B963A3594209
+                  2D02F15417E74261CD30197877953C04E05C3D5EA9A9387682B8C2C5B913FEEE
+                  04393F04E7707F0194D3CFDF9C6022394C02F992BA051697B1417A0A71D1B0AB
+                  942780722ABB0784978B1DE4D6FEED2DF135EC2AB904E06F70A1A564D2427E69
+                  BE5E80E0DD9DAC83571DCB67E7DC02708D1EBEA4141DDF88AE2C11E5B02E16B9
+                  17E0C4A7FF2B80723ABAECDB05E9EEC4C5AFB02744DF95F51455DF087987E6A5
+                  799D851CD8556229FD684E00EEE31B628198180CD2C24F19E5E4B0C9521E1B91
+                  47A594E922E73E4BA45F807440D1110A63E2D51CC3A027054872CAEBC61C0830
+                  D3478039F0CF59CAA79A027055D6D712A1E9E6685CD450809F456F5BB781F510
+                  A0F8062AE5EC18AFB494CF590AC0A6A28DBB3FC16A502F8870C8E3E4EF10DD18
+                  6962299F8B14807DB51B2C11122C5BB33972D075F2DC16B34EA26FAC8E825314
+                  801B96CA2D9212BC12364AFE4468A8D8FBE673D84501B81F679A65E252C1AB14
+                  80EAEF4E3B939470576E261876574663C0069CFCC33901F83A0B5BD62DD2CECA
+                  1258202DC7C91FB97235C8AA2C5F4A88DAF7CF0AB8001B595F957615441E13DD
+                  0748AA189A36F816DA389CF407F59F14A809DE297A596AFBD19834580BE44ED5
+                  03799F7A5485F9318BA3A385854471DA5659032FF51F45BFB8C5F70CB6141C15
+                  B03BCC171F5932B335658E0B163C4E07DA3BF8FFCBD3692790362E03CAD5430D
+                  6206C1850000000049454E44AE426082}
+                ExplicitLeft = 1
+                ExplicitTop = 1
+                ExplicitWidth = 40
+                ExplicitHeight = 100
+              end
+            end
+            object pnlMensagemAviso: TPanel
+              Left = 72
+              Top = 0
+              Width = 353
+              Height = 98
+              Align = alClient
+              BevelOuter = bvNone
+              Color = clWhite
+              ParentBackground = False
+              TabOrder = 1
+              object lblAvisoFatura: TLabel
+                AlignWithMargins = True
+                Left = 10
+                Top = 10
+                Width = 333
+                Height = 78
+                Margins.Left = 10
+                Margins.Top = 10
+                Margins.Right = 10
+                Margins.Bottom = 10
+                Align = alClient
+                Caption = 
+                  'ATEN'#199#195'O! Se for definido que a conta possui FATURA DE CART'#195'O vin' +
+                  'culada, o DIA  de VENCIMENTO ser'#225' o dia cadastrado na mesma.'
+                Font.Charset = DEFAULT_CHARSET
+                Font.Color = clWindowText
+                Font.Height = -16
+                Font.Name = 'Tahoma'
+                Font.Style = [fsBold]
+                ParentFont = False
+                WordWrap = True
+                ExplicitHeight = 76
+              end
+            end
+          end
+        end
+        object pnlFundoGrupoParcelas: TPanel
+          Left = 798
+          Top = 363
+          Width = 443
+          Height = 163
+          BevelOuter = bvNone
+          Color = 5868590
+          ParentBackground = False
+          TabOrder = 13
+          Visible = False
+          object lblGrupoParcelas: TLabel
+            AlignWithMargins = True
+            Left = 3
+            Top = 3
+            Width = 437
+            Height = 19
+            Align = alTop
+            Caption = 'Grupo de Parcelas'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWhite
+            Font.Height = -16
+            Font.Name = 'Tahoma'
+            Font.Style = []
+            ParentFont = False
+            ExplicitWidth = 128
+          end
+          object grdGrupoParcelas: TDBGrid
+            AlignWithMargins = True
+            Left = 3
+            Top = 28
+            Width = 437
+            Height = 132
+            Align = alClient
+            ReadOnly = True
+            TabOrder = 0
+            TitleFont.Charset = DEFAULT_CHARSET
+            TitleFont.Color = clWindowText
+            TitleFont.Height = -16
+            TitleFont.Name = 'Tahoma'
+            TitleFont.Style = []
+            Columns = <
+              item
+                Expanded = False
+                FieldName = 'ID'
+                Title.Caption = 'Cod'
+                Width = 59
+                Visible = True
+              end
+              item
+                Expanded = False
+                FieldName = 'QTDPARC'
+                Title.Caption = 'Parcela'
+                Width = 70
+                Visible = True
+              end
+              item
+                Expanded = False
+                FieldName = 'VALOR_PARCELA'
+                Title.Caption = 'Valor'
+                Width = 100
+                Visible = True
+              end
+              item
+                Alignment = taCenter
+                Expanded = False
+                FieldName = 'DATA_VENCIMENTO'
+                Title.Caption = 'Data Vencimento'
+                Width = 126
+                Visible = True
+              end
+              item
+                Expanded = False
+                FieldName = 'STATUS'
+                Title.Caption = 'Status'
+                Width = 109
+                Visible = True
+              end>
+          end
+        end
       end
       inherited PanelTitulo: TPanel
-        Width = 1385
-        ExplicitWidth = 1381
+        Width = 1327
+        ExplicitWidth = 1323
         inherited lblTitulo: TLabel
           Left = 23
           ExplicitLeft = 23
@@ -694,16 +804,16 @@ inherited frmContasPagar: TfrmContasPagar
       end
     end
     inherited CardPesquisa: TCard
-      Width = 1385
+      Width = 1327
       Height = 642
       ExplicitLeft = 0
       ExplicitTop = 0
-      ExplicitWidth = 1381
-      ExplicitHeight = 641
+      ExplicitWidth = 1327
+      ExplicitHeight = 642
       inherited pnlPesquisa: TPanel
-        Width = 1381
+        Width = 1327
         Height = 153
-        ExplicitWidth = 1381
+        ExplicitWidth = 1327
         ExplicitHeight = 153
         inherited lblPesquisar: TLabel
           Left = 192
@@ -3502,7 +3612,7 @@ inherited frmContasPagar: TfrmContasPagar
           ExplicitWidth = 297
         end
         inherited btnPesquisae: TButton
-          Left = 1255
+          Left = 1201
           Top = 30
           Height = 93
           Margins.Top = 30
@@ -3510,7 +3620,7 @@ inherited frmContasPagar: TfrmContasPagar
           Margins.Bottom = 30
           ImageIndex = 6
           OnClick = btnPesquisaeClick
-          ExplicitLeft = 1263
+          ExplicitLeft = 1201
           ExplicitTop = 30
           ExplicitHeight = 93
         end
@@ -3778,10 +3888,10 @@ inherited frmContasPagar: TfrmContasPagar
       end
       inherited pnlBotoes: TPanel
         Top = 573
-        Width = 1385
+        Width = 1327
         BevelOuter = bvNone
-        ExplicitTop = 574
-        ExplicitWidth = 1389
+        ExplicitTop = 573
+        ExplicitWidth = 1327
         inherited btnIncluir: TButton
           Left = 3
           Top = 3
@@ -3820,17 +3930,17 @@ inherited frmContasPagar: TfrmContasPagar
           ExplicitHeight = 63
         end
         inherited btnSair: TButton
-          Left = 1266
+          Left = 1204
           Top = 3
           Height = 63
           ImageIndex = 14
-          ExplicitLeft = 1266
+          ExplicitLeft = 1204
           ExplicitTop = 3
           ExplicitHeight = 63
         end
         object gbLegenda: TGroupBox
           AlignWithMargins = True
-          Left = 1070
+          Left = 1008
           Top = 3
           Width = 190
           Height = 63
@@ -3957,14 +4067,14 @@ inherited frmContasPagar: TfrmContasPagar
       end
       inherited pnlGrid: TPanel
         Top = 153
-        Width = 1385
+        Width = 1327
         Height = 391
         ExplicitTop = 153
-        ExplicitWidth = 1389
-        ExplicitHeight = 392
+        ExplicitWidth = 1327
+        ExplicitHeight = 391
         inherited DBGrid1: TDBGrid
-          Width = 1387
-          Height = 390
+          Width = 1325
+          Height = 389
           Color = clWhite
           DataSource = DataSourceCPagar
           PopupMenu = PopupMenu
@@ -4063,17 +4173,15 @@ inherited frmContasPagar: TfrmContasPagar
       object pnlTotais: TPanel
         Left = 0
         Top = 544
-        Width = 1385
+        Width = 1327
         Height = 29
         Align = alBottom
         Color = clWindow
         ParentBackground = False
         TabOrder = 3
-        ExplicitTop = 545
-        ExplicitWidth = 1389
         object lblQtdCp: TLabel
           AlignWithMargins = True
-          Left = 980
+          Left = 918
           Top = 6
           Width = 70
           Height = 19
@@ -4091,7 +4199,7 @@ inherited frmContasPagar: TfrmContasPagar
         end
         object lblTotalCpGrid: TLabel
           AlignWithMargins = True
-          Left = 1255
+          Left = 1193
           Top = 6
           Width = 118
           Height = 19
@@ -4110,7 +4218,7 @@ inherited frmContasPagar: TfrmContasPagar
         end
         object lblTQtdCo: TLabel
           AlignWithMargins = True
-          Left = 812
+          Left = 750
           Top = 6
           Width = 162
           Height = 19
@@ -4122,7 +4230,7 @@ inherited frmContasPagar: TfrmContasPagar
         end
         object lblTValorCp: TLabel
           AlignWithMargins = True
-          Left = 1083
+          Left = 1021
           Top = 6
           Width = 166
           Height = 19
@@ -4136,8 +4244,8 @@ inherited frmContasPagar: TfrmContasPagar
     end
   end
   inherited ImageList1: TImageList
-    Left = 1256
-    Top = 280
+    Left = 1280
+    Top = 176
     Bitmap = {
       494C010111001800040020002000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000080000000A000000001002000000000000040
@@ -6789,8 +6897,8 @@ inherited frmContasPagar: TfrmContasPagar
   object DataSourceCPagar: TDataSource
     DataSet = dmCPagar.cdsCPagar
     OnDataChange = DataSourceCPagarDataChange
-    Left = 1248
-    Top = 344
+    Left = 1280
+    Top = 304
   end
   object cdsParcelas: TClientDataSet
     PersistDataPacket.Data = {
@@ -6803,8 +6911,8 @@ inherited frmContasPagar: TfrmContasPagar
     Aggregates = <>
     IndexFieldNames = 'Parcela'
     Params = <>
-    Left = 1145
-    Top = 282
+    Left = 1281
+    Top = 114
     object cdsParcelasPARCELA: TIntegerField
       FieldName = 'PARCELA'
     end
@@ -6821,13 +6929,13 @@ inherited frmContasPagar: TfrmContasPagar
   end
   object dsParcelas: TDataSource
     DataSet = cdsParcelas
-    Left = 1145
-    Top = 346
+    Left = 1281
+    Top = 234
   end
   object PopupMenu: TPopupMenu
     Images = ImageList1
-    Left = 1241
-    Top = 426
+    Left = 1281
+    Top = 370
     object CancelarBaixa1: TMenuItem
       Caption = 'Cancelar Baixa'
       ImageIndex = 16

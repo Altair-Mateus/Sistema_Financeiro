@@ -60,11 +60,11 @@
         <SanitizedProjectName>SistemaFinanceiro</SanitizedProjectName>
         <DCC_UnitSearchPath>modules\.dcp;modules\.dcu;modules;modules\bcrypt\src;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <VerInfo_Locale>1046</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=24.7.1.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=24.7.1.0;Comments=</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=24.7.2.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=24.7.2.0;Comments=</VerInfo_Keys>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_MajorVer>24</VerInfo_MajorVer>
         <VerInfo_MinorVer>7</VerInfo_MinorVer>
-        <VerInfo_Release>1</VerInfo_Release>
+        <VerInfo_Release>2</VerInfo_Release>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <DCC_UsePackage>DBXSqliteDriver;IndyIPCommon;RESTComponents;bindcompdbx;DBXInterBaseDriver;vcl;IndyIPServer;vclactnband;ZComponent;vclFireDAC;IndySystem;ZCore;bindcompvclsmp;tethering;svnui;bindcompvclwinx;dsnapcon;FireDACADSDriver;FireDACMSAccDriver;fmxFireDAC;vclimg;ZDbc;TeeDB;FireDAC;vcltouch;vcldb;bindcompfmx;svn;FireDACSqliteDriver;FireDACPgDriver;ibmonitor;inetdb;FMXTee;soaprtl;DbxCommonDriver;FmxTeeUI;ibxpress;fmx;FireDACIBDriver;fmxdae;xmlrtl;soapmidas;vcledge;fmxobj;vclwinx;ibxbindings;rtl;vclib;DbxClientDriver;Tee;CustomIPTransport;vcldsnap;dbexpress;IndyCore;vclx;ZParseSql;bindcomp;appanalytics;dsnap;ZPlain;RtmRxCtl270;FireDACCommon;IndyIPClient;frce;bindcompvcl;RESTBackendComponents;TeeUI;VCLRESTComponents;soapserver;dbxcds;VclSmp;adortl;vclie;bindengine;DBXMySQLDriver;CloudService;dsnapxml;FireDACMySQLDriver;dbrtl;IndyProtocols;inetdbxpress;ImportExcel;FireDACCommonODBC;FireDACCommonDriver;inet;fmxase;$(DCC_UsePackage)</DCC_UsePackage>
@@ -75,7 +75,7 @@
         <UWP_DelphiLogo44>SistemaFinanceiro_Icon.ico</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>SistemaFinanceiro_Icon.ico</UWP_DelphiLogo150>
         <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
-        <VerInfo_Keys>CompanyName=Dev Altair Mateus T Alencastro;FileDescription=Sistema Financeiro;FileVersion=24.7.1.0;InternalName=;LegalCopyright=Dev Altair Mateus T Alencastro;LegalTrademarks=;OriginalFilename=;ProgramID=;ProductName=Sistema Financeiro;ProductVersion=24.7.1.0;Comments=github.com/Altair-Mateus</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=Dev Altair Mateus T Alencastro;FileDescription=Sistema Financeiro;FileVersion=24.7.2.0;InternalName=;LegalCopyright=Dev Altair Mateus T Alencastro;LegalTrademarks=;OriginalFilename=;ProgramID=;ProductName=Sistema Financeiro;ProductVersion=24.7.2.0;Comments=github.com/Altair-Mateus</VerInfo_Keys>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win64)'!=''">
         <DCC_UsePackage>DBXSqliteDriver;IndyIPCommon;RESTComponents;bindcompdbx;DBXInterBaseDriver;vcl;IndyIPServer;vclactnband;ZComponent;vclFireDAC;IndySystem;ZCore;bindcompvclsmp;tethering;bindcompvclwinx;dsnapcon;FireDACADSDriver;FireDACMSAccDriver;fmxFireDAC;vclimg;ZDbc;TeeDB;FireDAC;vcltouch;vcldb;bindcompfmx;FireDACSqliteDriver;FireDACPgDriver;ibmonitor;inetdb;FMXTee;soaprtl;DbxCommonDriver;FmxTeeUI;ibxpress;fmx;FireDACIBDriver;fmxdae;xmlrtl;soapmidas;vcledge;fmxobj;vclwinx;ibxbindings;rtl;vclib;DbxClientDriver;Tee;CustomIPTransport;vcldsnap;dbexpress;IndyCore;vclx;ZParseSql;bindcomp;appanalytics;dsnap;ZPlain;FireDACCommon;IndyIPClient;bindcompvcl;RESTBackendComponents;TeeUI;VCLRESTComponents;soapserver;dbxcds;VclSmp;adortl;vclie;bindengine;DBXMySQLDriver;CloudService;dsnapxml;FireDACMySQLDriver;dbrtl;IndyProtocols;inetdbxpress;FireDACCommonODBC;FireDACCommonDriver;inet;fmxase;$(DCC_UsePackage)</DCC_UsePackage>
@@ -94,7 +94,7 @@
         <DCC_DcuOutput>.\dcu</DCC_DcuOutput>
         <DCC_ExeOutput>.\bin</DCC_ExeOutput>
         <Icon_MainIcon>SistemaFinanceiro_Icon.ico</Icon_MainIcon>
-        <VerInfo_Keys>CompanyName=Desenvolvedor Altair Mateus T Alencastro;FileDescription=Sistema Financeiro;FileVersion=24.7.1.0;InternalName=;LegalCopyright=Dev Altair Mateus T Alencastro;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=Sistema Financeiro;ProductVersion=24.7.1.0;Comments=github.com/Altair-Mateus</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=Desenvolvedor Altair Mateus T Alencastro;FileDescription=Sistema Financeiro;FileVersion=24.7.2.0;InternalName=;LegalCopyright=Dev Altair Mateus T Alencastro;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=Sistema Financeiro;ProductVersion=24.7.2.0;Comments=github.com/Altair-Mateus</VerInfo_Keys>
         <UWP_DelphiLogo44>img\ico_logo.ico</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>img\ico_logo.ico</UWP_DelphiLogo150>
     </PropertyGroup>
@@ -109,7 +109,7 @@
         <Icon_MainIcon>SistemaFinanceiro_Icon1.ico</Icon_MainIcon>
         <UWP_DelphiLogo44>SistemaFinanceiro_Icon1.ico</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>SistemaFinanceiro_Icon1.ico</UWP_DelphiLogo150>
-        <VerInfo_Keys>CompanyName=Dev Altair Mateus T Alencastro;FileDescription=Sistema Financeiro;FileVersion=24.7.1.0;InternalName=;LegalCopyright=Dev Altair Mateus T Alencastro;LegalTrademarks=;OriginalFilename=;ProgramID=;ProductName=Sistema Financeiro;ProductVersion=24.7.1.0;Comments=github.com/Altair-Mateus</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=Dev Altair Mateus T Alencastro;FileDescription=Sistema Financeiro;FileVersion=24.7.2.0;InternalName=;LegalCopyright=Dev Altair Mateus T Alencastro;LegalTrademarks=;OriginalFilename=;ProgramID=;ProductName=Sistema Financeiro;ProductVersion=24.7.2.0;Comments=github.com/Altair-Mateus</VerInfo_Keys>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">

@@ -5,6 +5,7 @@ inherited frmContasReceber: TfrmContasReceber
   WindowState = wsMaximized
   OnClose = FormClose
   OnDestroy = FormDestroy
+  ExplicitTop = -141
   ExplicitWidth = 1339
   ExplicitHeight = 680
   TextHeight = 19
@@ -146,7 +147,7 @@ inherited frmContasReceber: TfrmContasReceber
           Top = 295
           Width = 793
           Height = 249
-          ActiveCard = cardParcelaUnica
+          ActiveCard = cardParcelamento
           BevelOuter = bvNone
           Caption = 'CardPanel1'
           TabOrder = 6
@@ -495,10 +496,10 @@ inherited frmContasReceber: TfrmContasReceber
           OnClick = btnPesquisaClienteClick
         end
         object pnlFundoGrupoParcelas: TPanel
-          Left = 859
-          Top = 295
-          Width = 449
-          Height = 193
+          Left = 798
+          Top = 363
+          Width = 443
+          Height = 163
           BevelOuter = bvNone
           Color = 5868590
           ParentBackground = False
@@ -508,7 +509,7 @@ inherited frmContasReceber: TfrmContasReceber
             AlignWithMargins = True
             Left = 3
             Top = 3
-            Width = 443
+            Width = 437
             Height = 19
             Align = alTop
             Caption = 'Grupo de Parcelas'
@@ -524,8 +525,8 @@ inherited frmContasReceber: TfrmContasReceber
             AlignWithMargins = True
             Left = 3
             Top = 28
-            Width = 443
-            Height = 162
+            Width = 437
+            Height = 132
             Align = alClient
             DataSource = dsGrupoParcelas
             ReadOnly = True
@@ -535,7 +536,6 @@ inherited frmContasReceber: TfrmContasReceber
             TitleFont.Height = -16
             TitleFont.Name = 'Tahoma'
             TitleFont.Style = []
-            OnDrawColumnCell = grdGrupoParcelasDrawColumnCell
             Columns = <
               item
                 Expanded = False
@@ -5014,6 +5014,7 @@ inherited frmContasReceber: TfrmContasReceber
           MaxLength = 10
           NumbersOnly = True
           TabOrder = 8
+          OnChange = PesquisaClick
           OnExit = edtClienteExit
         end
         object btnPesqCliente: TButton

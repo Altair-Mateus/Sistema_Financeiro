@@ -61,7 +61,8 @@ type
   private
     FCr : TModelCR;
     procedure KeyPressValor(Sender: TObject; var Key: Char);
-    procedure AtualizaValores;
+    procedure AtualizaValoresValor;
+    procedure AtualizaValoresPorcentagem;
   public
     { Public declarations }
     procedure BaixarCR(pId: Integer);
@@ -77,44 +78,6 @@ implementation
 uses
   SistemaFinanceiro.Model.dmUsuarios,
   SistemaFinanceiro.Utilitarios;
-
-procedure TfrmBaixarCR.AtualizaValores;
-var
-  ValorCr: Double;
-  PorcentDesc: Double;
-  ValorDesc: Double;
-  ValorFinal: Double;
-begin
-  // Inicializa as variáveis
-  ValorCr := FCr.ValorParcela;
-  PorcentDesc := 0;
-  ValorDesc := 0;
-  ValorFinal := 0;
-
-  // Tenta converter os valores dos campos de texto para double
-  TryStrToFloat(edtPorcDesc.Text, PorcentDesc);
-  TryStrToFloat(edtValorDesc.Text, ValorDesc);
-
-  // Se a porcentagem de desconto for maior que zero, calcula o valor do desconto
-  if PorcentDesc >= 0 then
-  begin
-    ValorDesc := (PorcentDesc / 100) * ValorCr;
-    edtValorDesc.Text := FloatToStr(ValorDesc);
-  end
-  // Se o valor do desconto for maior que zero, calcula a porcentagem de desconto
-  else if ValorDesc >= 0 then
-  begin
-    PorcentDesc := (ValorDesc / ValorCr) * 100;
-    edtPorcDesc.Text := FloatToStr(PorcentDesc);
-  end;
-
-  // Calcula o valor final
-  ValorFinal := ValorCr - ValorDesc;
-
-  // Atualiza os campos de texto com os valores calculados
-  edtValor.Text := FloatToStr(ValorFinal);
-end;
-
 
 procedure TfrmBaixarCR.BaixarCR(pId: Integer);
 begin
@@ -283,13 +246,73 @@ end;
 procedure TfrmBaixarCR.edtPorcDescKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  AtualizaValores;
+  AtualizaValoresPorcentagem;
 end;
 
 procedure TfrmBaixarCR.edtValorDescKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  AtualizaValores;
+  AtualizaValoresValor;
+end;
+
+procedure TfrmBaixarCR.AtualizaValoresPorcentagem;
+var
+  ValorCr: Double;
+  PorcentDesc: Double;
+  ValorDesc: Double;
+  ValorFinal: Double;
+begin
+  // Inicializa as variáveis
+  ValorCr := FCr.ValorParcela;
+  PorcentDesc := 0;
+  ValorDesc := 0;
+  ValorFinal := 0;
+
+  // Tenta converter a porcentagem de desconto para double
+  TryStrToFloat(edtPorcDesc.Text, PorcentDesc);
+
+  // Calcula o valor do desconto se a porcentagem for válida
+  if PorcentDesc >= 0 then
+  begin
+    ValorDesc := (PorcentDesc / 100) * ValorCr;
+    edtValorDesc.Text := FloatToStr(ValorDesc);
+  end;
+
+  // Calcula o valor final
+  ValorFinal := ValorCr - ValorDesc;
+
+  // Atualiza os campos de texto com os valores calculados
+  edtValor.Text := FloatToStr(ValorFinal);
+end;
+
+procedure TfrmBaixarCR.AtualizaValoresValor;
+var
+  ValorCr: Double;
+  PorcentDesc: Double;
+  ValorDesc: Double;
+  ValorFinal: Double;
+begin
+  // Inicializa as variáveis
+  ValorCr := FCr.ValorParcela;
+  PorcentDesc := 0;
+  ValorDesc := 0;
+  ValorFinal := 0;
+
+  // Tenta converter o valor de desconto para double
+  TryStrToFloat(edtValorDesc.Text, ValorDesc);
+
+  // Calcula a porcentagem de desconto se o valor for válido
+  if ValorDesc >= 0 then
+  begin
+    PorcentDesc := (ValorDesc / ValorCr) * 100;
+    edtPorcDesc.Text := FloatToStr(PorcentDesc);
+  end;
+
+  // Calcula o valor final
+  ValorFinal := ValorCr - ValorDesc;
+
+  // Atualiza os campos de texto com os valores calculados
+  edtValor.Text := FloatToStr(ValorFinal);
 end;
 
 procedure TfrmBaixarCR.FormCreate(Sender: TObject);
