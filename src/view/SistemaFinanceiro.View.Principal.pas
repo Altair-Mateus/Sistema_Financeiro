@@ -1,4 +1,5 @@
 unit SistemaFinanceiro.View.Principal;
+
 interface
 uses
   Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
@@ -109,7 +110,6 @@ type
 
     procedure FormCreate(Sender: TObject);
     procedure mnuUsuariosClick(Sender: TObject);
-    procedure btnusuariosClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure btnCaixaClick(Sender: TObject);
     procedure Caixa1Click(Sender: TObject);
@@ -153,8 +153,6 @@ type
     procedure ExibeTelaRelMensalCR;
     procedure CarregaImgPrincipal;
 
-    function GetVesaoArq : String;
-
   public
     { Public declarations }
     procedure ResumoMensalCaixa;
@@ -167,6 +165,7 @@ var
 
 implementation
 {$R *.dfm}
+
 uses
   SistemaFinanceiro.Model.dmUsuarios,
   System.DateUtils,
@@ -207,9 +206,7 @@ begin
 
     end;
 
-
   end;
-
 
   //  Atualiza Logo Principal
   CarregaImgPrincipal;
@@ -261,12 +258,6 @@ begin
   ExibeTelaFonecedores;
 end;
 
-procedure TfrmPrincipal.btnusuariosClick(Sender: TObject);
-begin
-  ShowMessage('ssss');
-  ExibeTelaUsuario;
-end;
-
 procedure TfrmPrincipal.Caixa1Click(Sender: TObject);
 begin
   ExibeTelaCaixa;
@@ -283,11 +274,6 @@ begin
   begin
     imgLogo.Picture.LoadFromFile('img_logo.png');
   end;
-
-
-//  //  Mantem sempre no tamanho
-//  imgLogo.Width := 300;
-//  imgLogo.Height := 300;
 
 end;
 
@@ -308,18 +294,12 @@ begin
   frmFrPgto := TfrmFrPgto.Create(Self);
 
   try
-
     //  Exibe o form
     frmFrPgto.ShowModal;
-
   finally
-
     //  Libera da memoria
     FreeAndNil(frmFrPgto);
-
   end;
-
-
 end;
 
 procedure TfrmPrincipal.ExibeTelaRelMensalCP;
@@ -329,14 +309,10 @@ begin
   frmGeraRelResumoMensalCp := TfrmGeraRelResumoMensalCp.Create(Self);
 
   try
-
     //  Exibe o form
     frmGeraRelResumoMensalCp.ShowModal;
-
   finally
-
     FreeAndNil(frmGeraRelResumoMensalCp);
-
   end;
 
 end;
@@ -348,16 +324,11 @@ begin
   frmGeraRelResumoMensalCr := TfrmGeraRelResumoMensalCr.Create(Self);
 
   try
-
     //  Exibe o form
     frmGeraRelResumoMensalCr.ShowModal;
-
   finally
-
     FreeAndNil(frmGeraRelResumoMensalCr);
-
   end;
-
 
 end;
 
@@ -368,15 +339,11 @@ begin
   frmAjuda := TfrmAjuda.Create(Self);
 
   try
-
     //  Exibe o form
     frmAjuda.ShowModal;
-
   finally
-
     //  Libera da memoria
     FreeAndNil(frmAjuda);
-
   end;
 
 end;
@@ -388,15 +355,11 @@ begin
   frmCaixa := TfrmCaixa.Create(Self);
 
   try
-
     //  Exibe o form
     frmCaixa.ShowModal;
-
   finally
-
     //  Libera da memoria
     FreeAndNil(frmCaixa);
-
   end;
 
 end;
@@ -408,15 +371,11 @@ begin
   frmCliente := TfrmCliente.Create(Self);
 
   try
-
     //  Exibe o Form
     frmCliente.ShowModal;
-
   finally
-
     //  Libera da memoria
     FreeAndNil(frmCliente);
-
   end;
 
 end;
@@ -428,15 +387,11 @@ begin
   frmContasPagar := TfrmContasPagar.Create(Self);
 
   try
-
     //  Exibe o Form
     frmContasPagar.ShowModal;
-
   finally
-
     //  Libera da memoria
     FreeAndNil(frmContasPagar);
-
   end;
 end;
 
@@ -464,15 +419,11 @@ begin
   frmFaturaCartao := TfrmFaturaCartao.Create(Self);
 
   try
-
     //  Exibe o form
     frmFaturaCartao.ShowModal;
-
   finally
-
     //  Libera da memoria
     FreeAndNil(frmFaturaCartao);
-
   end;
 
 end;
@@ -484,15 +435,11 @@ begin
   frmFornecedores := TfrmFornecedores.Create(Self);
 
   try
-
     //  Exibe o form
     frmFornecedores.ShowModal;
-
   finally
-
     //  Libera da memoria
     FreeAndNil(frmFornecedores);
-
   end;
 
 end;
@@ -504,15 +451,11 @@ begin
   frmSaldoCaixa := TfrmSaldoCaixa.Create(Self);
 
   try
-
     //  Exibe o form
     frmSaldoCaixa.ShowModal;
-
   finally
-
     //  Libera da memoria
     FreeAndNil(frmSaldoCaixa);
-
   end;
 end;
 
@@ -523,12 +466,9 @@ begin
   frmUsuarios := TfrmUsuarios.Create(Self);
 
   try
-
     //  Exibe o Form
     frmUsuarios.ShowModal;
-
   finally
-
     //  Libera da memoria
     FreeAndNil(frmUsuarios);
   end
@@ -562,12 +502,10 @@ begin
 
  if Key = VK_F5 then
   begin
-
     //  Atualiza os valores da tela inicial
     ResumoMensalCaixa;
     TotalCP;
     TotalCR;
-
   end;
 end;
 
@@ -637,7 +575,7 @@ begin
     end;
   end;
 
-  Self.Caption := 'Sistema Financeiro ' + GetVesaoArq + ' - Desenvolvido por Altair Mateus T. Alencastro';
+  Self.Caption := 'Sistema Financeiro ' + TUtilitario.GetVesaoArq + ' - Desenvolvido por Altair Mateus T. Alencastro';
   CarregaImgPrincipal;
   ResumoMensalCaixa;
   TotalCP;
@@ -648,32 +586,6 @@ end;
 procedure TfrmPrincipal.Fornecedores1Click(Sender: TObject);
 begin
   ExibeTelaFonecedores;
-end;
-
-function TfrmPrincipal.GetVesaoArq: String;
-var
-  VerInfoSize: DWORD;
-  VerInfo: Pointer;
-  VerValueSize: DWORD;
-  VerValue: PVSFixedFileInfo;
-  Dummy: DWORD;
-
-begin
-
-  VerInfoSize := GetFileVersionInfoSize(PChar(ParamStr(0)), Dummy);
-  GetMem(VerInfo, VerInfoSize);
-  GetFileVersionInfo(PChar(ParamStr(0)), 0, VerInfoSize, VerInfo);
-  VerQueryValue(VerInfo, '\\', Pointer(VerValue), VerValueSize);
-
-  with VerValue^ do
-  begin
-    Result := IntToStr(dwFileVersionMS shr 16);
-    Result := Result + '.' + IntToStr(dwFileVersionMS and $FFFF);
-    Result := Result + '.' + IntToStr(dwFileVersionLS shr 16);
-  end;
-
-  FreeMem(VerInfo, VerInfoSize);
-
 end;
 
 procedure TfrmPrincipal.imgBtnFornecedoreClick(Sender: TObject);
@@ -698,7 +610,7 @@ end;
 
 procedure TfrmPrincipal.pnlNomeBtnFornecedoreClick(Sender: TObject);
 begin
-ExibeTelaFonecedores
+  ExibeTelaFonecedores
 end;
 
 procedure TfrmPrincipal.ResumoMensal1Click(Sender: TObject);

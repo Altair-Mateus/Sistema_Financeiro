@@ -23,6 +23,7 @@ type
     class function FormatarValor(Valor: Currency; Decimais: Integer = 2) : string; overload;
     class function FormatarValor(Valor: String; Decimais: Integer = 2) : string; overload;
     class function TruncarValor(Valor: Currency; Decimais: Integer = 2) : Currency;
+    class function GetVesaoArq : String;
     class procedure KeyPressValor(Sender: TObject; var Key: Char);
     class procedure FormatoMoedaGrid(Grid: TDBGrid; Column: TColumn; Rect: TRect; State: TGridDrawState);
     class procedure SalvarOrdemColunasParaJSON(pGrid: TDBGrid; const pNomeArquivo: string; const pGridName: string);
@@ -184,6 +185,32 @@ begin
   Result := TGUID.NewGuid.ToString;
   Result := StringReplace(Result, '{', '', [rfReplaceAll]);
   Result := StringReplace(Result, '}', '', [rfReplaceAll]);
+end;
+
+class function TUtilitario.GetVesaoArq: String;
+var
+  VerInfoSize: DWORD;
+  VerInfo: Pointer;
+  VerValueSize: DWORD;
+  VerValue: PVSFixedFileInfo;
+  Dummy: DWORD;
+
+begin
+
+  VerInfoSize := GetFileVersionInfoSize(PChar(ParamStr(0)), Dummy);
+  GetMem(VerInfo, VerInfoSize);
+  GetFileVersionInfo(PChar(ParamStr(0)), 0, VerInfoSize, VerInfo);
+  VerQueryValue(VerInfo, '\\', Pointer(VerValue), VerValueSize);
+
+  with VerValue^ do
+  begin
+    Result := IntToStr(dwFileVersionMS shr 16);
+    Result := Result + '.' + IntToStr(dwFileVersionMS and $FFFF);
+    Result := Result + '.' + IntToStr(dwFileVersionLS shr 16);
+  end;
+
+  FreeMem(VerInfo, VerInfoSize);
+
 end;
 
 class procedure TUtilitario.KeyPressValor(Sender: TObject; var Key: Char);

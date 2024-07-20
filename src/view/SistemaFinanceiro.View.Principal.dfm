@@ -48,9 +48,6 @@ object frmPrincipal: TfrmPrincipal
       Color = 51942
       ParentBackground = False
       TabOrder = 0
-      ExplicitLeft = 14
-      ExplicitTop = 14
-      ExplicitHeight = 163
       object lblSaldoCx: TLabel
         AlignWithMargins = True
         Left = 3
@@ -3975,9 +3972,6 @@ object frmPrincipal: TfrmPrincipal
       ParentBackground = False
       ParentFont = False
       TabOrder = 1
-      ExplicitLeft = 339
-      ExplicitTop = 14
-      ExplicitHeight = 163
       object lblCP: TLabel
         AlignWithMargins = True
         Left = 3
@@ -6724,9 +6718,6 @@ object frmPrincipal: TfrmPrincipal
       ParentBackground = False
       ParentFont = False
       TabOrder = 2
-      ExplicitLeft = 664
-      ExplicitTop = 14
-      ExplicitHeight = 163
       object lblCR: TLabel
         AlignWithMargins = True
         Left = 3
@@ -10877,6 +10868,7 @@ object frmPrincipal: TfrmPrincipal
       Align = alTop
       BevelOuter = bvNone
       TabOrder = 0
+      ExplicitWidth = 1164
       object pnlFundoBtnFornecedores: TPanel
         AlignWithMargins = True
         Left = 15
@@ -10904,10 +10896,6 @@ object frmPrincipal: TfrmPrincipal
           Color = clWhite
           ParentBackground = False
           TabOrder = 0
-          ExplicitLeft = 2
-          ExplicitTop = 2
-          ExplicitWidth = 165
-          ExplicitHeight = 96
           object pnlNomeBtnFornecedores: TPanel
             Left = 0
             Top = 74
@@ -10927,8 +10915,6 @@ object frmPrincipal: TfrmPrincipal
             ParentFont = False
             TabOrder = 0
             OnClick = btnFornecedoresClick
-            ExplicitTop = 73
-            ExplicitWidth = 165
           end
           object pnlImgBtnFornecedores: TPanel
             Left = 0
@@ -10941,8 +10927,6 @@ object frmPrincipal: TfrmPrincipal
             Color = clWhite
             ParentBackground = False
             TabOrder = 1
-            ExplicitWidth = 165
-            ExplicitHeight = 73
             object imgBtnFornecedores: TImage
               Left = 0
               Top = 0
@@ -11045,7 +11029,6 @@ object frmPrincipal: TfrmPrincipal
         ParentBackground = False
         TabOrder = 1
         OnClick = btnClienteClick
-        ExplicitLeft = 224
         object pnlBtnClientes: TPanel
           AlignWithMargins = True
           Left = 3
@@ -11058,7 +11041,6 @@ object frmPrincipal: TfrmPrincipal
           Color = clWhite
           ParentBackground = False
           TabOrder = 0
-          ExplicitWidth = 163
           object pnlNomeBtnClientes: TPanel
             Left = 0
             Top = 74
@@ -11078,8 +11060,6 @@ object frmPrincipal: TfrmPrincipal
             ParentFont = False
             TabOrder = 0
             OnClick = btnClienteClick
-            ExplicitTop = 80
-            ExplicitWidth = 163
           end
           object pnlImgBtnClientes: TPanel
             Left = 0
@@ -11092,7 +11072,6 @@ object frmPrincipal: TfrmPrincipal
             Color = clWhite
             ParentBackground = False
             TabOrder = 1
-            ExplicitWidth = 163
             object ImgBtnClientes: TImage
               Left = 0
               Top = 0
@@ -11201,7 +11180,6 @@ object frmPrincipal: TfrmPrincipal
         Color = 5934638
         ParentBackground = False
         TabOrder = 2
-        ExplicitLeft = 419
         object pnnlBtnCr: TPanel
           AlignWithMargins = True
           Left = 3
@@ -11214,7 +11192,6 @@ object frmPrincipal: TfrmPrincipal
           Color = clWhite
           ParentBackground = False
           TabOrder = 0
-          ExplicitWidth = 163
           object pnlNomeBtnCr: TPanel
             Left = 0
             Top = 74
@@ -11234,7 +11211,6 @@ object frmPrincipal: TfrmPrincipal
             ParentFont = False
             TabOrder = 0
             OnClick = btnContasReceberClick
-            ExplicitWidth = 163
           end
           object pnlImgBtnCr: TPanel
             Left = 0
@@ -11247,7 +11223,6 @@ object frmPrincipal: TfrmPrincipal
             Color = clWhite
             ParentBackground = False
             TabOrder = 1
-            ExplicitWidth = 163
             object imgBtnCr: TImage
               Left = 0
               Top = 0
@@ -11353,7 +11328,6 @@ object frmPrincipal: TfrmPrincipal
         Color = 5934638
         ParentBackground = False
         TabOrder = 3
-        ExplicitLeft = 628
         object pnlBtnCp: TPanel
           AlignWithMargins = True
           Left = 3
@@ -11366,7 +11340,6 @@ object frmPrincipal: TfrmPrincipal
           Color = clWhite
           ParentBackground = False
           TabOrder = 0
-          ExplicitWidth = 163
           object pnlNomeBtnCp: TPanel
             Left = 0
             Top = 74
@@ -11386,7 +11359,6 @@ object frmPrincipal: TfrmPrincipal
             ParentFont = False
             TabOrder = 0
             OnClick = btnContasPagarClick
-            ExplicitWidth = 163
           end
           object pnlImgBtnCp: TPanel
             Left = 0
@@ -11399,7 +11371,6 @@ object frmPrincipal: TfrmPrincipal
             Color = clWhite
             ParentBackground = False
             TabOrder = 1
-            ExplicitWidth = 163
             object imgBtnCp: TImage
               Left = 0
               Top = 0
@@ -11526,7 +11497,6 @@ object frmPrincipal: TfrmPrincipal
         Color = 5934638
         ParentBackground = False
         TabOrder = 4
-        ExplicitLeft = 851
         object pnlBtnCaixa: TPanel
           AlignWithMargins = True
           Left = 3
@@ -11539,7 +11509,6 @@ object frmPrincipal: TfrmPrincipal
           Color = clWhite
           ParentBackground = False
           TabOrder = 0
-          ExplicitWidth = 163
           object pnlNomeBtnCaixa: TPanel
             Left = 0
             Top = 74
@@ -11559,7 +11528,6 @@ object frmPrincipal: TfrmPrincipal
             ParentFont = False
             TabOrder = 0
             OnClick = btnFluxoCaixaClick
-            ExplicitWidth = 163
           end
           object pnlImgBtnCaixa: TPanel
             Left = 0
@@ -11572,7 +11540,6 @@ object frmPrincipal: TfrmPrincipal
             Color = clWhite
             ParentBackground = False
             TabOrder = 1
-            ExplicitWidth = 163
             object imgBtnCaixa: TImage
               Left = 0
               Top = 0

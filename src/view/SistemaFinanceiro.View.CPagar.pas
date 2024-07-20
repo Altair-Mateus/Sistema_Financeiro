@@ -1459,6 +1459,8 @@ var
   end;
 
 begin
+
+  lDataPrimeiraParcela := 0;
   if not ValidarCampos then
     Exit;
 
