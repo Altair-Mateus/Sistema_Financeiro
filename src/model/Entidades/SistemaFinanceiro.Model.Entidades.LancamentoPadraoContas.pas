@@ -3,7 +3,8 @@ unit SistemaFinanceiro.Model.Entidades.LancamentoPadraoContas;
 interface
 
 uses
-   uDBColumnAttribute, uDaoRTTI;
+   uDBColumnAttribute, uDaoRTTI, SistemaFinanceiro.Model.uSFQuery,
+  System.SysUtils, Winapi.Windows, Vcl.Forms;
 
 type
   [TDBTable('LANCAMENTO_PADRAO_CONTAS')]
@@ -19,6 +20,7 @@ type
     FDescricao: String;
     FId_Fornecedor: Integer;
     FId_Cliente: Integer;
+    function Load: Boolean;
 
     public
       [TDBColumnAttribute('ID', True, True)]
@@ -41,16 +43,18 @@ type
       constructor Create;
       destructor Destroy; override;
 
-      function Insert : Boolean;
-      function UpdateBySQLText(const pWhereClause: string = '') : Boolean;
-      function UpdateByPK : Boolean;
-      function UpdateByProp : Boolean;
-      function DeleteBySQLText(const pWhere : String = '') : Boolean;
-      function DeleteByPk : Boolean;
-      function DeleteByProp : Boolean;
-      function Load : Boolean;
+      function Insert: Boolean;
+      function UpdateBySQLText(const pWhereClause: string = ''): Boolean;
+      function UpdateByPK: Boolean;
+      function UpdateByProp: Boolean;
+      function DeleteBySQLText(const pWhere: String = ''): Boolean;
+      function DeleteByPk: Boolean;
+      function DeleteByProp: Boolean;
+      function LoadObjectByPK: Boolean;
+      procedure ResetPropertiesToDefault;
+      procedure AddPropertyToWhere(const APropertyName: String);
 
-      procedure AddPropertyToWhere(const APropertyName : String);
+      function Existe(const pId : Integer; const pCarrega : Boolean = false) : Boolean;
 
   end;
 
@@ -67,36 +71,22 @@ end;
 constructor TModelLancamentoPadrao.Create;
 begin
   FDaoRTTI := TDaoRTTI.Create;
+  ResetPropertiesToDefault;
 end;
 
 function TModelLancamentoPadrao.DeleteByPk: Boolean;
 begin
-
-  Result := False;
-
-  if FDaoRTTI.DeleteByPK(Self) then
-    Result := True;
-
+  Result := FDaoRTTI.DeleteByPK(Self);
 end;
 
 function TModelLancamentoPadrao.DeleteByProp: Boolean;
 begin
-
-  Result := False;
-
-  if FDaoRTTI.DeleteByProp(Self) then
-    Result := True;
-
+  Result := FDaoRTTI.DeleteByProp(Self);
 end;
 
 function TModelLancamentoPadrao.DeleteBySQLText(const pWhere: String): Boolean;
 begin
-
-  Result := False;
-
-  if FDaoRTTI.DeleteBySQLText(Self, pWhere) then
-    Result := True;
-
+  Result := FDaoRTTI.DeleteBySQLText(Self, pWhere);
 end;
 
 destructor TModelLancamentoPadrao.Destroy;
@@ -105,55 +95,78 @@ begin
   inherited;
 end;
 
+function TModelLancamentoPadrao.Existe(const pId: Integer;
+  const pCarrega: Boolean): Boolean;
+var
+  lQuery : TSFQuery;
+begin
+  Result := False;
+  lQuery := TSFQuery.Create(nil);
+  try
+    try
+      lQuery.Close;
+      lQuery.SQL.Clear;
+      lQuery.SQL.Add(' SELECT ID FROM CONTAS_RECEBER ');
+      lQuery.SQL.Add(' WHERE ID = :ID                ');
+      lQuery.ParamByName('ID').AsInteger := pId;
+      lQuery.Open;
+
+      if (lQuery.RecordCount > 0) then
+      begin
+        Result := True;
+        if pCarrega then
+        begin
+          FID := pId;
+          LoadObjectByPK;
+        end;
+      end;
+
+    except
+      on E : Exception do
+      begin
+        Application.MessageBox(PWideChar('Erro ao realizar a consulta: ' + E.Message), 'Atenção', MB_OK + MB_ICONERROR);
+      end;
+    end;
+  finally
+    lQuery.Free;
+  end;
+
+end;
+
 function TModelLancamentoPadrao.Insert: Boolean;
 begin
-
-  Result := False;
-
-  if FDaoRTTI.Insert(Self) then
-    Result := True;
-
+  Result := FDaoRTTI.Insert(Self);
 end;
 
 function TModelLancamentoPadrao.Load: Boolean;
 begin
+  Result := FDaoRTTI.LoadObjectByPK(Self);
+end;
 
-  Result := False;
+function TModelLancamentoPadrao.LoadObjectByPK: Boolean;
+begin
+  Result := FDaoRTTI.LoadObjectByPK(Self);
+end;
 
-  if FDaoRTTI.LoadObjectByPK(Self) then
-    Result := True;
-
+procedure TModelLancamentoPadrao.ResetPropertiesToDefault;
+begin
+  FDaoRTTI.ResetPropertiesToDefault(Self);
 end;
 
 function TModelLancamentoPadrao.UpdateByPK: Boolean;
 begin
-
-  Result := False;
-
-  if FDaoRTTI.UpdateByPK(Self) then
-    Result := True;
-
+  Result := FDaoRTTI.UpdateByPK(Self);
 end;
 
 function TModelLancamentoPadrao.UpdateByProp: Boolean;
 begin
-
-  Result := False;
-
-  if FDaoRTTI.UpdateByProp(Self) then
-    Result := True;
-
+  Result := FDaoRTTI.UpdateByProp(Self);
 end;
 
 function TModelLancamentoPadrao.UpdateBySQLText(
   const pWhereClause: string): Boolean;
 begin
-
-  Result := False;
-
-  if FDaoRTTI.UpdateBySQLText(Self, pWhereClause) then
-    Result := True;
-
+  Result := FDaoRTTI.UpdateBySQLText(Self, pWhereClause);
 end;
 
 end.
