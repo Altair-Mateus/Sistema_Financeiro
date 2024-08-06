@@ -1,4 +1,4 @@
-object frmLancamentoPadraoContas: TfrmLancamentoPadraoContas
+object frmConsultaLancamentoPadraoContas: TfrmConsultaLancamentoPadraoContas
   Left = 0
   Top = 0
   BorderIcons = [biSystemMenu, biMaximize]
@@ -12,6 +12,9 @@ object frmLancamentoPadraoContas: TfrmLancamentoPadraoContas
   Font.Name = 'Tahoma'
   Font.Style = []
   Position = poOwnerFormCenter
+  OnClose = FormClose
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
   OnShow = FormShow
   TextHeight = 19
   object pnlContainer: TPanel
@@ -111,7 +114,7 @@ object frmLancamentoPadraoContas: TfrmLancamentoPadraoContas
       TabOrder = 1
       ExplicitWidth = 717
       ExplicitHeight = 317
-      object DBGrid1: TDBGrid
+      object grdLancPadrao: TDBGrid
         Left = 1
         Top = 1
         Width = 719
@@ -126,7 +129,7 @@ object frmLancamentoPadraoContas: TfrmLancamentoPadraoContas
         TitleFont.Height = -16
         TitleFont.Name = 'Tahoma'
         TitleFont.Style = []
-        OnDrawColumnCell = DBGrid1DrawColumnCell
+        OnDrawColumnCell = grdLancPadraoDrawColumnCell
         Columns = <
           item
             Expanded = False
@@ -206,6 +209,7 @@ object frmLancamentoPadraoContas: TfrmLancamentoPadraoContas
         Height = 27
         Align = alCustom
         TabOrder = 0
+        OnChange = PesquisaClick
       end
       object btnPesquisae: TButton
         AlignWithMargins = True
@@ -220,7 +224,7 @@ object frmLancamentoPadraoContas: TfrmLancamentoPadraoContas
         ImageIndex = 5
         Images = ImageList1
         TabOrder = 1
-        OnClick = btnPesquisaeClick
+        OnClick = PesquisaClick
         ExplicitLeft = 593
       end
       object cbTipo: TComboBox
@@ -232,6 +236,7 @@ object frmLancamentoPadraoContas: TfrmLancamentoPadraoContas
         ItemIndex = 0
         TabOrder = 2
         Text = 'TODOS'
+        OnClick = PesquisaClick
         Items.Strings = (
           'TODOS'
           'Contas a Pagar'
@@ -1838,7 +1843,7 @@ object frmLancamentoPadraoContas: TfrmLancamentoPadraoContas
       000000000000}
   end
   object dsLancPadraoContas: TDataSource
-    Left = 624
-    Top = 249
+    Left = 648
+    Top = 225
   end
 end

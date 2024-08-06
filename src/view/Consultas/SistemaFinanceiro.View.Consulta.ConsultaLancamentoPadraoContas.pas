@@ -3,13 +3,28 @@ unit SistemaFinanceiro.View.Consulta.ConsultaLancamentoPadraoContas;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Data.DB, Vcl.StdCtrls,
-  Vcl.Grids, Vcl.DBGrids, System.ImageList, Vcl.ImgList,
-  SistemaFinanceiro.View.Cadastro.LancamentoPadraoContas;
+  Winapi.Windows,
+  Winapi.Messages,
+  System.SysUtils,
+  System.Variants,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  Vcl.ExtCtrls,
+  Data.DB,
+  Vcl.StdCtrls,
+  Vcl.Grids,
+  Vcl.DBGrids,
+  System.ImageList,
+  Vcl.ImgList,
+  SistemaFinanceiro.View.Cadastro.LancamentoPadraoContas,
+  uEnumsUtils,
+  SistemaFinanceiro.Model.uSFQuery;
 
 type
-  TfrmLancamentoPadraoContas = class(TForm)
+  TfrmConsultaLancamentoPadraoContas = class(TForm)
     pnlContainer: TPanel;
     pnlBotoes: TPanel;
     btnIncluir: TButton;
@@ -18,7 +33,7 @@ type
     btnImprimir: TButton;
     btnVoltar: TButton;
     pnlGrid: TPanel;
-    DBGrid1: TDBGrid;
+    grdLancPadrao: TDBGrid;
     pnlPesquisa: TPanel;
     lblPesquisar: TLabel;
     lblTipo: TLabel;
@@ -28,12 +43,18 @@ type
     ImageList1: TImageList;
     dsLancPadraoContas: TDataSource;
     procedure btnVoltarClick(Sender: TObject);
-    procedure btnPesquisaeClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure btnIncluirClick(Sender: TObject);
-    procedure DBGrid1DrawColumnCell(Sender: TObject; const Rect: TRect;
+    procedure grdLancPadraoDrawColumnCell(Sender: TObject; const Rect: TRect;
       DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure FormCreate(Sender: TObject);
+    procedure PesquisaClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormDestroy(Sender: TObject);
   private
+    FTelaAtiva : Boolean;
+    FTipoLancamento : TTipoLancamento;
+    FQueryPesquisa: TSFQuery;
     procedure Pesquisar;
     procedure HabilitaBotoes;
   public
@@ -41,42 +62,40 @@ type
   end;
 
 var
-  frmLancamentoPadraoContas: TfrmLancamentoPadraoContas;
+  frmConsultaLancamentoPadraoContas: TfrmConsultaLancamentoPadraoContas;
 
 implementation
 
 {$R *.dfm}
 
 uses
-  SistemaFinanceiro.Utilitarios, SistemaFinanceiro.Model.uSFQuery;
+  SistemaFinanceiro.Utilitarios;
 
-procedure TfrmLancamentoPadraoContas.btnIncluirClick(Sender: TObject);
+procedure TfrmConsultaLancamentoPadraoContas.btnIncluirClick(Sender: TObject);
+var
+  lFormulario : TfrmCadLancamentoPadrao;
 begin
 
-  frmCadLancamentoPadrao := TfrmCadLancamentoPadrao.Create(Self);
+  lFormulario := TfrmCadLancamentoPadrao.Create(Self);
   try
-    frmCadLancamentoPadrao.ShowModal;
+    lFormulario.OperacaoCadastro := ocIncluir;
+    lFormulario.ShowModal;
   finally
-    FreeAndNil(frmCadLancamentoPadrao);
+    FreeAndNil(lFormulario);
   end;
 
 end;
 
-procedure TfrmLancamentoPadraoContas.btnPesquisaeClick(Sender: TObject);
-begin
-  Pesquisar;
-end;
-
-procedure TfrmLancamentoPadraoContas.btnVoltarClick(Sender: TObject);
+procedure TfrmConsultaLancamentoPadraoContas.btnVoltarClick(Sender: TObject);
 begin
   Close;
 end;
 
-procedure TfrmLancamentoPadraoContas.DBGrid1DrawColumnCell(Sender: TObject;
+procedure TfrmConsultaLancamentoPadraoContas.grdLancPadraoDrawColumnCell(Sender: TObject;
   const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
 begin
 
-  if not Odd(DBGrid1.DataSource.DataSet.RecNo) then
+  if not Odd(grdLancPadrao.DataSource.DataSet.RecNo) then
   begin
 
     if not(gdSelected in State) then
@@ -89,53 +108,89 @@ begin
 
   if (gdSelected in State) then
   begin
-    DBGrid1.Canvas.Brush.Color := $00578B2E;  // Define a cor de fundo da célula selecionada
-    DBGrid1.Canvas.Font.Color := clWhite;  // Define a cor do texto da célula selecionada
+    grdLancPadrao.Canvas.Brush.Color := $00578B2E;  // Define a cor de fundo da célula selecionada
+    grdLancPadrao.Canvas.Font.Color := clWhite;  // Define a cor do texto da célula selecionada
   end;
 
   // Desenha a célula com as propriedades de cor atualizadas
-  DBGrid1.DefaultDrawColumnCell(Rect, DataCol, Column, State);
+  grdLancPadrao.DefaultDrawColumnCell(Rect, DataCol, Column, State);
 
 end;
 
-procedure TfrmLancamentoPadraoContas.FormShow(Sender: TObject);
+procedure TfrmConsultaLancamentoPadraoContas.FormClose(Sender: TObject;
+  var Action: TCloseAction);
 begin
-  Pesquisar;
+  TUtilitario.SalvarOrdemColunasParaJSON(grdLancPadrao, 'ConfigGrids', 'grdLancamentoPadrao');
 end;
 
-procedure TfrmLancamentoPadraoContas.HabilitaBotoes;
+procedure TfrmConsultaLancamentoPadraoContas.FormCreate(Sender: TObject);
+begin
+  FTelaAtiva := False;
+
+end;
+
+procedure TfrmConsultaLancamentoPadraoContas.FormDestroy(Sender: TObject);
+begin
+   if Assigned(FQueryPesquisa) then
+    FQueryPesquisa.Free;
+end;
+
+procedure TfrmConsultaLancamentoPadraoContas.FormShow(Sender: TObject);
+begin
+  TUtilitario.CarregarOrdemColunasJSON(grdLancPadrao, 'ConfigGrids', 'grdLancamentoPadrao');
+  FTelaAtiva := True;
+  Pesquisar;
+  edtPesquisar.SetFocus;
+end;
+
+procedure TfrmConsultaLancamentoPadraoContas.HabilitaBotoes;
 begin
   btnAlterar.Enabled  := not dsLancPadraoContas.DataSet.IsEmpty;
   btnExcluir.Enabled  := not dsLancPadraoContas.DataSet.IsEmpty;
   btnImprimir.Enabled := not dsLancPadraoContas.DataSet.IsEmpty;
 end;
 
-procedure TfrmLancamentoPadraoContas.Pesquisar;
+procedure TfrmConsultaLancamentoPadraoContas.PesquisaClick(Sender: TObject);
+begin
+  if (FTelaAtiva) then
+    Pesquisar;
+end;
+
+procedure TfrmConsultaLancamentoPadraoContas.Pesquisar;
 var
-  LFiltroEdit, LFiltro : String;
-  lQuery : TSFQuery;
+  LFiltroEdit, LFiltro: String;
 begin
 
-  LFiltroEdit := TUtilitario.LikeFind(edtPesquisar.Text, DBGrid1);
-  LFiltro := '';
+  if Assigned(FQueryPesquisa) then
+    FreeAndNil(FQueryPesquisa);
 
-  case cbTipo.ItemIndex of
-    1 : LFiltro := lFiltro + ' AND TIPO = ''CP'' ';
-    2 : LFiltro := LFiltro + ' AND TIPO = ''CR'' ';
+  FQueryPesquisa := TSFQuery.Create(nil);
+  try
+    LFiltroEdit := TUtilitario.LikeFind(edtPesquisar.Text, grdLancPadrao);
+    LFiltro := '';
+
+    case cbTipo.ItemIndex of
+      1:
+        LFiltro := LFiltro + ' AND TIPO = ''CP'' ';
+      2:
+        LFiltro := LFiltro + ' AND TIPO = ''CR'' ';
+    end;
+
+    FQueryPesquisa.Close;
+    FQueryPesquisa.SQL.Add(' SELECT * FROM LANCAMENTO_PADRAO_CONTAS ');
+    FQueryPesquisa.SQL.Add(' WHERE 1 = 1');
+    FQueryPesquisa.SQL.Add(LFiltroEdit + LFiltro);
+    FQueryPesquisa.Open();
+
+    grdLancPadrao.DataSource.DataSet := FQueryPesquisa;
+
+  except
+    on e: Exception do
+    begin
+      Application.MessageBox(PWidechar('Erro ao realizar a consulta: ' +
+        e.Message), 'Atenção', MB_OK + MB_ICONERROR);
+    end;
   end;
-
-//  lQuery := TSFQuery.Create;
-//  try
-//
-//    lQuery.Close;
-//    lQuery.SQL.Add('SELECT * FROM LANCAMENTO_PADRAO_CONTAS WHERE 1 = 1');
-//    lQuery.SQL.Add('')
-//    dsLancPadraoContas.DataSet := lQuery.ExecuteQuery('SELECT * FROM LANCAMENTO_PADRAO_CONTAS WHERE 1 = 1' +
-//      LFiltroEdit + LFiltro + 'ORDER BY 1', []);
-//
-//  finally
-//    lQuery.Free;
-//  end;
 
   HabilitaBotoes;
 

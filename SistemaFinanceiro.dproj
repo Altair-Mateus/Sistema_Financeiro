@@ -347,12 +347,10 @@
         <DCCReference Include="src\model\Entidades\SistemaFinanceiro.Model.Entidades.PgtoBxCr.pas"/>
         <DCCReference Include="src\model\Entidades\SistemaFinanceiro.Model.Entidades.LancamentoPadraoContas.pas"/>
         <DCCReference Include="src\view\Consultas\SistemaFinanceiro.View.Consulta.ConsultaLancamentoPadraoContas.pas">
-            <Form>frmLancamentoPadraoContas</Form>
-            <FormType>dfm</FormType>
+            <Form>frmConsultaLancamentoPadraoContas</Form>
         </DCCReference>
         <DCCReference Include="src\view\Cadastro\SistemaFinanceiro.View.Cadastro.LancamentoPadraoContas.pas">
             <Form>frmCadLancamentoPadrao</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>

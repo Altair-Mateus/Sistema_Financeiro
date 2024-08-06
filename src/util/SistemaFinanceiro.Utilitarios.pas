@@ -13,7 +13,7 @@ uses
   Data.DB,
   System.Generics.Collections,
   System.IOUtils,
-  System.JSON.Writers, System.JSON.Types;
+  System.JSON.Writers, System.JSON.Types, Vcl.Forms, Winapi.Messages;
 
 type
   TUtilitario = class
@@ -24,10 +24,13 @@ type
     class function FormatarValor(Valor: String; Decimais: Integer = 2) : string; overload;
     class function TruncarValor(Valor: Currency; Decimais: Integer = 2) : Currency;
     class function GetVesaoArq : String;
+
     class procedure KeyPressValor(Sender: TObject; var Key: Char);
     class procedure FormatoMoedaGrid(Grid: TDBGrid; Column: TColumn; Rect: TRect; State: TGridDrawState);
     class procedure SalvarOrdemColunasParaJSON(pGrid: TDBGrid; const pNomeArquivo: string; const pGridName: string);
     class procedure CarregarOrdemColunasJSON(pGrid: TDBGrid; const pNomeArquivo: string; const pGridName: string);
+    class procedure FecharFormulario(pFormulario: TForm);
+
   end;
 
 implementation
@@ -142,6 +145,11 @@ begin
   end;
 end;
 
+
+class procedure TUtilitario.FecharFormulario(pFormulario: TForm);
+begin
+  PostMessage(pFormulario.Handle, WM_CLOSE, 0, 0);
+end;
 
 class function TUtilitario.FormatarValor(Valor: String;
   Decimais: Integer): string;

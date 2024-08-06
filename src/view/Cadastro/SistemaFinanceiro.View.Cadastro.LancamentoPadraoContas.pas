@@ -3,17 +3,29 @@ unit SistemaFinanceiro.View.Cadastro.LancamentoPadraoContas;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls,
-  Vcl.WinXCtrls, System.ImageList, Vcl.ImgList;
+  Winapi.Windows,
+  Winapi.Messages,
+  System.SysUtils,
+  System.Variants,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  Vcl.ExtCtrls,
+  Vcl.StdCtrls,
+  Vcl.WinXCtrls,
+  System.ImageList,
+  Vcl.ImgList,
+  uEnumsUtils,
+  SistemaFinanceiro.Model.Entidades.LancamentoPadraoContas;
 
 type
   TfrmCadLancamentoPadrao = class(TForm)
     pnlContainer: TPanel;
-    PanelCampos: TPanel;
+    pnlCampos: TPanel;
     lblDescricao: TLabel;
-    PanelTitulo: TPanel;
-    lblTitulo: TLabel;
+    pnlTitulo: TPanel;
     pnlBotoesCad: TPanel;
     btnSalvar: TButton;
     btnCancelar: TButton;
@@ -36,10 +48,17 @@ type
     procedure rdgTipoClick(Sender: TObject);
     procedure btnSalvarClick(Sender: TObject);
     procedure btnCancelarClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
   private
-    { Private declarations }
+    FTelaAtiva : Boolean;
+    FOperacaoCadastro: TOperacaoCadastro;
+    FCodLancamento: Integer;
+    FLancamentoPadrao : TModelLancamentoPadrao;
+    function CarregaDadosAlteracao : Boolean;
   public
-    { Public declarations }
+    property OperacaoCadastro: TOperacaoCadastro read FOperacaoCadastro write FOperacaoCadastro;
+    property CodLancamento: Integer read FCodLancamento write FCodLancamento;
   end;
 
 var
@@ -49,7 +68,7 @@ implementation
 
 {$R *.dfm}
 
-uses SistemaFinanceiro.Model.Entidades.LancamentoPadraoContas;
+uses SistemaFinanceiro.Utilitarios;
 
 procedure TfrmCadLancamentoPadrao.btnCancelarClick(Sender: TObject);
 begin
@@ -58,71 +77,106 @@ end;
 
 procedure TfrmCadLancamentoPadrao.btnSalvarClick(Sender: TObject);
 var
-  lLancamentoPadrao : TModelLancamentoPadrao;
-
+  lTipo : Integer;
+  lGravado : Boolean;
 begin
 
-  try
+  lGravado := False;
+  lTipo := rdgTipo.ItemIndex;
 
-    lLancamentoPadrao := TModelLancamentoPadrao.Create;
-    try
+  // validar
+  if lTipo < 0 then
+  begin
 
-      lLancamentoPadrao.Data_Cadastro := StrToDateTime(Trim(edtDtCad.Text));
-      lLancamentoPadrao.Descricao := Trim(edtDescricao.Text);
+  end;
 
-      case rdgTipo.ItemIndex of
+  FLancamentoPadrao.Descricao := Trim(edtDescricao.Text);
+  FLancamentoPadrao.Tipo := lTipo;
+  FLancamentoPadrao.Status := Ord(ToggleStatus.State);
 
-        0 :
-        begin
-          lLancamentoPadrao.Id_Fornecedor := StrToInt(edtIdCliFornec.Text);
-          lLancamentoPadrao.Tipo := 'CP';
-        end;
+  if not Trim(edtIdCliFornec.Text).IsEmpty then
+  begin
+    case lTipo of
+      0 : FLancamentoPadrao.Id_Cliente := Trim(edtIdCliFornec.Text).ToInteger;
+      1 : FLancamentoPadrao.Id_Fornecedor := Trim(edtIdCliFornec.Text).ToInteger;
+    end;
+  end;
 
-        1 :
-        begin
-          lLancamentoPadrao.Id_Cliente := StrToInt(edtIdCliFornec.Text);
-          lLancamentoPadrao.Tipo := 'CR';
-        end;
-
+  case FOperacaoCadastro of
+    ocIncluir:
+      begin
+        FLancamentoPadrao.Data_Cadastro := Now;
+        lGravado := FLancamentoPadrao.Insert;
       end;
-
-      if ToggleStatus.State = tssOn then
-        lLancamentoPadrao.Status := 'A'
-      else
-        lLancamentoPadrao.Status := 'I';
-
-      if lLancamentoPadrao.Insert then
-        Application.MessageBox('Registro Salvo com Sucesso!', 'Informação', MB_OK + MB_ICONINFORMATION);
-
-    finally
-      lLancamentoPadrao.Free;
-    end;
-
-  except
-    on E: Exception do
-    begin
-//      Application.MessageBox('Somente Administradores podem redefinir a senha!', 'Erro: ' + E.Message, MB_OK + MB_ICONERROR);
-    end;
+    ocAlterar:
+      begin
+        FLancamentoPadrao.Data_Alteracao := Now;
+        lGravado := FLancamentoPadrao.UpdateByPK;
+      end;
   end;
 
 end;
 
+function TfrmCadLancamentoPadrao.CarregaDadosAlteracao: Boolean;
+begin
+  Result := False;
+
+  FLancamentoPadrao.Id := FCodLancamento;
+  if (FLancamentoPadrao.LoadObjectByPK) then
+  begin
+    Result := True;
+
+    edtDescricao.Text := FLancamentoPadrao.Descricao;
+    edtDtCad.Text := DateToStr(FLancamentoPadrao.Data_Cadastro);
+    edtDtAlt.Text := DateToStr(FLancamentoPadrao.Data_Alteracao);
+    rdgTipo.ItemIndex := FLancamentoPadrao.Tipo;
+
+    case FLancamentoPadrao.Tipo of
+      0 : edtIdCliFornec.Text := FLancamentoPadrao.Id_Cliente.ToString;
+      1 : edtIdCliFornec.Text := FLancamentoPadrao.Id_Fornecedor.ToString;
+    end;
+
+    ToggleStatus.State := TToggleSwitchState(FLancamentoPadrao.Status);
+
+  end;
+end;
+
+procedure TfrmCadLancamentoPadrao.FormActivate(Sender: TObject);
+begin
+  if not(FTelaAtiva) then
+  begin
+
+    FTelaAtiva := True;
+    FLancamentoPadrao := TModelLancamentoPadrao.Create;
+
+    if (FOperacaoCadastro = ocAlterar) and (FCodLancamento > 0) then
+    begin
+      if not(CarregaDadosAlteracao) then
+      begin
+        TUtilitario.FecharFormulario(Self)
+      end;
+
+      pnlTitulo.Caption := 'Alterando Lançamento Nº ' + FLancamentoPadrao.Id.ToString;
+    end;
+  end;
+end;
+
+procedure TfrmCadLancamentoPadrao.FormCreate(Sender: TObject);
+begin
+  FTelaAtiva := False;
+end;
+
 procedure TfrmCadLancamentoPadrao.FormShow(Sender: TObject);
 begin
-
-
   edtDtCad.Text := DateTimeToStr(Now);
   ToggleStatus.State := tssOn;
-
 end;
 
 procedure TfrmCadLancamentoPadrao.rdgTipoClick(Sender: TObject);
 begin
-
   //  Libera para informar cliente ou fornecedor
-  edtIdCliFornec.Enabled;
-  btnPesquisar.Enabled;
-
+  edtIdCliFornec.Enabled := True;
+  btnPesquisar.Enabled := True;
 end;
 
 end.

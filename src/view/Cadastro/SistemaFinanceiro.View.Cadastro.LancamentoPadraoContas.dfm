@@ -1,6 +1,7 @@
 object frmCadLancamentoPadrao: TfrmCadLancamentoPadrao
   Left = 0
   Top = 0
+  BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'Cadastro de Lan'#231'amento Padr'#227'o'
   ClientHeight = 462
   ClientWidth = 718
@@ -11,6 +12,8 @@ object frmCadLancamentoPadrao: TfrmCadLancamentoPadrao
   Font.Name = 'Tahoma'
   Font.Style = []
   Position = poOwnerFormCenter
+  OnActivate = FormActivate
+  OnCreate = FormCreate
   OnShow = FormShow
   TextHeight = 19
   object pnlContainer: TPanel
@@ -19,23 +22,25 @@ object frmCadLancamentoPadrao: TfrmCadLancamentoPadrao
     Width = 718
     Height = 462
     Align = alClient
+    BevelOuter = bvNone
     TabOrder = 0
-    ExplicitWidth = 624
-    ExplicitHeight = 441
-    object PanelCampos: TPanel
-      Left = 1
-      Top = 42
-      Width = 716
-      Height = 350
+    ExplicitWidth = 714
+    ExplicitHeight = 461
+    object pnlCampos: TPanel
+      Left = 0
+      Top = 41
+      Width = 718
+      Height = 352
       Margins.Top = 0
       Align = alClient
       BevelOuter = bvNone
       Color = clWhite
       ParentBackground = False
       TabOrder = 0
-      ExplicitTop = 37
-      ExplicitWidth = 626
-      ExplicitHeight = 330
+      ExplicitLeft = 1
+      ExplicitTop = 42
+      ExplicitWidth = 712
+      ExplicitHeight = 349
       object lblDescricao: TLabel
         Left = 32
         Top = 16
@@ -65,8 +70,8 @@ object frmCadLancamentoPadrao: TfrmCadLancamentoPadrao
         Height = 113
         Caption = 'Tipo'
         Items.Strings = (
-          'Contas a Pagar'
-          'Contas a Receber')
+          'Contas a Receber'
+          'Contas a Pagar')
         TabOrder = 1
         OnClick = rdgTipoClick
       end
@@ -92,6 +97,7 @@ object frmCadLancamentoPadrao: TfrmCadLancamentoPadrao
           Width = 134
           Height = 27
           Color = clWhite
+          Enabled = False
           MaxLength = 20
           TabOrder = 0
         end
@@ -173,10 +179,10 @@ object frmCadLancamentoPadrao: TfrmCadLancamentoPadrao
         ThumbColor = 5737262
       end
     end
-    object PanelTitulo: TPanel
-      Left = 1
-      Top = 1
-      Width = 716
+    object pnlTitulo: TPanel
+      Left = 0
+      Top = 0
+      Width = 718
       Height = 41
       Margins.Left = 0
       Margins.Top = 0
@@ -184,37 +190,32 @@ object frmCadLancamentoPadrao: TfrmCadLancamentoPadrao
       Margins.Bottom = 0
       Align = alTop
       BevelOuter = bvNone
-      Color = 5737262
+      Caption = 'Inserindo um novo Lan'#231'amento Padr'#227'o de Contas'
+      Color = 5868590
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWhite
+      Font.Height = -19
+      Font.Name = 'Tahoma'
+      Font.Style = []
       ParentBackground = False
+      ParentFont = False
       TabOrder = 1
-      ExplicitWidth = 622
-      object lblTitulo: TLabel
-        Left = 16
-        Top = 9
-        Width = 397
-        Height = 23
-        Caption = 'Inserindo um novo Lan'#231'amento Padr'#227'o de Contas'
-        Color = 5934893
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindow
-        Font.Height = -19
-        Font.Name = 'Myriad Pro'
-        Font.Style = []
-        ParentColor = False
-        ParentFont = False
-      end
+      ExplicitLeft = 1
+      ExplicitTop = 1
+      ExplicitWidth = 712
     end
     object pnlBotoesCad: TPanel
-      Left = 1
-      Top = 392
-      Width = 716
+      Left = 0
+      Top = 393
+      Width = 718
       Height = 69
       Align = alBottom
       Color = 5934638
       ParentBackground = False
       TabOrder = 2
-      ExplicitTop = 371
-      ExplicitWidth = 622
+      ExplicitLeft = 1
+      ExplicitTop = 391
+      ExplicitWidth = 712
       object btnSalvar: TButton
         Left = 1
         Top = 1
@@ -247,8 +248,8 @@ object frmCadLancamentoPadrao: TfrmCadLancamentoPadrao
     ColorDepth = cd32Bit
     Height = 32
     Width = 32
-    Left = 560
-    Top = 384
+    Left = 656
+    Top = 328
     Bitmap = {
       494C010108001800040020002000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       00000000000036000000280000008000000060000000010020000000000000C0
@@ -1844,8 +1845,8 @@ object frmCadLancamentoPadrao: TfrmCadLancamentoPadrao
   object ImageList16x16: TImageList
     ColorDepth = cd32Bit
     DrawingStyle = dsTransparent
-    Left = 441
-    Top = 388
+    Left = 657
+    Top = 252
     Bitmap = {
       494C010101000800040010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
