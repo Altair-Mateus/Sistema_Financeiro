@@ -109,11 +109,14 @@ begin
 
       if (lQuery.RecordCount > 0) then
       begin
-        Result := True;
         if pCarrega then
         begin
           FID := pId;
-          LoadObjectByPK;
+          Result := LoadObjectByPK;
+        end
+        else
+        begin
+          Result := True;
         end;
       end;
 
@@ -146,11 +149,14 @@ begin
 
       if (lQuery.RecordCount > 0) then
       begin
-        Result := True;
         if pCarrega then
         begin
           FID := lQuery.FieldByName('ID').AsInteger;
-          LoadObjectByPK;
+          Result := LoadObjectByPK;
+        end
+        else
+        begin
+          Result := True;
         end;
       end;
 

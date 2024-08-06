@@ -13,10 +13,10 @@ type
   private
     FDaoRTTI : TDaoRTTI;
     FId: Integer;
-    FTipo: String;
+    FTipo: Integer;
     FData_Cadastro: TDateTime;
     FData_Alteracao: TDateTime;
-    FStatus: String;
+    FStatus: SmallInt;
     FDescricao: String;
     FId_Fornecedor: Integer;
     FId_Cliente: Integer;
@@ -26,13 +26,13 @@ type
       [TDBColumnAttribute('ID', True, True)]
       property Id: Integer read FId write FId;
       [TDBColumnAttribute('TIPO')]
-      property Tipo: String read FTipo write FTipo;
+      property Tipo: Integer read FTipo write FTipo;
       [TDBColumnAttribute('DATA_CADASTRO')]
       property Data_Cadastro: TDateTime read FData_Cadastro write FData_Cadastro;
       [TDBColumnAttribute('DATA_ALTERACAO')]
       property Data_Alteracao: TDateTime read FData_Alteracao write FData_Alteracao;
       [TDBColumnAttribute('STATUS')]
-      property Status: String read FStatus write FStatus;
+      property Status: SmallInt read FStatus write FStatus;
       [TDBColumnAttribute('DESCRICAO')]
       property Descricao: String read FDescricao write FDescricao;
       [TDBColumnAttribute('ID_FORNECEDOR')]
@@ -106,18 +106,21 @@ begin
     try
       lQuery.Close;
       lQuery.SQL.Clear;
-      lQuery.SQL.Add(' SELECT ID FROM CONTAS_RECEBER ');
+      lQuery.SQL.Add(' SELECT ID FROM LANCAMENTO_PADRAO_CONTAS ');
       lQuery.SQL.Add(' WHERE ID = :ID                ');
       lQuery.ParamByName('ID').AsInteger := pId;
       lQuery.Open;
 
       if (lQuery.RecordCount > 0) then
       begin
-        Result := True;
         if pCarrega then
         begin
           FID := pId;
-          LoadObjectByPK;
+          Result := LoadObjectByPK;
+        end
+        else
+        begin
+          Result := True;
         end;
       end;
 
