@@ -29,15 +29,15 @@ type
       property Tipo: Integer read FTipo write FTipo;
       [TDBColumnAttribute('DATA_CADASTRO')]
       property Data_Cadastro: TDateTime read FData_Cadastro write FData_Cadastro;
-      [TDBColumnAttribute('DATA_ALTERACAO')]
+      [TDBColumnAttribute('DATA_ALTERACAO', False, False, True)]
       property Data_Alteracao: TDateTime read FData_Alteracao write FData_Alteracao;
       [TDBColumnAttribute('STATUS')]
       property Status: SmallInt read FStatus write FStatus;
-      [TDBColumnAttribute('DESCRICAO')]
+      [TDBColumnAttribute('DESCRICAO', False, False, True)]
       property Descricao: String read FDescricao write FDescricao;
-      [TDBColumnAttribute('ID_FORNECEDOR')]
+      [TDBColumnAttribute('ID_FORNECEDOR', False, False, True)]
       property Id_Fornecedor: Integer read FId_Fornecedor write FId_Fornecedor;
-      [TDBColumnAttribute('ID_CLIENTE')]
+      [TDBColumnAttribute('ID_CLIENTE', False, False, True)]
       property Id_Cliente: Integer read FId_Cliente write FId_Cliente;
 
       constructor Create;

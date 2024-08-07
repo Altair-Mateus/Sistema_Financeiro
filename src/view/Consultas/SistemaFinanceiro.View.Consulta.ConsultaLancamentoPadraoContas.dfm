@@ -63,6 +63,7 @@ object frmConsultaLancamentoPadraoContas: TfrmConsultaLancamentoPadraoContas
         ImageIndex = 1
         Images = ImageList1
         TabOrder = 1
+        OnClick = btnAlterarClick
       end
       object btnExcluir: TButton
         AlignWithMargins = True
@@ -130,6 +131,7 @@ object frmConsultaLancamentoPadraoContas: TfrmConsultaLancamentoPadraoContas
         TitleFont.Name = 'Tahoma'
         TitleFont.Style = []
         OnDrawColumnCell = grdLancPadraoDrawColumnCell
+        OnDblClick = grdLancPadraoDblClick
         Columns = <
           item
             Expanded = False
@@ -233,14 +235,11 @@ object frmConsultaLancamentoPadraoContas: TfrmConsultaLancamentoPadraoContas
         Width = 171
         Height = 27
         Style = csDropDownList
-        ItemIndex = 0
         TabOrder = 2
-        Text = 'TODOS'
         OnClick = PesquisaClick
         Items.Strings = (
-          'TODOS'
-          'Contas a Pagar'
-          'Contas a Receber')
+          'Contas a Receber'
+          'Contas a Pagar')
       end
     end
   end

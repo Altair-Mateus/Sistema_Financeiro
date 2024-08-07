@@ -63,11 +63,12 @@ uses
   uDaoRTTI in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\model\uDaoRTTI.pas',
   uDBColumnAttribute in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\model\uDBColumnAttribute.pas' {$R *.res},
   SistemaFinanceiro.Model.uSFQuery in 'src\model\SistemaFinanceiro.Model.uSFQuery.pas',
-  uEnumsUtils in '..\New Delphi\Classes_Compartilhadas\Enums\uEnumsUtils.pas',
   SistemaFinanceiro.Model.Entidades.PgtoBxCr in 'src\model\Entidades\SistemaFinanceiro.Model.Entidades.PgtoBxCr.pas',
   SistemaFinanceiro.Model.Entidades.LancamentoPadraoContas in 'src\model\Entidades\SistemaFinanceiro.Model.Entidades.LancamentoPadraoContas.pas',
   SistemaFinanceiro.View.Consulta.ConsultaLancamentoPadraoContas in 'src\view\Consultas\SistemaFinanceiro.View.Consulta.ConsultaLancamentoPadraoContas.pas' {frmConsultaLancamentoPadraoContas},
-  SistemaFinanceiro.View.Cadastro.LancamentoPadraoContas in 'src\view\Cadastro\SistemaFinanceiro.View.Cadastro.LancamentoPadraoContas.pas' {frmCadLancamentoPadrao};
+  SistemaFinanceiro.View.Cadastro.LancamentoPadraoContas in 'src\view\Cadastro\SistemaFinanceiro.View.Cadastro.LancamentoPadraoContas.pas' {frmCadLancamentoPadrao},
+  uEnumsUtils in '..\New Delphi\Classes_Compartilhadas\Gerais\Enums\uEnumsUtils.pas',
+  fMensagem in '..\New Delphi\Classes_Compartilhadas\Gerais\Forms\fMensagem.pas' {frmMensagem};
 
 {$R *.res}
 
@@ -85,5 +86,6 @@ begin
   Application.CreateForm(TdmPgtoBxCp, dmPgtoBxCp);
   Application.CreateForm(TdmFaturaCartao, dmFaturaCartao);
   Application.CreateForm(TfrmPrincipal, frmPrincipal);
+  Application.CreateForm(TfrmMensagem, frmMensagem);
   Application.Run;
 end.

@@ -18,7 +18,7 @@ uses
   System.ImageList,
   Vcl.ImgList,
   uEnumsUtils,
-  SistemaFinanceiro.Model.Entidades.LancamentoPadraoContas;
+  SistemaFinanceiro.Model.Entidades.LancamentoPadraoContas, fMensagem;
 
 type
   TfrmCadLancamentoPadrao = class(TForm)
@@ -78,16 +78,15 @@ end;
 procedure TfrmCadLancamentoPadrao.btnSalvarClick(Sender: TObject);
 var
   lTipo : Integer;
-  lGravado : Boolean;
 begin
 
-  lGravado := False;
   lTipo := rdgTipo.ItemIndex;
 
   // validar
   if lTipo < 0 then
   begin
-
+    TfrmMensagem.TelaMensagem('Atenção!', 'Obrigatório informar o Tipo do lançamento!', tmAviso);
+    exit;
   end;
 
   FLancamentoPadrao.Descricao := Trim(edtDescricao.Text);
@@ -106,14 +105,16 @@ begin
     ocIncluir:
       begin
         FLancamentoPadrao.Data_Cadastro := Now;
-        lGravado := FLancamentoPadrao.Insert;
+        FLancamentoPadrao.Insert;
       end;
     ocAlterar:
       begin
         FLancamentoPadrao.Data_Alteracao := Now;
-        lGravado := FLancamentoPadrao.UpdateByPK;
+        FLancamentoPadrao.UpdateByPK;
       end;
   end;
+
+  Close;
 
 end;
 
@@ -127,16 +128,17 @@ begin
     Result := True;
 
     edtDescricao.Text := FLancamentoPadrao.Descricao;
-    edtDtCad.Text := DateToStr(FLancamentoPadrao.Data_Cadastro);
-    edtDtAlt.Text := DateToStr(FLancamentoPadrao.Data_Alteracao);
+    edtDtCad.Text := DateTimeToStr(FLancamentoPadrao.Data_Cadastro);
     rdgTipo.ItemIndex := FLancamentoPadrao.Tipo;
-
-    case FLancamentoPadrao.Tipo of
-      0 : edtIdCliFornec.Text := FLancamentoPadrao.Id_Cliente.ToString;
-      1 : edtIdCliFornec.Text := FLancamentoPadrao.Id_Fornecedor.ToString;
-    end;
-
     ToggleStatus.State := TToggleSwitchState(FLancamentoPadrao.Status);
+
+    if FLancamentoPadrao.Id_Cliente > 0 then
+      edtIdCliFornec.Text := FLancamentoPadrao.Id_Cliente.ToString
+    else if FLancamentoPadrao.Id_Fornecedor > 0 then
+      FLancamentoPadrao.Id_Fornecedor.ToString;
+
+    if FLancamentoPadrao.Data_Alteracao > 0 then
+      edtDtAlt.Text := DateTimeToStr(FLancamentoPadrao.Data_Alteracao);
 
   end;
 end;
@@ -153,7 +155,8 @@ begin
     begin
       if not(CarregaDadosAlteracao) then
       begin
-        TUtilitario.FecharFormulario(Self)
+        TfrmMensagem.TelaMensagem('Erro!', 'Erro ao recuperar dados do lançamento padrão nº ' + FCodLancamento.ToString, tmErro);
+        TUtilitario.FecharFormulario(Self);
       end;
 
       pnlTitulo.Caption := 'Alterando Lançamento Nº ' + FLancamentoPadrao.Id.ToString;

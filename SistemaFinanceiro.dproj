@@ -343,7 +343,6 @@
             <Form>$R *.res</Form>
         </DCCReference>
         <DCCReference Include="src\model\SistemaFinanceiro.Model.uSFQuery.pas"/>
-        <DCCReference Include="..\New Delphi\Classes_Compartilhadas\Enums\uEnumsUtils.pas"/>
         <DCCReference Include="src\model\Entidades\SistemaFinanceiro.Model.Entidades.PgtoBxCr.pas"/>
         <DCCReference Include="src\model\Entidades\SistemaFinanceiro.Model.Entidades.LancamentoPadraoContas.pas"/>
         <DCCReference Include="src\view\Consultas\SistemaFinanceiro.View.Consulta.ConsultaLancamentoPadraoContas.pas">
@@ -351,6 +350,11 @@
         </DCCReference>
         <DCCReference Include="src\view\Cadastro\SistemaFinanceiro.View.Cadastro.LancamentoPadraoContas.pas">
             <Form>frmCadLancamentoPadrao</Form>
+        </DCCReference>
+        <DCCReference Include="..\New Delphi\Classes_Compartilhadas\Gerais\Enums\uEnumsUtils.pas"/>
+        <DCCReference Include="..\New Delphi\Classes_Compartilhadas\Gerais\Forms\fMensagem.pas">
+            <Form>frmMensagem</Form>
+            <FormType>dfm</FormType>
         </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>

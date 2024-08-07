@@ -37,10 +37,8 @@ object frmCadLancamentoPadrao: TfrmCadLancamentoPadrao
       Color = clWhite
       ParentBackground = False
       TabOrder = 0
-      ExplicitLeft = 1
-      ExplicitTop = 42
-      ExplicitWidth = 712
-      ExplicitHeight = 349
+      ExplicitWidth = 714
+      ExplicitHeight = 351
       object lblDescricao: TLabel
         Left = 32
         Top = 16
@@ -200,9 +198,7 @@ object frmCadLancamentoPadrao: TfrmCadLancamentoPadrao
       ParentBackground = False
       ParentFont = False
       TabOrder = 1
-      ExplicitLeft = 1
-      ExplicitTop = 1
-      ExplicitWidth = 712
+      ExplicitWidth = 714
     end
     object pnlBotoesCad: TPanel
       Left = 0
@@ -213,9 +209,8 @@ object frmCadLancamentoPadrao: TfrmCadLancamentoPadrao
       Color = 5934638
       ParentBackground = False
       TabOrder = 2
-      ExplicitLeft = 1
-      ExplicitTop = 391
-      ExplicitWidth = 712
+      ExplicitTop = 392
+      ExplicitWidth = 714
       object btnSalvar: TButton
         Left = 1
         Top = 1

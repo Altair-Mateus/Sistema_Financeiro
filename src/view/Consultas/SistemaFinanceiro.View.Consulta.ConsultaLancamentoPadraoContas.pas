@@ -51,14 +51,19 @@ type
     procedure PesquisaClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormDestroy(Sender: TObject);
+    procedure btnAlterarClick(Sender: TObject);
+    procedure grdLancPadraoDblClick(Sender: TObject);
   private
     FTelaAtiva : Boolean;
     FTipoLancamento : TTipoLancamento;
     FQueryPesquisa: TSFQuery;
     procedure Pesquisar;
     procedure HabilitaBotoes;
+    procedure PreparaTela;
+    procedure EditarRegistro;
+    procedure QueryTipoGetText(Sender: TField; var Text: string; DisplayText: Boolean);
   public
-    { Public declarations }
+    property TipoLancamento: TTipoLancamento read FTipoLancamento write FTipoLancamento;
   end;
 
 var
@@ -70,6 +75,11 @@ implementation
 
 uses
   SistemaFinanceiro.Utilitarios;
+
+procedure TfrmConsultaLancamentoPadraoContas.btnAlterarClick(Sender: TObject);
+begin
+  EditarRegistro;
+end;
 
 procedure TfrmConsultaLancamentoPadraoContas.btnIncluirClick(Sender: TObject);
 var
@@ -84,11 +94,18 @@ begin
     FreeAndNil(lFormulario);
   end;
 
+  Pesquisar;
 end;
 
 procedure TfrmConsultaLancamentoPadraoContas.btnVoltarClick(Sender: TObject);
 begin
   Close;
+end;
+
+procedure TfrmConsultaLancamentoPadraoContas.grdLancPadraoDblClick(
+  Sender: TObject);
+begin
+  EditarRegistro
 end;
 
 procedure TfrmConsultaLancamentoPadraoContas.grdLancPadraoDrawColumnCell(Sender: TObject;
@@ -126,7 +143,7 @@ end;
 procedure TfrmConsultaLancamentoPadraoContas.FormCreate(Sender: TObject);
 begin
   FTelaAtiva := False;
-
+  FTipoLancamento := tlTodos;
 end;
 
 procedure TfrmConsultaLancamentoPadraoContas.FormDestroy(Sender: TObject);
@@ -137,10 +154,7 @@ end;
 
 procedure TfrmConsultaLancamentoPadraoContas.FormShow(Sender: TObject);
 begin
-  TUtilitario.CarregarOrdemColunasJSON(grdLancPadrao, 'ConfigGrids', 'grdLancamentoPadrao');
-  FTelaAtiva := True;
-  Pesquisar;
-  edtPesquisar.SetFocus;
+  PreparaTela;
 end;
 
 procedure TfrmConsultaLancamentoPadraoContas.HabilitaBotoes;
@@ -148,6 +162,47 @@ begin
   btnAlterar.Enabled  := not dsLancPadraoContas.DataSet.IsEmpty;
   btnExcluir.Enabled  := not dsLancPadraoContas.DataSet.IsEmpty;
   btnImprimir.Enabled := not dsLancPadraoContas.DataSet.IsEmpty;
+end;
+
+procedure TfrmConsultaLancamentoPadraoContas.PreparaTela;
+begin
+
+  TUtilitario.CarregarOrdemColunasJSON(grdLancPadrao, 'ConfigGrids', 'grdLancamentoPadrao');
+
+  //  Se vier da tela de CR ou CP irá filtrar somente os lançamento de acordo com a origem
+  if (FTipoLancamento <> tlTodos) then
+  begin
+    cbTipo.ItemIndex := Ord(FTipoLancamento);
+    cbTipo.Enabled := False;
+  end;
+
+  FTelaAtiva := True;
+  Pesquisar;
+  edtPesquisar.SetFocus;
+end;
+
+procedure TfrmConsultaLancamentoPadraoContas.QueryTipoGetText(Sender: TField;
+  var Text: string; DisplayText: Boolean);
+begin
+  case Sender.AsInteger of
+    0: Text := 'CR';
+    1: Text := 'CP';
+  end;
+end;
+
+procedure TfrmConsultaLancamentoPadraoContas.EditarRegistro;
+var
+  lFormulario: TfrmCadLancamentoPadrao;
+begin
+  lFormulario := TfrmCadLancamentoPadrao.Create(Self);
+  try
+    lFormulario.OperacaoCadastro := ocAlterar;
+    lFormulario.CodLancamento := grdLancPadrao.DataSource.DataSet.FieldByName('ID').AsInteger;
+    lFormulario.ShowModal;
+  finally
+    FreeAndNil(lFormulario);
+  end;
+  Pesquisar;
 end;
 
 procedure TfrmConsultaLancamentoPadraoContas.PesquisaClick(Sender: TObject);
@@ -165,24 +220,36 @@ begin
     FreeAndNil(FQueryPesquisa);
 
   FQueryPesquisa := TSFQuery.Create(nil);
+  LFiltro := '';
+  LFiltroEdit := '';
   try
+
+    // Pré pesquisa para funcionar o likefind
+    FQueryPesquisa.Close;
+    FQueryPesquisa.SQL.Clear;
+    FQueryPesquisa.SQL.Add(' SELECT FIRST 1 * FROM LANCAMENTO_PADRAO_CONTAS ');
+    FQueryPesquisa.Open();
+
+    grdLancPadrao.DataSource.DataSet := FQueryPesquisa;
     LFiltroEdit := TUtilitario.LikeFind(edtPesquisar.Text, grdLancPadrao);
-    LFiltro := '';
+
 
     case cbTipo.ItemIndex of
+      0:
+        LFiltro := LFiltro + ' AND TIPO = 0 ';
       1:
-        LFiltro := LFiltro + ' AND TIPO = ''CP'' ';
-      2:
-        LFiltro := LFiltro + ' AND TIPO = ''CR'' ';
+        LFiltro := LFiltro + ' AND TIPO = 1 ';
     end;
 
     FQueryPesquisa.Close;
+    FQueryPesquisa.SQL.Clear;
     FQueryPesquisa.SQL.Add(' SELECT * FROM LANCAMENTO_PADRAO_CONTAS ');
     FQueryPesquisa.SQL.Add(' WHERE 1 = 1');
     FQueryPesquisa.SQL.Add(LFiltroEdit + LFiltro);
     FQueryPesquisa.Open();
 
-    grdLancPadrao.DataSource.DataSet := FQueryPesquisa;
+    if FQueryPesquisa.RecordCount > 0 then
+      FQueryPesquisa.FieldByName('TIPO').OnGetText := QueryTipoGetText;
 
   except
     on e: Exception do
