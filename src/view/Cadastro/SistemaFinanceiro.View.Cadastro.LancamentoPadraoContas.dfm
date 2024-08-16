@@ -3,8 +3,8 @@ object frmCadLancamentoPadrao: TfrmCadLancamentoPadrao
   Top = 0
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'Cadastro de Lan'#231'amento Padr'#227'o'
-  ClientHeight = 462
-  ClientWidth = 718
+  ClientHeight = 461
+  ClientWidth = 714
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -19,13 +19,11 @@ object frmCadLancamentoPadrao: TfrmCadLancamentoPadrao
   object pnlContainer: TPanel
     Left = 0
     Top = 0
-    Width = 718
-    Height = 462
+    Width = 714
+    Height = 461
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitWidth = 714
-    ExplicitHeight = 461
     object pnlCampos: TPanel
       Left = 0
       Top = 41
@@ -182,7 +180,7 @@ object frmCadLancamentoPadrao: TfrmCadLancamentoPadrao
     object pnlTitulo: TPanel
       Left = 0
       Top = 0
-      Width = 718
+      Width = 714
       Height = 41
       Margins.Left = 0
       Margins.Top = 0
@@ -200,19 +198,16 @@ object frmCadLancamentoPadrao: TfrmCadLancamentoPadrao
       ParentBackground = False
       ParentFont = False
       TabOrder = 1
-      ExplicitWidth = 714
     end
     object pnlBotoesCad: TPanel
       Left = 0
-      Top = 393
-      Width = 718
+      Top = 392
+      Width = 714
       Height = 69
       Align = alBottom
       Color = 5934638
       ParentBackground = False
       TabOrder = 2
-      ExplicitTop = 392
-      ExplicitWidth = 714
       object btnSalvar: TButton
         Left = 1
         Top = 1

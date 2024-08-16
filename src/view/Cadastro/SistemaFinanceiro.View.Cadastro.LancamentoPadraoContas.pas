@@ -153,7 +153,7 @@ begin
     if FLancamentoPadrao.Id_Cliente > 0 then
       edtIdCliFornec.Text := FLancamentoPadrao.Id_Cliente.ToString
     else if FLancamentoPadrao.Id_Fornecedor > 0 then
-      FLancamentoPadrao.Id_Fornecedor.ToString;
+      edtIdCliFornec.Text := FLancamentoPadrao.Id_Fornecedor.ToString;
 
     if FLancamentoPadrao.Data_Alteracao > 0 then
       edtDtAlt.Text := DateTimeToStr(FLancamentoPadrao.Data_Alteracao);
