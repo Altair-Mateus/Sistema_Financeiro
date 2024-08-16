@@ -32,41 +32,41 @@ type
     FData_Alteracao: TDateTime;
     FStatus_Cli: String;
   public
-    [TDBColumn('ID', True)]
+    [TDBColumn('ID_CLI', True)]
     property Id_Cli: Integer read FId_Cli write FId_Cli;
     [TDBColumn('NOME')]
     property Nome: String read FNome write FNome;
     [TDBColumn('TIPO')]
     property Tipo: String read FTipo write FTipo;
-    [TDBColumn('CPF')]
+    [TDBColumn('CPF', False, False, True)]
     property Cpf: String read FCpf write FCpf;
-    [TDBColumn('CNPJ')]
+    [TDBColumn('CNPJ', False, False, True)]
     property Cnpj: String read FCnpj write FCnpj;
-    [TDBColumn('IE')]
+    [TDBColumn('IE', False, False, True)]
     property Ie: String read FIe write FIe;
-    [TDBColumn('ENDERECO')]
+    [TDBColumn('ENDERECO', False, False, True)]
     property Endereco: String read FEndereco write FEndereco;
-    [TDBColumn('N_LOGRADOURO')]
+    [TDBColumn('N_LOGRADOURO', False, False, True)]
     property N_Logradouro: String read FN_Logradouro write FN_Logradouro;
-    [TDBColumn('BAIRRO')]
+    [TDBColumn('BAIRRO', False, False, True)]
     property Bairro: String read FBairro write FBairro;
-    [TDBColumn('CIDADE')]
+    [TDBColumn('CIDADE', False, False, True)]
     property Cidade: String read FCidade write FCidade;
-    [TDBColumn('ESTADO')]
+    [TDBColumn('ESTADO', False, False, True)]
     property Estado: String read FEstado write FEstado;
-    [TDBColumn('CEP')]
+    [TDBColumn('CEP', False, False, True)]
     property Cep: String read FCep write FCep;
-    [TDBColumn('CELULAR')]
+    [TDBColumn('CELULAR', False, False, True)]
     property Celular: String read FCelular write FCelular;
-    [TDBColumn('TELEFONE')]
+    [TDBColumn('TELEFONE', False, False, True)]
     property Telefone: String read FTelefone write FTelefone;
-    [TDBColumn('COMPLEMENTO')]
+    [TDBColumn('COMPLEMENTO', False, False, True)]
     property Complemento: String read FComplemento write FComplemento;
-    [TDBColumn('EMAIL')]
+    [TDBColumn('EMAIL', False, False, True)]
     property Email: String read FEmail write FEmail;
     [TDBColumn('DATA_CADASTRO')]
     property Data_Cadastro: TDateTime read FData_Cadastro write FData_Cadastro;
-    [TDBColumn('DATA_ALTERACAO')]
+    [TDBColumn('DATA_ALTERACAO', False, False, True)]
     property Data_Alteracao: TDateTime read FData_Alteracao write FData_Alteracao;
     [TDBColumn('STATUS_CLI')]
     property Status_Cli: String read FStatus_Cli write FStatus_Cli;

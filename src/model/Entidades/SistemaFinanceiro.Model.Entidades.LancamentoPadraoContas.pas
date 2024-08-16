@@ -20,7 +20,6 @@ type
     FDescricao: String;
     FId_Fornecedor: Integer;
     FId_Cliente: Integer;
-    function Load: Boolean;
 
     public
       [TDBColumnAttribute('ID', True, True)]
@@ -139,11 +138,6 @@ end;
 function TModelLancamentoPadrao.Insert: Boolean;
 begin
   Result := FDaoRTTI.Insert(Self);
-end;
-
-function TModelLancamentoPadrao.Load: Boolean;
-begin
-  Result := FDaoRTTI.LoadObjectByPK(Self);
 end;
 
 function TModelLancamentoPadrao.LoadObjectByPK: Boolean;
