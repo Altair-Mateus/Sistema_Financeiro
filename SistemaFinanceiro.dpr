@@ -63,8 +63,16 @@ uses
   uDaoRTTI in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\model\uDaoRTTI.pas',
   uDBColumnAttribute in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\model\uDBColumnAttribute.pas' {$R *.res},
   SistemaFinanceiro.Model.uSFQuery in 'src\model\SistemaFinanceiro.Model.uSFQuery.pas',
-  uEnumsUtils in '..\New Delphi\Classes_Compartilhadas\Enums\uEnumsUtils.pas',
-  SistemaFinanceiro.Model.Entidades.PgtoBxCr in 'src\model\Entidades\SistemaFinanceiro.Model.Entidades.PgtoBxCr.pas';
+  SistemaFinanceiro.Model.Entidades.PgtoBxCr in 'src\model\Entidades\SistemaFinanceiro.Model.Entidades.PgtoBxCr.pas',
+  SistemaFinanceiro.Model.Entidades.LancamentoPadraoContas in 'src\model\Entidades\SistemaFinanceiro.Model.Entidades.LancamentoPadraoContas.pas',
+  SistemaFinanceiro.View.Consulta.ConsultaLancamentoPadraoContas in 'src\view\Consultas\SistemaFinanceiro.View.Consulta.ConsultaLancamentoPadraoContas.pas' {frmConsultaLancamentoPadraoContas},
+  SistemaFinanceiro.View.Cadastro.LancamentoPadraoContas in 'src\view\Cadastro\SistemaFinanceiro.View.Cadastro.LancamentoPadraoContas.pas' {frmCadLancamentoPadrao},
+  uEnumsUtils in '..\New Delphi\Classes_Compartilhadas\Gerais\Enums\uEnumsUtils.pas',
+  fMensagem in '..\New Delphi\Classes_Compartilhadas\Gerais\Forms\fMensagem.pas' {frmMensagem},
+  uEnumsUtilsDescription in '..\New Delphi\Classes_Compartilhadas\Gerais\Enums\uEnumsUtilsDescription.pas',
+  SistemaFinanceiro.Model.Entidades.Cliente in 'src\model\Entidades\SistemaFinanceiro.Model.Entidades.Cliente.pas',
+  SistemaFinanceiro.Model.Entidades.Fornecedor in 'src\model\Entidades\SistemaFinanceiro.Model.Entidades.Fornecedor.pas',
+  SistemaFinanceiro.View.Relatorios.LancamentoPadrao in 'src\view\Relatorios\SistemaFinanceiro.View.Relatorios.LancamentoPadrao.pas' {frmRelLancamentoPadrao};
 
 {$R *.res}
 
@@ -82,5 +90,7 @@ begin
   Application.CreateForm(TdmPgtoBxCp, dmPgtoBxCp);
   Application.CreateForm(TdmFaturaCartao, dmFaturaCartao);
   Application.CreateForm(TfrmPrincipal, frmPrincipal);
+  Application.CreateForm(TfrmMensagem, frmMensagem);
+  Application.CreateForm(TfrmRelLancamentoPadrao, frmRelLancamentoPadrao);
   Application.Run;
 end.

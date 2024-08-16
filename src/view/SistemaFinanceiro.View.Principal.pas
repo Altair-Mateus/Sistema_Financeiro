@@ -16,7 +16,8 @@ uses
   SistemaFinanceiro.View.GeraRelResumoMensalCp,
   SistemaFinanceiro.View.GeraRelResumoMensalCr, Vcl.Buttons,
   SistemaFinanceiro.Model.Entidades.CR,
-  SistemaFinanceiro.Model.Entidades.LancamentoCaixa;
+  SistemaFinanceiro.Model.Entidades.LancamentoCaixa,
+  SistemaFinanceiro.View.Consulta.ConsultaLancamentoPadraoContas;
 
 type
   TfrmPrincipal = class(TForm)
@@ -56,15 +57,15 @@ type
     Image3: TImage;
     Label4: TLabel;
     mnuClientes: TMenuItem;
-    Fornecedores1: TMenuItem;
+    mnuFornecedores: TMenuItem;
     N2: TMenuItem;
-    FormasdePagamento1: TMenuItem;
+    mnuFormasPgto: TMenuItem;
     pnlBtn: TPanel;
-    Configuraes1: TMenuItem;
-    AlterarImagemPrincipal1: TMenuItem;
+    mnuConfiguracoes: TMenuItem;
+    mnuAltImgPrincipal: TMenuItem;
     OpenDialog1: TOpenDialog;
     lblNomeSistema: TLabel;
-    FaturasdeCarto1: TMenuItem;
+    mnuFaturasCartao: TMenuItem;
     N3: TMenuItem;
     ContasaPagar2: TMenuItem;
     ResumoMensal1: TMenuItem;
@@ -107,6 +108,7 @@ type
     pnlNomeBtnCaixa: TPanel;
     pnlImgBtnCaixa: TPanel;
     imgBtnCaixa: TImage;
+    mnuLancamentoPadrao: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
     procedure mnuUsuariosClick(Sender: TObject);
@@ -121,11 +123,11 @@ type
     procedure ContasaReceber1Click(Sender: TObject);
     procedure btnClientesClick(Sender: TObject);
     procedure mnuClientesClick(Sender: TObject);
-    procedure Fornecedores1Click(Sender: TObject);
-    procedure FormasdePagamento1Click(Sender: TObject);
-    procedure AlterarImagemPrincipal1Click(Sender: TObject);
+    procedure mnuFornecedoresClick(Sender: TObject);
+    procedure mnuFormasPgtoClick(Sender: TObject);
+    procedure mnuAltImgPrincipalClick(Sender: TObject);
     procedure mnuAjudaClick(Sender: TObject);
-    procedure FaturasdeCarto1Click(Sender: TObject);
+    procedure mnuFaturasCartaoClick(Sender: TObject);
     procedure ResumoMensal1Click(Sender: TObject);
     procedure ResumoMensal2Click(Sender: TObject);
     procedure imgBtnFornecedoreClick(Sender: TObject);
@@ -135,6 +137,7 @@ type
     procedure btnContasPagarClick(Sender: TObject);
     procedure btnContasReceberClick(Sender: TObject);
     procedure btnFluxoCaixaClick(Sender: TObject);
+    procedure mnuLancamentoPadraoClick(Sender: TObject);
 
   private
     FDtIni : TDate;
@@ -151,6 +154,7 @@ type
     procedure ExibeTelaFaturaCartao;
     procedure ExibeTelaRelMensalCP;
     procedure ExibeTelaRelMensalCR;
+    procedure ExibeTelaLancamentoPadrao;
     procedure CarregaImgPrincipal;
 
   public
@@ -173,9 +177,9 @@ uses
   SistemaFinanceiro.Utilitarios,
   Winapi.Windows,
   SistemaFinanceiro.Model.dmCPagar,
-  MidasLib;
+  MidasLib, uEnumsUtils;
 
-procedure TfrmPrincipal.AlterarImagemPrincipal1Click(Sender: TObject);
+procedure TfrmPrincipal.mnuAltImgPrincipalClick(Sender: TObject);
 var
   NomeImg, DestImg : String;
 
@@ -300,6 +304,20 @@ begin
     //  Libera da memoria
     FreeAndNil(frmFrPgto);
   end;
+end;
+
+procedure TfrmPrincipal.ExibeTelaLancamentoPadrao;
+var
+  lFormulario : TfrmConsultaLancamentoPadraoContas;
+begin
+
+  lFormulario := TfrmConsultaLancamentoPadraoContas.Create(Self, tlTodos);
+  try
+    lFormulario.ShowModal;
+  finally
+    FreeAndNil(lFormulario);
+  end;
+
 end;
 
 procedure TfrmPrincipal.ExibeTelaRelMensalCP;
@@ -474,12 +492,12 @@ begin
   end
 end;
 
-procedure TfrmPrincipal.FaturasdeCarto1Click(Sender: TObject);
+procedure TfrmPrincipal.mnuFaturasCartaoClick(Sender: TObject);
 begin
   ExibeTelaFaturaCartao;
 end;
 
-procedure TfrmPrincipal.FormasdePagamento1Click(Sender: TObject);
+procedure TfrmPrincipal.mnuFormasPgtoClick(Sender: TObject);
 begin
   ExibeTelaFrPgto;
 end;
@@ -583,9 +601,14 @@ begin
   lblUserLogado.Caption := dmUsuarios.GetUsuarioLogado.Nome;
 end;
 
-procedure TfrmPrincipal.Fornecedores1Click(Sender: TObject);
+procedure TfrmPrincipal.mnuFornecedoresClick(Sender: TObject);
 begin
   ExibeTelaFonecedores;
+end;
+
+procedure TfrmPrincipal.mnuLancamentoPadraoClick(Sender: TObject);
+begin
+  ExibeTelaLancamentoPadrao;
 end;
 
 procedure TfrmPrincipal.imgBtnFornecedoreClick(Sender: TObject);
