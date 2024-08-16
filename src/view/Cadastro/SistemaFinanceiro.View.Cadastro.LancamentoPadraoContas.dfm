@@ -98,6 +98,7 @@ object frmCadLancamentoPadrao: TfrmCadLancamentoPadrao
           Enabled = False
           MaxLength = 20
           TabOrder = 0
+          OnExit = edtIdCliFornecExit
         end
         object btnPesquisar: TButton
           Left = 147
@@ -109,6 +110,7 @@ object frmCadLancamentoPadrao: TfrmCadLancamentoPadrao
           ImageIndex = 0
           Images = ImageList16x16
           TabOrder = 1
+          OnClick = btnPesquisarClick
         end
       end
       object gbDadosCad: TGroupBox

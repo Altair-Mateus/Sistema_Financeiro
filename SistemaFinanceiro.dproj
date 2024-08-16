@@ -356,6 +356,13 @@
             <Form>frmMensagem</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="..\New Delphi\Classes_Compartilhadas\Gerais\Enums\uEnumsUtilsDescription.pas"/>
+        <DCCReference Include="src\model\Entidades\SistemaFinanceiro.Model.Entidades.Cliente.pas"/>
+        <DCCReference Include="src\model\Entidades\SistemaFinanceiro.Model.Entidades.Fornecedor.pas"/>
+        <DCCReference Include="src\view\Relatorios\SistemaFinanceiro.View.Relatorios.LancamentoPadrao.pas">
+            <Form>frmRelLancamentoPadrao</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

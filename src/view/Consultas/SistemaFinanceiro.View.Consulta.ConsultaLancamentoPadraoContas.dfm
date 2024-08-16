@@ -3,8 +3,8 @@ object frmConsultaLancamentoPadraoContas: TfrmConsultaLancamentoPadraoContas
   Top = 0
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'Consulta de Lan'#231'amentos Padr'#245'es de Contas'
-  ClientHeight = 468
-  ClientWidth = 721
+  ClientHeight = 467
+  ClientWidth = 717
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -20,24 +20,24 @@ object frmConsultaLancamentoPadraoContas: TfrmConsultaLancamentoPadraoContas
   object pnlContainer: TPanel
     Left = 0
     Top = 0
-    Width = 721
-    Height = 468
+    Width = 717
+    Height = 467
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitWidth = 717
-    ExplicitHeight = 467
+    ExplicitWidth = 713
+    ExplicitHeight = 466
     object pnlBotoes: TPanel
       Left = 0
-      Top = 399
-      Width = 721
+      Top = 398
+      Width = 717
       Height = 69
       Align = alBottom
       Color = clWindow
       ParentBackground = False
       TabOrder = 0
-      ExplicitTop = 398
-      ExplicitWidth = 717
+      ExplicitTop = 397
+      ExplicitWidth = 713
       object btnIncluir: TButton
         AlignWithMargins = True
         Left = 4
@@ -77,6 +77,7 @@ object frmConsultaLancamentoPadraoContas: TfrmConsultaLancamentoPadraoContas
         ImageIndex = 2
         Images = ImageList1
         TabOrder = 2
+        OnClick = btnExcluirClick
       end
       object btnImprimir: TButton
         AlignWithMargins = True
@@ -90,10 +91,11 @@ object frmConsultaLancamentoPadraoContas: TfrmConsultaLancamentoPadraoContas
         ImageIndex = 4
         Images = ImageList1
         TabOrder = 3
+        OnClick = btnImprimirClick
       end
       object btnVoltar: TButton
         AlignWithMargins = True
-        Left = 597
+        Left = 593
         Top = 4
         Width = 120
         Height = 61
@@ -103,23 +105,23 @@ object frmConsultaLancamentoPadraoContas: TfrmConsultaLancamentoPadraoContas
         Images = ImageList1
         TabOrder = 4
         OnClick = btnVoltarClick
-        ExplicitLeft = 593
+        ExplicitLeft = 589
       end
     end
     object pnlGrid: TPanel
       Left = 0
       Top = 81
-      Width = 721
-      Height = 318
+      Width = 717
+      Height = 317
       Align = alClient
       TabOrder = 1
-      ExplicitWidth = 717
-      ExplicitHeight = 317
+      ExplicitWidth = 713
+      ExplicitHeight = 316
       object grdLancPadrao: TDBGrid
         Left = 1
         Top = 1
-        Width = 719
-        Height = 316
+        Width = 715
+        Height = 315
         Align = alClient
         DataSource = dsLancPadraoContas
         Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgConfirmDelete, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
@@ -147,14 +149,13 @@ object frmConsultaLancamentoPadraoContas: TfrmConsultaLancamentoPadraoContas
             Visible = True
           end
           item
-            Alignment = taCenter
             Expanded = False
             FieldName = 'TIPO'
             Title.Caption = 'Tipo'
+            Width = 171
             Visible = True
           end
           item
-            Alignment = taCenter
             Expanded = False
             FieldName = 'STATUS'
             Title.Caption = 'Status'
@@ -165,14 +166,14 @@ object frmConsultaLancamentoPadraoContas: TfrmConsultaLancamentoPadraoContas
     object pnlPesquisa: TPanel
       Left = 0
       Top = 0
-      Width = 721
+      Width = 717
       Height = 81
       Align = alTop
       BevelOuter = bvNone
       Color = 5737262
       ParentBackground = False
       TabOrder = 2
-      ExplicitWidth = 717
+      ExplicitWidth = 713
       object lblPesquisar: TLabel
         Left = 16
         Top = 16
@@ -215,7 +216,7 @@ object frmConsultaLancamentoPadraoContas: TfrmConsultaLancamentoPadraoContas
       end
       object btnPesquisae: TButton
         AlignWithMargins = True
-        Left = 597
+        Left = 593
         Top = 5
         Width = 121
         Height = 71
@@ -227,7 +228,7 @@ object frmConsultaLancamentoPadraoContas: TfrmConsultaLancamentoPadraoContas
         Images = ImageList1
         TabOrder = 1
         OnClick = PesquisaClick
-        ExplicitLeft = 593
+        ExplicitLeft = 589
       end
       object cbTipo: TComboBox
         Left = 382
@@ -235,9 +236,12 @@ object frmConsultaLancamentoPadraoContas: TfrmConsultaLancamentoPadraoContas
         Width = 171
         Height = 27
         Style = csDropDownList
+        ItemIndex = 0
         TabOrder = 2
+        Text = 'TODOS'
         OnClick = PesquisaClick
         Items.Strings = (
+          'TODOS'
           'Contas a Receber'
           'Contas a Pagar')
       end

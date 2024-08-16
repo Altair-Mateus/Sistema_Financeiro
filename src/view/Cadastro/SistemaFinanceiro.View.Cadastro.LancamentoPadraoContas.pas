@@ -18,7 +18,8 @@ uses
   System.ImageList,
   Vcl.ImgList,
   uEnumsUtils,
-  SistemaFinanceiro.Model.Entidades.LancamentoPadraoContas, fMensagem;
+  SistemaFinanceiro.Model.Entidades.LancamentoPadraoContas, fMensagem,
+  SistemaFinanceiro.View.Fornecedores, SistemaFinanceiro.View.Clientes;
 
 type
   TfrmCadLancamentoPadrao = class(TForm)
@@ -50,12 +51,18 @@ type
     procedure btnCancelarClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);
+    procedure btnPesquisarClick(Sender: TObject);
+    procedure edtIdCliFornecExit(Sender: TObject);
   private
     FTelaAtiva : Boolean;
     FOperacaoCadastro: TOperacaoCadastro;
     FCodLancamento: Integer;
     FLancamentoPadrao : TModelLancamentoPadrao;
     function CarregaDadosAlteracao : Boolean;
+    procedure ExibeTelaFornecedor;
+    procedure ExibeTelaCliente;
+    procedure ValidaCliente;
+    procedure ValidaFornecedor;
   public
     property OperacaoCadastro: TOperacaoCadastro read FOperacaoCadastro write FOperacaoCadastro;
     property CodLancamento: Integer read FCodLancamento write FCodLancamento;
@@ -68,11 +75,22 @@ implementation
 
 {$R *.dfm}
 
-uses SistemaFinanceiro.Utilitarios;
+uses
+  SistemaFinanceiro.Utilitarios,
+  SistemaFinanceiro.Model.Entidades.Cliente,
+  SistemaFinanceiro.Model.Entidades.Fornecedor;
 
 procedure TfrmCadLancamentoPadrao.btnCancelarClick(Sender: TObject);
 begin
   Close;
+end;
+
+procedure TfrmCadLancamentoPadrao.btnPesquisarClick(Sender: TObject);
+begin
+  case rdgTipo.ItemIndex of
+    0 : ExibeTelaCliente;
+    1 : ExibeTelaFornecedor;
+  end;
 end;
 
 procedure TfrmCadLancamentoPadrao.btnSalvarClick(Sender: TObject);
@@ -143,6 +161,46 @@ begin
   end;
 end;
 
+procedure TfrmCadLancamentoPadrao.edtIdCliFornecExit(Sender: TObject);
+begin
+  case rdgTipo.ItemIndex of
+    0 : ValidaCliente;
+    1 : ValidaFornecedor;
+  end;
+end;
+
+procedure TfrmCadLancamentoPadrao.ExibeTelaCliente;
+var
+  lFormulario : TfrmCliente;
+begin
+  lFormulario := TfrmCliente.Create(Self);
+
+  try
+    lFormulario.ShowModal;
+    //  Pega a ID do cliente selecionado
+    edtIdCliFornec.Text := lFormulario.DBGrid1.DataSource.DataSet.FieldByName('ID_CLI').AsString;
+  finally
+    lFormulario.Free;
+  end;
+  edtIdCliFornec.SetFocus;
+end;
+
+procedure TfrmCadLancamentoPadrao.ExibeTelaFornecedor;
+var
+  lFormulario : TfrmFornecedores;
+begin
+  lFormulario := TfrmFornecedores.Create(Self);
+
+  try
+    lFormulario.ShowModal;
+    //  Pega a ID do cliente selecionado
+    edtIdCliFornec.Text := lFormulario.DBGrid1.DataSource.DataSet.FieldByName('ID_FORNEC').AsString;
+  finally
+    lFormulario.Free;
+  end;
+  edtIdCliFornec.SetFocus;
+end;
+
 procedure TfrmCadLancamentoPadrao.FormActivate(Sender: TObject);
 begin
   if not(FTelaAtiva) then
@@ -180,6 +238,55 @@ begin
   //  Libera para informar cliente ou fornecedor
   edtIdCliFornec.Enabled := True;
   btnPesquisar.Enabled := True;
+
+  if not(Trim(edtIdCliFornec.Text).IsEmpty) then
+  begin
+    edtIdCliFornec.Clear;
+    edtIdCliFornec.SetFocus;
+  end;
+end;
+
+procedure TfrmCadLancamentoPadrao.ValidaCliente;
+var
+  lCliente : TModelCliente;
+begin
+
+  if not Trim(edtIdCliFornec.Text).IsEmpty then
+  begin
+    lCliente := TModelCliente.Create;
+    try
+      if not lCliente.Existe(StrToInt(Trim(edtIdCliFornec.Text))) then
+      begin
+        TfrmMensagem.TelaMensagem('Erro!', 'Cliente não encontrado!', tmErro);
+        edtIdCliFornec.Clear;
+        edtIdCliFornec.SetFocus;
+      end;
+    finally
+      lCliente.Free;
+    end;
+  end;
+end;
+
+procedure TfrmCadLancamentoPadrao.ValidaFornecedor;
+var
+  lFornecedor : TModelFornecedor;
+begin
+
+  if not Trim(edtIdCliFornec.Text).IsEmpty then
+  begin
+    lFornecedor := TModelFornecedor.Create;
+    try
+      if not lFornecedor.Existe(StrToInt(Trim(edtIdCliFornec.Text))) then
+      begin
+        TfrmMensagem.TelaMensagem('Erro!', 'Fornecedor não encontrado!', tmErro);
+        edtIdCliFornec.Clear;
+        edtIdCliFornec.SetFocus;
+      end;
+    finally
+      lFornecedor.Free;
+    end;
+  end;
+
 end;
 
 end.

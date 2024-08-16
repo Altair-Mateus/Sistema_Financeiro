@@ -21,7 +21,8 @@ uses
   Vcl.ImgList,
   SistemaFinanceiro.View.Cadastro.LancamentoPadraoContas,
   uEnumsUtils,
-  SistemaFinanceiro.Model.uSFQuery;
+  SistemaFinanceiro.Model.uSFQuery, fMensagem,
+  SistemaFinanceiro.View.Relatorios.LancamentoPadrao;
 
 type
   TfrmConsultaLancamentoPadraoContas = class(TForm)
@@ -53,6 +54,8 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure btnAlterarClick(Sender: TObject);
     procedure grdLancPadraoDblClick(Sender: TObject);
+    procedure btnExcluirClick(Sender: TObject);
+    procedure btnImprimirClick(Sender: TObject);
   private
     FTelaAtiva : Boolean;
     FTipoLancamento : TTipoLancamento;
@@ -62,8 +65,9 @@ type
     procedure PreparaTela;
     procedure EditarRegistro;
     procedure QueryTipoGetText(Sender: TField; var Text: string; DisplayText: Boolean);
+    procedure QueryStatusGetText(Sender: TField; var Text: string; DisplayText: Boolean);
   public
-    property TipoLancamento: TTipoLancamento read FTipoLancamento write FTipoLancamento;
+    constructor Create(pOwner: TComponent; pTipoLancamento : TTipoLancamento); reintroduce;
   end;
 
 var
@@ -74,11 +78,58 @@ implementation
 {$R *.dfm}
 
 uses
-  SistemaFinanceiro.Utilitarios;
+  SistemaFinanceiro.Utilitarios,
+  SistemaFinanceiro.Model.Entidades.LancamentoPadraoContas,
+  uEnumsUtilsDescription;
 
 procedure TfrmConsultaLancamentoPadraoContas.btnAlterarClick(Sender: TObject);
 begin
   EditarRegistro;
+end;
+
+procedure TfrmConsultaLancamentoPadraoContas.btnExcluirClick(Sender: TObject);
+var
+  lLancamento: TModelLancamentoPadrao;
+  lOpEscolhida : TModalResult;
+begin
+
+  lLancamento := TModelLancamentoPadrao.Create;
+  try
+    try
+
+      lOpEscolhida := TfrmMensagem.TelaEscolha('Atenção', 'Deseja excluir o lançamento padrão selecionado? ', tmEscolha);
+      if (lOpEscolhida = mrOk) then
+      begin
+        lLancamento.Id := grdLancPadrao.DataSource.DataSet.FieldByName('ID').AsInteger;
+        lLancamento.DeleteByPk;
+        Pesquisar;
+      end;
+
+    except
+      on E: Exception do
+      begin
+        TfrmMensagem.TelaMensagem('Erro!', 'Erro ao excluir lançamento padrão ' + E.Message, tmErro);
+      end;
+    end;
+  finally
+    lLancamento.Free;
+  end;
+
+end;
+
+procedure TfrmConsultaLancamentoPadraoContas.btnImprimirClick(Sender: TObject);
+var
+  lFormulario : TfrmRelLancamentoPadrao;
+begin
+  lFormulario := TfrmRelLancamentoPadrao.Create(Self, grdLancPadrao.DataSource.DataSet);
+  try
+    // Desativa a atualização visual do grid
+    grdLancPadrao.DataSource.DataSet.DisableControls;
+    lFormulario.RLReport.Preview;
+  finally
+    lFormulario.Free;
+    grdLancPadrao.DataSource.DataSet.EnableControls;
+  end;
 end;
 
 procedure TfrmConsultaLancamentoPadraoContas.btnIncluirClick(Sender: TObject);
@@ -100,6 +151,13 @@ end;
 procedure TfrmConsultaLancamentoPadraoContas.btnVoltarClick(Sender: TObject);
 begin
   Close;
+end;
+
+constructor TfrmConsultaLancamentoPadraoContas.Create(pOwner: TComponent;
+  pTipoLancamento: TTipoLancamento);
+begin
+  inherited Create(pOwner);
+  FTipoLancamento := pTipoLancamento;
 end;
 
 procedure TfrmConsultaLancamentoPadraoContas.grdLancPadraoDblClick(
@@ -170,10 +228,22 @@ begin
   TUtilitario.CarregarOrdemColunasJSON(grdLancPadrao, 'ConfigGrids', 'grdLancamentoPadrao');
 
   //  Se vier da tela de CR ou CP irá filtrar somente os lançamento de acordo com a origem
-  if (FTipoLancamento <> tlTodos) then
-  begin
-    cbTipo.ItemIndex := Ord(FTipoLancamento);
-    cbTipo.Enabled := False;
+  case FTipoLancamento of
+    tlCr:
+    begin
+      cbTipo.ItemIndex := 1;
+      cbTipo.Enabled := False;
+    end;
+    tlCp:
+    begin
+      cbTipo.ItemIndex := 2;
+      cbTipo.Enabled := False;
+    end;
+    tlTodos:
+    begin
+      cbTipo.ItemIndex := 0;
+      cbTipo.Enabled := True;
+    end
   end;
 
   FTelaAtiva := True;
@@ -181,13 +251,28 @@ begin
   edtPesquisar.SetFocus;
 end;
 
+procedure TfrmConsultaLancamentoPadraoContas.QueryStatusGetText(Sender: TField;
+  var Text: string; DisplayText: Boolean);
+var
+  lStatus : TStatusCadastro;
+begin
+  if not Sender.IsNull then
+  begin
+    lStatus := TStatusCadastro(Sender.AsInteger);
+    Text := TEnumsUtilsDescription.GetEnumDescription<TStatusCadastro>(lStatus);
+  end;
+end;
+
 procedure TfrmConsultaLancamentoPadraoContas.QueryTipoGetText(Sender: TField;
   var Text: string; DisplayText: Boolean);
+var
+  lTipoLancamento: TTipoLancamento;
 begin
-  case Sender.AsInteger of
-    0: Text := 'CR';
-    1: Text := 'CP';
-  end;
+  if not Sender.IsNull then
+  begin
+    lTipoLancamento := TTipoLancamento(Sender.AsInteger);
+    Text := TEnumsUtilsDescription.GetEnumDescription<TTipoLancamento>(lTipoLancamento);
+  end
 end;
 
 procedure TfrmConsultaLancamentoPadraoContas.EditarRegistro;
@@ -235,9 +320,9 @@ begin
 
 
     case cbTipo.ItemIndex of
-      0:
-        LFiltro := LFiltro + ' AND TIPO = 0 ';
       1:
+        LFiltro := LFiltro + ' AND TIPO = 0 ';
+      2:
         LFiltro := LFiltro + ' AND TIPO = 1 ';
     end;
 
@@ -249,13 +334,17 @@ begin
     FQueryPesquisa.Open();
 
     if FQueryPesquisa.RecordCount > 0 then
+    begin
       FQueryPesquisa.FieldByName('TIPO').OnGetText := QueryTipoGetText;
+      FQueryPesquisa.FieldByName('STATUS').OnGetText := QueryStatusGetText;
+    end;
 
+    grdLancPadrao.Columns[2].Alignment := taLeftJustify;
+    grdLancPadrao.Columns[3].Alignment := taLeftJustify;
   except
     on e: Exception do
     begin
-      Application.MessageBox(PWidechar('Erro ao realizar a consulta: ' +
-        e.Message), 'Atenção', MB_OK + MB_ICONERROR);
+      TfrmMensagem.TelaMensagem('Erro!', 'Erro ao realizar a consulta: ' + E.Message, tmErro);
     end;
   end;
 

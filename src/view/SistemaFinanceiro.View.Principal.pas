@@ -177,7 +177,7 @@ uses
   SistemaFinanceiro.Utilitarios,
   Winapi.Windows,
   SistemaFinanceiro.Model.dmCPagar,
-  MidasLib;
+  MidasLib, uEnumsUtils;
 
 procedure TfrmPrincipal.mnuAltImgPrincipalClick(Sender: TObject);
 var
@@ -311,7 +311,7 @@ var
   lFormulario : TfrmConsultaLancamentoPadraoContas;
 begin
 
-  lFormulario := TfrmConsultaLancamentoPadraoContas.Create(Self);
+  lFormulario := TfrmConsultaLancamentoPadraoContas.Create(Self, tlTodos);
   try
     lFormulario.ShowModal;
   finally
