@@ -150,9 +150,9 @@ begin
     rdgTipo.ItemIndex := FLancamentoPadrao.Tipo;
     ToggleStatus.State := TToggleSwitchState(FLancamentoPadrao.Status);
 
-    if FLancamentoPadrao.Id_Cliente > 0 then
+    if (FLancamentoPadrao.Tipo = Smallint(tlCr)) then
       edtIdCliFornec.Text := FLancamentoPadrao.Id_Cliente.ToString
-    else if FLancamentoPadrao.Id_Fornecedor > 0 then
+    else if (FLancamentoPadrao.Tipo = Smallint(tlCp)) then
       edtIdCliFornec.Text := FLancamentoPadrao.Id_Fornecedor.ToString;
 
     if FLancamentoPadrao.Data_Alteracao > 0 then
