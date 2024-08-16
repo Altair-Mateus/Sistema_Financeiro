@@ -201,7 +201,6 @@ end;
 procedure TfrmConsultaLancamentoPadraoContas.FormCreate(Sender: TObject);
 begin
   FTelaAtiva := False;
-  FTipoLancamento := tlTodos;
 end;
 
 procedure TfrmConsultaLancamentoPadraoContas.FormDestroy(Sender: TObject);

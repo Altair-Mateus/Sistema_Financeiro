@@ -7,7 +7,9 @@ uses
   Vcl.StdCtrls, Vcl.WinXPanels, Vcl.ComCtrls, Vcl.WinXCtrls, Datasnap.DBClient, System.SysUtils,
   SistemaFinanceiro.View.BaixarCP, Vcl.Menus, SistemaFinanceiro.View.CpDetalhe,
   Vcl.Imaging.pngimage, SistemaFinanceiro.View.Fornecedores,
-  SistemaFinanceiro.View.FaturaCartao, SistemaFinanceiro.View.BxMultiplaCp;
+  SistemaFinanceiro.View.FaturaCartao, SistemaFinanceiro.View.BxMultiplaCp,
+  SistemaFinanceiro.View.Consulta.ConsultaLancamentoPadraoContas, fMensagem,
+  uEnumsUtils;
 type
   TfrmContasPagar = class(TfrmCadastroPadrao)
     DataSourceCPagar: TDataSource;
@@ -121,6 +123,7 @@ type
     pnlFundoGrupoParcelas: TPanel;
     lblGrupoParcelas: TLabel;
     grdGrupoParcelas: TDBGrid;
+    btnLancPadrao: TButton;
     procedure btnCancelarClick(Sender: TObject);
     procedure btnExcluirClick(Sender: TObject);
     procedure btnPesquisaeClick(Sender: TObject);
@@ -168,9 +171,11 @@ type
     procedure chkBaixarAoSalvarClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure btnLancPadraoClick(Sender: TObject);
+    procedure CardCadastroEnter(Sender: TObject);
 
   private
-    { Private declarations }
+    FOpCad: TOperacaoCadastro;
     FCodCP : Integer;
     DataVctoFat : Integer;
 
@@ -188,6 +193,8 @@ type
     procedure FatCartaoAtiva;
     procedure CalcCpGrid;
     procedure CalcQtdCpGrid;
+    procedure ExibeTelaLancPadrao;
+    procedure CarregaLancPadrao(pCod : Integer);
     function DtVencimentoCheckContaPaga : TDate;
 
   public
@@ -209,14 +216,12 @@ uses
   System.DateUtils, SistemaFinanceiro.View.Principal,
   SistemaFinanceiro.View.Relatorios.Cp, SistemaFinanceiro.Model.dmFornecedores,
   SistemaFinanceiro.Model.dmFaturaCartao, SistemaFinanceiro.Model.dmUsuarios,
-  SistemaFinanceiro.View.BaixarCP.FrPgto;
+  SistemaFinanceiro.View.BaixarCP.FrPgto,
+  SistemaFinanceiro.Model.Entidades.LancamentoPadraoContas;
 
 procedure TfrmContasPagar.btnAlterarClick(Sender: TObject);
 begin
-
-  inherited;
   EditarRegCPagar;
-
 end;
 
 procedure TfrmContasPagar.btnBaixarCPClick(Sender: TObject);
@@ -340,6 +345,7 @@ end;
 
 procedure TfrmContasPagar.btnIncluirClick(Sender: TObject);
 begin
+  FOpCad := ocIncluir;
   inherited;
 
   lblTitulo.Caption := 'Inserindo um novo lançamento no Contas a Pagar';
@@ -352,7 +358,7 @@ begin
 
   end;
 
-  memDesc.SetFocus;
+
 
   //  Seta parcela previamente como 1
   edtParcela.Text := '1';
@@ -383,8 +389,14 @@ begin
   dateVencimento.DateTime := Now + 7;
 
 
+
   memDesc.SetFocus;
 
+end;
+
+procedure TfrmContasPagar.btnLancPadraoClick(Sender: TObject);
+begin
+  ExibeTelaLancPadrao;
 end;
 
 procedure TfrmContasPagar.btnLimparClick(Sender: TObject);
@@ -731,20 +743,6 @@ var
 
 begin
 
-  //  Se for um novo registro irá gerar o código, status em aberto
-  //  e setar 0 no valor abatido
-  if DataSourceCPagar.State in [dsInsert] then
-  begin
-
-    //  gera a id
-    dmCPagar.GeraCodigo;
-
-    dmCPagar.cdsCPagarDATA_CADASTRO.AsDateTime := now;
-    dmCPagar.cdsCPagarSTATUS.AsString          := 'A';
-    dmCPagar.cdsCPagarVALOR_ABATIDO.AsCurrency := 0;
-
-  end;
-
   //  Valida campos obrigatorios
   if Trim(memDesc.Text) = '' then
   begin
@@ -753,7 +751,7 @@ begin
     abort;
   end;
 
-  if not TryStrToInt(edtFornecedor.Text, IdFornecedor) then
+  if not TryStrToInt(edtFornecedor.Text, IdFornecedor) or (IdFornecedor <= 0) then
   begin
     edtFornecedor.SetFocus;
     Application.MessageBox('Campo FORNECEDOR não pode estar vazio!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
@@ -793,6 +791,20 @@ begin
     edtValorParcela.SetFocus;
     Application.MessageBox('Valor da parcela Inválido!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
     abort;
+  end;
+
+  //  Se for um novo registro irá gerar o código, status em aberto
+  //  e setar 0 no valor abatido
+  if DataSourceCPagar.State in [dsInsert] then
+  begin
+
+    //  gera a id
+    dmCPagar.GeraCodigo;
+
+    dmCPagar.cdsCPagarDATA_CADASTRO.AsDateTime := now;
+    dmCPagar.cdsCPagarSTATUS.AsString          := 'A';
+    dmCPagar.cdsCPagarVALOR_ABATIDO.AsCurrency := 0;
+
   end;
 
   //  Passando os dados para o dataset
@@ -937,6 +949,42 @@ begin
 
 end;
 
+procedure TfrmContasPagar.CardCadastroEnter(Sender: TObject);
+begin
+  inherited;
+  btnLancPadrao.Visible := (FOpCad = ocIncluir);
+end;
+
+procedure TfrmContasPagar.CarregaLancPadrao(pCod : Integer);
+var
+  lLancamento : TModelLancamentoPadrao;
+begin
+  lLancamento := TModelLancamentoPadrao.Create;
+  try
+    if (lLancamento.Existe(pCod, True)) then
+    begin
+
+      if (lLancamento.Status = Smallint(scInativo)) then
+      begin
+        TfrmMensagem.TelaMensagem('Cadastro Inativo!', 'Lançamento Padrão inativo, altere o cadastro do mesmo e tente novamente.', tmAviso);
+        Exit;
+      end;
+
+      memDesc.Text := lLancamento.Descricao;
+      if (lLancamento.Id_Fornecedor > 0) then
+        edtFornecedor.Text := IntToStr(lLancamento.Id_Fornecedor);
+      BuscaNomeFornecedor;
+      memDesc.SetFocus;
+    end
+    else
+    begin
+      TfrmMensagem.TelaMensagem('Erro!', 'Erro ao recuperar os dados do cadastro do Lançamento Padrão escolhido', tmErro);
+    end;
+  finally
+    lLancamento.Free;
+  end;
+end;
+
 procedure TfrmContasPagar.cbDataClick(Sender: TObject);
 begin
   inherited;
@@ -1071,10 +1119,7 @@ end;
 
 procedure TfrmContasPagar.DBGrid1DblClick(Sender: TObject);
 begin
-  inherited;
-
   EditarRegCPagar;
-
 end;
 
 procedure TfrmContasPagar.DBGrid1DrawColumnCell(Sender: TObject;
@@ -1112,11 +1157,10 @@ end;
 procedure TfrmContasPagar.EditarRegCPagar;
 begin
 
-  edtParcela.Enabled      := True;
-  edtValorParcela.Enabled := True;
+  FOpCad := ocAlterar;
 
-  //  Esvaziando data set de parcelas
-  cdsParcelas.EmptyDataSet;
+  // Abre a tela de cadastro
+  CardPanelPrincipal.ActiveCard := CardCadastro;
 
   //  Se o documento já foi baixado cancela a edição
   if dmCPagar.cdsCPagarSTATUS.AsString = 'P' then
@@ -1139,6 +1183,12 @@ begin
 
   // Coloca o dataset em modo de edição
   dmCPagar.cdsCPagar.Edit;
+
+  edtParcela.Enabled      := True;
+  edtValorParcela.Enabled := True;
+
+  //  Esvaziando data set de parcelas
+  cdsParcelas.EmptyDataSet;
 
   // Coloca o numero do registro no titulo
   lblTitulo.Caption := 'Alterando Registro Nº ' + dmCPagar.cdsCPagarID.AsString;
@@ -1375,6 +1425,19 @@ begin
   frmPrincipal.TotalCP;
   frmPrincipal.ResumoMensalCaixa;
 
+end;
+
+procedure TfrmContasPagar.ExibeTelaLancPadrao;
+var
+  lFormulario : TfrmConsultaLancamentoPadraoContas;
+begin
+  lFormulario := TfrmConsultaLancamentoPadraoContas.Create(Self, tlCp);
+  try
+    lFormulario.ShowModal;
+    CarregaLancPadrao(lFormulario.grdLancPadrao.DataSource.DataSet.FieldByName('ID').AsInteger);
+  finally
+    lFormulario.Free;
+  end;
 end;
 
 procedure TfrmContasPagar.FatCartaoAtiva;

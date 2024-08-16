@@ -3,8 +3,8 @@ object frmConsultaLancamentoPadraoContas: TfrmConsultaLancamentoPadraoContas
   Top = 0
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'Consulta de Lan'#231'amentos Padr'#245'es de Contas'
-  ClientHeight = 467
-  ClientWidth = 717
+  ClientHeight = 466
+  ClientWidth = 713
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -20,13 +20,11 @@ object frmConsultaLancamentoPadraoContas: TfrmConsultaLancamentoPadraoContas
   object pnlContainer: TPanel
     Left = 0
     Top = 0
-    Width = 717
-    Height = 467
+    Width = 713
+    Height = 466
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitWidth = 713
-    ExplicitHeight = 466
     object pnlBotoes: TPanel
       Left = 0
       Top = 398
