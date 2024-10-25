@@ -3,7 +3,7 @@ unit SistemaFinanceiro.Model.Entidades.LancamentoPadraoContas;
 interface
 
 uses
-   uDBColumnAttribute, uDaoRTTI, SistemaFinanceiro.Model.uSFQuery,
+   uDBAttributes, uDaoRTTI, SistemaFinanceiro.Model.uSFQuery,
   System.SysUtils, Winapi.Windows, Vcl.Forms;
 
 type

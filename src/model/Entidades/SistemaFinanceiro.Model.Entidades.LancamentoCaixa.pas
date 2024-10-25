@@ -3,7 +3,7 @@ unit SistemaFinanceiro.Model.Entidades.LancamentoCaixa;
 interface
 
 uses
-  uDBColumnAttribute,
+  uDBAttributes,
   uDaoRTTI,
   SistemaFinanceiro.Model.uSFQuery,
   Vcl.Dialogs,

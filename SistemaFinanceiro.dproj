@@ -338,7 +338,7 @@
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\model\uDaoRTTI.pas"/>
-        <DCCReference Include="..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\model\uDBColumnAttribute.pas">
+        <DCCReference Include="..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\model\uDBAttributes.pas">
             <Form>$R *.res</Form>
         </DCCReference>
         <DCCReference Include="src\model\SistemaFinanceiro.Model.uSFQuery.pas"/>
@@ -362,6 +362,11 @@
             <Form>frmRelLancamentoPadrao</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\view\fTesteDaoRTTI.pas">
+            <Form>frmTesteDaoRTTI</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\view\uUsuario.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -392,6 +397,12 @@
                     <Platform Name="Win32">
                         <RemoteDir>Assets\</RemoteDir>
                         <RemoteName>Logo44x44.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Win32\Release\SistemaFinanceiro.exe" Configuration="Release" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>SistemaFinanceiro.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

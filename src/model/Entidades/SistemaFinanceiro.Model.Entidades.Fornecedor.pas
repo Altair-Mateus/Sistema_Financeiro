@@ -3,7 +3,7 @@ unit SistemaFinanceiro.Model.Entidades.Fornecedor;
 interface
 
 uses
-  uDBColumnAttribute, uDaoRTTI, SistemaFinanceiro.Model.uSFQuery,
+  uDBAttributes, uDaoRTTI, SistemaFinanceiro.Model.uSFQuery,
   System.SysUtils, fMensagem, uEnumsUtils;
 
 type

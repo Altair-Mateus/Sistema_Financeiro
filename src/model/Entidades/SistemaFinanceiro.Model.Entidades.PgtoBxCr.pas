@@ -3,7 +3,7 @@ unit SistemaFinanceiro.Model.Entidades.PgtoBxCr;
 interface
 
 uses
-  uDBColumnAttribute,
+  uDBAttributes,
   uDaoRTTI,
   SistemaFinanceiro.Model.uSFQuery,
   System.SysUtils,
