@@ -1,153 +1,194 @@
 unit SistemaFinanceiro.Model.Entidades.CP;
+
 interface
+
+uses
+  uDBAttributes,
+  uDaoRTTI,
+  SistemaFinanceiro.Model.uSFQuery,
+  System.SysUtils;
+
 type
+
+  [TDBTable('CONTAS_RECEBER')]
   TModelCP = class
-    private
-      FID: String;
-      FValorParcela: Currency;
-      FDataCompra: TDate;
-      FDataVencimento: TDate;
-      FDataPagamento: TDate;
-      FValorAbatido: Currency;
-      FValorCompra: Currency;
-      FStatus: String;
-      FDataCadastro: TDate;
-      FDoc: String;
-      FDesc: String;
-      FParcela: Integer;
-      FParcial: String;
-      FCpOrigem: Integer;
-      FIdFornecedor: Integer;
+
+  private
+    FDaoRTTI: TDaoRTTI;
+    FID: String;
+    FValorParcela: Double;
+    FDataCompra: TDate;
+    FDataVencimento: TDate;
+    FDataPagamento: TDate;
+    FValorAbatido: Double;
+    FValorCompra: Double;
+    FStatus: String;
+    FDataCadastro: TDate;
+    FDoc: String;
+    FDesc: String;
+    FParcela: Integer;
+    FParcial: String;
+    FCpOrigem: Integer;
+    FIdFornecedor: Integer;
     FFatCartao: String;
     FIdFatCartao: Integer;
+    FIdGrupoParcelas: Integer;
+    FNumTotalParcelas: Integer;
 
-      procedure SetID(const Value: String);
-      procedure SetDataCadastro(const Value: TDate);
-      procedure SetDataCompra(const Value: TDate);
-      procedure SetDataPagamento(const Value: TDate);
-      procedure SetDataVencimento(const Value: TDate);
-      procedure SetDesc(const Value: String);
-      procedure SetDoc(const Value: String);
-      procedure SetParcela(const Value: Integer);
-      procedure SetStatus(const Value: String);
-      procedure SetValorAbatido(const Value: Currency);
-      procedure SetValorCompra(const Value: Currency);
-      procedure SetValorParcela(const Value: Currency);
-      procedure SetParcial(const Value: String);
-      procedure SetCpOrigem(const Value: Integer);
-      procedure SetIdFornecedor(const Value: Integer);
-    procedure SetFatCartao(const Value: String);
-    procedure SetIdFatCartao(const Value: Integer);
+  public
+    [TDBColumn('ID'), TDBIsPrimaryKey]
+    property ID: String read FID write FID;
+    [TDBColumn('NUMERO_DOC'), TDBAcceptNull]
+    property Doc: String read FDoc write FDoc;
+    [TDBColumn('DESCRICAO'), TDBAcceptNull]
+    property Desc: String read FDesc write FDesc;
+    [TDBColumn('PARCELA')]
+    property Parcela: Integer read FParcela write FParcela;
+    [TDBColumn('VALOR_PARCELA')]
+    property ValorParcela: Double read FValorParcela write FValorParcela;
+    [TDBColumn('VALOR_COMPRA')]
+    property ValorCompra: Double read FValorCompra write FValorCompra;
+    [TDBColumn('VALOR_ABATIDO')]
+    property ValorAbatido: Double read FValorAbatido write FValorAbatido;
+    [TDBColumn('DATA_COMPRA')]
+    property DataCompra: TDate read FDataCompra write FDataCompra;
+    [TDBColumn('DATA_CADASTRO')]
+    property DataCadastro: TDate read FDataCadastro write FDataCadastro;
+    [TDBColumn('DATA_VENCIMENTO')]
+    property DataVencimento: TDate read FDataVencimento write FDataVencimento;
+    [TDBColumn('DATA_PAGAMENTO')]
+    property DataPagamento: TDate read FDataPagamento write FDataPagamento;
+    [TDBColumn('STATUS')]
+    property Status: String read FStatus write FStatus;
+    [TDBColumn('PARCIAL')]
+    property Parcial: String read FParcial write FParcial;
+    [TDBColumn('CP_ORIGEM')]
+    property CpOrigem: Integer read FCpOrigem write FCpOrigem;
+    [TDBColumn('ID_FORNECEDOR')]
+    property IdFornecedor: Integer read FIdFornecedor write FIdFornecedor;
+    [TDBColumn('FATURA_cART')]
+    property FatCartao: String read FFatCartao write FFatCartao;
+    [TDBColumn('ID_FATURA')]
+    property IdFatCartao: Integer read FIdFatCartao write FIdFatCartao;
+    [TDBColumn('NUM_TOT_PARCELAS'), TDBAcceptNull]
+    property NumTotalParcelas: Integer read FNumTotalParcelas write FNumTotalParcelas;
+    [TDBColumn('ID_GRUPO_PARCELAS'), TDBAcceptNull]
+    property IdGrupoParcelas: Integer read FIdGrupoParcelas write FIdGrupoParcelas;
 
-      public
-        property ID             : String read FID write SetID;
-        property Doc            : String read FDoc write SetDoc;
-        property Desc           : String read FDesc write SetDesc;
-        property Parcela        : Integer read FParcela write SetParcela;
-        property ValorParcela   : Currency read FValorParcela write SetValorParcela;
-        property ValorCompra    : Currency read FValorCompra write SetValorCompra;
-        property ValorAbatido   : Currency read FValorAbatido write SetValorAbatido;
-        property DataCompra     : TDate read FDataCompra write SetDataCompra;
-        property DataCadastro   : TDate read FDataCadastro write SetDataCadastro;
-        property DataVencimento : TDate read FDataVencimento write SetDataVencimento;
-        property DataPagamento  : TDate read FDataPagamento write SetDataPagamento;
-        property Status         : String read FStatus write SetStatus;
-        property Parcial        : String read FParcial write SetParcial;
-        property CpOrigem       : Integer read FCpOrigem write SetCpOrigem;
-        property IdFornecedor   : Integer read FIdFornecedor write SetIdFornecedor;
-        property FatCartao      : String read FFatCartao write SetFatCartao;
-        property IdFatCartao    : Integer read FIdFatCartao write SetIdFatCartao;
+    constructor Create;
+    destructor Destroy; override;
 
+    function Insert: Boolean;
+    function UpdateBySQLText(const pWhereClause: string = ''): Boolean;
+    function UpdateByPK: Boolean;
+    function UpdateByProp: Boolean;
+    function DeleteBySQLText(const pWhere: String = ''): Boolean;
+    function DeleteByPk: Boolean;
+    function DeleteByProp: Boolean;
+    function LoadObjectByPK: Boolean;
+    procedure ResetPropertiesToDefault;
+    procedure AddPropertyToWhere(const APropertyName: String);
 
+    function Existe(const pId : Integer; const pCarrega : Boolean = false) : Boolean;
+    procedure GeraCodigo;
+
+    class function TotalCP(pDtIni, pDtFim: TDate) : Double;
+    class function GetIdGrupoParcelas : Integer;
+
+    function CancBxCp : Boolean;
 
   end;
 
 implementation
+
 { TModelCP }
 
-procedure TModelCP.SetCpOrigem(const Value: Integer);
+
+procedure TModelCP.AddPropertyToWhere(const APropertyName: String);
 begin
-  FCpOrigem := Value;
+
 end;
 
-procedure TModelCP.SetDataCadastro(const Value: TDate);
+function TModelCP.CancBxCp: Boolean;
 begin
-  FDataCadastro := Value;
+
 end;
 
-procedure TModelCP.SetDataCompra(const Value: TDate);
+constructor TModelCP.Create;
 begin
-  FDataCompra := Value;
+  FDaoRTTI := TDaoRTTI.Create;
+  ResetPropertiesToDefault;
 end;
 
-procedure TModelCP.SetDataPagamento(const Value: TDate);
+function TModelCP.DeleteByPk: Boolean;
 begin
-  FDataPagamento := Value;
+
 end;
 
-procedure TModelCP.SetDataVencimento(const Value: TDate);
+function TModelCP.DeleteByProp: Boolean;
 begin
-  FDataVencimento := Value;
+
 end;
 
-procedure TModelCP.SetDesc(const Value: String);
+function TModelCP.DeleteBySQLText(const pWhere: String): Boolean;
 begin
-  FDesc := Value;
+
 end;
 
-procedure TModelCP.SetDoc(const Value: String);
+destructor TModelCP.Destroy;
 begin
-  FDoc := Value;
+  FDaoRTTI.Free;
+  inherited;
 end;
 
-procedure TModelCP.SetFatCartao(const Value: String);
+function TModelCP.Existe(const pId: Integer; const pCarrega: Boolean): Boolean;
 begin
-  FFatCartao := Value;
+
 end;
 
-procedure TModelCP.SetID(const Value: String);
+procedure TModelCP.GeraCodigo;
 begin
-  FID := Value;
+
 end;
 
-procedure TModelCP.SetIdFatCartao(const Value: Integer);
+class function TModelCP.GetIdGrupoParcelas: Integer;
 begin
-  FIdFatCartao := Value;
+
 end;
 
-procedure TModelCP.SetIdFornecedor(const Value: Integer);
+function TModelCP.Insert: Boolean;
 begin
-   FIdFornecedor := Value;
+  Result := FDaoRTTI.Insert(Self);
 end;
 
-procedure TModelCP.SetParcela(const Value: Integer);
+function TModelCP.LoadObjectByPK: Boolean;
 begin
-  FParcela := Value;
+  Result := FDaoRTTI.LoadObjectByPK(Self);
 end;
 
-procedure TModelCP.SetParcial(const Value: String);
+procedure TModelCP.ResetPropertiesToDefault;
 begin
-  FParcial := Value;
+  FDaoRTTI.ResetPropertiesToDefault(Self);
 end;
 
-procedure TModelCP.SetStatus(const Value: String);
+class function TModelCP.TotalCP(pDtIni, pDtFim: TDate): Double;
 begin
-  FStatus := Value;
+
 end;
 
-procedure TModelCP.SetValorAbatido(const Value: Currency);
+function TModelCP.UpdateByPK: Boolean;
 begin
-  FValorAbatido := Value;
+  Result := FDaoRTTI.UpdateByPK(Self);
 end;
 
-procedure TModelCP.SetValorCompra(const Value: Currency);
+function TModelCP.UpdateByProp: Boolean;
 begin
-  FValorCompra := Value;
+  Result := FDaoRTTI.UpdateByProp(Self);
 end;
 
-procedure TModelCP.SetValorParcela(const Value: Currency);
+function TModelCP.UpdateBySQLText(const pWhereClause: string): Boolean;
 begin
-  FValorParcela := Value;
+  Result := FDaoRTTI.UpdateBySQLText(Self, pWhereClause);
 end;
 
 end.
