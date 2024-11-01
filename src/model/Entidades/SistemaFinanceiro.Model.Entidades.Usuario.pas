@@ -36,7 +36,7 @@ type
     procedure AddPropertyToWhere(const APropertyName: String);
 
 
-    [TDBColumnAttribute('ID', True, True)]
+    [TDBColumnAttribute('ID'), TDBIsPrimaryKey, TDBIsAutoIncrement]
     property Id            : Integer read FId write FId;
     [TDBColumnAttribute('NOME')]
     property Nome          : String read FNome write FNome;

@@ -40,11 +40,11 @@ type
     FIdGrupoParcelas: Integer;
 
   public
-    [TDBColumn('ID', True, False)]
+    [TDBColumn('ID'), TDBIsPrimaryKey]
     property ID: Integer read FID write FID;
-    [TDBColumn('NUMERO_DOCUMENTO', False, False, True)]
+    [TDBColumn('NUMERO_DOCUMENTO'), TDBAcceptNull]
     property Doc: String read FDoc write FDoc;
-    [TDBColumn('DESCRICAO', False, False, True)]
+    [TDBColumn('DESCRICAO'), TDBAcceptNull]
     property Desc: String read FDesc write FDesc;
     [TDBColumn('PARCELA')]
     property Parcela: Integer read FParcela write FParcela;
@@ -60,19 +60,19 @@ type
     property DataCadastro: TDate read FDataCadastro write FDataCadastro;
     [TDBColumn('DATA_VENCIMENTO')]
     property DataVencimento: TDate read FDataVencimento write FDataVencimento;
-    [TDBColumn('DATA_RECEBIMENTO', False, False, True)]
+    [TDBColumn('DATA_RECEBIMENTO'), TDBAcceptNull]
     property DataRecebimento: TDate read FDataRecebimento write FDataRecebimento;
     [TDBColumn('STATUS')]
     property Status: String read FStatus write FStatus;
     [TDBColumn('PARCIAL')]
     property Parcial: String read FParcial write FParcial;
-    [TDBColumn('CR_ORIGEM', False, False, True)]
+    [TDBColumn('CR_ORIGEM'), TDBAcceptNull]
     property CrOrigem: Integer read FCrOrigem write FCrOrigem;
     [TDBColumn('ID_CLIENTE')]
     property IdCliente: Integer read FIdCliente write FIdCliente;
-    [TDBColumn('NUM_TOT_PARCELAS', False, False, True)]
+    [TDBColumn('NUM_TOT_PARCELAS'), TDBAcceptNull]
     property NumTotalParcelas: Integer read FNumTotalParcelas write FNumTotalParcelas;
-    [TDBColumn('ID_GRUPO_PARCELAS', False, False, True)]
+    [TDBColumn('ID_GRUPO_PARCELAS'), TDBAcceptNull]
     property IdGrupoParcelas: Integer read FIdGrupoParcelas write FIdGrupoParcelas;
 
     constructor Create;

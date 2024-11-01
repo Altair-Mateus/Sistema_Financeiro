@@ -82,7 +82,9 @@ CREATE TABLE CONTAS_PAGAR_DETALHE (
     VALOR           DECIMAL(18,4) NOT NULL,
     DATA            DATE NOT NULL,
     USUARIO         INTEGER NOT NULL,
-    DESCONTO_BX     DECIMAL(18,4) DEFAULT 0
+    DESCONTO_BX     DECIMAL(18,4) DEFAULT 0,
+	NUM_TOT_PARCELAS   INTEGER,
+    ID_GRUPO_PARCELAS  INTEGER
 );
 
 
@@ -251,6 +253,7 @@ UPDATE OR INSERT INTO FR_PGTO (ID_FR, NOME_FR, "DESC", STATUS, DATA_CADASTRO, DA
 /***                         Generators                                     ***/
 /******************************************************************************/
 CREATE SEQUENCE GEN_ID_GRUPO_PARCELAS;
+CREATE SEQUENCE GEN_ID_GRUPO_PARCELAS_CP;
 CREATE GENERATOR GEN_LANCAMENTO_PADRAO_CONTAS_ID;
 
 

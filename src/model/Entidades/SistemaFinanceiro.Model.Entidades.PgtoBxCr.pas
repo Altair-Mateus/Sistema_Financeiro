@@ -23,7 +23,7 @@ type
     FDataHora: TDateTime;
     FValorPago: Double;
   public
-    [TDBColumn('ID', True, False)]
+    [TDBColumn('ID'), TDBIsPrimaryKey]
     property Id: Integer read FId write FId;
     [TDBColumn('ID_CR')]
     property IdCr: Integer read FIdCr write FIdCr;

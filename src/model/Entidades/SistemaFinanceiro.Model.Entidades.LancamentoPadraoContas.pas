@@ -3,15 +3,16 @@ unit SistemaFinanceiro.Model.Entidades.LancamentoPadraoContas;
 interface
 
 uses
-   uDBAttributes, uDaoRTTI, SistemaFinanceiro.Model.uSFQuery,
+  uDBAttributes, uDaoRTTI, SistemaFinanceiro.Model.uSFQuery,
   System.SysUtils, Winapi.Windows, Vcl.Forms;
 
 type
+
   [TDBTable('LANCAMENTO_PADRAO_CONTAS')]
   TModelLancamentoPadrao = class
 
   private
-    FDaoRTTI : TDaoRTTI;
+    FDaoRTTI: TDaoRTTI;
     FId: Integer;
     FTipo: Integer;
     FData_Cadastro: TDateTime;
@@ -21,39 +22,41 @@ type
     FId_Fornecedor: Integer;
     FId_Cliente: Integer;
 
-    public
-      [TDBColumnAttribute('ID', True, True)]
-      property Id: Integer read FId write FId;
-      [TDBColumnAttribute('TIPO')]
-      property Tipo: Integer read FTipo write FTipo;
-      [TDBColumnAttribute('DATA_CADASTRO')]
-      property Data_Cadastro: TDateTime read FData_Cadastro write FData_Cadastro;
-      [TDBColumnAttribute('DATA_ALTERACAO', False, False, True)]
-      property Data_Alteracao: TDateTime read FData_Alteracao write FData_Alteracao;
-      [TDBColumnAttribute('STATUS')]
-      property Status: SmallInt read FStatus write FStatus;
-      [TDBColumnAttribute('DESCRICAO', False, False, True)]
-      property Descricao: String read FDescricao write FDescricao;
-      [TDBColumnAttribute('ID_FORNECEDOR', False, False, True)]
-      property Id_Fornecedor: Integer read FId_Fornecedor write FId_Fornecedor;
-      [TDBColumnAttribute('ID_CLIENTE', False, False, True)]
-      property Id_Cliente: Integer read FId_Cliente write FId_Cliente;
+  public
+    [TDBColumnAttribute('ID'), TDBIsPrimaryKey, TDBIsAutoIncrement]
+    property Id: Integer read FId write FId;
+    [TDBColumnAttribute('TIPO')]
+    property Tipo: Integer read FTipo write FTipo;
+    [TDBColumnAttribute('DATA_CADASTRO')]
+    property Data_Cadastro: TDateTime read FData_Cadastro write FData_Cadastro;
+    [TDBColumnAttribute('DATA_ALTERACAO'), TDBAcceptNull]
+    property Data_Alteracao: TDateTime read FData_Alteracao
+      write FData_Alteracao;
+    [TDBColumnAttribute('STATUS')]
+    property Status: SmallInt read FStatus write FStatus;
+    [TDBColumnAttribute('DESCRICAO'), TDBAcceptNull]
+    property Descricao: String read FDescricao write FDescricao;
+    [TDBColumnAttribute('ID_FORNECEDOR'), TDBAcceptNull]
+    property Id_Fornecedor: Integer read FId_Fornecedor write FId_Fornecedor;
+    [TDBColumnAttribute('ID_CLIENTE'), TDBAcceptNull]
+    property Id_Cliente: Integer read FId_Cliente write FId_Cliente;
 
-      constructor Create;
-      destructor Destroy; override;
+    constructor Create;
+    destructor Destroy; override;
 
-      function Insert: Boolean;
-      function UpdateBySQLText(const pWhereClause: string = ''): Boolean;
-      function UpdateByPK: Boolean;
-      function UpdateByProp: Boolean;
-      function DeleteBySQLText(const pWhere: String = ''): Boolean;
-      function DeleteByPk: Boolean;
-      function DeleteByProp: Boolean;
-      function LoadObjectByPK: Boolean;
-      procedure ResetPropertiesToDefault;
-      procedure AddPropertyToWhere(const APropertyName: String);
+    function Insert: Boolean;
+    function UpdateBySQLText(const pWhereClause: string = ''): Boolean;
+    function UpdateByPK: Boolean;
+    function UpdateByProp: Boolean;
+    function DeleteBySQLText(const pWhere: String = ''): Boolean;
+    function DeleteByPk: Boolean;
+    function DeleteByProp: Boolean;
+    function LoadObjectByPK: Boolean;
+    procedure ResetPropertiesToDefault;
+    procedure AddPropertyToWhere(const APropertyName: String);
 
-      function Existe(const pId : Integer; const pCarrega : Boolean = false) : Boolean;
+    function Existe(const pId: Integer;
+      const pCarrega: Boolean = False): Boolean;
 
   end;
 
@@ -61,8 +64,8 @@ implementation
 
 { TModelLancamentoPadrao }
 
-procedure TModelLancamentoPadrao.AddPropertyToWhere(
-  const APropertyName: String);
+procedure TModelLancamentoPadrao.AddPropertyToWhere(const APropertyName
+  : String);
 begin
   FDaoRTTI.AddPropertyToWhere(APropertyName);
 end;
@@ -75,7 +78,7 @@ end;
 
 function TModelLancamentoPadrao.DeleteByPk: Boolean;
 begin
-  Result := FDaoRTTI.DeleteByPK(Self);
+  Result := FDaoRTTI.DeleteByPk(Self);
 end;
 
 function TModelLancamentoPadrao.DeleteByProp: Boolean;
@@ -97,7 +100,7 @@ end;
 function TModelLancamentoPadrao.Existe(const pId: Integer;
   const pCarrega: Boolean): Boolean;
 var
-  lQuery : TSFQuery;
+  lQuery: TSFQuery;
 begin
   Result := False;
   lQuery := TSFQuery.Create(nil);
@@ -114,7 +117,7 @@ begin
       begin
         if pCarrega then
         begin
-          FID := pId;
+          FId := pId;
           Result := LoadObjectByPK;
         end
         else
@@ -124,9 +127,10 @@ begin
       end;
 
     except
-      on E : Exception do
+      on E: Exception do
       begin
-        Application.MessageBox(PWideChar('Erro ao realizar a consulta: ' + E.Message), 'Atenção', MB_OK + MB_ICONERROR);
+        Application.MessageBox(PWideChar('Erro ao realizar a consulta: ' +
+          E.Message), 'Atenção', MB_OK + MB_ICONERROR);
       end;
     end;
   finally
@@ -160,8 +164,8 @@ begin
   Result := FDaoRTTI.UpdateByProp(Self);
 end;
 
-function TModelLancamentoPadrao.UpdateBySQLText(
-  const pWhereClause: string): Boolean;
+function TModelLancamentoPadrao.UpdateBySQLText(const pWhereClause
+  : string): Boolean;
 begin
   Result := FDaoRTTI.UpdateBySQLText(Self, pWhereClause);
 end;
