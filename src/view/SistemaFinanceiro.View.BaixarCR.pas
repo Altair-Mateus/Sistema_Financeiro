@@ -232,7 +232,6 @@ begin
 
   finally
     lCrDetalhe.Free;
-    FreeAndNil(FCr);
   end;
 
 end;
