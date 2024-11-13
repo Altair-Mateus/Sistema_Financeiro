@@ -87,7 +87,7 @@ type
     function DeleteByProp: Boolean;
     function LoadObjectByPK: Boolean;
     procedure ResetPropertiesToDefault;
-    procedure AddPropertyToWhere(const APropertyName: String);
+    procedure AddPropertyToWhere(const pPropertyName: String);
 
     function Existe(const pId : Integer; const pCarrega : Boolean = false) : Boolean;
     procedure GeraCodigo;
@@ -104,9 +104,9 @@ implementation
 { TModelCP }
 
 
-procedure TModelCP.AddPropertyToWhere(const APropertyName: String);
+procedure TModelCP.AddPropertyToWhere(const pPropertyName: String);
 begin
-
+  FDaoRTTI.AddPropertyToWhere(pPropertyName);
 end;
 
 function TModelCP.CancBxCp: Boolean;
@@ -122,12 +122,12 @@ end;
 
 function TModelCP.DeleteByPk: Boolean;
 begin
-
+  Result := FDaoRTTI.DeleteByPK(Self);
 end;
 
 function TModelCP.DeleteByProp: Boolean;
 begin
-
+  Result := FDaoRTTI.DeleteByProp(Self);
 end;
 
 function TModelCP.DeleteBySQLText(const pWhere: String): Boolean;
