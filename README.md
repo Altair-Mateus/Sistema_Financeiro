@@ -1,7 +1,7 @@
 # Sistema Financeiro
 
 <div style="background-color: black; display: inline-block; text-align: center;">
-  <img src="./img/img_logo.png" alt="Sistema Financeiro" style="width: 300px;">
+  <img src="./img/img_logo.png" alt="Sistema Financeiro" style="width: 200px;">
 </div>
 
 
@@ -19,7 +19,7 @@ Este repositório contém um sistema financeiro desenvolvido em **Delphi**, com 
   - Realize pagamentos de uma ou mais contas, com filtros por cliente/fornecedor ou faturas de cartão.
   - Lançamento automático no fluxo de caixa ao realizar a baixa/pagamento.
   - Possibilidade de cancelar baixas/pagamentos, revertendo o status da conta e removendo o movimento do fluxo de caixa.
-  - Veja detalhes da baixa como descriação, valor pago, data e usuário que realizou a mesma.
+  - Veja detalhes da baixa como descrição, valor pago, data e usuário que realizou a mesma.
 - **Descontos**: 
   - Aplique descontos em valor ou porcentagem ao realizar baixas/pagamentos.
 - **Contas Parceladas**:
