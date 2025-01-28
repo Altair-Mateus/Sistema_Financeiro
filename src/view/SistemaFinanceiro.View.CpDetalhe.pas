@@ -94,7 +94,7 @@ begin
 
   try
 
-    if Cp.ID.IsEmpty then
+    if Cp.ID <= 0 then
     begin
       raise Exception.Create('Conta a pagar não encontrado!');
     end;

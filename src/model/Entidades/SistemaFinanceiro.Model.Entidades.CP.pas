@@ -10,12 +10,12 @@ uses
 
 type
 
-  [TDBTable('CONTAS_RECEBER')]
+  [TDBTable('CONTAS_PAGAR')]
   TModelCP = class
 
   private
     FDaoRTTI: TDaoRTTI;
-    FID: String;
+    FID: Integer;
     FValorParcela: Double;
     FDataCompra: TDate;
     FDataVencimento: TDate;
@@ -37,7 +37,7 @@ type
 
   public
     [TDBColumn('ID'), TDBIsPrimaryKey]
-    property ID: String read FID write FID;
+    property ID: Integer read FID write FID;
     [TDBColumn('NUMERO_DOC'), TDBAcceptNull]
     property Doc: String read FDoc write FDoc;
     [TDBColumn('DESCRICAO'), TDBAcceptNull]
@@ -71,9 +71,11 @@ type
     [TDBColumn('ID_FATURA')]
     property IdFatCartao: Integer read FIdFatCartao write FIdFatCartao;
     [TDBColumn('NUM_TOT_PARCELAS'), TDBAcceptNull]
-    property NumTotalParcelas: Integer read FNumTotalParcelas write FNumTotalParcelas;
+    property NumTotalParcelas: Integer read FNumTotalParcelas
+      write FNumTotalParcelas;
     [TDBColumn('ID_GRUPO_PARCELAS'), TDBAcceptNull]
-    property IdGrupoParcelas: Integer read FIdGrupoParcelas write FIdGrupoParcelas;
+    property IdGrupoParcelas: Integer read FIdGrupoParcelas
+      write FIdGrupoParcelas;
 
     constructor Create;
     destructor Destroy; override;
@@ -89,20 +91,20 @@ type
     procedure ResetPropertiesToDefault;
     procedure AddPropertyToWhere(const pPropertyName: String);
 
-    function Existe(const pId : Integer; const pCarrega : Boolean = false) : Boolean;
+    function Existe(const pId: Integer;
+      const pCarrega: Boolean = false): Boolean;
     procedure GeraCodigo;
 
-    class function TotalCP(pDtIni, pDtFim: TDate) : Double;
-    class function GetIdGrupoParcelas : Integer;
+    class function TotalCP(pDtIni, pDtFim: TDate): Double;
+    class function GetIdGrupoParcelas: Integer;
 
-    function CancBxCp : Boolean;
+    function CancBxCp: Boolean;
 
   end;
 
 implementation
 
 { TModelCP }
-
 
 procedure TModelCP.AddPropertyToWhere(const pPropertyName: String);
 begin
@@ -122,7 +124,7 @@ end;
 
 function TModelCP.DeleteByPk: Boolean;
 begin
-  Result := FDaoRTTI.DeleteByPK(Self);
+  Result := FDaoRTTI.DeleteByPk(Self);
 end;
 
 function TModelCP.DeleteByProp: Boolean;
@@ -142,7 +144,34 @@ begin
 end;
 
 function TModelCP.Existe(const pId: Integer; const pCarrega: Boolean): Boolean;
+var
+  lQuery: TSFQuery;
 begin
+  Result := false;
+  lQuery := TSFQuery.Create(nil);
+  try
+      lQuery.Close;
+      lQuery.SQL.Clear;
+      lQuery.SQL.Add(' SELECT ID FROM CONTAS_PAGAR   ');
+      lQuery.SQL.Add(' WHERE ID = :ID                ');
+      lQuery.ParamByName('ID').AsInteger := pId;
+      lQuery.Open;
+
+      if (lQuery.RecordCount > 0) then
+      begin
+        if (pCarrega) then
+        begin
+          FID := pId;
+          Result := LoadObjectByPK;
+        end
+        else
+        begin
+          Result := True;
+        end;
+      end;
+  finally
+    lQuery.Free;
+  end;
 
 end;
 

@@ -220,13 +220,13 @@ begin
 
         try
 
-          if Cp.ID.IsEmpty then
+          if Cp.ID <= 0 then
           begin
             raise Exception.Create('Conta a receber não encontrada!');
           end;
 
           //  Carrega os dados
-          edtCod.Text       := Cp.ID;
+          edtCod.Text       := IntToStr(Cp.ID);
           edtForCli.Text    := IntToStr(Cp.IdFornecedor) + ' - ' + dmFornecedores.GetNomeFornecedor(IntToStr(Cp.IdFornecedor));
           lblForCli.Caption := 'Fornecedor';
 

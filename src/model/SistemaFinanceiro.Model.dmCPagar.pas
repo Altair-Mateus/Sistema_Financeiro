@@ -1,5 +1,7 @@
 unit SistemaFinanceiro.Model.dmCPagar;
+
 interface
+
 uses
   System.SysUtils, System.Classes, FireDAC.Stan.Intf, FireDAC.Stan.Option,
   FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf,
@@ -8,6 +10,7 @@ uses
   Datasnap.DBClient, SistemaFinanceiro.Model.Entidades.CP,
   SistemaFinanceiro.Model.Entidades.CP.Detalhe, Vcl.Dialogs,
   Vcl.Forms, Winapi.Windows;
+
 type
   TdmCPagar = class(TDataModule)
     FDQueryCPagar: TFDQuery;
@@ -91,18 +94,18 @@ type
       DisplayText: Boolean);
   private
     { Private declarations }
-    procedure QryCancBxCP(SQl : String; Id : Integer);
+    procedure QryCancBxCP(SQl: String; Id: Integer);
 
   public
     { Public declarations }
     procedure GeraCodigo;
-    procedure BaixarCP(BaixaCP : TModelCpDetalhe);
+    procedure BaixarCP(BaixaCP: TModelCpDetalhe);
     procedure CancBxCP(Id: Integer);
 
-    function GetCP(Id : Integer) : TModelCP;
-    function GetCpDet(Id : Integer) : TModelCpDetalhe;
-    function GeraCodigoCPDetalhe : Integer;
-    function TotalCP(DataInicial, DataFinal : TDate) : Currency;
+    function GetCP(Id: Integer): TModelCP;
+    function GetCpDet(Id: Integer): TModelCpDetalhe;
+    function GeraCodigoCPDetalhe: Integer;
+    function TotalCP(DataInicial, DataFinal: TDate): Currency;
 
   end;
 
@@ -117,45 +120,44 @@ uses SistemaFinanceiro.Model.udmDados,
   SistemaFinanceiro.Model.Entidades.LancamentoCaixa,
   SistemaFinanceiro.Model.dmCaixa;
 {$R *.dfm}
-
 { TDataModuleCPagar }
 
 procedure TdmCPagar.BaixarCP(BaixaCP: TModelCpDetalhe);
 var
-  ContaPagar   : TModelCP;
-  FDQueryCP    : TFDQuery;
-  FDQueryCpDet : TFDQuery;
-  FDQueryCaixa : TFDQuery;
-  SQLUpdate    : String;
-  SQLInsert    : String;
-  LancarCaixa  : TModelLancamentoCaixa;
-  CodlancCaixa : String;
+  ContaPagar: TModelCP;
+  FDQueryCP: TFDQuery;
+  FDQueryCpDet: TFDQuery;
+  FDQueryCaixa: TFDQuery;
+  SQLUpdate: String;
+  SQLInsert: String;
+  LancarCaixa: TModelLancamentoCaixa;
+  CodlancCaixa: String;
 
 const
-  ToleranciaValCp : Currency = 0.01;
+  ToleranciaValCp: Currency = 0.01;
 
 begin
 
-  ContaPagar   := GetCP(BaixaCP.IdCP);
-  FDQueryCP    := TFDQuery.Create(nil);
+  ContaPagar := GetCP(BaixaCP.IdCP);
+  FDQueryCP := TFDQuery.Create(nil);
   FDQueryCpDet := TFDQuery.Create(nil);
   FDQueryCaixa := TFDQuery.Create(nil);
 
   try
 
-    //  Estabelece conexão com o banco
-    FDQueryCP.Connection    := DataModule1.FDConnection;
+    // Estabelece conexão com o banco
+    FDQueryCP.Connection := DataModule1.FDConnection;
     FDQueryCpDet.Connection := DataModule1.FDConnection;
     FDQueryCaixa.Connection := DataModule1.FDConnection;
 
-    if ContaPagar.ID = '' then
+    if ContaPagar.Id = 0 then
     begin
       raise Exception.Create('Conta a pagar não encontrada!');
     end;
 
     ContaPagar.ValorAbatido := ContaPagar.ValorAbatido + BaixaCP.Valor;
 
-    //  Caso o valor abatido já seja igual ao valor da parcela
+    // Caso o valor abatido já seja igual ao valor da parcela
     if ContaPagar.ValorAbatido >= ContaPagar.ValorParcela then
     begin
       ContaPagar.Status := 'P';
@@ -165,106 +167,110 @@ begin
     try
 
       // Inclui conta parcial
-      if (Abs(ContaPagar.ValorParcela - BaixaCP.Valor) - BaixaCP.ValorDesc) > ToleranciaValCp then
+      if (Abs(ContaPagar.ValorParcela - BaixaCP.Valor) - BaixaCP.ValorDesc) > ToleranciaValCp
+      then
       begin
 
-        //  Inseriando nova duplcata parcial
-        if not (cdsCPagar.State in [dsInsert, dsEdit]) then
+        // Inseriando nova duplcata parcial
+        if not(cdsCPagar.State in [dsInsert, dsEdit]) then
         begin
-          //  Colocando o data set em modo de inserção de dados
+          // Colocando o data set em modo de inserção de dados
           cdsCPagar.Insert;
         end;
 
-        //  gera a id
+        // gera a id
         GeraCodigo;
         cdsCPagarDATA_CADASTRO.AsDateTime := now;
-        cdsCPagarSTATUS.AsString          := 'A';
+        cdsCPagarSTATUS.AsString := 'A';
         cdsCPagarVALOR_ABATIDO.AsCurrency := 0;
 
-
-        //  Passando os dados para o dataset
-        if (ContaPagar.Doc = '') or (ContaPagar.Parcial = 'S' ) then
+        // Passando os dados para o dataset
+        if (ContaPagar.Doc = '') or (ContaPagar.Parcial = 'S') then
         begin
           cdsCPagarNUMERO_DOC.AsString := ContaPagar.Doc;
         end
         else
         begin
-          cdsCPagarNUMERO_DOC.AsString  := Format('%s-P', [ContaPagar.Doc]);
+          cdsCPagarNUMERO_DOC.AsString := Format('%s-P', [ContaPagar.Doc]);
         end;
 
-        cdsCPagarDESCRICAO.AsString         := Format('Parcial - Restante da Conta ID Nº %s - Doc Nº %s', [ContaPagar.ID, ContaPagar.Doc]);
-        cdsCPagarVALOR_COMPRA.AsCurrency    := ContaPagar.ValorCompra;
-        cdsCPagarDATA_COMPRA.AsDateTime     := ContaPagar.DataCompra;
-        cdsCPagarPARCELA.AsInteger          := ContaPagar.Parcela;
-        cdsCPagarVALOR_PARCELA.AsCurrency   := ((ContaPagar.ValorParcela - BaixaCP.Valor) - BaixaCP.ValorDesc);
+        cdsCPagarDESCRICAO.AsString :=
+          Format('Parcial - Restante da Conta ID Nº %s - Doc Nº %s',
+          [ContaPagar.Id, ContaPagar.Doc]);
+        cdsCPagarVALOR_COMPRA.AsCurrency := ContaPagar.ValorCompra;
+        cdsCPagarDATA_COMPRA.AsDateTime := ContaPagar.DataCompra;
+        cdsCPagarPARCELA.AsInteger := ContaPagar.Parcela;
+        cdsCPagarVALOR_PARCELA.AsCurrency :=
+          ((ContaPagar.ValorParcela - BaixaCP.Valor) - BaixaCP.ValorDesc);
         cdsCPagarDATA_VENCIMENTO.AsDateTime := ContaPagar.DataVencimento;
-        cdsCPagarPARCIAL.AsString           := 'S';
-        cdsCPagarCP_ORIGEM.AsString         := ContaPagar.ID;
-        cdsCPagarID_FORNECEDOR.AsInteger    := ContaPagar.IdFornecedor;
-        cdsCPagarFATURA_CART.AsString       := ContaPagar.FatCartao;
+        cdsCPagarPARCIAL.AsString := 'S';
+        cdsCPagarCP_ORIGEM.AsString := IntToStr(ContaPagar.Id);
+        cdsCPagarID_FORNECEDOR.AsInteger := ContaPagar.IdFornecedor;
+        cdsCPagarFATURA_CART.AsString := ContaPagar.FatCartao;
 
         if ContaPagar.FatCartao = 'S' then
         begin
-          cdsCPagarID_FATURA.AsInteger        := ContaPagar.IdFatCartao;
+          cdsCPagarID_FATURA.AsInteger := ContaPagar.IdFatCartao;
         end;
 
-        //  Gravando no BD
+        // Gravando no BD
         cdsCPagar.Post;
         cdsCPagar.ApplyUpdates(0);
 
       end;
 
-
-      //  Montando o SQL para atualizar a conta baixada
+      // Montando o SQL para atualizar a conta baixada
       SQLUpdate := 'UPDATE CONTAS_PAGAR SET VALOR_ABATIDO = :VALORABATIDO, ' +
-                ' VALOR_PARCELA = :VALORPARCELA, STATUS = :STATUS, ' +
-                ' DATA_PAGAMENTO = :DATAPGTO' +
-                ' WHERE ID = :IDCP; ';
+        ' VALOR_PARCELA = :VALORPARCELA, STATUS = :STATUS, ' +
+        ' DATA_PAGAMENTO = :DATAPGTO' + ' WHERE ID = :IDCP; ';
 
       FDQueryCP.Close;
-      FDQueryCP.SQL.Clear;
-      FDQueryCP.SQL.Add(SQLUpdate);
+      FDQueryCP.SQl.Clear;
+      FDQueryCP.SQl.Add(SQLUpdate);
 
-      FDQueryCP.ParamByName('VALORABATIDO').AsCurrency := ContaPagar.ValorAbatido;
-      FDQueryCP.ParamByName('VALORPARCELA').AsCurrency := ContaPagar.ValorParcela;
-      FDQueryCP.ParamByName('STATUS').AsString         := 'P';
-      FDQueryCP.ParamByName('DATAPGTO').AsDate         := BaixaCP.Data;
-      FDQueryCP.ParamByName('IDCP').AsString           := ContaPagar.ID;
+      FDQueryCP.ParamByName('VALORABATIDO').AsCurrency :=
+        ContaPagar.ValorAbatido;
+      FDQueryCP.ParamByName('VALORPARCELA').AsCurrency :=
+        ContaPagar.ValorParcela;
+      FDQueryCP.ParamByName('STATUS').AsString := 'P';
+      FDQueryCP.ParamByName('DATAPGTO').AsDate := BaixaCP.Data;
+      FDQueryCP.ParamByName('IDCP').AsString := IntToStr(ContaPagar.Id);
 
       FDQueryCP.Prepare;
       FDQueryCP.ExecSQL;
 
+      // Montando o SQL para persisitr os dados na tabela Contas_pagar_detalhe
+      SQLInsert :=
+        'INSERT INTO CONTAS_PAGAR_DETALHE (ID, ID_CONTA_PAGAR, DETALHES, ' +
+        ' VALOR, DATA, USUARIO, DESCONTO_BX) VALUES (:ID, :IDCP, :DETALHES, :VALOR, '
+        + ' :DATA, :USUARIO, :DESC)';
 
-
-      //  Montando o SQL para persisitr os dados na tabela Contas_pagar_detalhe
-      SQLInsert := 'INSERT INTO CONTAS_PAGAR_DETALHE (ID, ID_CONTA_PAGAR, DETALHES, ' +
-                   ' VALOR, DATA, USUARIO, DESCONTO_BX) VALUES (:ID, :IDCP, :DETALHES, :VALOR, ' +
-                   ' :DATA, :USUARIO, :DESC)';
-
-      FDQueryCpDet.SQL.Add(SQLInsert);
-      FDQueryCpDet.ParamByName('ID').AsInteger      := GeraCodigoCPDetalhe;
-      FDQueryCpDet.ParamByName('IDCP').AsInteger    := BaixaCP.IdCP;
+      FDQueryCpDet.SQl.Add(SQLInsert);
+      FDQueryCpDet.ParamByName('ID').AsInteger := GeraCodigoCPDetalhe;
+      FDQueryCpDet.ParamByName('IDCP').AsInteger := BaixaCP.IdCP;
       FDQueryCpDet.ParamByName('DETALHES').AsString := BaixaCP.Detalhes;
-      FDQueryCpDet.ParamByName('VALOR').AsCurrency  := BaixaCP.Valor;
-      FDQueryCpDet.ParamByName('DATA').AsDate       := BaixaCP.Data;
-      FDQueryCpDet.ParamByName('USUARIO').AsString  := BaixaCP.Usuario;
-      FDQueryCpDet.ParamByName('DESC').AsCurrency   := BaixaCP.ValorDesc;
+      FDQueryCpDet.ParamByName('VALOR').AsCurrency := BaixaCP.Valor;
+      FDQueryCpDet.ParamByName('DATA').AsDate := BaixaCP.Data;
+      FDQueryCpDet.ParamByName('USUARIO').AsString := BaixaCP.Usuario;
+      FDQueryCpDet.ParamByName('DESC').AsCurrency := BaixaCP.ValorDesc;
 
       FDQueryCpDet.Prepare;
       FDQueryCpDet.ExecSQL;
 
-      //  Lançando a baixa no caixa
+      // Lançando a baixa no caixa
       LancarCaixa := TModelLancamentoCaixa.Create;
       try
 
-        LancarCaixa.ID           := dmCaixa.GeraId;
-        LancarCaixa.NumDoc       := ContaPagar.Doc;
-        LancarCaixa.Desc         := Format('Baixa Conta ID Nº %s Pagar - Nº Documento: %s - Parcela: %d', [ContaPagar.ID, contaPagar.Doc, ContaPagar.Parcela]);
-        LancarCaixa.Valor        := BaixaCP.Valor;
-        LancarCaixa.Tipo         := 'D';
+        LancarCaixa.Id := dmCaixa.GeraId;
+        LancarCaixa.NumDoc := ContaPagar.Doc;
+        LancarCaixa.Desc :=
+          Format('Baixa Conta ID Nº %s Pagar - Nº Documento: %s - Parcela: %d',
+          [ContaPagar.Id, ContaPagar.Doc, ContaPagar.Parcela]);
+        LancarCaixa.Valor := BaixaCP.Valor;
+        LancarCaixa.Tipo := 'D';
         LancarCaixa.DataCadastro := BaixaCP.Data;
-        LancarCaixa.Origem       := 'CP';
-        LancarCaixa.IdOrigem     := StrToInt(ContaPagar.ID);
+        LancarCaixa.Origem := 'CP';
+        LancarCaixa.IdOrigem := ContaPagar.Id;
 
         try
 
@@ -284,7 +290,7 @@ begin
         finally
 
           FDQueryCaixa.Close;
-          FDQueryCaixa.Free;  
+          FDQueryCaixa.Free;
 
         end;
 
@@ -293,7 +299,6 @@ begin
         LancarCaixa.Free;
 
       end;
-
 
     finally
 
@@ -314,42 +319,43 @@ end;
 
 procedure TdmCPagar.CancBxCP(Id: Integer);
 Const
-  SQLCp   = 'UPDATE CONTAS_PAGAR SET VALOR_ABATIDO = 0, DATA_PAGAMENTO = NULL, STATUS = ''A'' ' +
-            ' WHERE ID = :IDCP';
-  SQlDet  = 'DELETE FROM CONTAS_PAGAR_DETALHE WHERE ID_CONTA_PAGAR = :IDCP';
+  SQLCp = 'UPDATE CONTAS_PAGAR SET VALOR_ABATIDO = 0, DATA_PAGAMENTO = NULL, STATUS = ''A'' '
+    + ' WHERE ID = :IDCP';
+  SQlDet = 'DELETE FROM CONTAS_PAGAR_DETALHE WHERE ID_CONTA_PAGAR = :IDCP';
   SQlPgto = 'DELETE FROM PGTO_BX_CP WHERE ID_CP = :IDCP';
-  SQLCx   = 'DELETE FROM CAIXA WHERE ORIGEM = ''CP'' AND ID_ORIGEM = :IDCP';
+  SQLCx = 'DELETE FROM CAIXA WHERE ORIGEM = ''CP'' AND ID_ORIGEM = :IDCP';
 
 begin
 
-  //  Valida a ID
+  // Valida a ID
   if Id <= 0 then
   begin
-   raise Exception.Create('Conta a pagar não encontrada!');
+    raise Exception.Create('Conta a pagar não encontrada!');
   end;
 
   DataModule1.FDConnection.StartTransaction;
 
   try
 
-    QryCancBxCP(SQLDet, Id);
-    QryCancBxCP(SQLPgto, Id);
+    QryCancBxCP(SQlDet, Id);
+    QryCancBxCP(SQlPgto, Id);
     QryCancBxCP(SQLCx, Id);
     QryCancBxCP(SQLCp, Id);
 
     DataModule1.FDConnection.Commit;
-    Application.MessageBox('Conta cancelada com Sucesso!!', 'Atenção', MB_OK + MB_ICONINFORMATION);
+    Application.MessageBox('Conta cancelada com Sucesso!!', 'Atenção',
+      MB_OK + MB_ICONINFORMATION);
 
   except
 
     on E: Exception do
     begin
       DataModule1.FDConnection.Rollback;
-      Application.MessageBox(PWideChar(E.Message), 'Erro ao cancelar a CP!', MB_OK + MB_ICONWARNING);
+      Application.MessageBox(PWideChar(E.Message), 'Erro ao cancelar a CP!',
+        MB_OK + MB_ICONWARNING);
     end;
 
   end;
-
 
 end;
 
@@ -362,21 +368,20 @@ begin
     Text := 'ABERTA';
   end
   else if Sender.AsString = 'P' then
-       begin
-         Text := 'PAGA';
-       end
-       else if Sender.AsString = 'C' then
-            begin
-              Text := 'CANCELADA';
-            end;
-
+  begin
+    Text := 'PAGA';
+  end
+  else if Sender.AsString = 'C' then
+  begin
+    Text := 'CANCELADA';
+  end;
 
 end;
 
 procedure TdmCPagar.GeraCodigo;
 var
-  FDQueryId : TFDQuery;
-  cod : integer;
+  FDQueryId: TFDQuery;
+  cod: Integer;
 
 begin
 
@@ -385,17 +390,17 @@ begin
 
   try
 
-    //  Estabelece a conexao com o banco
+    // Estabelece a conexao com o banco
     FDQueryId.Connection := DataModule1.FDConnection;
     FDQueryId.Close;
-    FDQueryId.SQL.Clear;
+    FDQueryId.SQl.Clear;
     FDQueryId.Open('SELECT MAX(ID) AS ID FROM CONTAS_PAGAR');
 
-    //  Ultimo codigo usado + 1
+    // Ultimo codigo usado + 1
     cod := FDQueryId.FieldByName('ID').AsInteger + 1;
-    cdsCPagarid.AsInteger := cod;
+    cdsCPagarID.AsInteger := cod;
 
-    //  Insere o registro no final da tabela
+    // Insere o registro no final da tabela
     FDQueryId.Append;
 
   finally
@@ -407,7 +412,7 @@ end;
 
 function TdmCPagar.GeraCodigoCPDetalhe: Integer;
 var
-  FDQueryIdDet : TFDQuery;
+  FDQueryIdDet: TFDQuery;
 
 begin
 
@@ -415,17 +420,17 @@ begin
   FDQueryIdDet := TFDQuery.Create(nil);
 
   try
-    //  Estabelece a conexao com o banco
+    // Estabelece a conexao com o banco
     FDQueryIdDet.Connection := DataModule1.FDConnection;
 
     FDQueryIdDet.Close;
-    FDQueryIdDet.SQL.Clear;
+    FDQueryIdDet.SQl.Clear;
     FDQueryIdDet.Open('SELECT MAX(ID) AS ID FROM CONTAS_PAGAR_DETALHE');
 
-    //  Ultimo codigo usado + 1
+    // Ultimo codigo usado + 1
     Result := FDQueryIdDet.FieldByName('ID').AsInteger + 1;
 
-    //  Insere o registro no final da tabela
+    // Insere o registro no final da tabela
     FDQueryIdDet.Append;
 
   finally
@@ -437,7 +442,7 @@ end;
 
 function TdmCPagar.GetCP(Id: Integer): TModelCP;
 var
-  FDQueryCP : TFDQuery;
+  FDQueryCP: TFDQuery;
 
 begin
 
@@ -445,12 +450,12 @@ begin
 
   try
 
-    //  Estabelece a conexão
+    // Estabelece a conexão
     FDQueryCP.Connection := DataModule1.FDConnection;
 
     FDQueryCP.Close;
-    FDQueryCP.SQL.Clear;
-    FDQueryCP.SQL.Add('SELECT * FROM CONTAS_PAGAR WHERE ID = :ID');
+    FDQueryCP.SQl.Clear;
+    FDQueryCP.SQl.Add('SELECT * FROM CONTAS_PAGAR WHERE ID = :ID');
     FDQueryCP.ParamByName('ID').AsInteger := Id;
     FDQueryCP.Open;
 
@@ -458,23 +463,25 @@ begin
 
     try
 
-      Result.ID             := FDQueryCP.FieldByName('ID').AsString;
-      Result.Doc            := FDQueryCP.FieldByName('NUMERO_DOC').AsString;
-      Result.Desc           := FDQueryCP.FieldByName('DESCRICAO').AsString;
-      Result.Parcela        := FDQueryCP.FieldByName('PARCELA').AsInteger;
-      Result.ValorParcela   := FDQueryCP.FieldByName('VALOR_PARCELA').AsCurrency;
-      Result.ValorCompra    := FDQueryCP.FieldByName('VALOR_COMPRA').AsCurrency;
-      Result.ValorAbatido   := FDQueryCP.FieldByName('VALOR_ABATIDO').AsCurrency;
-      Result.DataCompra     := FDQueryCP.FieldByName('DATA_COMPRA').AsDateTime;
-      Result.DataCadastro   := FDQueryCP.FieldByName('DATA_CADASTRO').AsDateTime;
-      Result.DataVencimento := FDQueryCP.FieldByName('DATA_VENCIMENTO').AsDateTime;
-      Result.DataPagamento  := FDQueryCP.FieldByName('DATA_PAGAMENTO').AsDateTime;
-      Result.Status         := FDQueryCP.FieldByName('STATUS').AsString;
-      Result.Parcial        := FDQueryCP.FieldByName('PARCIAL').AsString;
-      Result.CpOrigem       := FDQueryCP.FieldByName('CP_ORIGEM').AsInteger;
-      Result.IdFornecedor   := FDQueryCP.FieldByName('ID_FORNECEDOR').AsInteger;
-      Result.FatCartao      := FDQueryCP.FieldByName('FATURA_CART').AsString;
-      Result.IdFatCartao    := FDQueryCP.FieldByName('ID_FATURA').AsInteger;
+      Result.Id := FDQueryCP.FieldByName('ID').AsInteger;
+      Result.Doc := FDQueryCP.FieldByName('NUMERO_DOC').AsString;
+      Result.Desc := FDQueryCP.FieldByName('DESCRICAO').AsString;
+      Result.Parcela := FDQueryCP.FieldByName('PARCELA').AsInteger;
+      Result.ValorParcela := FDQueryCP.FieldByName('VALOR_PARCELA').AsCurrency;
+      Result.ValorCompra := FDQueryCP.FieldByName('VALOR_COMPRA').AsCurrency;
+      Result.ValorAbatido := FDQueryCP.FieldByName('VALOR_ABATIDO').AsCurrency;
+      Result.DataCompra := FDQueryCP.FieldByName('DATA_COMPRA').AsDateTime;
+      Result.DataCadastro := FDQueryCP.FieldByName('DATA_CADASTRO').AsDateTime;
+      Result.DataVencimento := FDQueryCP.FieldByName('DATA_VENCIMENTO')
+        .AsDateTime;
+      Result.DataPagamento := FDQueryCP.FieldByName('DATA_PAGAMENTO')
+        .AsDateTime;
+      Result.Status := FDQueryCP.FieldByName('STATUS').AsString;
+      Result.Parcial := FDQueryCP.FieldByName('PARCIAL').AsString;
+      Result.CpOrigem := FDQueryCP.FieldByName('CP_ORIGEM').AsInteger;
+      Result.IdFornecedor := FDQueryCP.FieldByName('ID_FORNECEDOR').AsInteger;
+      Result.FatCartao := FDQueryCP.FieldByName('FATURA_CART').AsString;
+      Result.IdFatCartao := FDQueryCP.FieldByName('ID_FATURA').AsInteger;
 
     except
       Result.Free;
@@ -489,39 +496,39 @@ end;
 
 function TdmCPagar.GetCpDet(Id: Integer): TModelCpDetalhe;
 var
-  FDQueryCPDet : TFDQuery;
-  SQL: String;
+  FDQueryCpDet: TFDQuery;
+  SQl: String;
 
 begin
 
-  FDQueryCPDet := TFDQuery.Create(Nil);
+  FDQueryCpDet := TFDQuery.Create(Nil);
 
   try
 
-    //  Estabelece a conexão
-    FDQueryCPDet.Connection := DataModule1.FDConnection;
+    // Estabelece a conexão
+    FDQueryCpDet.Connection := DataModule1.FDConnection;
 
-    SQL:= 'SELECT * FROM CONTAS_PAGAR_DETALHE CP' +
-         ' LEFT JOIN USUARIOS US ON CP.USUARIO = US.ID ' +
-         ' WHERE ID_CONTA_PAGAR = :ID';
+    SQl := 'SELECT * FROM CONTAS_PAGAR_DETALHE CP' +
+      ' LEFT JOIN USUARIOS US ON CP.USUARIO = US.ID ' +
+      ' WHERE ID_CONTA_PAGAR = :ID';
 
-    FDQueryCPDet.Close;
-    FDQueryCPDet.SQL.Clear;
-    FDQueryCPDet.SQL.Add(SQL);
-    FDQueryCPDet.ParamByName('ID').AsInteger := Id;
-    FDQueryCPDet.Open;
+    FDQueryCpDet.Close;
+    FDQueryCpDet.SQl.Clear;
+    FDQueryCpDet.SQl.Add(SQl);
+    FDQueryCpDet.ParamByName('ID').AsInteger := Id;
+    FDQueryCpDet.Open;
 
     Result := TModelCpDetalhe.Create;
 
     try
 
-      Result.Id        := FDQueryCPDet.FieldByName('ID').AsInteger;
-      Result.IdCP      := FDQueryCPDet.FieldByName('ID_CONTA_PAGAR').AsInteger;
-      Result.Detalhes  := FDQueryCPDet.FieldByName('DETALHES').AsString;
-      Result.Valor     := FDQueryCPDet.FieldByName('VALOR').AsCurrency;
-      Result.Data      := FDQueryCPDet.FieldByName('DATA').AsDateTime;
-      Result.Usuario   := FDQueryCPDet.FieldByName('NOME').AsString;
-      Result.ValorDesc := FDQueryCPDet.FieldByName('DESCONTO_BX').AsCurrency;
+      Result.Id := FDQueryCpDet.FieldByName('ID').AsInteger;
+      Result.IdCP := FDQueryCpDet.FieldByName('ID_CONTA_PAGAR').AsInteger;
+      Result.Detalhes := FDQueryCpDet.FieldByName('DETALHES').AsString;
+      Result.Valor := FDQueryCpDet.FieldByName('VALOR').AsCurrency;
+      Result.Data := FDQueryCpDet.FieldByName('DATA').AsDateTime;
+      Result.Usuario := FDQueryCpDet.FieldByName('NOME').AsString;
+      Result.ValorDesc := FDQueryCpDet.FieldByName('DESCONTO_BX').AsCurrency;
 
     except
       Result.Free;
@@ -529,15 +536,14 @@ begin
     end;
 
   finally
-    FDQueryCPDet.Free;
+    FDQueryCpDet.Free;
   end;
-
 
 end;
 
-procedure TdmCPagar.QryCancBxCP(SQl: String; Id : Integer);
+procedure TdmCPagar.QryCancBxCP(SQl: String; Id: Integer);
 var
-  FDQueryCancBx : TFDQuery;
+  FDQueryCancBx: TFDQuery;
 
 begin
 
@@ -548,8 +554,8 @@ begin
     FDQueryCancBx.Connection := DataModule1.FDConnection;
 
     FDQueryCancBx.Close;
-    FDQueryCancBx.SQL.Clear;
-    FDQueryCancBx.SQL.Add(SQL);
+    FDQueryCancBx.SQl.Clear;
+    FDQueryCancBx.SQl.Add(SQl);
     FDQueryCancBx.ParamByName('IDCP').AsInteger := Id;
     FDQueryCancBx.ExecSQL;
 
@@ -561,7 +567,7 @@ end;
 
 function TdmCPagar.TotalCP(DataInicial, DataFinal: TDate): Currency;
 var
-  FDQueryTotalCP : TFDQuery;
+  FDQueryTotalCP: TFDQuery;
 
 begin
 
@@ -570,13 +576,15 @@ begin
 
   try
 
-    //  Estabele a conexão com o banco
+    // Estabele a conexão com o banco
     FDQueryTotalCP.Connection := DataModule1.FDConnection;
 
     FDQueryTotalCP.Close;
-    FDQueryTotalCP.SQL.Clear;
-    FDQueryTotalCP.SQL.Add('SELECT COALESCE(SUM(VALOR_PARCELA), 0) AS VALOR FROM CONTAS_PAGAR ');
-    FDQueryTotalCP.SQL.Add(' WHERE STATUS = ''A'' AND DATA_VENCIMENTO BETWEEN :DATA_INICIAL AND :DATA_FINAL ');
+    FDQueryTotalCP.SQl.Clear;
+    FDQueryTotalCP.SQl.Add
+      ('SELECT COALESCE(SUM(VALOR_PARCELA), 0) AS VALOR FROM CONTAS_PAGAR ');
+    FDQueryTotalCP.SQl.Add
+      (' WHERE STATUS = ''A'' AND DATA_VENCIMENTO BETWEEN :DATA_INICIAL AND :DATA_FINAL ');
 
     FDQueryTotalCP.ParamByName('DATA_INICIAL').AsDate := DataInicial;
     FDQueryTotalCP.ParamByName('DATA_FINAL').AsDate := DataFinal;
@@ -584,7 +592,6 @@ begin
     FDQueryTotalCP.Open;
 
     Result := FDQueryTotalCP.FieldByName('VALOR').AsCurrency;
-
 
   finally
 
