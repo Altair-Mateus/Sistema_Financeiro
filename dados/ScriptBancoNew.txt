@@ -71,7 +71,9 @@ CREATE TABLE CONTAS_PAGAR (
     CP_ORIGEM        INTEGER,
     ID_FORNECEDOR    INTEGER NOT NULL,
     FATURA_CART      VARCHAR(1) NOT NULL,
-    ID_FATURA        INTEGER
+    ID_FATURA        INTEGER,
+	NUM_TOT_PARCELAS   INTEGER,
+    ID_GRUPO_PARCELAS  INTEGER
 );
 
 
@@ -251,6 +253,7 @@ UPDATE OR INSERT INTO FR_PGTO (ID_FR, NOME_FR, "DESC", STATUS, DATA_CADASTRO, DA
 /***                         Generators                                     ***/
 /******************************************************************************/
 CREATE SEQUENCE GEN_ID_GRUPO_PARCELAS;
+CREATE SEQUENCE GEN_ID_GRUPO_PARCELAS_CP;
 CREATE GENERATOR GEN_LANCAMENTO_PADRAO_CONTAS_ID;
 
 
