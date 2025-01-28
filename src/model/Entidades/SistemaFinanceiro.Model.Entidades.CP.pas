@@ -6,7 +6,8 @@ uses
   uDBAttributes,
   uDaoRTTI,
   SistemaFinanceiro.Model.uSFQuery,
-  System.SysUtils;
+  System.SysUtils,
+  FireDAC.Stan.Param;
 
 type
 
@@ -98,22 +99,17 @@ type
     class function TotalCP(pDtIni, pDtFim: TDate): Double;
     class function GetIdGrupoParcelas: Integer;
 
-    function CancBxCp: Boolean;
-
   end;
 
 implementation
 
 { TModelCP }
 
+uses uContasPagarExceptions;
+
 procedure TModelCP.AddPropertyToWhere(const pPropertyName: String);
 begin
   FDaoRTTI.AddPropertyToWhere(pPropertyName);
-end;
-
-function TModelCP.CancBxCp: Boolean;
-begin
-
 end;
 
 constructor TModelCP.Create;
@@ -134,7 +130,7 @@ end;
 
 function TModelCP.DeleteBySQLText(const pWhere: String): Boolean;
 begin
-
+  Result := FDaoRTTI.DeleteBySQLText(Self, pWhere);
 end;
 
 destructor TModelCP.Destroy;
@@ -150,25 +146,25 @@ begin
   Result := false;
   lQuery := TSFQuery.Create(nil);
   try
-      lQuery.Close;
-      lQuery.SQL.Clear;
-      lQuery.SQL.Add(' SELECT ID FROM CONTAS_PAGAR   ');
-      lQuery.SQL.Add(' WHERE ID = :ID                ');
-      lQuery.ParamByName('ID').AsInteger := pId;
-      lQuery.Open;
+    lQuery.Close;
+    lQuery.SQL.Clear;
+    lQuery.SQL.Add(' SELECT ID FROM CONTAS_PAGAR   ');
+    lQuery.SQL.Add(' WHERE ID = :ID                ');
+    lQuery.ParamByName('ID').AsInteger := pId;
+    lQuery.Open;
 
-      if (lQuery.RecordCount > 0) then
+    if (lQuery.RecordCount > 0) then
+    begin
+      if (pCarrega) then
       begin
-        if (pCarrega) then
-        begin
-          FID := pId;
-          Result := LoadObjectByPK;
-        end
-        else
-        begin
-          Result := True;
-        end;
+        FID := pId;
+        Result := LoadObjectByPK;
+      end
+      else
+      begin
+        Result := True;
       end;
+    end;
   finally
     lQuery.Free;
   end;
@@ -176,12 +172,55 @@ begin
 end;
 
 procedure TModelCP.GeraCodigo;
+var
+  lQuery: TSFQuery;
 begin
+  lQuery := TSFQuery.Create(nil);
+  try
+    try
+      lQuery.Close;
+      lQuery.SQL.Clear;
+      lQuery.Open('SELECT COALESCE(MAX(ID), 0) AS ID FROM CONTAS_PAGAR');
+
+      // Ultimo codigo usado + 1
+      FID := lQuery.FieldByName('ID').AsInteger + 1;
+
+      // Insere o registro no final da tabela
+      lQuery.Append;
+    except
+      on E: Exception do
+      begin
+        raise ECPagarId.Create(E.Message);
+      end;
+    end;
+  finally
+    lQuery.Free;
+  end;
 
 end;
 
 class function TModelCP.GetIdGrupoParcelas: Integer;
+var
+  lQuery: TSFQuery;
 begin
+  Result := 0;
+
+  lQuery := TSFQuery.Create(nil);
+  try
+    try
+      lQuery.Close;
+      lQuery.SQL.Clear;
+      lQuery.Open('SELECT NEXT VALUE FOR GEN_ID_GRUPO_PARCELAS_CP FROM RDB$DATABASE');
+      Result := lQuery.Fields[0].AsInteger;
+    except
+      on E: Exception do
+      begin
+        raise ECpagarIdGrupoParcelas.Create(E.Message);
+      end;
+    end;
+  finally
+    lQuery.Free;
+  end;
 
 end;
 
@@ -201,7 +240,31 @@ begin
 end;
 
 class function TModelCP.TotalCP(pDtIni, pDtFim: TDate): Double;
+var
+  lQuery: TSFQuery;
 begin
+  Result := 0;
+  lQuery := TSFQuery.Create(nil);
+  try
+    try
+      lQuery.Close;
+      lQuery.SQL.Clear;
+      lQuery.SQL.Add(' SELECT COALESCE(SUM(VALOR_PARCELA), 0) AS VALOR FROM CONTAS_PAGAR ');
+      lQuery.SQL.Add(' WHERE STATUS = ''A'' AND DATA_VENCIMENTO BETWEEN :DTINI AND :DTFIM  ');
+      lQuery.ParamByName('DTINI').AsDate := pDtIni;
+      lQuery.ParamByName('DTFIM').AsDate := pDtFim;
+      lQuery.Open;
+
+      Result := lQuery.FieldByName('VALOR').AsFloat;
+    except
+      on E: Exception do
+      begin
+        raise ECPagarTotal.Create(E.Message);
+      end;
+    end;
+  finally
+    lQuery.Free;
+  end;
 
 end;
 

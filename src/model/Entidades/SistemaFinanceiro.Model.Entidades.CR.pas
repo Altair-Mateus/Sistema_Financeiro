@@ -438,7 +438,7 @@ begin
     except
       on E: Exception do
       begin
-        Application.MessageBox(PWideChar('Erro ao obter próximo ID de grupo de parcelas: ' + E.Message), 'Atenção', MB_OK + MB_ICONERROR)
+        Application.MessageBox(PWideChar('Erro ao obter valores totais do Contas a Pagar: ' + E.Message), 'Atenção', MB_OK + MB_ICONERROR)
       end;
     end;
   finally

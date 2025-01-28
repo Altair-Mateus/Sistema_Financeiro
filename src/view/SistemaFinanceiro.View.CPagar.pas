@@ -1,15 +1,41 @@
 unit SistemaFinanceiro.View.CPagar;
+
 interface
+
 uses
-  Winapi.Windows, Winapi.Messages, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, SistemaFinanceiro.View.CadastroPadrao,
-  Data.DB, System.ImageList, Vcl.ImgList, Vcl.Grids, Vcl.DBGrids, Vcl.ExtCtrls,
-  Vcl.StdCtrls, Vcl.WinXPanels, Vcl.ComCtrls, Vcl.WinXCtrls, Datasnap.DBClient, System.SysUtils,
-  SistemaFinanceiro.View.BaixarCP, Vcl.Menus, SistemaFinanceiro.View.CpDetalhe,
-  Vcl.Imaging.pngimage, SistemaFinanceiro.View.Fornecedores,
-  SistemaFinanceiro.View.FaturaCartao, SistemaFinanceiro.View.BxMultiplaCp,
-  SistemaFinanceiro.View.Consulta.ConsultaLancamentoPadraoContas, fMensagem,
-  uEnumsUtils;
+  Winapi.Windows,
+  Winapi.Messages,
+  System.Variants,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  SistemaFinanceiro.View.CadastroPadrao,
+  Data.DB,
+  System.ImageList,
+  Vcl.ImgList,
+  Vcl.Grids,
+  Vcl.DBGrids,
+  Vcl.ExtCtrls,
+  Vcl.StdCtrls,
+  Vcl.WinXPanels,
+  Vcl.ComCtrls,
+  Vcl.WinXCtrls,
+  Datasnap.DBClient,
+  System.SysUtils,
+  SistemaFinanceiro.View.BaixarCP,
+  Vcl.Menus,
+  SistemaFinanceiro.View.CpDetalhe,
+  Vcl.Imaging.pngimage,
+  SistemaFinanceiro.View.Fornecedores,
+  SistemaFinanceiro.View.FaturaCartao,
+  SistemaFinanceiro.View.BxMultiplaCp,
+  SistemaFinanceiro.View.Consulta.ConsultaLancamentoPadraoContas,
+  fMensagem,
+  uEnumsUtils,
+  SistemaFinanceiro.Model.uSFQuery;
+
 type
   TfrmContasPagar = class(TfrmCadastroPadrao)
     DataSourceCPagar: TDataSource;
@@ -126,7 +152,6 @@ type
     btnLancPadrao: TButton;
     procedure btnCancelarClick(Sender: TObject);
     procedure btnExcluirClick(Sender: TObject);
-    procedure btnPesquisaeClick(Sender: TObject);
     procedure btnIncluirClick(Sender: TObject);
     procedure btnSalvarClick(Sender: TObject);
     procedure btnAlterarClick(Sender: TObject);
@@ -142,27 +167,14 @@ type
       DataCol: Integer; Column: TColumn; State: TGridDrawState);
     procedure DataSourceCPagarDataChange(Sender: TObject; Field: TField);
     procedure btnDetalhesClick(Sender: TObject);
-    procedure cbStatusClick(Sender: TObject);
-    procedure cbDataClick(Sender: TObject);
-    procedure rbDataVencClick(Sender: TObject);
-    procedure rbDataCompraClick(Sender: TObject);
-    procedure rbIdClick(Sender: TObject);
-    procedure rbValorParcelaClick(Sender: TObject);
-    procedure rbValorCompraClick(Sender: TObject);
     procedure btnImprimirClick(Sender: TObject);
-    procedure checkParciaisClick(Sender: TObject);
     procedure checkDiaFixoVctoClick(Sender: TObject);
     procedure btnPesquisaFornecedorClick(Sender: TObject);
     procedure btnPesqFornecedorClick(Sender: TObject);
-    procedure edtFiltroFornecedorChange(Sender: TObject);
-    procedure edtPesquisarChange(Sender: TObject);
-    procedure dateInicialChange(Sender: TObject);
-    procedure dateFinalChange(Sender: TObject);
     procedure toggleFaturaClick(Sender: TObject);
     procedure btnPesqFatClick(Sender: TObject);
     procedure edtCodFatCartaoExit(Sender: TObject);
     procedure edtFornecedorExit(Sender: TObject);
-    procedure edtFiltroFatCartaoChange(Sender: TObject);
     procedure btnPesqFtCartaoClick(Sender: TObject);
     procedure btnBxMultiplaClick(Sender: TObject);
     procedure CheckFatViradaClick(Sender: TObject);
@@ -173,17 +185,20 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure btnLancPadraoClick(Sender: TObject);
     procedure CardCadastroEnter(Sender: TObject);
-
+    procedure PesquisaClick(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
+    FTelaAtiva: Boolean;
     FOpCad: TOperacaoCadastro;
-    FCodCP : Integer;
-    DataVctoFat : Integer;
+    FCodCP: Integer;
+    DataVctoFat: Integer;
+    FQueryPesquisa, FQueryGrupoParcelas: TSFQuery;
 
     procedure HabilitaBotoes;
     procedure CadParcelaUnica;
     procedure CadParcelamento;
     procedure EditarRegCPagar;
-    procedure ExibeTelaBaixar(pCodCP : Integer);
+    procedure ExibeTelaBaixar(pCodCP: Integer);
     procedure ExibeTelaBxMultipla;
     procedure ExibeDetalhe;
     procedure BuscaNomeFornecedor;
@@ -194,8 +209,12 @@ type
     procedure CalcCpGrid;
     procedure CalcQtdCpGrid;
     procedure ExibeTelaLancPadrao;
-    procedure CarregaLancPadrao(pCod : Integer);
-    function DtVencimentoCheckContaPaga : TDate;
+    procedure CarregaLancPadrao(pCod: Integer);
+    function DtVencimentoCheckContaPaga: TDate;
+
+    function ValidaPesquisa: Boolean;
+    procedure QuerySTATUSGetText(Sender: TField; var Text: string;
+      DisplayText: Boolean);
 
   public
     { Public declarations }
@@ -209,7 +228,9 @@ var
   frmContasPagar: TfrmContasPagar;
 
 implementation
+
 {$R *.dfm}
+
 uses
   SistemaFinanceiro.Model.dmCPagar,
   SistemaFinanceiro.Utilitarios,
@@ -242,7 +263,7 @@ procedure TfrmContasPagar.btnCancelarClick(Sender: TObject);
 begin
 
   inherited;
-  //  Cancelando inclusão
+  // Cancelando inclusão
   dmCPagar.cdsCPagar.Cancel;
 
 end;
@@ -254,7 +275,9 @@ begin
   if DataSourceCPagar.DataSet.FieldByName('STATUS').AsString <> 'P' then
   begin
 
-    Application.MessageBox('Conta não paga, realize a baixa para ver os detalhes!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+    Application.MessageBox
+      ('Conta não paga, realize a baixa para ver os detalhes!', 'Atenção',
+      MB_OK + MB_ICONEXCLAMATION);
     abort;
 
   end;
@@ -265,26 +288,29 @@ end;
 
 procedure TfrmContasPagar.btnExcluirClick(Sender: TObject);
 var
-  option : Word;
+  option: Word;
 
 begin
   inherited;
 
-  //  Se o documento já foi baixado cancela a exclusão
+  // Se o documento já foi baixado cancela a exclusão
   if dmCPagar.cdsCPagarSTATUS.AsString = 'P' then
   begin
-    Application.MessageBox('Documento já pago não pode ser cancelado!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+    Application.MessageBox('Documento já pago não pode ser cancelado!',
+      'Atenção', MB_OK + MB_ICONEXCLAMATION);
     abort;
   end;
 
-  //  Se o documento foi cancelado, a exclusão é cancelada
+  // Se o documento foi cancelado, a exclusão é cancelada
   if dmCPagar.cdsCPagarSTATUS.AsString = 'C' then
   begin
-    Application.MessageBox('Documento já cancelado não pode ser cancelado!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+    Application.MessageBox('Documento já cancelado não pode ser cancelado!',
+      'Atenção', MB_OK + MB_ICONEXCLAMATION);
     abort;
   end;
 
-  option := Application.MessageBox('Deseja cancelar o registro? ', 'Confirmação', MB_YESNO + MB_ICONQUESTION);
+  option := Application.MessageBox('Deseja cancelar o registro? ',
+    'Confirmação', MB_YESNO + MB_ICONQUESTION);
 
   if option = IDNO then
   begin
@@ -297,15 +323,18 @@ begin
     dmCPagar.cdsCPagar.Post;
     dmCPagar.cdsCPagar.ApplyUpdates(0);
 
-    Application.MessageBox('Documento cancelado com sucesso!', 'Atenção', MB_OK + MB_ICONINFORMATION);
+    Application.MessageBox('Documento cancelado com sucesso!', 'Atenção',
+      MB_OK + MB_ICONINFORMATION);
 
     Pesquisar;
 
-    //  Atualiza o relatorio na tela inicial
+    // Atualiza o relatorio na tela inicial
     frmPrincipal.TotalCP;
 
-  except on E: Exception do
-    Application.MessageBox(PWidechar(E.Message), 'Erro ao cancelar documento!', MB_OK + MB_ICONERROR);
+  except
+    on E: Exception do
+      Application.MessageBox(PWidechar(E.Message),
+        'Erro ao cancelar documento!', MB_OK + MB_ICONERROR);
   end;
 
 end;
@@ -319,7 +348,7 @@ procedure TfrmContasPagar.btnImprimirClick(Sender: TObject);
 begin
   inherited;
 
-  //  Cria o form
+  // Cria o form
   frmRelCp := TfrmRelCp.Create(Self);
 
   try
@@ -328,7 +357,7 @@ begin
     DataSourceCPagar.DataSet.DisableControls;
     frmRelCp.DataSourceCp.DataSet := DataSourceCPagar.DataSet;
 
-    //  Mostra a pre visualização
+    // Mostra a pre visualização
     frmRelCp.RLReport.Preview();
 
   finally
@@ -350,45 +379,41 @@ begin
 
   lblTitulo.Caption := 'Inserindo um novo lançamento no Contas a Pagar';
 
-  if not (dmCPagar.cdsCPagar.State in [dsInsert, dsEdit]) then
+  if not(dmCPagar.cdsCPagar.State in [dsInsert, dsEdit]) then
   begin
 
-    //  Colocando o data set em modo de inserção de dados
+    // Colocando o data set em modo de inserção de dados
     dmCPagar.cdsCPagar.Insert;
 
   end;
 
-
-
-  //  Seta parcela previamente como 1
+  // Seta parcela previamente como 1
   edtParcela.Text := '1';
 
-  //  Esvaziando data set de parcelas
+  // Esvaziando data set de parcelas
   cdsParcelas.EmptyDataSet;
 
-  //  Liberacoes e bloqueios
-  edtQtdParcelas.Enabled     := True;
-  edtIntervaloDias.Enabled   := True;
-  edtDiaFixoVcto.Enabled     := False;
-  checkDiaFixoVcto.Checked   := False;
-  checkDiaFixoVcto.Enabled   := True;
-  chkBaixarAoSalvar.Checked  := False;
-  CheckFatVirada.Checked     := False;
-  btnGerar.Enabled           := True;
-  btnLimpar.Enabled          := False;
-  toggleFatura.State         := tssOff;
-  toggleParcelamento.State   := tssOff;
+  // Liberacoes e bloqueios
+  edtQtdParcelas.Enabled := True;
+  edtIntervaloDias.Enabled := True;
+  edtDiaFixoVcto.Enabled := False;
+  checkDiaFixoVcto.Checked := False;
+  checkDiaFixoVcto.Enabled := True;
+  chkBaixarAoSalvar.Checked := False;
+  CheckFatVirada.Checked := False;
+  btnGerar.Enabled := True;
+  btnLimpar.Enabled := False;
+  toggleFatura.State := tssOff;
+  toggleParcelamento.State := tssOff;
   toggleParcelamento.Enabled := True;
-  edtParcela.ReadOnly        := True;
-  edtValorParcela.ReadOnly   := True;
-  lblNomeFornecedor.Visible  := False;
-  lblNomeFatCartao.Visible   := False;
+  edtParcela.ReadOnly := True;
+  edtValorParcela.ReadOnly := True;
+  lblNomeFornecedor.Visible := False;
+  lblNomeFatCartao.Visible := False;
 
-  //  Coloca a data atual no datetimepicker
+  // Coloca a data atual no datetimepicker
   dateCompra.DateTime := Now;
   dateVencimento.DateTime := Now + 7;
-
-
 
   memDesc.SetFocus;
 
@@ -403,13 +428,13 @@ procedure TfrmContasPagar.btnLimparClick(Sender: TObject);
 begin
   inherited;
 
-  //  Esvaziando data set de parcelas
+  // Esvaziando data set de parcelas
   cdsParcelas.EmptyDataSet;
 
-  //  Liberações
-  edtQtdParcelas.Enabled   := True;
-  btnGerar.Enabled         := True;
-  btnLimpar.Enabled        := False;
+  // Liberações
+  edtQtdParcelas.Enabled := True;
+  btnGerar.Enabled := True;
+  btnLimpar.Enabled := False;
 
   edtQtdParcelas.Clear;
 
@@ -418,7 +443,7 @@ begin
 
     checkDiaFixoVcto.Checked := False;
     checkDiaFixoVcto.Enabled := True;
-    edtDiaFixoVcto.Enabled   := True;
+    edtDiaFixoVcto.Enabled := True;
     edtIntervaloDias.Enabled := True;
     edtIntervaloDias.Clear;
     edtDiaFixoVcto.Clear;
@@ -430,21 +455,22 @@ end;
 procedure TfrmContasPagar.btnPesqFatClick(Sender: TObject);
 begin
 
-  //  Cria o form
+  // Cria o form
   frmFaturaCartao := TfrmFaturaCartao.Create(Self);
 
   try
 
-    //  Exibe o form
+    // Exibe o form
     frmFaturaCartao.ShowModal;
 
   finally
 
-    //  Pega a Id da fatura selecionada
-    edtCodFatCartao.Text := frmFaturaCartao.DataSourceFaturaCartao.DataSet.FieldByName('ID_FT').AsString;
+    // Pega a Id da fatura selecionada
+    edtCodFatCartao.Text := frmFaturaCartao.DataSourceFaturaCartao.DataSet.
+      FieldByName('ID_FT').AsString;
     edtCodFatCartao.SetFocus;
 
-    //  Libera da memória
+    // Libera da memória
     FreeAndNil(frmFaturaCartao);
 
   end;
@@ -455,20 +481,21 @@ procedure TfrmContasPagar.btnPesqFornecedorClick(Sender: TObject);
 begin
   inherited;
 
-  //  Cria o form
+  // Cria o form
   frmFornecedores := TfrmFornecedores.Create(Self);
 
   try
 
-    //  Exibe o form
+    // Exibe o form
     frmFornecedores.ShowModal;
 
   finally
 
-    //  Pega a ID do cliente selecionado
-    edtFiltroFornecedor.Text := frmFornecedores.DataSourceFornecedor.DataSet.FieldByName('ID_FORNEC').AsString;
+    // Pega a ID do cliente selecionado
+    edtFiltroFornecedor.Text := frmFornecedores.DataSourceFornecedor.DataSet.
+      FieldByName('ID_FORNEC').AsString;
 
-    //  Libera da  memoria
+    // Libera da  memoria
     FreeAndNil(frmFornecedores);
 
   end;
@@ -481,20 +508,21 @@ procedure TfrmContasPagar.btnPesqFtCartaoClick(Sender: TObject);
 begin
   inherited;
 
-  //  Cria o form
+  // Cria o form
   frmFaturaCartao := TfrmFaturaCartao.Create(Self);
 
   try
 
-    //  Exibe o form
+    // Exibe o form
     frmFaturaCartao.ShowModal;
 
   finally
 
-    //  Pega a Id da fatura selecionada
-    edtFiltroFatCartao.Text := frmFaturaCartao.DataSourceFaturaCartao.DataSet.FieldByName('ID_FT').AsString;
+    // Pega a Id da fatura selecionada
+    edtFiltroFatCartao.Text := frmFaturaCartao.DataSourceFaturaCartao.DataSet.
+      FieldByName('ID_FT').AsString;
 
-    //  Libera da memória
+    // Libera da memória
     FreeAndNil(frmFaturaCartao);
 
   end;
@@ -503,31 +531,24 @@ begin
 
 end;
 
-procedure TfrmContasPagar.btnPesquisaeClick(Sender: TObject);
-begin
-  inherited;
-
-  Pesquisar;
-
-end;
-
 procedure TfrmContasPagar.btnPesquisaFornecedorClick(Sender: TObject);
 begin
 
-  //  Cria o form
+  // Cria o form
   frmFornecedores := TfrmFornecedores.Create(Self);
 
   try
 
-    //  Exibe o form
+    // Exibe o form
     frmFornecedores.ShowModal;
 
   finally
 
-    //  Pega a ID do cliente selecionado
-    edtFornecedor.Text := frmFornecedores.DataSourceFornecedor.DataSet.FieldByName('ID_FORNEC').AsString;
+    // Pega a ID do cliente selecionado
+    edtFornecedor.Text := frmFornecedores.DataSourceFornecedor.DataSet.
+      FieldByName('ID_FORNEC').AsString;
 
-    //  Libera da  memoria
+    // Libera da  memoria
     FreeAndNil(frmFornecedores);
 
   end;
@@ -553,29 +574,31 @@ begin
   // Retorna ao card de pesquisa
   CardPanelPrincipal.ActiveCard := CardPesquisa;
 
-  //  Atualiza a lista
+  // Atualiza a lista
   Pesquisar;
 
-  //  Atualiza relatorio tela principal
+  // Atualiza relatorio tela principal
   frmPrincipal.TotalCP;
 
 end;
 
 procedure TfrmContasPagar.BuscaNomeFatCartao;
 var
-  NomeFatCartao : String;
+  NomeFatCartao: String;
 
 begin
 
   if Trim(edtCodFatCartao.Text) <> '' then
   begin
 
-    NomeFatCartao := dmFaturaCartao.GetNomeFatCartao(Trim(edtCodFatCartao.Text));
+    NomeFatCartao := dmFaturaCartao.GetNomeFatCartao
+      (Trim(edtCodFatCartao.Text));
 
     if NomeFatCartao = '' then
     begin
 
-      Application.MessageBox('Fatura de Cartão não encontrada!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+      Application.MessageBox('Fatura de Cartão não encontrada!', 'Atenção',
+        MB_OK + MB_ICONEXCLAMATION);
       edtCodFatCartao.SetFocus;
       edtCodFatCartao.Clear;
       abort;
@@ -586,28 +609,30 @@ begin
     lblNomeFatCartao.Visible := True;
 
     DataVctoFat := dmFaturaCartao.GetDataVcto(Trim(edtCodFatCartao.Text));
-    dateVencimento.Date := EncodeDate(YearOf(dateVencimento.Date), MonthOf(dateVencimento.Date), DataVctoFat);
+    dateVencimento.Date := EncodeDate(YearOf(dateVencimento.Date),
+      MonthOf(dateVencimento.Date), DataVctoFat);
 
   end;
-
 
 end;
 
 procedure TfrmContasPagar.BuscaNomeFornecedor;
 var
-  NomeFornecedor : String;
+  NomeFornecedor: String;
 
 begin
 
   if Trim(edtFornecedor.Text) <> '' then
   begin
 
-    NomeFornecedor := dmFornecedores.GetNomeFornecedor(Trim(edtFornecedor.Text));
+    NomeFornecedor := dmFornecedores.GetNomeFornecedor
+      (Trim(edtFornecedor.Text));
 
     if NomeFornecedor = '' then
     begin
 
-      Application.MessageBox('Fornecedor não encontrado!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+      Application.MessageBox('Fornecedor não encontrado!', 'Atenção',
+        MB_OK + MB_ICONEXCLAMATION);
       edtFornecedor.SetFocus;
       edtFornecedor.Clear;
 
@@ -622,17 +647,18 @@ end;
 
 procedure TfrmContasPagar.CadParcelamento;
 var
-  ValorCompra : Currency;
-  IdFornecedor : Integer;
+  ValorCompra: Currency;
+  IdFornecedor: Integer;
 
 begin
 
-  //  Valida valor da compra
+  // Valida valor da compra
   if not TryStrToCurr(edtValorCompra.Text, ValorCompra) then
   begin
 
     edtValorCompra.SetFocus;
-    Application.MessageBox('Valor da Compra inválido!', 'Atenção', MB_OK + MB_ICONWARNING);
+    Application.MessageBox('Valor da Compra inválido!', 'Atenção',
+      MB_OK + MB_ICONWARNING);
     abort;
 
   end;
@@ -641,48 +667,52 @@ begin
   begin
 
     edtFornecedor.SetFocus;
-    Application.MessageBox('Campo FORNECEDOR não pode estar vazio!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+    Application.MessageBox('Campo FORNECEDOR não pode estar vazio!', 'Atenção',
+      MB_OK + MB_ICONEXCLAMATION);
     abort;
 
   end;
 
-  //  Posiciona no primeiro registro do cds
+  // Posiciona no primeiro registro do cds
   cdsParcelas.First;
 
   if cdsParcelas.IsEmpty then
   begin
 
     edtQtdParcelas.SetFocus;
-    Application.MessageBox('Parcelas não geradas!', 'Atenção', MB_OK + MB_ICONWARNING);
+    Application.MessageBox('Parcelas não geradas!', 'Atenção',
+      MB_OK + MB_ICONWARNING);
     abort;
 
   end;
 
-  //  Valida todos os registros do cds
+  // Valida todos os registros do cds
   while not cdsParcelas.Eof do
   begin
 
     if cdsParcelasPARCELA.AsInteger < 0 then
     begin
-      Application.MessageBox('Número de Parcela Inválido!', 'Atenção', MB_OK + MB_ICONWARNING);
+      Application.MessageBox('Número de Parcela Inválido!', 'Atenção',
+        MB_OK + MB_ICONWARNING);
       abort;
     end;
 
     if cdsParcelasVALOR.AsCurrency < 0.01 then
     begin
-      Application.MessageBox('Valor da Parcela Inválido!', 'Atenção', MB_OK + MB_ICONWARNING);
+      Application.MessageBox('Valor da Parcela Inválido!', 'Atenção',
+        MB_OK + MB_ICONWARNING);
       abort;
     end;
 
-    //  Avança para o próximo registro
+    // Avança para o próximo registro
     cdsParcelas.Next;
 
   end;
 
-   //  Posiciona no primeiro registro do cds
+  // Posiciona no primeiro registro do cds
   cdsParcelas.First;
 
-  //  Gravando Parcelas
+  // Gravando Parcelas
   while not cdsParcelas.Eof do
   begin
 
@@ -692,18 +722,20 @@ begin
     end;
 
     dmCPagar.GeraCodigo;
-    dmCPagar.cdsCPagarDATA_CADASTRO.AsDateTime   := now;
-    dmCPagar.cdsCPagarSTATUS.AsString            := 'A';
-    dmCPagar.cdsCPagarVALOR_ABATIDO.AsCurrency   := 0;
-    dmCPagar.cdsCPagarNUMERO_DOC.AsString        := cdsParcelasDOCUMENTO.AsString;
-    dmCPagar.cdsCPagarDESCRICAO.AsString         := Format('%s - Parcela %d', [memDesc.Text, cdsParcelasPARCELA.AsInteger]);
-    dmCPagar.cdsCPagarVALOR_COMPRA.AsCurrency    := ValorCompra;
-    dmCPagar.cdsCPagarDATA_COMPRA.AsDateTime     := dateCompra.Date;
-    dmCPagar.cdsCPagarPARCELA.AsInteger          := cdsParcelasPARCELA.AsInteger;
-    dmCPagar.cdsCPagarVALOR_PARCELA.AsCurrency   := cdsParcelasVALOR.AsCurrency;
-    dmCPagar.cdsCPagarDATA_VENCIMENTO.AsDateTime := cdsParcelasVENCIMENTO.AsDateTime;
-    dmCPagar.cdsCPagarPARCIAL.AsString           := 'N';
-    dmCPagar.cdsCPagarID_FORNECEDOR.AsInteger    := IdFornecedor;
+    dmCPagar.cdsCPagarDATA_CADASTRO.AsDateTime := Now;
+    dmCPagar.cdsCPagarSTATUS.AsString := 'A';
+    dmCPagar.cdsCPagarVALOR_ABATIDO.AsCurrency := 0;
+    dmCPagar.cdsCPagarNUMERO_DOC.AsString := cdsParcelasDOCUMENTO.AsString;
+    dmCPagar.cdsCPagarDESCRICAO.AsString := Format('%s - Parcela %d',
+      [memDesc.Text, cdsParcelasPARCELA.AsInteger]);
+    dmCPagar.cdsCPagarVALOR_COMPRA.AsCurrency := ValorCompra;
+    dmCPagar.cdsCPagarDATA_COMPRA.AsDateTime := dateCompra.Date;
+    dmCPagar.cdsCPagarPARCELA.AsInteger := cdsParcelasPARCELA.AsInteger;
+    dmCPagar.cdsCPagarVALOR_PARCELA.AsCurrency := cdsParcelasVALOR.AsCurrency;
+    dmCPagar.cdsCPagarDATA_VENCIMENTO.AsDateTime :=
+      cdsParcelasVENCIMENTO.AsDateTime;
+    dmCPagar.cdsCPagarPARCIAL.AsString := 'N';
+    dmCPagar.cdsCPagarID_FORNECEDOR.AsInteger := IdFornecedor;
 
     if toggleFatura.State = tssOff then
     begin
@@ -711,15 +743,15 @@ begin
       dmCPagar.cdsCPagarFATURA_CART.AsString := 'N';
 
     end
-      else
-      begin
+    else
+    begin
 
-        dmCPagar.cdsCPagarFATURA_CART.AsString := 'S';
-        dmCPagar.cdsCPagarID_FATURA.AsString   := Trim(edtCodFatCartao.Text);
+      dmCPagar.cdsCPagarFATURA_CART.AsString := 'S';
+      dmCPagar.cdsCPagarID_FATURA.AsString := Trim(edtCodFatCartao.Text);
 
-      end;
+    end;
 
-    //  Gravando no banco
+    // Gravando no banco
     dmCPagar.cdsCPagar.Post;
     dmCPagar.cdsCPagar.ApplyUpdates(0);
 
@@ -727,7 +759,8 @@ begin
 
   end;
 
-  Application.MessageBox('Parcelas Cadastradas com Sucesso!!', 'Atenção', MB_OK + MB_ICONINFORMATION);
+  Application.MessageBox('Parcelas Cadastradas com Sucesso!!', 'Atenção',
+    MB_OK + MB_ICONINFORMATION);
 
   Pesquisar;
 
@@ -736,95 +769,107 @@ end;
 
 procedure TfrmContasPagar.CadParcelaUnica;
 var
-  Parcela      : Integer;
-  ValorCompra  : Currency;
-  ValorParcela : Currency;
-  IdFornecedor : Integer;
+  Parcela: Integer;
+  ValorCompra: Currency;
+  ValorParcela: Currency;
+  IdFornecedor: Integer;
 
 begin
 
-  //  Valida campos obrigatorios
+  // Valida campos obrigatorios
   if Trim(memDesc.Text) = '' then
   begin
     memDesc.SetFocus;
-    Application.MessageBox('Campo DESCRICAO não pode estar vazio!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+    Application.MessageBox('Campo DESCRICAO não pode estar vazio!', 'Atenção',
+      MB_OK + MB_ICONEXCLAMATION);
     abort;
   end;
 
-  if not TryStrToInt(edtFornecedor.Text, IdFornecedor) or (IdFornecedor <= 0) then
+  if not TryStrToInt(edtFornecedor.Text, IdFornecedor) or (IdFornecedor <= 0)
+  then
   begin
     edtFornecedor.SetFocus;
-    Application.MessageBox('Campo FORNECEDOR não pode estar vazio!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+    Application.MessageBox('Campo FORNECEDOR não pode estar vazio!', 'Atenção',
+      MB_OK + MB_ICONEXCLAMATION);
     abort;
   end;
 
-  if (not TryStrToCurr(edtValorCompra.Text, ValorCompra)) or (ValorCompra <= 0) then
+  if (not TryStrToCurr(edtValorCompra.Text, ValorCompra)) or (ValorCompra <= 0)
+  then
   begin
     edtValorCompra.SetFocus;
-    Application.MessageBox('Valor da compra Inválido!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+    Application.MessageBox('Valor da compra Inválido!', 'Atenção',
+      MB_OK + MB_ICONEXCLAMATION);
     abort;
   end;
 
   if (not TryStrToInt(edtParcela.Text, Parcela)) or (Parcela <= 0) then
   begin
     edtParcela.SetFocus;
-    Application.MessageBox('Número da parcela Inválido!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+    Application.MessageBox('Número da parcela Inválido!', 'Atenção',
+      MB_OK + MB_ICONEXCLAMATION);
     abort;
   end;
 
   if dateVencimento.Date < dateCompra.Date then
   begin
     dateVencimento.SetFocus;
-    Application.MessageBox('Data de vencimento não pode ser inferior a data de compra!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+    Application.MessageBox
+      ('Data de vencimento não pode ser inferior a data de compra!', 'Atenção',
+      MB_OK + MB_ICONEXCLAMATION);
     abort;
   end;
 
   if dateCompra.Date > Now then
   begin
     dateCompra.SetFocus;
-    Application.MessageBox('Data de compra não pode ser maior que a data atual!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+    Application.MessageBox
+      ('Data de compra não pode ser maior que a data atual!', 'Atenção',
+      MB_OK + MB_ICONEXCLAMATION);
     abort;
   end;
 
   if not TryStrToCurr(edtValorParcela.Text, ValorParcela) then
   begin
     edtValorParcela.SetFocus;
-    Application.MessageBox('Valor da parcela Inválido!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+    Application.MessageBox('Valor da parcela Inválido!', 'Atenção',
+      MB_OK + MB_ICONEXCLAMATION);
     abort;
   end;
 
-  //  Se for um novo registro irá gerar o código, status em aberto
-  //  e setar 0 no valor abatido
+  // Se for um novo registro irá gerar o código, status em aberto
+  // e setar 0 no valor abatido
   if DataSourceCPagar.State in [dsInsert] then
   begin
 
-    //  gera a id
+    // gera a id
     dmCPagar.GeraCodigo;
 
-    dmCPagar.cdsCPagarDATA_CADASTRO.AsDateTime := now;
-    dmCPagar.cdsCPagarSTATUS.AsString          := 'A';
+    dmCPagar.cdsCPagarDATA_CADASTRO.AsDateTime := Now;
+    dmCPagar.cdsCPagarSTATUS.AsString := 'A';
     dmCPagar.cdsCPagarVALOR_ABATIDO.AsCurrency := 0;
 
   end;
 
-  //  Passando os dados para o dataset
-  dmCPagar.cdsCPagarNUMERO_DOC.AsString        := Trim(edtNDoc.Text);
-  dmCPagar.cdsCPagarDESCRICAO.AsString         := Trim(memDesc.Text);
-  dmCPagar.cdsCPagarVALOR_COMPRA.AsCurrency    := ValorCompra;
-  dmCPagar.cdsCPagarDATA_COMPRA.AsDateTime     := dateCompra.Date;
-  dmCPagar.cdsCPagarPARCELA.AsInteger          := Parcela;
-  dmCPagar.cdsCPagarVALOR_PARCELA.AsCurrency   := ValorParcela;
-  dmCPagar.cdsCPagarPARCIAL.AsString           := 'N';
-  dmCPagar.cdsCPagarID_FORNECEDOR.AsInteger    := IdFornecedor;
+  // Passando os dados para o dataset
+  dmCPagar.cdsCPagarNUMERO_DOC.AsString := Trim(edtNDoc.Text);
+  dmCPagar.cdsCPagarDESCRICAO.AsString := Trim(memDesc.Text);
+  dmCPagar.cdsCPagarVALOR_COMPRA.AsCurrency := ValorCompra;
+  dmCPagar.cdsCPagarDATA_COMPRA.AsDateTime := dateCompra.Date;
+  dmCPagar.cdsCPagarPARCELA.AsInteger := Parcela;
+  dmCPagar.cdsCPagarVALOR_PARCELA.AsCurrency := ValorParcela;
+  dmCPagar.cdsCPagarPARCIAL.AsString := 'N';
+  dmCPagar.cdsCPagarID_FORNECEDOR.AsInteger := IdFornecedor;
 
   if chkBaixarAoSalvar.Checked then
     FCodCP := dmCPagar.cdsCPagarID.AsInteger;
 
-  //  Verifica se é fatura, se for a data de vcto
-  //  será pega a da fatura
+  // Verifica se é fatura, se for a data de vcto
+  // será pega a da fatura
   if (toggleFatura.State = tssOn) and (edtCodFatCartao.Text <> '') then
   begin
-    dateVencimento.Date := EncodeDate(YearOf(dateVencimento.Date), MonthOf(dateVencimento.Date), DataVctoFat);
+    dateVencimento.Date := EncodeDate(YearOf(dateVencimento.Date),
+      MonthOf(dateVencimento.Date), DataVctoFat);
   end;
   dmCPagar.cdsCPagarDATA_VENCIMENTO.AsDateTime := dateVencimento.Date;
 
@@ -838,7 +883,7 @@ begin
     dmCPagar.cdsCPagarID_FATURA.AsString := Trim(edtCodFatCartao.Text);
   end;
 
-  //  Gravando no BD
+  // Gravando no BD
   dmCPagar.cdsCPagar.Post;
   dmCPagar.cdsCPagar.ApplyUpdates(0);
 
@@ -846,35 +891,35 @@ end;
 
 procedure TfrmContasPagar.CalcCpGrid;
 var
-  TotalCp: Currency;
+  TotalCP: Currency;
 
 begin
 
-  TotalCp := 0;
+  TotalCP := 0;
 
-  //  Percorre e soma
+  // Percorre e soma
   with DBGrid1.DataSource.DataSet do
   begin
 
-    //  Desativa o controle
+    // Desativa o controle
     DisableControls;
 
-    //  Posiciona no primeiro reg
+    // Posiciona no primeiro reg
     First;
 
     while not Eof do
     begin
 
-      TotalCp := TotalCp + FieldByName('VALOR_PARCELA').AsCurrency;
+      TotalCP := TotalCP + FieldByName('VALOR_PARCELA').AsCurrency;
 
       Next;
 
     end;
 
-    //  Reativa o controle
+    // Reativa o controle
     EnableControls;
 
-    lblTotalCpGrid.Caption := TUtilitario.FormatoMoeda(TotalCp);
+    lblTotalCpGrid.Caption := TUtilitario.FormatoMoeda(TotalCP);
 
   end;
 
@@ -888,64 +933,65 @@ begin
 
   QtdCp := 0;
 
-  //  Realiza a conta
+  // Realiza a conta
   QtdCp := DBGrid1.DataSource.DataSet.RecordCount;
 
-  //  Exibe na label
+  // Exibe na label
   lblQtdCp.Caption := IntToStr(QtdCp);
 
 end;
 
 procedure TfrmContasPagar.CancelarBaixa1Click(Sender: TObject);
 var
-  IdCp   : Integer;
-  Option : Word;
+  IdCp: Integer;
+  option: Word;
 
 begin
 
-  //  Valida se o user logado é adm
-  if not (dmUsuarios.GetUsuarioLogado.User_Admin = 'S') then
+  // Valida se o user logado é adm
+  if not(dmUsuarios.GetUsuarioLogado.User_Admin = 'S') then
   begin
 
-    Application.MessageBox('Somente Administradores podem cancelar uma Baixa!', 'Erro', MB_OK + MB_ICONERROR);
+    Application.MessageBox('Somente Administradores podem cancelar uma Baixa!',
+      'Erro', MB_OK + MB_ICONERROR);
     abort;
 
   end;
 
-
   if not DataSourceCPagar.DataSet.IsEmpty then
   begin
 
-    //  Bloqueia o cancelamento se a conta não estiver como PAGA
+    // Bloqueia o cancelamento se a conta não estiver como PAGA
     if DataSourceCPagar.DataSet.FieldByName('STATUS').AsString <> 'P' then
     begin
 
-      Application.MessageBox('Conta não baixada!!', 'Erro', MB_OK + MB_ICONERROR);
+      Application.MessageBox('Conta não baixada!!', 'Erro',
+        MB_OK + MB_ICONERROR);
       abort;
 
     end;
 
-    Option := Application.MessageBox('Deseja cancelar o registro? ', 'Confirmação', MB_YESNO + MB_ICONQUESTION);
+    option := Application.MessageBox('Deseja cancelar o registro? ',
+      'Confirmação', MB_YESNO + MB_ICONQUESTION);
 
-    if Option = IDNO then
+    if option = IDNO then
     begin
       exit;
     end;
 
-    //  Pega a id da conta
+    // Pega a id da conta
     IdCp := DataSourceCPagar.DataSet.FieldByName('ID').AsInteger;
 
-    //  Chama a procedure que fara o trabalho
+    // Chama a procedure que fara o trabalho
     dmCPagar.CancBxCP(IdCp);
 
     Pesquisar;
 
-    //  Atualiza relatorio tela principal
+    // Atualiza relatorio tela principal
     frmPrincipal.TotalCP;
     frmPrincipal.ResumoMensalCaixa;
 
   end;
-
 
 end;
 
@@ -955,9 +1001,9 @@ begin
   btnLancPadrao.Visible := (FOpCad = ocIncluir);
 end;
 
-procedure TfrmContasPagar.CarregaLancPadrao(pCod : Integer);
+procedure TfrmContasPagar.CarregaLancPadrao(pCod: Integer);
 var
-  lLancamento : TModelLancamentoPadrao;
+  lLancamento: TModelLancamentoPadrao;
 begin
   lLancamento := TModelLancamentoPadrao.Create;
   try
@@ -966,8 +1012,10 @@ begin
 
       if (lLancamento.Status = Smallint(scInativo)) then
       begin
-        TfrmMensagem.TelaMensagem('Cadastro Inativo!', 'Lançamento Padrão inativo, altere o cadastro do mesmo e tente novamente.', tmAviso);
-        Exit;
+        TfrmMensagem.TelaMensagem('Cadastro Inativo!',
+          'Lançamento Padrão inativo, altere o cadastro do mesmo e tente novamente.',
+          tmAviso);
+        exit;
       end;
 
       memDesc.Text := lLancamento.Descricao;
@@ -978,42 +1026,28 @@ begin
     end
     else
     begin
-      TfrmMensagem.TelaMensagem('Erro!', 'Erro ao recuperar os dados do cadastro do Lançamento Padrão escolhido', tmErro);
+      TfrmMensagem.TelaMensagem('Erro!',
+        'Erro ao recuperar os dados do cadastro do Lançamento Padrão escolhido',
+        tmErro);
     end;
   finally
     lLancamento.Free;
   end;
 end;
 
-procedure TfrmContasPagar.cbDataClick(Sender: TObject);
-begin
-  inherited;
-
-  Pesquisar;
-
-end;
-
-procedure TfrmContasPagar.cbStatusClick(Sender: TObject);
-begin
-  inherited;
-
-  Pesquisar;
-
-end;
-
 procedure TfrmContasPagar.checkDiaFixoVctoClick(Sender: TObject);
 begin
   inherited;
 
-    if checkDiaFixoVcto.Checked then
+  if checkDiaFixoVcto.Checked then
   begin
 
-    edtDiaFixoVcto.Visible   := True;
-    edtDiaFixoVcto.Enabled   := True;
-    lblDiaFixo.Visible       := True;
+    edtDiaFixoVcto.Visible := True;
+    edtDiaFixoVcto.Enabled := True;
+    lblDiaFixo.Visible := True;
     edtIntervaloDias.Enabled := False;
-    edtIntervaloDias.Text    := '30';
-    Label9.Visible           := True;
+    edtIntervaloDias.Text := '30';
+    Label9.Visible := True;
 
     edtDiaFixoVcto.SetFocus;
 
@@ -1021,22 +1055,21 @@ begin
   else
   begin
 
-    edtDiaFixoVcto.Visible   := False;
-    edtDiaFixoVcto.Enabled   := False;
-    lblDiaFixo.Visible       := False;
+    edtDiaFixoVcto.Visible := False;
+    edtDiaFixoVcto.Enabled := False;
+    lblDiaFixo.Visible := False;
     edtIntervaloDias.Enabled := True;
     edtIntervaloDias.Clear;
-    Label9.Visible           := False;
+    Label9.Visible := False;
 
   end;
-
 
 end;
 
 procedure TfrmContasPagar.CheckFatViradaClick(Sender: TObject);
 begin
 
-  //  Pula o mês de vencimento caso seja CP p1
+  // Pula o mês de vencimento caso seja CP p1
   if CheckFatVirada.Checked then
   begin
 
@@ -1058,12 +1091,12 @@ procedure TfrmContasPagar.checkNaoConsideraFaturaClick(Sender: TObject);
 begin
   inherited;
 
-  //  Bloqueia as faturas de cartão
+  // Bloqueia as faturas de cartão
   if checkNaoConsideraFatura.Checked then
   begin
 
     btnPesqFtCartao.Enabled := False;
-    edtFiltroFatCartao.Enabled  := False;
+    edtFiltroFatCartao.Enabled := False;
     edtFiltroFatCartao.Clear;
 
   end
@@ -1075,15 +1108,7 @@ begin
 
   end;
 
-  Pesquisar;
-end;
-
-procedure TfrmContasPagar.checkParciaisClick(Sender: TObject);
-begin
-  inherited;
-
-  Pesquisar;
-
+  PesquisaClick(Sender);
 end;
 
 procedure TfrmContasPagar.chkBaixarAoSalvarClick(Sender: TObject);
@@ -1096,24 +1121,10 @@ procedure TfrmContasPagar.DataSourceCPagarDataChange(Sender: TObject;
 begin
   inherited;
 
-  btnDetalhes.Enabled := DataSourceCPagar.DataSet.FieldByName('STATUS').AsString = 'P';
-  btnBaixarCP.Enabled := DataSourceCPagar.DataSet.FieldByName('STATUS').AsString = 'A';
-
-end;
-
-procedure TfrmContasPagar.dateFinalChange(Sender: TObject);
-begin
-  inherited;
-
-  Pesquisar;
-
-end;
-
-procedure TfrmContasPagar.dateInicialChange(Sender: TObject);
-begin
-  inherited;
-
-  Pesquisar;
+  btnDetalhes.Enabled := DataSourceCPagar.DataSet.FieldByName('STATUS')
+    .AsString = 'P';
+  btnBaixarCP.Enabled := DataSourceCPagar.DataSet.FieldByName('STATUS')
+    .AsString = 'A';
 
 end;
 
@@ -1126,26 +1137,27 @@ procedure TfrmContasPagar.DBGrid1DrawColumnCell(Sender: TObject;
   const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
 begin
 
-  //  Altera a cor das duplicatas vencidas
+  // Altera a cor das duplicatas vencidas
   if (not DBGrid1.DataSource.DataSet.IsEmpty) and
-      (DBGrid1.DataSource.DataSet.FieldByName('DATA_VENCIMENTO').AsDateTime < Date)
-      and (DBGrid1.DataSource.DataSet.FieldByName('STATUS').AsString = 'A')then
+    (DBGrid1.DataSource.DataSet.FieldByName('DATA_VENCIMENTO').AsDateTime <
+    Date) and (DBGrid1.DataSource.DataSet.FieldByName('STATUS').AsString = 'A')
+  then
   begin
-    DBGrid1.Canvas.Font.Color := clRed;  // Define a cor do texto da célula
+    DBGrid1.Canvas.Font.Color := clRed; // Define a cor do texto da célula
   end;
 
-  //  Altera a cor das duplicatas pagas
+  // Altera a cor das duplicatas pagas
   if (not DBGrid1.DataSource.DataSet.IsEmpty) and
-     (DBGrid1.DataSource.DataSet.FieldByName('STATUS').AsString = 'P')then
+    (DBGrid1.DataSource.DataSet.FieldByName('STATUS').AsString = 'P') then
   begin
-    DBGrid1.Canvas.Font.Color := clHotLight;  // Define a cor do texto da célula
+    DBGrid1.Canvas.Font.Color := clHotLight; // Define a cor do texto da célula
   end;
 
-  //  Altera a cor das duplicatas canceladas
+  // Altera a cor das duplicatas canceladas
   if (not DBGrid1.DataSource.DataSet.IsEmpty) and
-     (DBGrid1.DataSource.DataSet.FieldByName('STATUS').AsString = 'C')then
+    (DBGrid1.DataSource.DataSet.FieldByName('STATUS').AsString = 'C') then
   begin
-    DBGrid1.Canvas.Font.Color := $00E68AE5;  // Define a cor do texto da célula
+    DBGrid1.Canvas.Font.Color := $00E68AE5; // Define a cor do texto da célula
   end;
 
   // Desenha a célula com as propriedades de cor atualizadas
@@ -1162,21 +1174,23 @@ begin
   // Abre a tela de cadastro
   CardPanelPrincipal.ActiveCard := CardCadastro;
 
-  //  Se o documento já foi baixado cancela a edição
+  // Se o documento já foi baixado cancela a edição
   if dmCPagar.cdsCPagarSTATUS.AsString = 'P' then
   begin
 
     CardPanelPrincipal.ActiveCard := CardPesquisa;
-    Application.MessageBox('Documento já pago não pode ser alterado!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+    Application.MessageBox('Documento já pago não pode ser alterado!',
+      'Atenção', MB_OK + MB_ICONEXCLAMATION);
     abort;
 
   end;
 
-  //  Se o documento foi cancelado, a edição é cancelada
+  // Se o documento foi cancelado, a edição é cancelada
   if dmCPagar.cdsCPagarSTATUS.AsString = 'C' then
   begin
     CardPanelPrincipal.ActiveCard := CardPesquisa;
-    Application.MessageBox('Documento já cancelado não pode ser alterado!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+    Application.MessageBox('Documento já cancelado não pode ser alterado!',
+      'Atenção', MB_OK + MB_ICONEXCLAMATION);
     abort;
 
   end;
@@ -1184,58 +1198,59 @@ begin
   // Coloca o dataset em modo de edição
   dmCPagar.cdsCPagar.Edit;
 
-  edtParcela.Enabled      := True;
+  edtParcela.Enabled := True;
   edtValorParcela.Enabled := True;
 
-  //  Esvaziando data set de parcelas
+  // Esvaziando data set de parcelas
   cdsParcelas.EmptyDataSet;
 
   // Coloca o numero do registro no titulo
   lblTitulo.Caption := 'Alterando Registro Nº ' + dmCPagar.cdsCPagarID.AsString;
 
-  //  Bloqueia o toogle de parcelamento
-  toggleParcelamento.Enabled  := False;
-  toggleParcelamento.State    := tssOff;
+  // Bloqueia o toogle de parcelamento
+  toggleParcelamento.Enabled := False;
+  toggleParcelamento.State := tssOff;
   CardPanelParcela.ActiveCard := cardParcelaUnica;
-  edtParcela.ReadOnly         := True;
-  CheckFatVirada.Visible      := False;
-  CheckFatVirada.Checked      := False;
+  edtParcela.ReadOnly := True;
+  CheckFatVirada.Visible := False;
+  CheckFatVirada.Checked := False;
 
-  edtValorParcela.ReadOnly  := False;
+  edtValorParcela.ReadOnly := False;
   chkBaixarAoSalvar.Checked := False;
 
-  //  Carrega os dados
-  edtNDoc.Text         := dmCPagar.cdsCPagarNUMERO_DOC.AsString;
-  memDesc.Text         := dmCPagar.cdsCPagarDESCRICAO.AsString;
-  edtValorCompra.Text  := TUtilitario.FormatarValor(dmCPagar.cdsCPagarVALOR_COMPRA.AsCurrency);
-  edtParcela.Text      := dmCPagar.cdsCPagarPARCELA.AsString;
-  edtValorParcela.Text := TUtilitario.FormatarValor(dmCPagar.cdsCPagarVALOR_PARCELA.AsString);
-  dateVencimento.Date  := dmCPagar.cdsCPagarDATA_VENCIMENTO.AsDateTime;
-  dateCompra.Date      := dmCPagar.cdsCPagarDATA_COMPRA.AsDateTime;
-  edtFornecedor.Text   := dmCPagar.cdsCPagarID_FORNECEDOR.AsString;
+  // Carrega os dados
+  edtNDoc.Text := dmCPagar.cdsCPagarNUMERO_DOC.AsString;
+  memDesc.Text := dmCPagar.cdsCPagarDESCRICAO.AsString;
+  edtValorCompra.Text := TUtilitario.FormatarValor
+    (dmCPagar.cdsCPagarVALOR_COMPRA.AsCurrency);
+  edtParcela.Text := dmCPagar.cdsCPagarPARCELA.AsString;
+  edtValorParcela.Text := TUtilitario.FormatarValor
+    (dmCPagar.cdsCPagarVALOR_PARCELA.AsString);
+  dateVencimento.Date := dmCPagar.cdsCPagarDATA_VENCIMENTO.AsDateTime;
+  dateCompra.Date := dmCPagar.cdsCPagarDATA_COMPRA.AsDateTime;
+  edtFornecedor.Text := dmCPagar.cdsCPagarID_FORNECEDOR.AsString;
 
-  //  Verifica se a CP foi vinculado a uma fatura de cartão
+  // Verifica se a CP foi vinculado a uma fatura de cartão
   if dmCPagar.cdsCPagarFATURA_CART.AsString = 'S' then
   begin
 
-    toggleFatura.State       := tssOn;
-    lblCodFatCartao.Visible  := True;
+    toggleFatura.State := tssOn;
+    lblCodFatCartao.Visible := True;
     lblNomeFatCartao.Visible := True;
-    edtCodFatCartao.Visible  := True;
-    btnPesqFat.Visible       := True;
+    edtCodFatCartao.Visible := True;
+    btnPesqFat.Visible := True;
 
     edtCodFatCartao.Text := dmCPagar.cdsCPagarID_FATURA.AsString;
     BuscaNomeFatCartao;
 
   end
-    else
-    begin
+  else
+  begin
 
-      toggleFatura.State    := tssOff;
-      edtCodFatCartao.Clear;
+    toggleFatura.State := tssOff;
+    edtCodFatCartao.Clear;
 
-    end;
-
+  end;
 
   BuscaNomeFornecedor;
 
@@ -1249,13 +1264,16 @@ begin
   if Trim(edtCodFatCartao.Text) <> '' then
   begin
 
-    if dmFaturaCartao.GetStatusFatCartao(Trim(edtCodFatCartao.Text)) = False then
+    if dmFaturaCartao.GetStatusFatCartao(Trim(edtCodFatCartao.Text)) = False
+    then
     begin
 
       edtCodFatCartao.Clear;
       edtCodFatCartao.SetFocus;
       lblNomeFatCartao.Caption := '';
-      Application.MessageBox('Fatura de Cartão não está Ativa, verifique o cadastro!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+      Application.MessageBox
+        ('Fatura de Cartão não está Ativa, verifique o cadastro!', 'Atenção',
+        MB_OK + MB_ICONEXCLAMATION);
       abort;
 
     end;
@@ -1276,24 +1294,6 @@ begin
 
   end;
 
-
-
-end;
-
-procedure TfrmContasPagar.edtFiltroFatCartaoChange(Sender: TObject);
-begin
-  inherited;
-
-  Pesquisar;
-
-end;
-
-procedure TfrmContasPagar.edtFiltroFornecedorChange(Sender: TObject);
-begin
-  inherited;
-
-  Pesquisar;
-
 end;
 
 procedure TfrmContasPagar.edtFornecedorExit(Sender: TObject);
@@ -1311,22 +1311,13 @@ begin
       edtFornecedor.Clear;
       edtFornecedor.SetFocus;
       lblNomeFornecedor.Caption := '';
-      Application.MessageBox('Fornecedor não está Ativo, verifique o cadastro!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+      Application.MessageBox('Fornecedor não está Ativo, verifique o cadastro!',
+        'Atenção', MB_OK + MB_ICONEXCLAMATION);
       abort;
 
     end;
 
-
   end;
-
-end;
-
-
-procedure TfrmContasPagar.edtPesquisarChange(Sender: TObject);
-begin
-  inherited;
-
-  Pesquisar;
 
 end;
 
@@ -1339,7 +1330,7 @@ begin
   if dmCPagar.cdsCPagar.State in [dsInsert] then
   begin
 
-    //  Se ao inserir Parcela unica pega o mesmo valor da venda
+    // Se ao inserir Parcela unica pega o mesmo valor da venda
     edtValorParcela.Text := TUtilitario.FormatarValor(edtValorCompra.Text);
 
   end;
@@ -1360,9 +1351,10 @@ begin
   frmCpDetalhe := TfrmCpDetalhe.Create(Self);
   try
 
-    frmCpDetalhe.ExibirCPDetalhes(DataSourceCPagar.DataSet.FieldByName('ID').AsInteger);
+    frmCpDetalhe.ExibirCPDetalhes(DataSourceCPagar.DataSet.FieldByName('ID')
+      .AsInteger);
 
-    //  Exibe o form
+    // Exibe o form
     frmCpDetalhe.ShowModal;
 
   finally
@@ -1371,10 +1363,9 @@ begin
 
   end;
 
-
 end;
 
-procedure TfrmContasPagar.ExibeTelaBaixar(pCodCP : Integer);
+procedure TfrmContasPagar.ExibeTelaBaixar(pCodCP: Integer);
 begin
 
   // Cria o form
@@ -1384,7 +1375,7 @@ begin
 
     frmBaixarCP.BaixarCP(pCodCP);
 
-    //  Exibe o form
+    // Exibe o form
     frmBaixarCP.ShowModal;
 
   finally
@@ -1393,10 +1384,9 @@ begin
 
   end;
 
-
   Pesquisar;
 
-  //  Atualiza relatorio tela principal
+  // Atualiza relatorio tela principal
   frmPrincipal.TotalCP;
   frmPrincipal.ResumoMensalCaixa;
 
@@ -1405,12 +1395,12 @@ end;
 procedure TfrmContasPagar.ExibeTelaBxMultipla;
 begin
 
-   // Cria o form
+  // Cria o form
   frmBxMultiplaCP := TfrmBxMultiplaCP.Create(Self);
 
   try
 
-    //  Exibe o form
+    // Exibe o form
     frmBxMultiplaCP.ShowModal;
 
   finally
@@ -1421,7 +1411,7 @@ begin
 
   Pesquisar;
 
-  //  Atualiza relatorio tela principal
+  // Atualiza relatorio tela principal
   frmPrincipal.TotalCP;
   frmPrincipal.ResumoMensalCaixa;
 
@@ -1429,12 +1419,13 @@ end;
 
 procedure TfrmContasPagar.ExibeTelaLancPadrao;
 var
-  lFormulario : TfrmConsultaLancamentoPadraoContas;
+  lFormulario: TfrmConsultaLancamentoPadraoContas;
 begin
   lFormulario := TfrmConsultaLancamentoPadraoContas.Create(Self, tlCp);
   try
     lFormulario.ShowModal;
-    CarregaLancPadrao(lFormulario.grdLancPadrao.DataSource.DataSet.FieldByName('ID').AsInteger);
+    CarregaLancPadrao(lFormulario.grdLancPadrao.DataSource.DataSet.FieldByName
+      ('ID').AsInteger);
   finally
     lFormulario.Free;
   end;
@@ -1448,8 +1439,8 @@ begin
 
     checkDiaFixoVcto.Checked := True;
     checkDiaFixoVcto.Enabled := False;
-    edtDiaFixoVcto.Text      := IntToStr(DataVctoFat);
-    edtDiaFixoVcto.Enabled   := False;
+    edtDiaFixoVcto.Text := IntToStr(DataVctoFat);
+    edtDiaFixoVcto.Enabled := False;
 
   end;
 
@@ -1465,19 +1456,32 @@ procedure TfrmContasPagar.FormCreate(Sender: TObject);
 begin
   inherited;
 
-  edtValorCompra.OnKeyPress  := KeyPressValor;
+  FTelaAtiva := False;
+
+  edtValorCompra.OnKeyPress := KeyPressValor;
   edtValorParcela.OnKeyPress := KeyPressValor;
 
-  //  Define as datas da consulta
+  // Define as datas da consulta
   dateInicial.Date := StartOfTheMonth(Now);
-  dateFinal.Date   := EndOfTheMonth(Now);
+  dateFinal.Date := EndOfTheMonth(Now);
 
+end;
+
+procedure TfrmContasPagar.FormDestroy(Sender: TObject);
+begin
+  inherited;
+  if Assigned(FQueryPesquisa) then
+    FQueryPesquisa.Free;
+
+  if Assigned(FQueryGrupoParcelas) then
+    FQueryGrupoParcelas.Free;
 end;
 
 procedure TfrmContasPagar.FormShow(Sender: TObject);
 begin
   inherited;
   TUtilitario.CarregarOrdemColunasJSON(DBGrid1, 'ConfigGrids', 'grdCP');
+  FTelaAtiva := True;
 end;
 
 procedure TfrmContasPagar.GeraParcelas;
@@ -1495,28 +1499,35 @@ var
   begin
     Result := True;
 
-    if (not TryStrToFloat(edtValorCompra.Text, lValorCompra)) or (lValorCompra <= 0) then
+    if (not TryStrToFloat(edtValorCompra.Text, lValorCompra)) or
+      (lValorCompra <= 0) then
     begin
       edtValorCompra.SetFocus;
-      Application.MessageBox('Valor da compra Inválido!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+      Application.MessageBox('Valor da compra Inválido!', 'Atenção',
+        MB_OK + MB_ICONEXCLAMATION);
       Result := False;
     end
     else if dateCompra.Date > Now then
     begin
       dateCompra.SetFocus;
-      Application.MessageBox('Data de compra não pode ser maior que a data atual!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+      Application.MessageBox
+        ('Data de compra não pode ser maior que a data atual!', 'Atenção',
+        MB_OK + MB_ICONEXCLAMATION);
       Result := False;
     end
-    else if not TryStrToInt(edtQtdParcelas.Text, lQtdParcelas) or (lQtdParcelas <= 1) then
+    else if not TryStrToInt(edtQtdParcelas.Text, lQtdParcelas) or
+      (lQtdParcelas <= 1) then
     begin
       edtQtdParcelas.SetFocus;
-      Application.MessageBox('Números de Parcelas Inválido!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+      Application.MessageBox('Números de Parcelas Inválido!', 'Atenção',
+        MB_OK + MB_ICONEXCLAMATION);
       Result := False;
     end
     else if not TryStrToInt(edtIntervaloDias.Text, lIntervaloDias) then
     begin
       edtIntervaloDias.SetFocus;
-      Application.MessageBox('Intervalo de dias Inválido!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+      Application.MessageBox('Intervalo de dias Inválido!', 'Atenção',
+        MB_OK + MB_ICONEXCLAMATION);
       Result := False;
     end;
   end;
@@ -1525,7 +1536,7 @@ begin
 
   lDataPrimeiraParcela := 0;
   if not ValidarCampos then
-    Exit;
+    exit;
 
   // Calculando valores das parcelas
   lValorParcela := (Trunc(lValorCompra / lQtdParcelas * 100) / 100);
@@ -1541,23 +1552,28 @@ begin
     lDiaFixoVcto := DataVctoFat;
 
     if CheckFatVirada.Checked then
-      lDataPrimeiraParcela := IncMonth(dateCompra.Date, 2) // Vcto da parcela 1 para dois meses
+      lDataPrimeiraParcela := IncMonth(dateCompra.Date, 2)
+      // Vcto da parcela 1 para dois meses
     else
       lDataPrimeiraParcela := IncMonth(dateCompra.Date, 1);
 
-    lDataPrimeiraParcela := EncodeDate(YearOf(lDataPrimeiraParcela), MonthOf(lDataPrimeiraParcela), lDiaFixoVcto);
+    lDataPrimeiraParcela := EncodeDate(YearOf(lDataPrimeiraParcela),
+      MonthOf(lDataPrimeiraParcela), lDiaFixoVcto);
   end
   else if checkDiaFixoVcto.Checked then
   begin
-    if not TryStrToInt(edtDiaFixoVcto.Text, lDiaFixoVcto) or (lDiaFixoVcto > 28) or (lDiaFixoVcto < 1) then
+    if not TryStrToInt(edtDiaFixoVcto.Text, lDiaFixoVcto) or (lDiaFixoVcto > 28)
+      or (lDiaFixoVcto < 1) then
     begin
       edtDiaFixoVcto.SetFocus;
-      Application.MessageBox('Dia fixo de vencimento Inválido!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
-      Exit;
+      Application.MessageBox('Dia fixo de vencimento Inválido!', 'Atenção',
+        MB_OK + MB_ICONEXCLAMATION);
+      exit;
     end;
 
     lDataPrimeiraParcela := IncMonth(dateCompra.Date, 1);
-    lDataPrimeiraParcela := EncodeDate(YearOf(lDataPrimeiraParcela), MonthOf(lDataPrimeiraParcela), lDiaFixoVcto);
+    lDataPrimeiraParcela := EncodeDate(YearOf(lDataPrimeiraParcela),
+      MonthOf(lDataPrimeiraParcela), lDiaFixoVcto);
   end;
 
   // Gerando parcelas
@@ -1569,14 +1585,16 @@ begin
     lValorResiduo := 0;
 
     if checkDiaFixoVcto.Checked then
-      cdsParcelasVENCIMENTO.AsDateTime := EncodeDate(YearOf(IncMonth(lDataPrimeiraParcela, lContador - 1)),
-                                                     MonthOf(IncMonth(lDataPrimeiraParcela, lContador - 1)),
-                                                     lDiaFixoVcto)
+      cdsParcelasVENCIMENTO.AsDateTime :=
+        EncodeDate(YearOf(IncMonth(lDataPrimeiraParcela, lContador - 1)),
+        MonthOf(IncMonth(lDataPrimeiraParcela, lContador - 1)), lDiaFixoVcto)
     else
-      cdsParcelasVENCIMENTO.AsDateTime := IncDay(dateCompra.Date, lIntervaloDias * lContador);
+      cdsParcelasVENCIMENTO.AsDateTime :=
+        IncDay(dateCompra.Date, lIntervaloDias * lContador);
 
-    if not (Trim(edtNDoc.Text).IsEmpty) then
-      cdsParcelasDocumento.AsString := Trim(edtNDoc.Text) + '-' + IntToStr(lContador);
+    if not(Trim(edtNDoc.Text).IsEmpty) then
+      cdsParcelasDOCUMENTO.AsString := Trim(edtNDoc.Text) + '-' +
+        IntToStr(lContador);
 
     cdsParcelas.Post;
   end;
@@ -1593,8 +1611,8 @@ end;
 procedure TfrmContasPagar.HabilitaBotoes;
 begin
 
-  btnAlterar.Enabled  := not DataSourceCPagar.DataSet.IsEmpty;
-  btnExcluir.Enabled  := not DataSourceCPagar.DataSet.IsEmpty;
+  btnAlterar.Enabled := not DataSourceCPagar.DataSet.IsEmpty;
+  btnExcluir.Enabled := not DataSourceCPagar.DataSet.IsEmpty;
   btnBaixarCP.Enabled := not DataSourceCPagar.DataSet.IsEmpty;
   btnDetalhes.Enabled := not DataSourceCPagar.DataSet.IsEmpty;
   btnImprimir.Enabled := not DataSourceCPagar.DataSet.IsEmpty;
@@ -1606,191 +1624,200 @@ begin
 
   if Key = #13 then
   begin
-    //  Verifica se a tecla pressionada é o Enter
-    //  Cancela o efeito do enter
+    // Verifica se a tecla pressionada é o Enter
+    // Cancela o efeito do enter
     Key := #0;
-    //  Pula para o proximo
+    // Pula para o proximo
     Perform(WM_NEXTDLGCTL, 0, 0);
   end;
 
-  //  Se for digitado um ponto, será convertido para virgula
+  // Se for digitado um ponto, será convertido para virgula
   if Key = FormatSettings.ThousandSeparator then
-   begin
-      Key := #0;
-    end;
+  begin
+    Key := #0;
+  end;
 
   // Permite apenas digitar os caracteres dentro do charinset
-  if not (CharInSet(Key, ['0'..'9', FormatSettings.DecimalSeparator, #8, #13])) then
+  if not(CharInSet(Key, ['0' .. '9', FormatSettings.DecimalSeparator, #8, #13]))
+  then
   begin
     Key := #0;
   end;
 
   // Valida se já existe o ponto decimal
-  if (Key = FormatSettings.DecimalSeparator) and (pos(Key, TEdit(Sender).Text) > 0) then
+  if (Key = FormatSettings.DecimalSeparator) and
+    (pos(Key, TEdit(Sender).Text) > 0) then
   begin
     Key := #0;
   end;
 
 end;
 
+procedure TfrmContasPagar.PesquisaClick(Sender: TObject);
+begin
+  if (FTelaAtiva) then
+    Pesquisar;
+end;
+
 procedure TfrmContasPagar.Pesquisar;
 var
   LFiltroEdit: String;
-  LFiltro    : String;
-  LOrdem     : String;
+  LFiltro: String;
+  LOrdem: String;
 
 begin
 
-  //  Validações
-  if dateInicial.Date > dateFinal.Date then
-  begin
+  LFiltroEdit := '';
+  LFiltro := '';
+  LOrdem := '';
 
-    dateFinal.SetFocus;
-    Application.MessageBox('Data Inicial não pode ser maior que a data Final!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+  if not(ValidaPesquisa) then
     exit;
 
-  end;
+  if (Assigned(FQueryPesquisa)) then
+    FreeAndNil(FQueryPesquisa);
 
-  if cbStatus.ItemIndex < 0 then
-  begin
+  FQueryPesquisa := TSFQuery.Create(nil);
+  try
 
-    cbStatus.SetFocus;
-    Application.MessageBox('Selecione um tipo de STATUS!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
-    exit;
+    // Pré pesquisa para funcionar o likefind
+    FQueryPesquisa.Close;
+    FQueryPesquisa.SQL.Clear;
+    FQueryPesquisa.SQL.Add
+      (' SELECT FIRST 1 CP.*, F.RAZAO_SOCIAL FROM CONTAS_PAGAR CP LEFT JOIN FORNECEDORES F ');
+    FQueryPesquisa.SQL.Add(' ON CP.ID_FORNECEDOR = F.ID_FORNEC ');
+    FQueryPesquisa.Open;
 
-  end;
+    // Configurações do DataSet para o DBGrid
+    DBGrid1.DataSource.DataSet := FQueryPesquisa;
 
-  if cbData.ItemIndex < 0 then
-   begin
+    LFiltroEdit := TUtilitario.LikeFind(edtPesquisar.Text, DBGrid1);
 
-    cbData.SetFocus;
-    Application.MessageBox('Selecione um tipo de DATA!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
-    exit;
+    // Pesquisa por tipo
+    case cbStatus.ItemIndex of
+      1:
+        LFiltro := LFiltro + ' AND CP.STATUS = ''P'' ';
+      2:
+        LFiltro := LFiltro + ' AND CP.STATUS = ''A'' ';
+      3:
+        LFiltro := LFiltro + ' AND CP.STATUS = ''C'' ';
+    end;
 
-  end;
+    // Pesquisa por data
+    if (dateInicial.Checked) and (dateFinal.Checked) then
+    begin
 
-  LFiltroEdit := TUtilitario.LikeFind(edtPesquisar.Text, DBGrid1);
-  LFiltro     := '';
-  LOrdem      := '';
+      case cbData.ItemIndex of
 
-  //  Limpa os parametros do cds
-  dmCPagar.cdsCPagar.Params.Clear;
+        0:
+          LFiltro := LFiltro + ' AND CP.DATA_COMPRA BETWEEN :DTINI AND :DTFIM ';
+        1:
+          LFiltro := LFiltro +
+            ' AND CP.DATA_VENCIMENTO BETWEEN :DTINI AND :DTFIM ';
+        2:
+          LFiltro := LFiltro +
+            ' AND CP.DATA_PAGAMENTO BETWEEN :DTINI AND :DTFIM ';
 
-  //  Pesquisa por tipo
-  case cbStatus.ItemIndex of
-    1 : LFiltro := LFiltro + ' AND CP.STATUS = ''P'' ';
-    2 : LFiltro := LFiltro + ' AND CP.STATUS = ''A'' ';
-    3 : LFiltro := LFiltro + ' AND CP.STATUS = ''C'' ';
-  end;
-
-  //  Pesquisa por data
-  if (dateInicial.Checked) and (dateFinal.Checked) then
-  begin
-
-    case cbData.ItemIndex of
-
-      0 : LFiltro := LFiltro + ' AND CP.DATA_COMPRA BETWEEN :DTINI AND :DTFIM ';
-      1 : LFiltro := LFiltro + ' AND CP.DATA_VENCIMENTO BETWEEN :DTINI AND :DTFIM ';
-      2 : LFiltro := LFiltro + ' AND CP.DATA_PAGAMENTO BETWEEN :DTINI AND :DTFIM ';
+      end;
 
     end;
 
-
-    //  Criando os parametros
-    dmCPagar.cdsCPagar.Params.CreateParam(TFieldType.ftDate, 'DTINI', TParamType.ptInput);
-    dmCPagar.cdsCPagar.ParamByName('DTINI').AsDate := dateInicial.Date;
-    dmCPagar.cdsCPagar.Params.CreateParam(TFieldType.ftDate, 'DTFIM', TParamType.ptInput);
-    dmCPagar.cdsCPagar.ParamByName('DTFIM').AsDate := dateFinal.Date;
-
-  end;
-
-   //  Pesquisa parciais
+    // Pesquisa parciais
     if checkParciais.Checked then
-    begin
-
       LFiltro := LFiltro + ' AND CP.PARCIAL = ''S'' ';
 
-    end;
-
-    //  Pesquisa vencidas
+    // Pesquisa vencidas
     if checkVencidas.Checked then
+      LFiltro := LFiltro +
+        ' AND CP.STATUS = ''A'' AND CP.DATA_VENCIMENTO < :DATUAL ';
+
+    // Pesquisa por FORNECEDORES
+    if Trim(edtFiltroFornecedor.Text) <> '' then
+      LFiltro := LFiltro + ' AND CP.ID_FORNECEDOR = :ID ';
+
+    // Pesquisa por Fatura de Cartao
+    if Trim(edtFiltroFatCartao.Text) <> '' then
+      LFiltro := LFiltro + ' AND CP.ID_FATURA = :ID_FT ';
+
+    // Pesquisa Sem Fatura de cartão
+    if checkNaoConsideraFatura.Checked then
+      LFiltro := LFiltro + 'AND FATURA_CART = ''N'' ';
+
+    // Ordem de pesquisa
+    if rbId.Checked then
+      LOrdem := ' ORDER BY CP.ID DESC'
+    else if rbDataVenc.Checked then
+      LOrdem := ' ORDER BY CP.DATA_VENCIMENTO'
+    else if rbValorParcela.Checked then
+      LOrdem := ' ORDER BY CP.VALOR_PARCELA DESC'
+    else if rbValorCompra.Checked then
+      LOrdem := ' ORDER BY CP.VALOR_COMPRA DESC'
+    else if rbDataCompra.Checked then
+      LOrdem := ' ORDER BY CP.DATA_COMPRA DESC'
+    else
+      LOrdem := ' ORDER BY CP.ID DESC';
+
+    FQueryPesquisa.Close;
+    FQueryPesquisa.SQL.Clear;
+    FQueryPesquisa.SQL.Add('SELECT CP.*, F.RAZAO_SOCIAL FROM CONTAS_PAGAR CP ' +
+      'LEFT JOIN FORNECEDORES F ON CP.ID_FORNECEDOR = F.ID_FORNEC WHERE 1 = 1 '
+      + LFiltroEdit + LFiltro + LOrdem);
+
+    // Criando os parametros
+    if (dateInicial.Checked) and (dateFinal.Checked) then
     begin
-
-      LFiltro := LFiltro + ' AND CP.STATUS = ''A'' AND CP.DATA_VENCIMENTO < :DATUAL ';
-
-      //  Criando os parametros
-      dmCPagar.cdsCPagar.Params.CreateParam(TFieldType.ftDate, 'DATUAL', TParamType.ptInput);
-      dmCPagar.cdsCPagar.ParamByName('DATUAL').AsDate := NOW;
-
+      FQueryPesquisa.ParamByName('DTINI').AsDate := dateInicial.Date;
+      FQueryPesquisa.ParamByName('DTFIM').AsDate := dateFinal.Date;
     end;
 
-  //  Pesquisa por FORNECEDORES
-  if Trim(edtFiltroFornecedor.Text) <> '' then
-  begin
+    if (checkVencidas.Checked) then
+      FQueryPesquisa.ParamByName('DATUAL').AsDate := Now;
 
-    LFiltro := LFiltro + ' AND CP.ID_FORNECEDOR = :ID ';
+    if not(Trim(edtFiltroFornecedor.Text).IsEmpty) then
+      FQueryPesquisa.ParamByName('ID').AsString :=
+        Trim(edtFiltroFornecedor.Text);
 
-    //  Criando os parametros
-    dmCPagar.cdsCPagar.Params.CreateParam(TFieldType.ftString, 'ID', TParamType.ptInput);
-    dmCPagar.cdsCPagar.ParamByName('ID').AsString := Trim(edtFiltroFornecedor.Text);
+    if not(Trim(edtFiltroFatCartao.Text).IsEmpty) then
+      FQueryPesquisa.ParamByName('ID_FT').AsString :=
+        Trim(edtFiltroFatCartao.Text);
 
+
+    FQueryPesquisa.Open;
+
+    // Formata visualmente o campo de STATUS
+    FQueryPesquisa.FieldByName('STATUS').OnGetText := QuerySTATUSGetText;
+
+    HabilitaBotoes;
+
+    // Calcula a quantidade e valor
+    CalcCpGrid;
+    CalcQtdCpGrid;
+
+    // Posiciona no primeiro registro
+    DataSourceCPagar.DataSet.First;
+
+  except
+    on E: Exception do
+    begin
+      TfrmMensagem.TelaMensagem('Erro!', 'Erro ao realizar consulta: ' +
+        E.Message, tmErro);
+    end;
   end;
-
-  //  Pesquisa por Fatura de Cartao
-  if Trim(edtFiltroFatCartao.Text) <> '' then
-  begin
-
-    LFiltro := LFiltro + ' AND CP.ID_FATURA = :ID_FT ';
-
-    //  Criando os parametros
-    dmCPagar.cdsCPagar.Params.CreateParam(TFieldType.ftString, 'ID_FT', TParamType.ptInput);
-    dmCPagar.cdsCPagar.ParamByName('ID_FT').AsString := Trim(edtFiltroFatCartao.Text);
-
-  end;
-
-  //  Pesquisa Sem Fatura de cartão
-  if checkNaoConsideraFatura.Checked then
-  begin
-
-    LFiltro := LFiltro + 'AND FATURA_CART = ''N'' ';
-
-  end;
-
-  //  Ordem de pesquisa
-  if rbId.Checked then
-    lOrdem := ' ORDER BY CP.ID DESC'
-  else if rbDataVenc.Checked then
-    lOrdem := ' ORDER BY CP.DATA_VENCIMENTO'
-  else if rbValorParcela.Checked then
-    lOrdem := ' ORDER BY CP.VALOR_PARCELA DESC'
-  else if rbValorCompra.Checked then
-    lOrdem := ' ORDER BY CP.VALOR_COMPRA DESC'
-  else if rbDataCompra.Checked then
-    lOrdem := ' ORDER BY CP.DATA_COMPRA DESC'
-  else
-    lOrdem := ' ORDER BY CP.ID DESC';
-
-  dmCPagar.cdsCPagar.Close;
-  dmCPagar.cdsCPagar.CommandText := 'SELECT CP.*, F.RAZAO_SOCIAL FROM CONTAS_PAGAR CP ' +
-                                    'LEFT JOIN FORNECEDORES F ON CP.ID_FORNECEDOR = F.ID_FORNEC WHERE 1 = 1 ' +
-                                    LFiltroEdit + LFiltro + lOrdem;
-  dmCPagar.cdsCPagar.Open;
-
-
-  HabilitaBotoes;
-
-  //  Calcula a quantidade e valor
-  CalcCpGrid;
-  CalcQtdCpGrid;
-
-  //  Posiciona no primeiro registro
-  DataSourceCPagar.DataSet.First;
-
-  inherited;
 
 end;
 
-function TfrmContasPagar.DtVencimentoCheckContaPaga : TDate;
+procedure TfrmContasPagar.QuerySTATUSGetText(Sender: TField; var Text: string;
+  DisplayText: Boolean);
+begin
+  if Sender.AsString = 'A' then
+    Text := 'ABERTA'
+  else if Sender.AsString = 'P' then
+    Text := 'PAGA'
+  else if Sender.AsString = 'C' then
+    Text := 'CANCELADA';
+end;
+
+function TfrmContasPagar.DtVencimentoCheckContaPaga: TDate;
 begin
 
   Result := dateVencimento.Date;
@@ -1800,58 +1827,18 @@ begin
 
 end;
 
-procedure TfrmContasPagar.rbDataCompraClick(Sender: TObject);
-begin
-  inherited;
-
-  Pesquisar;
-
-end;
-
-procedure TfrmContasPagar.rbDataVencClick(Sender: TObject);
-begin
-  inherited;
-
-  Pesquisar;
-
-end;
-
-procedure TfrmContasPagar.rbIdClick(Sender: TObject);
-begin
-  inherited;
-
-  Pesquisar;
-
-end;
-
-procedure TfrmContasPagar.rbValorCompraClick(Sender: TObject);
-begin
-  inherited;
-
-  Pesquisar;
-
-end;
-
-procedure TfrmContasPagar.rbValorParcelaClick(Sender: TObject);
-begin
-  inherited;
-
-  Pesquisar;
-
-end;
-
 procedure TfrmContasPagar.toggleFaturaClick(Sender: TObject);
 begin
 
   if toggleFatura.State = tssOff then
   begin
 
-    //  Oculta as info de fatura
-    lblCodFatCartao.Visible  := False;
+    // Oculta as info de fatura
+    lblCodFatCartao.Visible := False;
     lblNomeFatCartao.Visible := False;
     edtCodFatCartao.Clear;
-    edtCodFatCartao.Visible  := False;
-    btnPesqFat.Visible       := False;
+    edtCodFatCartao.Visible := False;
+    btnPesqFat.Visible := False;
 
     DataVctoFat := 0;
 
@@ -1861,7 +1848,7 @@ begin
       checkDiaFixoVcto.Checked := False;
       checkDiaFixoVcto.Enabled := True;
       edtDiaFixoVcto.Clear;
-      edtDiaFixoVcto.Enabled   := True;
+      edtDiaFixoVcto.Enabled := True;
 
     end;
 
@@ -1870,22 +1857,21 @@ begin
 
   end
   else
-   begin
+  begin
 
-    //  Oculta as info de fatura
+    // Oculta as info de fatura
     lblCodFatCartao.Visible := True;
     edtCodFatCartao.Visible := True;
-    btnPesqFat.Visible      := True;
+    btnPesqFat.Visible := True;
 
     edtCodFatCartao.SetFocus;
 
     pnlFundoAvisoFatura.Visible := True;
 
-    if not (dmCPagar.cdsCPagar.State in [dsEdit]) then
+    if not(dmCPagar.cdsCPagar.State in [dsEdit]) then
       CheckFatVirada.Visible := True;
 
-   end;
-
+  end;
 
 end;
 
@@ -1898,14 +1884,43 @@ begin
     CardPanelParcela.ActiveCard := cardParcelaUnica;
 
   end
-    else if toggleParcelamento.State = tssOn then
-         begin
+  else if toggleParcelamento.State = tssOn then
+  begin
 
-          CardPanelParcela.ActiveCard := cardParcelamento;
+    CardPanelParcela.ActiveCard := cardParcelamento;
 
-          FatCartaoAtiva;
+    FatCartaoAtiva;
 
-         end;
+  end;
+end;
+
+function TfrmContasPagar.ValidaPesquisa: Boolean;
+begin
+  Result := False;
+
+  if (dateInicial.Date > dateFinal.Date) then
+  begin
+    TfrmMensagem.TelaMensagem('Atenção',
+      'Data Inicial não pode ser maior que a data Final!', tmAviso);
+    dateFinal.SetFocus;
+    exit;
+  end;
+
+  if (cbStatus.ItemIndex < 0) then
+  begin
+    TfrmMensagem.TelaMensagem('Atenção',
+      'Selecione um tipo de STATUS!', tmAviso);
+    cbStatus.SetFocus;
+    exit;
+  end;
+
+  if (cbData.ItemIndex < 0) then
+  begin
+    TfrmMensagem.TelaMensagem('Atenção', 'Selecione um tipo de Data!', tmAviso);
+    cbData.SetFocus;
+    exit;
+  end;
+  Result := True;
 end;
 
 end.

@@ -1,60 +1,241 @@
 unit SistemaFinanceiro.Model.Entidades.CP.Detalhe;
+
 interface
+
+uses
+  uDaoRTTI,
+  uDBAttributes,
+  System.SysUtils,
+  FireDAC.Stan.Param;
+
 type
+
+  [TDBTable('CONTAS_PAGAR_DETALHE')]
   TModelCpDetalhe = class
-    private
-      FValor: Currency;
-      FDetalhes: String;
-      FId: Integer;
-      FIdCP: Integer;
-      FUsuario: String;
-      FData: TDate;
+  private
+    FDaoRTTI: TDaoRTTI;
+    FValor: Currency;
+    FDetalhes: String;
+    FId: Integer;
+    FIdCP: Integer;
+    FUsuario: String;
+    FData: TDate;
     FValorDesc: Currency;
-      procedure SetData(const Value: TDate);
-      procedure SetDetalhes(const Value: String);
-      procedure SetId(const Value: Integer);
-      procedure SetIdCP(const Value: Integer);
-      procedure SetUsuario(const Value: String);
-      procedure SetValor(const Value: Currency);
-      procedure SetValorDesc(const Value: Currency);
-    public
-      property Id        : Integer read FId write SetId;
-      property IdCP      : Integer read FIdCP write SetIdCP;
-      property Detalhes  : String read FDetalhes write SetDetalhes;
-      property Valor     : Currency read FValor write SetValor;
-      property Data      : TDate read FData write SetData;
-      property Usuario   : String read FUsuario write SetUsuario;
-      property ValorDesc : Currency read FValorDesc write SetValorDesc;
+
+  public
+    [TDBColumn('ID'), TDBIsPrimaryKey]
+    property Id: Integer read FId write FId;
+    [TDBColumn('ID_CONTA_PAGAR')]
+    property IdCP: Integer read FIdCP write FIdCP;
+    [TDBColumn('DETALHES')]
+    property Detalhes: String read FDetalhes write FDetalhes;
+    [TDBColumn('VALOR')]
+    property Valor: Currency read FValor write FValor;
+    [TDBColumn('DATA')]
+    property Data: TDate read FData write FData;
+    [TDBColumn('USUARIO')]
+    property Usuario: String read FUsuario write FUsuario;
+    [TDBColumn('DESCONTO_BX')]
+    property ValorDesc: Currency read FValorDesc write FValorDesc;
+
+    constructor Create;
+    destructor Destroy; override;
+
+    function Insert: Boolean;
+    function UpdateBySQLText(const pWhereClause: string = ''): Boolean;
+    function UpdateByPK: Boolean;
+    function UpdateByProp: Boolean;
+    function DeleteBySQLText(const pWhere: String = ''): Boolean;
+    function DeleteByPk: Boolean;
+    function DeleteByProp: Boolean;
+    function LoadObjectByPK: Boolean;
+    procedure ResetPropertiesToDefault;
+    procedure AddPropertyToWhere(const APropertyName: String);
+
+    function Existe(const pId: Integer;
+      const pCarrega: Boolean = false): Boolean;
+    function ExistePorCp(const pIdCr: Integer;
+      const pCarrega: Boolean = false): Boolean;
+    procedure GeraCodigo;
   end;
+
 implementation
+
 { TModelCpDetalhe }
-procedure TModelCpDetalhe.SetData(const Value: TDate);
+
+uses SistemaFinanceiro.Model.uSFQuery, uContasPagarDetalheExceptions;
+
+procedure TModelCpDetalhe.AddPropertyToWhere(const APropertyName: String);
 begin
-  FData := Value;
+  FDaoRTTI.AddPropertyToWhere(APropertyName);
 end;
-procedure TModelCpDetalhe.SetDetalhes(const Value: String);
+
+constructor TModelCpDetalhe.Create;
 begin
-  FDetalhes := Value;
+  FDaoRTTI := TDaoRTTI.Create;
+  ResetPropertiesToDefault;
 end;
-procedure TModelCpDetalhe.SetId(const Value: Integer);
+
+function TModelCpDetalhe.DeleteByPk: Boolean;
 begin
-  FId := Value;
+  Result := FDaoRTTI.DeleteByPk(Self);
 end;
-procedure TModelCpDetalhe.SetIdCP(const Value: Integer);
+
+function TModelCpDetalhe.DeleteByProp: Boolean;
 begin
-  FIdCP := Value;
+  Result := FDaoRTTI.DeleteByProp(Self);
 end;
-procedure TModelCpDetalhe.SetUsuario(const Value: String);
+
+function TModelCpDetalhe.DeleteBySQLText(const pWhere: String): Boolean;
 begin
-  FUsuario := Value;
+  Result := FDaoRTTI.DeleteBySQLText(Self, pWhere);
 end;
-procedure TModelCpDetalhe.SetValor(const Value: Currency);
+
+destructor TModelCpDetalhe.Destroy;
 begin
-  FValor := Value;
+  FDaoRTTI.Free;
+  inherited;
 end;
-procedure TModelCpDetalhe.SetValorDesc(const Value: Currency);
+
+function TModelCpDetalhe.Existe(const pId: Integer;
+  const pCarrega: Boolean): Boolean;
+var
+  lQuery: TSFQuery;
 begin
-  FValorDesc := Value;
+  Result := false;
+  lQuery := TSFQuery.Create(nil);
+  try
+    try
+      lQuery.Close;
+      lQuery.SQL.Clear;
+      lQuery.SQL.Add(' SELECT ID FROM CONTAS_PAGAR_DETALHE ');
+      lQuery.SQL.Add(' WHERE ID = :ID                        ');
+      lQuery.ParamByName('ID').AsInteger := pId;
+      lQuery.Open;
+
+      if (lQuery.RecordCount > 0) then
+      begin
+        if pCarrega then
+        begin
+          FId := pId;
+          Result := LoadObjectByPK;
+        end
+        else
+        begin
+          Result := True;
+        end;
+      end;
+
+    except
+      on E: Exception do
+      begin
+        raise ECpDetalheExiste.Create(E.Message);
+      end;
+    end;
+  finally
+    lQuery.Free;
+  end;
+
+end;
+
+function TModelCpDetalhe.ExistePorCp(const pIdCr: Integer;
+  const pCarrega: Boolean): Boolean;
+var
+  lQuery: TSFQuery;
+begin
+  Result := false;
+  lQuery := TSFQuery.Create(nil);
+  try
+    try
+      lQuery.Close;
+      lQuery.SQL.Clear;
+      lQuery.SQL.Add(' SELECT ID FROM CONTAS_PAGAR_DETALHE ');
+      lQuery.SQL.Add(' WHERE ID_CONTA_PAGAR = :IDCP        ');
+      lQuery.ParamByName('IDCP').AsInteger := pIdCr;
+      lQuery.Open;
+
+      if (lQuery.RecordCount > 0) then
+      begin
+        if pCarrega then
+        begin
+          FId := lQuery.FieldByName('ID').AsInteger;
+          Result := LoadObjectByPK;
+        end
+        else
+        begin
+          Result := True;
+        end;
+      end;
+
+    except
+      on E: Exception do
+      begin
+        raise ECpDetalheExiste.Create(E.Message);
+      end;
+    end;
+  finally
+    lQuery.Free;
+  end;
+
+end;
+
+procedure TModelCpDetalhe.GeraCodigo;
+var
+  lQuery: TSFQuery;
+begin
+  lQuery := TSFQuery.Create(nil);
+  try
+    try
+      lQuery.Close;
+      lQuery.SQL.Clear;
+      lQuery.Open
+        ('SELECT COALESCE(MAX(ID), 0) AS ID FROM CONTAS_PAGAR_DETALHE');
+
+      // Ultimo codigo usado + 1
+      FId := lQuery.FieldByName('ID').AsInteger + 1;
+
+      // Insere o registro no final da tabela
+      lQuery.Append;
+    except
+      on E: Exception do
+      begin
+        raise ECpDetalheId.Create(E.Message);
+      end;
+    end;
+  finally
+    lQuery.Free;
+  end;
+
+end;
+
+function TModelCpDetalhe.Insert: Boolean;
+begin
+  Result := FDaoRTTI.Insert(Self);
+end;
+
+function TModelCpDetalhe.LoadObjectByPK: Boolean;
+begin
+  Result := FDaoRTTI.LoadObjectByPK(Self);
+end;
+
+procedure TModelCpDetalhe.ResetPropertiesToDefault;
+begin
+  FDaoRTTI.ResetPropertiesToDefault(Self);
+end;
+
+function TModelCpDetalhe.UpdateByPK: Boolean;
+begin
+  Result := FDaoRTTI.UpdateByPK(Self);
+end;
+
+function TModelCpDetalhe.UpdateByProp: Boolean;
+begin
+  Result := FDaoRTTI.UpdateByProp(Self);
+end;
+
+function TModelCpDetalhe.UpdateBySQLText(const pWhereClause: string): Boolean;
+begin
+  Result := FDaoRTTI.UpdateBySQLText(Self, pWhereClause);
 end;
 
 end.

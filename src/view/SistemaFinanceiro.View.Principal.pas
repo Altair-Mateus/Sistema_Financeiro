@@ -2,16 +2,35 @@ unit SistemaFinanceiro.View.Principal;
 
 interface
 uses
-  Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Menus, SistemaFinanceiro.View.Splash,
-  SistemaFinanceiro.View.Usuarios, SistemaFinanceiro.View.Login, Vcl.ComCtrls,
-  Vcl.ExtCtrls, Vcl.Imaging.pngimage, Vcl.StdCtrls, System.ImageList,
-  Vcl.ImgList, SistemaFinanceiro.View.RedefinirSenha,
-  SistemaFinanceiro.View.Caixa, SistemaFinanceiro.View.SaldoCaixa,
+  Winapi.Messages,
+  System.SysUtils,
+  System.Variants,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  Vcl.Menus,
+  SistemaFinanceiro.View.Splash,
+  SistemaFinanceiro.View.Usuarios,
+  SistemaFinanceiro.View.Login,
+  Vcl.ComCtrls,
+  Vcl.ExtCtrls,
+  Vcl.Imaging.pngimage,
+  Vcl.StdCtrls,
+  System.ImageList,
+  Vcl.ImgList,
+  SistemaFinanceiro.View.RedefinirSenha,
+  SistemaFinanceiro.View.Caixa,
+  SistemaFinanceiro.View.SaldoCaixa,
   SistemaFinanceiro.View.CPagar,
-  SistemaFinanceiro.View.CReceber, SistemaFinanceiro.View.Clientes,
-  SistemaFinanceiro.View.Fornecedores, SistemaFinanceiro.View.FrPgto,
-  SistemaFinanceiro.View.CadAdmin, System.IOUtils, SistemaFinanceiro.View.Ajuda,
+  SistemaFinanceiro.View.CReceber,
+  SistemaFinanceiro.View.Clientes,
+  SistemaFinanceiro.View.Fornecedores,
+  SistemaFinanceiro.View.FrPgto,
+  SistemaFinanceiro.View.CadAdmin,
+  System.IOUtils,
+  SistemaFinanceiro.View.Ajuda,
   SistemaFinanceiro.View.FaturaCartao,
   SistemaFinanceiro.View.GeraRelResumoMensalCp,
   SistemaFinanceiro.View.GeraRelResumoMensalCr, Vcl.Buttons,
@@ -176,8 +195,9 @@ uses
   SistemaFinanceiro.Model.Entidades.ResumoCaixa,
   SistemaFinanceiro.Utilitarios,
   Winapi.Windows,
-  SistemaFinanceiro.Model.dmCPagar,
-  MidasLib, uEnumsUtils;
+  MidasLib,
+  uEnumsUtils,
+  SistemaFinanceiro.Model.Entidades.CP;
 
 procedure TfrmPrincipal.mnuAltImgPrincipalClick(Sender: TObject);
 var
@@ -694,7 +714,7 @@ end;
 
 procedure TfrmPrincipal.TotalCP;
 begin
-  lblValorCP.Caption := TUtilitario.FormatoMoeda(dmCPagar.TotalCP(FDtIni, FDtFim));
+  lblValorCP.Caption := TUtilitario.FormatoMoeda(TModelCP.TotalCP(FDtIni, FDtFim));
 end;
 
 procedure TfrmPrincipal.TotalCR;

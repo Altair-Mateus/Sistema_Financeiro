@@ -61,7 +61,7 @@ uses
   SistemaFinanceiro.View.Relatorios.ResumoMensalCr in 'src\view\Relatorios\SistemaFinanceiro.View.Relatorios.ResumoMensalCr.pas' {frmRelMensalCr},
   SistemaFinanceiro.View.DetalhesOrigemCpCr in 'src\view\SistemaFinanceiro.View.DetalhesOrigemCpCr.pas' {frmDetalhesOrigemCpCr},
   uDaoRTTI in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\model\uDaoRTTI.pas',
-  uDBAttributes in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\model\uDBAttributes.pas',
+  uDBAttributes in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\model\uDBAttributes.pas' {$R *.res},
   SistemaFinanceiro.Model.uSFQuery in 'src\model\SistemaFinanceiro.Model.uSFQuery.pas',
   SistemaFinanceiro.Model.Entidades.PgtoBxCr in 'src\model\Entidades\SistemaFinanceiro.Model.Entidades.PgtoBxCr.pas',
   SistemaFinanceiro.Model.Entidades.LancamentoPadraoContas in 'src\model\Entidades\SistemaFinanceiro.Model.Entidades.LancamentoPadraoContas.pas',
@@ -74,7 +74,11 @@ uses
   SistemaFinanceiro.Model.Entidades.Fornecedor in 'src\model\Entidades\SistemaFinanceiro.Model.Entidades.Fornecedor.pas',
   SistemaFinanceiro.View.Relatorios.LancamentoPadrao in 'src\view\Relatorios\SistemaFinanceiro.View.Relatorios.LancamentoPadrao.pas' {frmRelLancamentoPadrao},
   fTesteDaoRTTI in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\view\fTesteDaoRTTI.pas' {frmTesteDaoRTTI},
-  uUsuario in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\view\uUsuario.pas';
+  uUsuario in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\view\uUsuario.pas',
+  uContasPagarExceptions in 'src\exceptions\uContasPagarExceptions.pas',
+  uContasPagarDetalheExceptions in 'src\exceptions\uContasPagarDetalheExceptions.pas',
+  SistemaFinanceiro.Model.Entidades.PgtoBxCp in 'src\model\Entidades\SistemaFinanceiro.Model.Entidades.PgtoBxCp.pas',
+  uBaixaCpExceptions in 'src\exceptions\uBaixaCpExceptions.pas';
 
 {$R *.res}
 

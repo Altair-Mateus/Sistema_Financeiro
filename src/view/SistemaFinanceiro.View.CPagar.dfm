@@ -5,13 +5,15 @@ inherited frmContasPagar: TfrmContasPagar
   Position = poDesigned
   WindowState = wsMaximized
   OnClose = FormClose
-  ExplicitTop = -140
+  OnDestroy = FormDestroy
+  ExplicitLeft = -305
   ExplicitWidth = 1335
   ExplicitHeight = 679
   TextHeight = 19
   inherited CardPanelPrincipal: TCardPanel
     Width = 1323
     Height = 641
+    ActiveCard = CardPesquisa
     ExplicitWidth = 1319
     ExplicitHeight = 640
     inherited CardCadastro: TCard
@@ -823,12 +825,14 @@ inherited frmContasPagar: TfrmContasPagar
     inherited CardPesquisa: TCard
       Width = 1323
       Height = 641
-      ExplicitWidth = 1323
-      ExplicitHeight = 641
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 1319
+      ExplicitHeight = 640
       inherited pnlPesquisa: TPanel
         Width = 1323
         Height = 153
-        ExplicitWidth = 1323
+        ExplicitWidth = 1319
         ExplicitHeight = 153
         inherited lblPesquisar: TLabel
           Left = 192
@@ -3621,7 +3625,7 @@ inherited frmContasPagar: TfrmContasPagar
           Left = 192
           Top = 32
           Width = 297
-          OnChange = edtPesquisarChange
+          OnChange = PesquisaClick
           ExplicitLeft = 192
           ExplicitTop = 32
           ExplicitWidth = 297
@@ -3634,7 +3638,7 @@ inherited frmContasPagar: TfrmContasPagar
           Margins.Right = 5
           Margins.Bottom = 30
           ImageIndex = 6
-          OnClick = btnPesquisaeClick
+          OnClick = PesquisaClick
           ExplicitLeft = 1197
           ExplicitTop = 30
           ExplicitHeight = 93
@@ -3648,7 +3652,7 @@ inherited frmContasPagar: TfrmContasPagar
           ItemIndex = 0
           TabOrder = 2
           Text = 'TODAS'
-          OnClick = cbStatusClick
+          OnClick = PesquisaClick
           Items.Strings = (
             'TODAS'
             'PAGA'
@@ -3677,6 +3681,7 @@ inherited frmContasPagar: TfrmContasPagar
           ParentColor = False
           ParentFont = False
           TabOrder = 3
+          OnClick = PesquisaClick
           object rbDataVenc: TRadioButton
             Left = 3
             Top = 33
@@ -3692,7 +3697,6 @@ inherited frmContasPagar: TfrmContasPagar
             ParentColor = False
             ParentFont = False
             TabOrder = 0
-            OnClick = rbDataVencClick
           end
           object rbValorParcela: TRadioButton
             Left = 127
@@ -3709,7 +3713,6 @@ inherited frmContasPagar: TfrmContasPagar
             ParentColor = False
             ParentFont = False
             TabOrder = 1
-            OnClick = rbValorParcelaClick
           end
           object rbValorCompra: TRadioButton
             Left = 127
@@ -3726,7 +3729,6 @@ inherited frmContasPagar: TfrmContasPagar
             ParentColor = False
             ParentFont = False
             TabOrder = 2
-            OnClick = rbValorCompraClick
           end
           object rbDataCompra: TRadioButton
             Left = 3
@@ -3743,7 +3745,6 @@ inherited frmContasPagar: TfrmContasPagar
             ParentColor = False
             ParentFont = False
             TabOrder = 3
-            OnClick = rbDataCompraClick
           end
           object rbId: TRadioButton
             Left = 3
@@ -3762,7 +3763,6 @@ inherited frmContasPagar: TfrmContasPagar
             ParentFont = False
             TabOrder = 4
             TabStop = True
-            OnClick = rbIdClick
           end
         end
         object cbData: TComboBox
@@ -3774,7 +3774,7 @@ inherited frmContasPagar: TfrmContasPagar
           ItemIndex = 1
           TabOrder = 4
           Text = 'DATA VENCIMENTO'
-          OnClick = cbDataClick
+          OnClick = PesquisaClick
           Items.Strings = (
             'DATA COMPRA'
             'DATA VENCIMENTO'
@@ -3789,7 +3789,7 @@ inherited frmContasPagar: TfrmContasPagar
           Time = 0.872988819442980500
           ShowCheckbox = True
           TabOrder = 5
-          OnChange = dateFinalChange
+          OnChange = PesquisaClick
         end
         object dateInicial: TDateTimePicker
           Left = 192
@@ -3800,7 +3800,7 @@ inherited frmContasPagar: TfrmContasPagar
           Time = 0.872988819442980500
           ShowCheckbox = True
           TabOrder = 6
-          OnChange = dateInicialChange
+          OnChange = PesquisaClick
         end
         object pnlParciais: TPanel
           Left = 962
@@ -3823,7 +3823,7 @@ inherited frmContasPagar: TfrmContasPagar
             Font.Style = []
             ParentFont = False
             TabOrder = 0
-            OnClick = checkParciaisClick
+            OnClick = PesquisaClick
           end
           object checkVencidas: TCheckBox
             Left = 8
@@ -3838,7 +3838,7 @@ inherited frmContasPagar: TfrmContasPagar
             Font.Style = []
             ParentFont = False
             TabOrder = 1
-            OnClick = checkParciaisClick
+            OnClick = PesquisaClick
           end
           object checkNaoConsideraFatura: TCheckBox
             Left = 8
@@ -3867,7 +3867,7 @@ inherited frmContasPagar: TfrmContasPagar
           MaxLength = 10
           NumbersOnly = True
           TabOrder = 8
-          OnChange = edtFiltroFornecedorChange
+          OnChange = PesquisaClick
         end
         object btnPesqFornecedor: TButton
           Left = 1096
@@ -3898,7 +3898,7 @@ inherited frmContasPagar: TfrmContasPagar
           MaxLength = 10
           NumbersOnly = True
           TabOrder = 11
-          OnChange = edtFiltroFatCartaoChange
+          OnChange = PesquisaClick
         end
       end
       inherited pnlBotoes: TPanel
@@ -6943,7 +6943,6 @@ inherited frmContasPagar: TfrmContasPagar
     end
   end
   object dsParcelas: TDataSource
-    DataSet = cdsParcelas
     Left = 1281
     Top = 234
   end
