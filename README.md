@@ -1,8 +1,9 @@
 # Sistema Financeiro
 
-<div style="background-color: black; display: inline-block;">
-  <img src="./img/img_logo.png" alt="Sistema Financeiro">
+<div style="background-color: black; display: inline-block; text-align: center;">
+  <img src="./img/img_logo.png" alt="Sistema Financeiro" style="width: 300px;">
 </div>
+
 
 Este repositório contém um sistema financeiro desenvolvido em **Delphi**, com o objetivo de aprofundar na linguagem e em seus conceitos, aplicando melhorias contínuas e incorporando novas tecnologias e recursos. O sistema utiliza **Firebird** como banco de dados, **bcrypt** para criptografar senhas dos usuários e **Fortes Report** para geração de relatórios personalizados.
 
