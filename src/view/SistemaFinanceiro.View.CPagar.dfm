@@ -6,7 +6,6 @@ inherited frmContasPagar: TfrmContasPagar
   WindowState = wsMaximized
   OnClose = FormClose
   OnDestroy = FormDestroy
-  ExplicitLeft = -305
   ExplicitWidth = 1335
   ExplicitHeight = 679
   TextHeight = 19
@@ -20,13 +19,13 @@ inherited frmContasPagar: TfrmContasPagar
       Width = 1323
       Height = 641
       OnEnter = CardCadastroEnter
-      ExplicitWidth = 1319
-      ExplicitHeight = 640
+      ExplicitWidth = 1323
+      ExplicitHeight = 641
       inherited pnlBotoesCad: TPanel
         Top = 572
         Width = 1323
-        ExplicitTop = 571
-        ExplicitWidth = 1319
+        ExplicitTop = 572
+        ExplicitWidth = 1323
         inherited btnSalvar: TButton
           ImageIndex = 7
           OnClick = btnSalvarClick
@@ -53,8 +52,8 @@ inherited frmContasPagar: TfrmContasPagar
       inherited PanelCampos: TPanel
         Width = 1323
         Height = 531
-        ExplicitWidth = 1319
-        ExplicitHeight = 530
+        ExplicitWidth = 1323
+        ExplicitHeight = 531
         object lblDesc: TLabel
           Left = 44
           Top = 32
@@ -766,6 +765,7 @@ inherited frmContasPagar: TfrmContasPagar
             Width = 437
             Height = 132
             Align = alClient
+            DataSource = dsGrupoParcelas
             ReadOnly = True
             TabOrder = 0
             TitleFont.Charset = DEFAULT_CHARSET
@@ -815,7 +815,7 @@ inherited frmContasPagar: TfrmContasPagar
       end
       inherited PanelTitulo: TPanel
         Width = 1323
-        ExplicitWidth = 1319
+        ExplicitWidth = 1323
         inherited lblTitulo: TLabel
           Left = 23
           ExplicitLeft = 23
@@ -3639,7 +3639,7 @@ inherited frmContasPagar: TfrmContasPagar
           Margins.Bottom = 30
           ImageIndex = 6
           OnClick = PesquisaClick
-          ExplicitLeft = 1197
+          ExplicitLeft = 1193
           ExplicitTop = 30
           ExplicitHeight = 93
         end
@@ -3649,15 +3649,12 @@ inherited frmContasPagar: TfrmContasPagar
           Width = 173
           Height = 27
           Style = csDropDownList
-          ItemIndex = 0
           TabOrder = 2
-          Text = 'TODAS'
           OnClick = PesquisaClick
           Items.Strings = (
             'TODAS'
             'PAGA'
-            'ABERTA'
-            'CANCELADA')
+            'ABERTA')
         end
         object gbFiltros: TGroupBox
           Left = 705
@@ -3905,8 +3902,8 @@ inherited frmContasPagar: TfrmContasPagar
         Top = 572
         Width = 1323
         BevelOuter = bvNone
-        ExplicitTop = 572
-        ExplicitWidth = 1323
+        ExplicitTop = 571
+        ExplicitWidth = 1319
         inherited btnIncluir: TButton
           Left = 3
           Top = 3
@@ -3949,7 +3946,7 @@ inherited frmContasPagar: TfrmContasPagar
           Top = 3
           Height = 63
           ImageIndex = 14
-          ExplicitLeft = 1200
+          ExplicitLeft = 1196
           ExplicitTop = 3
           ExplicitHeight = 63
         end
@@ -3968,6 +3965,7 @@ inherited frmContasPagar: TfrmContasPagar
           Font.Style = []
           ParentFont = False
           TabOrder = 5
+          ExplicitLeft = 1000
           object lblPagas: TLabel
             Left = 31
             Top = 16
@@ -4085,8 +4083,8 @@ inherited frmContasPagar: TfrmContasPagar
         Width = 1323
         Height = 390
         ExplicitTop = 153
-        ExplicitWidth = 1323
-        ExplicitHeight = 390
+        ExplicitWidth = 1319
+        ExplicitHeight = 389
         inherited DBGrid1: TDBGrid
           Width = 1321
           Height = 388
@@ -4108,6 +4106,7 @@ inherited frmContasPagar: TfrmContasPagar
               Visible = True
             end
             item
+              Alignment = taCenter
               Expanded = False
               FieldName = 'ID_FORNECEDOR'
               Title.Caption = 'Cod Fornecedor'
@@ -4128,8 +4127,9 @@ inherited frmContasPagar: TfrmContasPagar
               Visible = True
             end
             item
+              Alignment = taCenter
               Expanded = False
-              FieldName = 'PARCELA'
+              FieldName = 'QTDPARC'
               Title.Caption = 'Parcela'
               Width = 67
               Visible = True
@@ -4142,6 +4142,7 @@ inherited frmContasPagar: TfrmContasPagar
               Visible = True
             end
             item
+              Alignment = taCenter
               Expanded = False
               FieldName = 'DATA_VENCIMENTO'
               Title.Caption = ' Vencimento'
@@ -4163,6 +4164,7 @@ inherited frmContasPagar: TfrmContasPagar
               Visible = True
             end
             item
+              Alignment = taCenter
               Expanded = False
               FieldName = 'DATA_COMPRA'
               Title.Caption = 'Data da Compra'
@@ -4170,6 +4172,7 @@ inherited frmContasPagar: TfrmContasPagar
               Visible = True
             end
             item
+              Alignment = taCenter
               Expanded = False
               FieldName = 'DATA_PAGAMENTO'
               Title.Caption = 'Data de Pagamento'
@@ -4194,6 +4197,8 @@ inherited frmContasPagar: TfrmContasPagar
         Color = clWindow
         ParentBackground = False
         TabOrder = 3
+        ExplicitTop = 542
+        ExplicitWidth = 1319
         object lblQtdCp: TLabel
           AlignWithMargins = True
           Left = 914
@@ -6910,7 +6915,6 @@ inherited frmContasPagar: TfrmContasPagar
       000000000000}
   end
   object DataSourceCPagar: TDataSource
-    DataSet = dmCPagar.cdsCPagar
     OnDataChange = DataSourceCPagarDataChange
     Left = 1280
     Top = 304
@@ -6943,6 +6947,7 @@ inherited frmContasPagar: TfrmContasPagar
     end
   end
   object dsParcelas: TDataSource
+    DataSet = cdsParcelas
     Left = 1281
     Top = 234
   end
@@ -6955,5 +6960,10 @@ inherited frmContasPagar: TfrmContasPagar
       ImageIndex = 16
       OnClick = CancelarBaixa1Click
     end
+  end
+  object dsGrupoParcelas: TDataSource
+    DataSet = cdsParcelas
+    Left = 1273
+    Top = 434
   end
 end

@@ -34,7 +34,12 @@ uses
   SistemaFinanceiro.View.Consulta.ConsultaLancamentoPadraoContas,
   fMensagem,
   uEnumsUtils,
-  SistemaFinanceiro.Model.uSFQuery;
+  SistemaFinanceiro.Model.uSFQuery,
+  SistemaFinanceiro.Model.Entidades.CP,
+  FireDAC.Stan.Param,
+  System.DateUtils,
+  SistemaFinanceiro.View.Relatorios.CP,
+  SistemaFinanceiro.View.BaixarCP.FrPgto;
 
 type
   TfrmContasPagar = class(TfrmCadastroPadrao)
@@ -150,7 +155,7 @@ type
     lblGrupoParcelas: TLabel;
     grdGrupoParcelas: TDBGrid;
     btnLancPadrao: TButton;
-    procedure btnCancelarClick(Sender: TObject);
+    dsGrupoParcelas: TDataSource;
     procedure btnExcluirClick(Sender: TObject);
     procedure btnIncluirClick(Sender: TObject);
     procedure btnSalvarClick(Sender: TObject);
@@ -190,13 +195,13 @@ type
   private
     FTelaAtiva: Boolean;
     FOpCad: TOperacaoCadastro;
-    FCodCP: Integer;
     DataVctoFat: Integer;
     FQueryPesquisa, FQueryGrupoParcelas: TSFQuery;
+    FCp: TModelCP;
 
     procedure HabilitaBotoes;
-    procedure CadParcelaUnica;
-    procedure CadParcelamento;
+    function CadParcelaUnica: Boolean;
+    function CadParcelamento: Boolean;
     procedure EditarRegCPagar;
     procedure ExibeTelaBaixar(pCodCP: Integer);
     procedure ExibeTelaBxMultipla;
@@ -215,6 +220,16 @@ type
     function ValidaPesquisa: Boolean;
     procedure QuerySTATUSGetText(Sender: TField; var Text: string;
       DisplayText: Boolean);
+    procedure IncluirContaPagar;
+    procedure PreparaInclusaoCp;
+    function ValidaCadParcelaUnica: Boolean;
+    function ValidaDadosGeraisIncCp: Boolean;
+    function ValidaCadParcelamento: Boolean;
+    function ValidaStatusCp: Boolean;
+    procedure InicializaAlteracaoCp;
+    procedure CarregaDadosAlteracao;
+    function CarregaGrupoParcelas: Boolean;
+    procedure InicializaTela;
 
   public
     { Public declarations }
@@ -231,13 +246,14 @@ implementation
 
 {$R *.dfm}
 
+
 uses
   SistemaFinanceiro.Model.dmCPagar,
   SistemaFinanceiro.Utilitarios,
-  System.DateUtils, SistemaFinanceiro.View.Principal,
-  SistemaFinanceiro.View.Relatorios.Cp, SistemaFinanceiro.Model.dmFornecedores,
-  SistemaFinanceiro.Model.dmFaturaCartao, SistemaFinanceiro.Model.dmUsuarios,
-  SistemaFinanceiro.View.BaixarCP.FrPgto,
+  SistemaFinanceiro.Model.dmFornecedores,
+  SistemaFinanceiro.Model.dmFaturaCartao,
+  SistemaFinanceiro.Model.dmUsuarios,
+  SistemaFinanceiro.View.Principal,
   SistemaFinanceiro.Model.Entidades.LancamentoPadraoContas;
 
 procedure TfrmContasPagar.btnAlterarClick(Sender: TObject);
@@ -259,15 +275,6 @@ begin
 
 end;
 
-procedure TfrmContasPagar.btnCancelarClick(Sender: TObject);
-begin
-
-  inherited;
-  // Cancelando inclusão
-  dmCPagar.cdsCPagar.Cancel;
-
-end;
-
 procedure TfrmContasPagar.btnDetalhesClick(Sender: TObject);
 begin
   inherited;
@@ -278,7 +285,7 @@ begin
     Application.MessageBox
       ('Conta não paga, realize a baixa para ver os detalhes!', 'Atenção',
       MB_OK + MB_ICONEXCLAMATION);
-    abort;
+    exit;
 
   end;
 
@@ -288,53 +295,41 @@ end;
 
 procedure TfrmContasPagar.btnExcluirClick(Sender: TObject);
 var
-  option: Word;
-
+  lCp: TModelCP;
 begin
-  inherited;
 
-  // Se o documento já foi baixado cancela a exclusão
-  if dmCPagar.cdsCPagarSTATUS.AsString = 'P' then
-  begin
-    Application.MessageBox('Documento já pago não pode ser cancelado!',
-      'Atenção', MB_OK + MB_ICONEXCLAMATION);
-    abort;
-  end;
-
-  // Se o documento foi cancelado, a exclusão é cancelada
-  if dmCPagar.cdsCPagarSTATUS.AsString = 'C' then
-  begin
-    Application.MessageBox('Documento já cancelado não pode ser cancelado!',
-      'Atenção', MB_OK + MB_ICONEXCLAMATION);
-    abort;
-  end;
-
-  option := Application.MessageBox('Deseja cancelar o registro? ',
-    'Confirmação', MB_YESNO + MB_ICONQUESTION);
-
-  if option = IDNO then
-  begin
+  if not(ValidaStatusCp) then
     exit;
-  end;
 
+  lCp := TModelCP.Create;
   try
-    dmCPagar.cdsCPagar.Edit;
-    dmCPagar.cdsCPagarSTATUS.AsString := 'C';
-    dmCPagar.cdsCPagar.Post;
-    dmCPagar.cdsCPagar.ApplyUpdates(0);
+    try
+      if (TfrmMensagem.TelaEscolha('Atenção', 'Deseja cancelar a conta selecionada? ', tmEscolha) = mrYes) then
+      begin
 
-    Application.MessageBox('Documento cancelado com sucesso!', 'Atenção',
-      MB_OK + MB_ICONINFORMATION);
+        lCp.ID := DBGrid1.DataSource.DataSet.FieldByName('ID').AsInteger;
+        if not(lCp.LoadObjectByPK) then
+        begin
+          TfrmMensagem.TelaMensagem('Erro!', 'Conta inválida!', tmErro);
+          exit;
+        end;
 
-    Pesquisar;
+        lCp.Status := 'C';
+        lCp.UpdateByPK;
 
-    // Atualiza o relatorio na tela inicial
-    frmPrincipal.TotalCP;
+        Pesquisar;
 
+        // Atualiza o relatorio na tela inicial
+        frmPrincipal.TotalCP;
+      end;
+    finally
+      lCp.Free;
+    end;
   except
     on E: Exception do
-      Application.MessageBox(PWidechar(E.Message),
-        'Erro ao cancelar documento!', MB_OK + MB_ICONERROR);
+    begin
+      TfrmMensagem.TelaMensagem('Erro', 'Erro ao excluir conta: ' + E.Message, tmErro);
+    end;
   end;
 
 end;
@@ -375,47 +370,11 @@ end;
 procedure TfrmContasPagar.btnIncluirClick(Sender: TObject);
 begin
   FOpCad := ocIncluir;
+
+  // Dispara o evento do form pai para trocar a visualização do Card
   inherited;
 
-  lblTitulo.Caption := 'Inserindo um novo lançamento no Contas a Pagar';
-
-  if not(dmCPagar.cdsCPagar.State in [dsInsert, dsEdit]) then
-  begin
-
-    // Colocando o data set em modo de inserção de dados
-    dmCPagar.cdsCPagar.Insert;
-
-  end;
-
-  // Seta parcela previamente como 1
-  edtParcela.Text := '1';
-
-  // Esvaziando data set de parcelas
-  cdsParcelas.EmptyDataSet;
-
-  // Liberacoes e bloqueios
-  edtQtdParcelas.Enabled := True;
-  edtIntervaloDias.Enabled := True;
-  edtDiaFixoVcto.Enabled := False;
-  checkDiaFixoVcto.Checked := False;
-  checkDiaFixoVcto.Enabled := True;
-  chkBaixarAoSalvar.Checked := False;
-  CheckFatVirada.Checked := False;
-  btnGerar.Enabled := True;
-  btnLimpar.Enabled := False;
-  toggleFatura.State := tssOff;
-  toggleParcelamento.State := tssOff;
-  toggleParcelamento.Enabled := True;
-  edtParcela.ReadOnly := True;
-  edtValorParcela.ReadOnly := True;
-  lblNomeFornecedor.Visible := False;
-  lblNomeFatCartao.Visible := False;
-
-  // Coloca a data atual no datetimepicker
-  dateCompra.DateTime := Now;
-  dateVencimento.DateTime := Now + 7;
-
-  memDesc.SetFocus;
+  IncluirContaPagar;
 
 end;
 
@@ -558,27 +517,38 @@ begin
 end;
 
 procedure TfrmContasPagar.btnSalvarClick(Sender: TObject);
+var
+  lContaGravada: Boolean;
 begin
+  lContaGravada := False;
+  try
 
-  if toggleParcelamento.State = tssOff then
-  begin
-    CadParcelaUnica;
-    if (chkBaixarAoSalvar.Checked) and (FCodCP > 0) then
-      ExibeTelaBaixar(FCodCP);
-  end
-  else
-  begin
-    CadParcelamento;
+    if not(ValidaDadosGeraisIncCp) then
+      exit;
+
+    if (toggleParcelamento.State = tssOff) then
+      lContaGravada := CadParcelaUnica
+    else
+      lContaGravada := CadParcelamento;
+
+    if not(lContaGravada) then
+      exit;
+
+    // Retorna ao card de pesquisa
+    CardPanelPrincipal.ActiveCard := CardPesquisa;
+
+    // Atualiza a lista
+    Pesquisar;
+
+    // Atualiza relatorio tela principal
+    frmPrincipal.TotalCP;
+  except
+    on E: Exception do
+    begin
+      TfrmMensagem.TelaMensagem('Erro', 'Erro ao salvar Conta a Pagar: ' +
+        E.Message, tmErro);
+    end;
   end;
-
-  // Retorna ao card de pesquisa
-  CardPanelPrincipal.ActiveCard := CardPesquisa;
-
-  // Atualiza a lista
-  Pesquisar;
-
-  // Atualiza relatorio tela principal
-  frmPrincipal.TotalCP;
 
 end;
 
@@ -601,7 +571,7 @@ begin
         MB_OK + MB_ICONEXCLAMATION);
       edtCodFatCartao.SetFocus;
       edtCodFatCartao.Clear;
-      abort;
+      exit;
 
     end;
 
@@ -645,69 +615,19 @@ begin
 
 end;
 
-procedure TfrmContasPagar.CadParcelamento;
+function TfrmContasPagar.CadParcelamento: Boolean;
 var
-  ValorCompra: Currency;
-  IdFornecedor: Integer;
-
+  lParcelaCp: TModelCP;
+  lQtdParcelas, lIdGrupoParcelas: Integer;
 begin
 
-  // Valida valor da compra
-  if not TryStrToCurr(edtValorCompra.Text, ValorCompra) then
-  begin
+  Result := False;
 
-    edtValorCompra.SetFocus;
-    Application.MessageBox('Valor da Compra inválido!', 'Atenção',
-      MB_OK + MB_ICONWARNING);
-    abort;
+  if not(ValidaCadParcelamento) then
+    exit;
 
-  end;
-
-  if not TryStrToInt(edtFornecedor.Text, IdFornecedor) then
-  begin
-
-    edtFornecedor.SetFocus;
-    Application.MessageBox('Campo FORNECEDOR não pode estar vazio!', 'Atenção',
-      MB_OK + MB_ICONEXCLAMATION);
-    abort;
-
-  end;
-
-  // Posiciona no primeiro registro do cds
-  cdsParcelas.First;
-
-  if cdsParcelas.IsEmpty then
-  begin
-
-    edtQtdParcelas.SetFocus;
-    Application.MessageBox('Parcelas não geradas!', 'Atenção',
-      MB_OK + MB_ICONWARNING);
-    abort;
-
-  end;
-
-  // Valida todos os registros do cds
-  while not cdsParcelas.Eof do
-  begin
-
-    if cdsParcelasPARCELA.AsInteger < 0 then
-    begin
-      Application.MessageBox('Número de Parcela Inválido!', 'Atenção',
-        MB_OK + MB_ICONWARNING);
-      abort;
-    end;
-
-    if cdsParcelasVALOR.AsCurrency < 0.01 then
-    begin
-      Application.MessageBox('Valor da Parcela Inválido!', 'Atenção',
-        MB_OK + MB_ICONWARNING);
-      abort;
-    end;
-
-    // Avança para o próximo registro
-    cdsParcelas.Next;
-
-  end;
+  lQtdParcelas := cdsParcelas.RecordCount;
+  lIdGrupoParcelas := TModelCP.GetIdGrupoParcelas;
 
   // Posiciona no primeiro registro do cds
   cdsParcelas.First;
@@ -716,176 +636,121 @@ begin
   while not cdsParcelas.Eof do
   begin
 
-    if dmCPagar.cdsCPagar.State in [dsBrowse, dsInactive] then
-    begin
-      dmCPagar.cdsCPagar.Insert;
+    lParcelaCp := TModelCP.Create;
+    try
+
+      lParcelaCp.GeraCodigo;
+      lParcelaCp.DataCadastro := Now;
+      lParcelaCp.Status := 'A';
+      lParcelaCp.ValorAbatido := 0;
+      lParcelaCp.Doc := Trim(cdsParcelasDOCUMENTO.AsString);
+      lParcelaCp.Desc := Format('%s - Parcela %d',
+        [memDesc.Text, cdsParcelasPARCELA.AsInteger]);
+      lParcelaCp.ValorCompra := StrToFloat(edtValorCompra.Text);
+      lParcelaCp.DataCompra := dateCompra.Date;
+      lParcelaCp.Parcela := cdsParcelasPARCELA.AsInteger;
+      lParcelaCp.ValorParcela := cdsParcelasVALOR.AsCurrency;
+      lParcelaCp.DataVencimento := cdsParcelasVENCIMENTO.AsDateTime;
+      lParcelaCp.Parcial := 'N';
+      lParcelaCp.FatCartao := 'N';
+      lParcelaCp.IdFornecedor := StrToInt(edtFornecedor.Text);
+      lParcelaCp.NumTotalParcelas := lQtdParcelas;
+      lParcelaCp.IdGrupoParcelas := lIdGrupoParcelas;
+
+      if (toggleFatura.State = tssOn) then
+      begin
+        lParcelaCp.FatCartao := 'S';
+        lParcelaCp.IdFatCartao := StrToInt(edtCodFatCartao.Text);
+      end;
+
+      // Gravando no banco
+      lParcelaCp.Insert;
+
+    finally
+      lParcelaCp.Free;
     end;
-
-    dmCPagar.GeraCodigo;
-    dmCPagar.cdsCPagarDATA_CADASTRO.AsDateTime := Now;
-    dmCPagar.cdsCPagarSTATUS.AsString := 'A';
-    dmCPagar.cdsCPagarVALOR_ABATIDO.AsCurrency := 0;
-    dmCPagar.cdsCPagarNUMERO_DOC.AsString := cdsParcelasDOCUMENTO.AsString;
-    dmCPagar.cdsCPagarDESCRICAO.AsString := Format('%s - Parcela %d',
-      [memDesc.Text, cdsParcelasPARCELA.AsInteger]);
-    dmCPagar.cdsCPagarVALOR_COMPRA.AsCurrency := ValorCompra;
-    dmCPagar.cdsCPagarDATA_COMPRA.AsDateTime := dateCompra.Date;
-    dmCPagar.cdsCPagarPARCELA.AsInteger := cdsParcelasPARCELA.AsInteger;
-    dmCPagar.cdsCPagarVALOR_PARCELA.AsCurrency := cdsParcelasVALOR.AsCurrency;
-    dmCPagar.cdsCPagarDATA_VENCIMENTO.AsDateTime :=
-      cdsParcelasVENCIMENTO.AsDateTime;
-    dmCPagar.cdsCPagarPARCIAL.AsString := 'N';
-    dmCPagar.cdsCPagarID_FORNECEDOR.AsInteger := IdFornecedor;
-
-    if toggleFatura.State = tssOff then
-    begin
-
-      dmCPagar.cdsCPagarFATURA_CART.AsString := 'N';
-
-    end
-    else
-    begin
-
-      dmCPagar.cdsCPagarFATURA_CART.AsString := 'S';
-      dmCPagar.cdsCPagarID_FATURA.AsString := Trim(edtCodFatCartao.Text);
-
-    end;
-
-    // Gravando no banco
-    dmCPagar.cdsCPagar.Post;
-    dmCPagar.cdsCPagar.ApplyUpdates(0);
 
     cdsParcelas.Next;
 
   end;
 
-  Application.MessageBox('Parcelas Cadastradas com Sucesso!!', 'Atenção',
-    MB_OK + MB_ICONINFORMATION);
+  Result := True;
 
-  Pesquisar;
+  TfrmMensagem.TelaMensagem('Informação', 'Parcelas Cadastradas com Sucesso!!',
+    tmSucesso);
 
-  CardPanelPrincipal.ActiveCard := CardPesquisa;
 end;
 
-procedure TfrmContasPagar.CadParcelaUnica;
+function TfrmContasPagar.CadParcelaUnica: Boolean;
 var
-  Parcela: Integer;
-  ValorCompra: Currency;
-  ValorParcela: Currency;
-  IdFornecedor: Integer;
-
+  lRegGravado: Boolean;
 begin
+  Result := False;
+  lRegGravado := False;
 
-  // Valida campos obrigatorios
-  if Trim(memDesc.Text) = '' then
+  if not(ValidaCadParcelaUnica) then
+    exit;
+
+  if not(Assigned(FCp)) then
   begin
-    memDesc.SetFocus;
-    Application.MessageBox('Campo DESCRICAO não pode estar vazio!', 'Atenção',
-      MB_OK + MB_ICONEXCLAMATION);
-    abort;
+    TfrmMensagem.TelaMensagem('Erro', 'Erro ao inicializar processo para gravar a Conta', tmErro);
+    exit;
   end;
 
-  if not TryStrToInt(edtFornecedor.Text, IdFornecedor) or (IdFornecedor <= 0)
-  then
-  begin
-    edtFornecedor.SetFocus;
-    Application.MessageBox('Campo FORNECEDOR não pode estar vazio!', 'Atenção',
-      MB_OK + MB_ICONEXCLAMATION);
-    abort;
+  try
+
+    FCp.IdFornecedor := StrToInt(edtFornecedor.Text);
+    FCp.Doc := Trim(edtNDoc.Text);
+    FCp.Desc := Trim(memDesc.Text);
+    FCp.Parcela := StrToInt(edtParcela.Text);
+    FCp.ValorParcela := StrToFloat(edtValorParcela.Text);
+    FCp.ValorCompra := StrToFloat(edtValorCompra.Text);
+    FCp.DataCompra := dateCompra.Date;
+    FCp.Parcial := 'N';
+    FCp.ValorAbatido := 0;
+    FCp.Status := 'A';
+    FCp.FatCartao := 'N';
+
+    // Verifica se é fatura, se for a data de vcto
+    // será pega a da fatura
+    if (toggleFatura.State = tssOn) and (not(Trim(edtCodFatCartao.Text).IsEmpty))
+    then
+    begin
+      dateVencimento.Date := EncodeDate(YearOf(dateVencimento.Date),
+        MonthOf(dateVencimento.Date), DataVctoFat);
+
+      FCp.FatCartao := 'S';
+      FCp.IdFatCartao := StrToInt(edtCodFatCartao.Text);
+    end;
+
+    FCp.DataVencimento := dateVencimento.Date;
+
+    // Gravando conta
+    case FOpCad of
+
+      ocIncluir:
+        begin
+          FCp.GeraCodigo;
+          FCp.DataCadastro := Now;
+          FCp.NumTotalParcelas := 1;
+          lRegGravado := FCp.Insert;
+        end;
+
+      ocAlterar:
+        begin
+          lRegGravado := FCp.UpdateByPK;
+        end;
+    end;
+
+    // Se foi marcado para baixar ao salvar e a conta foi salva irá exibir a tela da baixa
+    if ((lRegGravado) and (chkBaixarAoSalvar.Checked)) then
+      ExibeTelaBaixar(FCp.ID);
+
+    Result := True;
+
+  finally
+    FreeAndNil(FCp);
   end;
-
-  if (not TryStrToCurr(edtValorCompra.Text, ValorCompra)) or (ValorCompra <= 0)
-  then
-  begin
-    edtValorCompra.SetFocus;
-    Application.MessageBox('Valor da compra Inválido!', 'Atenção',
-      MB_OK + MB_ICONEXCLAMATION);
-    abort;
-  end;
-
-  if (not TryStrToInt(edtParcela.Text, Parcela)) or (Parcela <= 0) then
-  begin
-    edtParcela.SetFocus;
-    Application.MessageBox('Número da parcela Inválido!', 'Atenção',
-      MB_OK + MB_ICONEXCLAMATION);
-    abort;
-  end;
-
-  if dateVencimento.Date < dateCompra.Date then
-  begin
-    dateVencimento.SetFocus;
-    Application.MessageBox
-      ('Data de vencimento não pode ser inferior a data de compra!', 'Atenção',
-      MB_OK + MB_ICONEXCLAMATION);
-    abort;
-  end;
-
-  if dateCompra.Date > Now then
-  begin
-    dateCompra.SetFocus;
-    Application.MessageBox
-      ('Data de compra não pode ser maior que a data atual!', 'Atenção',
-      MB_OK + MB_ICONEXCLAMATION);
-    abort;
-  end;
-
-  if not TryStrToCurr(edtValorParcela.Text, ValorParcela) then
-  begin
-    edtValorParcela.SetFocus;
-    Application.MessageBox('Valor da parcela Inválido!', 'Atenção',
-      MB_OK + MB_ICONEXCLAMATION);
-    abort;
-  end;
-
-  // Se for um novo registro irá gerar o código, status em aberto
-  // e setar 0 no valor abatido
-  if DataSourceCPagar.State in [dsInsert] then
-  begin
-
-    // gera a id
-    dmCPagar.GeraCodigo;
-
-    dmCPagar.cdsCPagarDATA_CADASTRO.AsDateTime := Now;
-    dmCPagar.cdsCPagarSTATUS.AsString := 'A';
-    dmCPagar.cdsCPagarVALOR_ABATIDO.AsCurrency := 0;
-
-  end;
-
-  // Passando os dados para o dataset
-  dmCPagar.cdsCPagarNUMERO_DOC.AsString := Trim(edtNDoc.Text);
-  dmCPagar.cdsCPagarDESCRICAO.AsString := Trim(memDesc.Text);
-  dmCPagar.cdsCPagarVALOR_COMPRA.AsCurrency := ValorCompra;
-  dmCPagar.cdsCPagarDATA_COMPRA.AsDateTime := dateCompra.Date;
-  dmCPagar.cdsCPagarPARCELA.AsInteger := Parcela;
-  dmCPagar.cdsCPagarVALOR_PARCELA.AsCurrency := ValorParcela;
-  dmCPagar.cdsCPagarPARCIAL.AsString := 'N';
-  dmCPagar.cdsCPagarID_FORNECEDOR.AsInteger := IdFornecedor;
-
-  if chkBaixarAoSalvar.Checked then
-    FCodCP := dmCPagar.cdsCPagarID.AsInteger;
-
-  // Verifica se é fatura, se for a data de vcto
-  // será pega a da fatura
-  if (toggleFatura.State = tssOn) and (edtCodFatCartao.Text <> '') then
-  begin
-    dateVencimento.Date := EncodeDate(YearOf(dateVencimento.Date),
-      MonthOf(dateVencimento.Date), DataVctoFat);
-  end;
-  dmCPagar.cdsCPagarDATA_VENCIMENTO.AsDateTime := dateVencimento.Date;
-
-  if toggleFatura.State = tssOff then
-  begin
-    dmCPagar.cdsCPagarFATURA_CART.AsString := 'N';
-  end
-  else
-  begin
-    dmCPagar.cdsCPagarFATURA_CART.AsString := 'S';
-    dmCPagar.cdsCPagarID_FATURA.AsString := Trim(edtCodFatCartao.Text);
-  end;
-
-  // Gravando no BD
-  dmCPagar.cdsCPagar.Post;
-  dmCPagar.cdsCPagar.ApplyUpdates(0);
 
 end;
 
@@ -931,8 +796,6 @@ var
 
 begin
 
-  QtdCp := 0;
-
   // Realiza a conta
   QtdCp := DBGrid1.DataSource.DataSet.RecordCount;
 
@@ -954,7 +817,7 @@ begin
 
     Application.MessageBox('Somente Administradores podem cancelar uma Baixa!',
       'Erro', MB_OK + MB_ICONERROR);
-    abort;
+    exit;
 
   end;
 
@@ -967,7 +830,7 @@ begin
 
       Application.MessageBox('Conta não baixada!!', 'Erro',
         MB_OK + MB_ICONERROR);
-      abort;
+      exit;
 
     end;
 
@@ -1164,95 +1027,48 @@ begin
   DBGrid1.DefaultDrawColumnCell(Rect, DataCol, Column, State);
   inherited;
 
+  TUtilitario.FormatoMoedaGrid(TDBGrid(Sender), Column, Rect, State);
+
 end;
 
 procedure TfrmContasPagar.EditarRegCPagar;
 begin
 
+  if not(ValidaStatusCp) then
+    exit;
+
   FOpCad := ocAlterar;
 
-  // Abre a tela de cadastro
-  CardPanelPrincipal.ActiveCard := CardCadastro;
+  if Assigned(FCp) then
+    FreeAndNil(FCp);
 
-  // Se o documento já foi baixado cancela a edição
-  if dmCPagar.cdsCPagarSTATUS.AsString = 'P' then
-  begin
+  FCp := TModelCP.Create;
 
-    CardPanelPrincipal.ActiveCard := CardPesquisa;
-    Application.MessageBox('Documento já pago não pode ser alterado!',
-      'Atenção', MB_OK + MB_ICONEXCLAMATION);
-    abort;
+  try
 
-  end;
+    FCp.ID := DBGrid1.DataSource.DataSet.FieldByName('ID').AsInteger;
 
-  // Se o documento foi cancelado, a edição é cancelada
-  if dmCPagar.cdsCPagarSTATUS.AsString = 'C' then
-  begin
-    CardPanelPrincipal.ActiveCard := CardPesquisa;
-    Application.MessageBox('Documento já cancelado não pode ser alterado!',
-      'Atenção', MB_OK + MB_ICONEXCLAMATION);
-    abort;
+    if not(FCp.LoadObjectByPK) then
+    begin
+      TfrmMensagem.TelaMensagem('Erro!', 'Erro ao carregar dados da conta', tmErro);
+      exit;
+    end;
 
-  end;
+    // Abre a tela de cadastro
+    CardPanelPrincipal.ActiveCard := CardCadastro;
 
-  // Coloca o dataset em modo de edição
-  dmCPagar.cdsCPagar.Edit;
+    InicializaAlteracaoCp;
+    CarregaDadosAlteracao;
 
-  edtParcela.Enabled := True;
-  edtValorParcela.Enabled := True;
+  except
 
-  // Esvaziando data set de parcelas
-  cdsParcelas.EmptyDataSet;
-
-  // Coloca o numero do registro no titulo
-  lblTitulo.Caption := 'Alterando Registro Nº ' + dmCPagar.cdsCPagarID.AsString;
-
-  // Bloqueia o toogle de parcelamento
-  toggleParcelamento.Enabled := False;
-  toggleParcelamento.State := tssOff;
-  CardPanelParcela.ActiveCard := cardParcelaUnica;
-  edtParcela.ReadOnly := True;
-  CheckFatVirada.Visible := False;
-  CheckFatVirada.Checked := False;
-
-  edtValorParcela.ReadOnly := False;
-  chkBaixarAoSalvar.Checked := False;
-
-  // Carrega os dados
-  edtNDoc.Text := dmCPagar.cdsCPagarNUMERO_DOC.AsString;
-  memDesc.Text := dmCPagar.cdsCPagarDESCRICAO.AsString;
-  edtValorCompra.Text := TUtilitario.FormatarValor
-    (dmCPagar.cdsCPagarVALOR_COMPRA.AsCurrency);
-  edtParcela.Text := dmCPagar.cdsCPagarPARCELA.AsString;
-  edtValorParcela.Text := TUtilitario.FormatarValor
-    (dmCPagar.cdsCPagarVALOR_PARCELA.AsString);
-  dateVencimento.Date := dmCPagar.cdsCPagarDATA_VENCIMENTO.AsDateTime;
-  dateCompra.Date := dmCPagar.cdsCPagarDATA_COMPRA.AsDateTime;
-  edtFornecedor.Text := dmCPagar.cdsCPagarID_FORNECEDOR.AsString;
-
-  // Verifica se a CP foi vinculado a uma fatura de cartão
-  if dmCPagar.cdsCPagarFATURA_CART.AsString = 'S' then
-  begin
-
-    toggleFatura.State := tssOn;
-    lblCodFatCartao.Visible := True;
-    lblNomeFatCartao.Visible := True;
-    edtCodFatCartao.Visible := True;
-    btnPesqFat.Visible := True;
-
-    edtCodFatCartao.Text := dmCPagar.cdsCPagarID_FATURA.AsString;
-    BuscaNomeFatCartao;
-
-  end
-  else
-  begin
-
-    toggleFatura.State := tssOff;
-    edtCodFatCartao.Clear;
+    on E: Exception do
+    begin
+      TfrmMensagem.TelaMensagem('Erro!', E.Message, tmErro);
+      CardPanelPrincipal.ActiveCard := CardPesquisa;
+    end;
 
   end;
-
-  BuscaNomeFornecedor;
 
 end;
 
@@ -1274,7 +1090,7 @@ begin
       Application.MessageBox
         ('Fatura de Cartão não está Ativa, verifique o cadastro!', 'Atenção',
         MB_OK + MB_ICONEXCLAMATION);
-      abort;
+      exit;
 
     end;
 
@@ -1313,7 +1129,7 @@ begin
       lblNomeFornecedor.Caption := '';
       Application.MessageBox('Fornecedor não está Ativo, verifique o cadastro!',
         'Atenção', MB_OK + MB_ICONEXCLAMATION);
-      abort;
+      exit;
 
     end;
 
@@ -1327,12 +1143,10 @@ begin
 
   edtValorCompra.Text := TUtilitario.FormatarValor(edtValorCompra.Text);
 
-  if dmCPagar.cdsCPagar.State in [dsInsert] then
+  if (FOpCad = ocIncluir) then
   begin
-
     // Se ao inserir Parcela unica pega o mesmo valor da venda
     edtValorParcela.Text := TUtilitario.FormatarValor(edtValorCompra.Text);
-
   end;
 
 end;
@@ -1458,13 +1272,6 @@ begin
 
   FTelaAtiva := False;
 
-  edtValorCompra.OnKeyPress := KeyPressValor;
-  edtValorParcela.OnKeyPress := KeyPressValor;
-
-  // Define as datas da consulta
-  dateInicial.Date := StartOfTheMonth(Now);
-  dateFinal.Date := EndOfTheMonth(Now);
-
 end;
 
 procedure TfrmContasPagar.FormDestroy(Sender: TObject);
@@ -1475,13 +1282,15 @@ begin
 
   if Assigned(FQueryGrupoParcelas) then
     FQueryGrupoParcelas.Free;
+
+  if Assigned(FCp) then
+    FCp.Free;
 end;
 
 procedure TfrmContasPagar.FormShow(Sender: TObject);
 begin
   inherited;
-  TUtilitario.CarregarOrdemColunasJSON(DBGrid1, 'ConfigGrids', 'grdCP');
-  FTelaAtiva := True;
+  InicializaTela;
 end;
 
 procedure TfrmContasPagar.GeraParcelas;
@@ -1699,8 +1508,6 @@ begin
         LFiltro := LFiltro + ' AND CP.STATUS = ''P'' ';
       2:
         LFiltro := LFiltro + ' AND CP.STATUS = ''A'' ';
-      3:
-        LFiltro := LFiltro + ' AND CP.STATUS = ''C'' ';
     end;
 
     // Pesquisa por data
@@ -1759,9 +1566,11 @@ begin
 
     FQueryPesquisa.Close;
     FQueryPesquisa.SQL.Clear;
-    FQueryPesquisa.SQL.Add('SELECT CP.*, F.RAZAO_SOCIAL FROM CONTAS_PAGAR CP ' +
-      'LEFT JOIN FORNECEDORES F ON CP.ID_FORNECEDOR = F.ID_FORNEC WHERE 1 = 1 '
-      + LFiltroEdit + LFiltro + LOrdem);
+    FQueryPesquisa.SQL.Add(' SELECT CP.*, F.RAZAO_SOCIAL, CAST(CP.PARCELA AS VARCHAR(10)) || ''/'' ');
+    FQueryPesquisa.SQL.Add(' || CAST(CP.NUM_TOT_PARCELAS AS VARCHAR(10)) AS QTDPARC ');
+    FQueryPesquisa.SQL.Add(' FROM CONTAS_PAGAR CP ');
+    FQueryPesquisa.SQL.Add(' LEFT JOIN FORNECEDORES F ON CP.ID_FORNECEDOR = F.ID_FORNEC WHERE CP.STATUS <> ''C'' ');
+    FQueryPesquisa.SQL.Add(LFiltroEdit + LFiltro + LOrdem);
 
     // Criando os parametros
     if (dateInicial.Checked) and (dateFinal.Checked) then
@@ -1780,7 +1589,6 @@ begin
     if not(Trim(edtFiltroFatCartao.Text).IsEmpty) then
       FQueryPesquisa.ParamByName('ID_FT').AsString :=
         Trim(edtFiltroFatCartao.Text);
-
 
     FQueryPesquisa.Open;
 
@@ -1804,6 +1612,157 @@ begin
     end;
   end;
 
+end;
+
+procedure TfrmContasPagar.InicializaTela;
+begin
+  edtValorCompra.OnKeyPress := KeyPressValor;
+  edtValorParcela.OnKeyPress := KeyPressValor;
+
+  // Define as datas da consulta
+  dateInicial.Date := StartOfTheMonth(Now);
+  dateFinal.Date := EndOfTheMonth(Now);
+  cbStatus.ItemIndex := 0;
+
+  TUtilitario.CarregarOrdemColunasJSON(DBGrid1, 'ConfigGrids', 'grdCP');
+
+  FTelaAtiva := True;
+end;
+
+procedure TfrmContasPagar.CarregaDadosAlteracao;
+begin
+  // Carrega os dados
+  edtNDoc.Text := FCp.Doc;
+  memDesc.Text := FCp.Desc;
+  edtValorCompra.Text := TUtilitario.FormatarValor(FCp.ValorCompra);
+  edtParcela.Text := IntToStr(FCp.Parcela);
+  edtValorParcela.Text := TUtilitario.FormatarValor(FCp.ValorParcela);
+  dateVencimento.Date := FCp.DataVencimento;
+  dateCompra.Date := FCp.DataCompra;
+  edtFornecedor.Text := IntToStr(FCp.IdFornecedor);
+  BuscaNomeFornecedor;
+
+  // Verifica se a CP foi vinculado a uma fatura de cartão
+  if (FCp.FatCartao = 'S') then
+  begin
+    toggleFatura.State := tssOn;
+    lblCodFatCartao.Visible := True;
+    lblNomeFatCartao.Visible := True;
+    edtCodFatCartao.Visible := True;
+    btnPesqFat.Visible := True;
+    edtCodFatCartao.Text := IntToStr(FCp.IdFatCartao);
+    BuscaNomeFatCartao;
+  end
+  else
+  begin
+    toggleFatura.State := tssOff;
+    edtCodFatCartao.Clear;
+  end;
+
+  // Verifica se a conta tem um grupo de parcelas
+  if (FCp.IdGrupoParcelas > 0) then
+  begin
+    CarregaGrupoParcelas;
+    pnlFundoGrupoParcelas.Visible := True;
+  end
+  else
+  begin
+    pnlFundoGrupoParcelas.Visible := False;
+  end;
+end;
+
+function TfrmContasPagar.CarregaGrupoParcelas: Boolean;
+begin
+  Result := False;
+
+  try
+    if Assigned(FQueryGrupoParcelas) then
+      FreeAndNil(FQueryGrupoParcelas);
+
+    FQueryGrupoParcelas := TSFQuery.Create(nil);
+
+    FQueryGrupoParcelas.Close;
+    FQueryGrupoParcelas.SQL.Clear;
+    FQueryGrupoParcelas.SQL.Add(' SELECT ID, VALOR_PARCELA, DATA_VENCIMENTO, STATUS,  ');
+    FQueryGrupoParcelas.SQL.Add(' CAST(PARCELA AS VARCHAR(10)) || ''/''               ');
+    FQueryGrupoParcelas.SQL.Add(' || CAST(NUM_TOT_PARCELAS AS VARCHAR(10)) AS QTDPARC ');
+    FQueryGrupoParcelas.SQL.Add(' FROM CONTAS_PAGAR                                   ');
+    FQueryGrupoParcelas.SQL.Add(' WHERE ID_GRUPO_PARCELAS = :ID_GRUPO_PARCELAS        ');
+    FQueryGrupoParcelas.ParamByName('ID_GRUPO_PARCELAS').AsInteger := FCp.IdGrupoParcelas;
+    FQueryGrupoParcelas.Open;
+
+    grdGrupoParcelas.DataSource.DataSet := FQueryGrupoParcelas;
+  except
+    on E: Exception do
+    begin
+      raise Exception.Create('Erro ao carregar grupo de parcelas' + E.Message);
+    end;
+  end;
+end;
+
+procedure TfrmContasPagar.InicializaAlteracaoCp;
+begin
+  // Coloca o numero do registro no titulo
+  lblTitulo.Caption := 'Alterando Registro Nº ' + dmCPagar.cdsCPagarID.AsString;
+
+  toggleParcelamento.Enabled := False;
+  toggleParcelamento.State := tssOff;
+  CardPanelParcela.ActiveCard := cardParcelaUnica;
+  edtParcela.ReadOnly := True;
+  CheckFatVirada.Visible := False;
+  CheckFatVirada.Checked := False;
+  edtValorParcela.ReadOnly := False;
+  chkBaixarAoSalvar.Checked := False;
+
+  edtParcela.Enabled := True;
+  edtValorParcela.Enabled := True;
+
+  // Esvaziando data set de parcelas
+  cdsParcelas.EmptyDataSet;
+end;
+
+procedure TfrmContasPagar.PreparaInclusaoCp;
+begin
+  lblTitulo.Caption := 'Inserindo um novo lançamento no Contas a Pagar';
+
+  // Seta parcela previamente como 1
+  edtParcela.Text := '1';
+
+  // Esvaziando data set de parcelas
+  cdsParcelas.EmptyDataSet;
+
+  // Liberacoes e bloqueios
+  edtQtdParcelas.Enabled := True;
+  edtIntervaloDias.Enabled := True;
+  edtDiaFixoVcto.Enabled := False;
+  checkDiaFixoVcto.Checked := False;
+  checkDiaFixoVcto.Enabled := True;
+  chkBaixarAoSalvar.Checked := False;
+  CheckFatVirada.Checked := False;
+  btnGerar.Enabled := True;
+  btnLimpar.Enabled := False;
+  toggleFatura.State := tssOff;
+  toggleParcelamento.State := tssOff;
+  toggleParcelamento.Enabled := True;
+  edtParcela.ReadOnly := True;
+  edtValorParcela.ReadOnly := True;
+  lblNomeFornecedor.Visible := False;
+  lblNomeFatCartao.Visible := False;
+
+  // Coloca a data atual no datetimepicker
+  dateCompra.DateTime := Now;
+  dateVencimento.DateTime := Now + 7;
+  memDesc.SetFocus;
+end;
+
+procedure TfrmContasPagar.IncluirContaPagar;
+begin
+  PreparaInclusaoCp;
+
+  if (Assigned(FCp)) then
+    FreeAndNil(FCp);
+
+  FCp := TModelCP.Create;
 end;
 
 procedure TfrmContasPagar.QuerySTATUSGetText(Sender: TField; var Text: string;
@@ -1892,6 +1851,157 @@ begin
     FatCartaoAtiva;
 
   end;
+end;
+
+function TfrmContasPagar.ValidaCadParcelamento: Boolean;
+begin
+
+  Result := False;
+
+  // Posiciona no primeiro registro do cds
+  cdsParcelas.First;
+
+  if (cdsParcelas.IsEmpty) then
+  begin
+    TfrmMensagem.TelaMensagem('Atenção!',
+      'Informando que a conta é parcelada porém as Parcelas não foram geradas!',
+      tmAviso);
+    edtQtdParcelas.SetFocus;
+    exit;
+  end;
+
+  // Valida todos os registros do cds
+  while not cdsParcelas.Eof do
+  begin
+
+    if (cdsParcelasPARCELA.AsInteger < 0) then
+    begin
+      TfrmMensagem.TelaMensagem('Atenção!',
+        'Número de parcela gerado inválido!', tmAviso);
+      exit;
+    end;
+
+    if (cdsParcelasVALOR.AsCurrency < 0.01) then
+    begin
+      TfrmMensagem.TelaMensagem('Atenção!',
+        'Valor da Parcela Inválido!', tmAviso);
+      exit;
+    end;
+
+    // Avança para o próximo registro
+    cdsParcelas.Next;
+
+  end;
+
+  Result := True;
+
+end;
+
+function TfrmContasPagar.ValidaCadParcelaUnica: Boolean;
+begin
+  Result := False;
+
+  // Valida campos obrigatorios
+
+  if (Trim(edtParcela.Text).IsEmpty) then
+  begin
+    TfrmMensagem.TelaMensagem('Atenção!',
+      'Número da parcela Inválido!', tmAviso);
+    edtParcela.SetFocus;
+    exit;
+  end;
+
+  if (dateVencimento.Date < dateCompra.Date) then
+  begin
+    TfrmMensagem.TelaMensagem('Atenção!',
+      'Data de vencimento não pode ser inferior a data de compra!', tmAviso);
+    dateVencimento.SetFocus;
+    exit;
+  end;
+
+  if (Trim(edtValorParcela.Text).IsEmpty) then
+  begin
+    TfrmMensagem.TelaMensagem('Atenção!', 'Valor da parcela Inválido!',
+      tmAviso);
+    edtValorParcela.SetFocus;
+    exit;
+  end;
+
+  if not(Assigned(FCp)) then
+  begin
+    TfrmMensagem.TelaMensagem('Erro',
+      'Erro ao inicializar processo para gravar a Conta', tmErro);
+    exit;
+  end;
+
+  Result := True;
+end;
+
+function TfrmContasPagar.ValidaDadosGeraisIncCp: Boolean;
+var
+  lValorCompra: Double;
+begin
+  Result := False;
+  lValorCompra := 0;
+
+  if (Trim(memDesc.Text).IsEmpty) then
+  begin
+    TfrmMensagem.TelaMensagem('Atenção!',
+      'Campo DESCRICAO não pode estar vazio!', tmAviso);
+    memDesc.SetFocus;
+    exit;
+  end;
+
+  if (Trim(edtFornecedor.Text).IsEmpty) then
+  begin
+    TfrmMensagem.TelaMensagem('Atenção!',
+      'Campo FORNECEDOR não pode estar vazio!', tmAviso);
+    edtFornecedor.SetFocus;
+    exit;
+  end;
+
+  if (not(TryStrToFloat(edtValorCompra.Text, lValorCompra)) or
+    (lValorCompra = 0)) then
+  begin
+    TfrmMensagem.TelaMensagem('Atenção!', 'Valor da compra Inválido!', tmAviso);
+    edtValorCompra.SetFocus;
+    exit;
+  end;
+
+  if (dateCompra.Date > Now) then
+  begin
+    TfrmMensagem.TelaMensagem('Atenção!',
+      'Data de compra não pode ser maior que a data atual!', tmAviso);
+    dateCompra.SetFocus;
+    exit;
+  end;
+
+  Result := True;
+end;
+
+function TfrmContasPagar.ValidaStatusCp: Boolean;
+var
+  lStatus: String;
+begin
+  Result := False;
+
+  lStatus := Trim(DBGrid1.DataSource.DataSet.FieldByName('STATUS').AsString);
+
+  // Se o documento já foi baixado cancela a edição
+  if (lStatus = 'P') then
+  begin
+    TfrmMensagem.TelaMensagem('Atenção!', 'Documento já pago não pode ser alterado!', tmAviso);
+    exit;
+  end;
+
+  // Se o documento foi cancelado, a edição é cancelada
+  if (lStatus = 'C') then
+  begin
+    TfrmMensagem.TelaMensagem('Atenção!', 'Documento já cancelado não pode ser alterado!', tmAviso);
+    exit;
+  end;
+
+  Result := True;
 end;
 
 function TfrmContasPagar.ValidaPesquisa: Boolean;

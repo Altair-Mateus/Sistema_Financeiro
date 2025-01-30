@@ -69,7 +69,7 @@ type
     property IdFornecedor: Integer read FIdFornecedor write FIdFornecedor;
     [TDBColumn('FATURA_cART')]
     property FatCartao: String read FFatCartao write FFatCartao;
-    [TDBColumn('ID_FATURA')]
+    [TDBColumn('ID_FATURA'), TDBAcceptNull]
     property IdFatCartao: Integer read FIdFatCartao write FIdFatCartao;
     [TDBColumn('NUM_TOT_PARCELAS'), TDBAcceptNull]
     property NumTotalParcelas: Integer read FNumTotalParcelas
