@@ -3,8 +3,8 @@ object frmBxMultiplaCp: TfrmBxMultiplaCp
   Top = 0
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'Baixar V'#225'rias CPs'
-  ClientHeight = 685
-  ClientWidth = 1301
+  ClientHeight = 684
+  ClientWidth = 1297
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -19,13 +19,14 @@ object frmBxMultiplaCp: TfrmBxMultiplaCp
   object pnlFiltros: TPanel
     Left = 0
     Top = 0
-    Width = 1301
+    Width = 1297
     Height = 177
     Align = alTop
     BevelOuter = bvNone
     Color = 5737262
     ParentBackground = False
     TabOrder = 0
+    ExplicitWidth = 1301
     object lblDataInicial: TLabel
       Left = 18
       Top = 18
@@ -182,7 +183,7 @@ object frmBxMultiplaCp: TfrmBxMultiplaCp
     end
     object btnVisualizar: TButton
       AlignWithMargins = True
-      Left = 1179
+      Left = 1175
       Top = 45
       Width = 121
       Height = 87
@@ -196,7 +197,6 @@ object frmBxMultiplaCp: TfrmBxMultiplaCp
       TabOrder = 2
       WordWrap = True
       OnClick = btnVisualizarClick
-      ExplicitLeft = 1175
     end
     object edtFornecedor: TEdit
       Left = 344
@@ -296,13 +296,15 @@ object frmBxMultiplaCp: TfrmBxMultiplaCp
   object pnlContas: TPanel
     Left = 0
     Top = 177
-    Width = 1301
-    Height = 439
+    Width = 1297
+    Height = 438
     Align = alClient
     BevelOuter = bvNone
     Color = clWhite
     ParentBackground = False
     TabOrder = 1
+    ExplicitWidth = 1301
+    ExplicitHeight = 439
     object DBGrid1: TDBGrid
       Left = 0
       Top = 0
@@ -389,13 +391,15 @@ object frmBxMultiplaCp: TfrmBxMultiplaCp
   end
   object pnlBotoes: TPanel
     Left = 0
-    Top = 616
-    Width = 1301
+    Top = 615
+    Width = 1297
     Height = 69
     Align = alBottom
     Color = clWhite
     ParentBackground = False
     TabOrder = 2
+    ExplicitTop = 616
+    ExplicitWidth = 1301
     object btnConfirmar: TButton
       AlignWithMargins = True
       Left = 6

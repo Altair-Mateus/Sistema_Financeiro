@@ -2,8 +2,8 @@ object frmDetalhesOrigemCpCr: TfrmDetalhesOrigemCpCr
   Left = 0
   Top = 0
   Caption = 'Detalhes da Origem do Lan'#231'amento no Caixa'
-  ClientHeight = 756
-  ClientWidth = 1168
+  ClientHeight = 755
+  ClientWidth = 1164
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,11 +16,13 @@ object frmDetalhesOrigemCpCr: TfrmDetalhesOrigemCpCr
   object pnlPrincipal: TPanel
     Left = 0
     Top = 0
-    Width = 1168
-    Height = 756
+    Width = 1164
+    Height = 755
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
+    ExplicitWidth = 1168
+    ExplicitHeight = 756
     object pnlTitulo: TPanel
       Left = 0
       Top = 0

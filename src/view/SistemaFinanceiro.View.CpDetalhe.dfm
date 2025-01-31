@@ -3,8 +3,8 @@ object frmCpDetalhe: TfrmCpDetalhe
   Top = 0
   BorderIcons = [biSystemMenu]
   Caption = 'Detalhes Conta Paga'
-  ClientHeight = 672
-  ClientWidth = 837
+  ClientHeight = 671
+  ClientWidth = 833
   Color = 5737262
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,11 +16,13 @@ object frmCpDetalhe: TfrmCpDetalhe
   object pnlPrincipal: TPanel
     Left = 0
     Top = 0
-    Width = 837
-    Height = 672
+    Width = 833
+    Height = 671
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
+    ExplicitWidth = 837
+    ExplicitHeight = 672
     object pnlPesquisa: TPanel
       Left = 0
       Top = 0

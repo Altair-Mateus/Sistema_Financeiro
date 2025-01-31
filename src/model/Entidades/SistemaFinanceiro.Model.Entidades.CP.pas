@@ -105,7 +105,8 @@ implementation
 
 { TModelCP }
 
-uses uContasPagarExceptions;
+uses
+  SistemaFinanceiro.Exceptions.ContasPagar;
 
 procedure TModelCP.AddPropertyToWhere(const pPropertyName: String);
 begin

@@ -3,13 +3,27 @@ unit SistemaFinanceiro.Model.dmCPagar;
 interface
 
 uses
-  System.SysUtils, System.Classes, FireDAC.Stan.Intf, FireDAC.Stan.Option,
-  FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf,
-  FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt, Data.DB,
-  FireDAC.Comp.DataSet, FireDAC.Comp.Client, Datasnap.Provider,
-  Datasnap.DBClient, SistemaFinanceiro.Model.Entidades.CP,
-  SistemaFinanceiro.Model.Entidades.CP.Detalhe, Vcl.Dialogs,
-  Vcl.Forms, Winapi.Windows;
+  System.SysUtils,
+  System.Classes,
+  FireDAC.Stan.Intf,
+  FireDAC.Stan.Option,
+  FireDAC.Stan.Param,
+  FireDAC.Stan.Error,
+  FireDAC.DatS,
+  FireDAC.Phys.Intf,
+  FireDAC.DApt.Intf,
+  FireDAC.Stan.Async,
+  FireDAC.DApt,
+  Data.DB,
+  FireDAC.Comp.DataSet,
+  FireDAC.Comp.Client,
+  Datasnap.Provider,
+  Datasnap.DBClient,
+  SistemaFinanceiro.Model.Entidades.CP,
+  SistemaFinanceiro.Model.Entidades.CP.Detalhe,
+  Vcl.Dialogs,
+  Vcl.Forms,
+  Winapi.Windows;
 
 type
   TdmCPagar = class(TDataModule)
@@ -116,7 +130,9 @@ implementation
 
 {%CLASSGROUP 'Vcl.Controls.TControl'}
 
-uses SistemaFinanceiro.Model.udmDados,
+
+uses
+  SistemaFinanceiro.Model.udmDados,
   SistemaFinanceiro.Model.Entidades.LancamentoCaixa,
   SistemaFinanceiro.Model.dmCaixa;
 {$R *.dfm}
@@ -251,7 +267,7 @@ begin
       FDQueryCpDet.ParamByName('DETALHES').AsString := BaixaCP.Detalhes;
       FDQueryCpDet.ParamByName('VALOR').AsCurrency := BaixaCP.Valor;
       FDQueryCpDet.ParamByName('DATA').AsDate := BaixaCP.Data;
-      FDQueryCpDet.ParamByName('USUARIO').AsString := BaixaCP.Usuario;
+      FDQueryCpDet.ParamByName('USUARIO').AsInteger := BaixaCP.Usuario;
       FDQueryCpDet.ParamByName('DESC').AsCurrency := BaixaCP.ValorDesc;
 
       FDQueryCpDet.Prepare;
@@ -527,7 +543,7 @@ begin
       Result.Detalhes := FDQueryCpDet.FieldByName('DETALHES').AsString;
       Result.Valor := FDQueryCpDet.FieldByName('VALOR').AsCurrency;
       Result.Data := FDQueryCpDet.FieldByName('DATA').AsDateTime;
-      Result.Usuario := FDQueryCpDet.FieldByName('NOME').AsString;
+      Result.Usuario := FDQueryCpDet.FieldByName('NOME').AsInteger;
       Result.ValorDesc := FDQueryCpDet.FieldByName('DESCONTO_BX').AsCurrency;
 
     except

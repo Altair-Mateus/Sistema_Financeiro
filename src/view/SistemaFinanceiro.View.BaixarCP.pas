@@ -1,11 +1,26 @@
 unit SistemaFinanceiro.View.BaixarCP;
+
 interface
+
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls,
-  System.ImageList, Vcl.ImgList, SistemaFinanceiro.Model.Entidades.CP,
-  SistemaFinanceiro.Model.Entidades.CP.Detalhe, Vcl.ComCtrls,
+  Winapi.Windows,
+  Winapi.Messages,
+  System.SysUtils,
+  System.Variants,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  Vcl.ExtCtrls,
+  Vcl.StdCtrls,
+  System.ImageList,
+  Vcl.ImgList,
+  SistemaFinanceiro.Model.Entidades.CP,
+  SistemaFinanceiro.Model.Entidades.CP.Detalhe,
+  Vcl.ComCtrls,
   SistemaFinanceiro.View.BaixarCP.FrPgto;
+
 type
   TfrmBaixarCP = class(TForm)
     pnlPrincipal: TPanel;
@@ -60,10 +75,10 @@ type
       Shift: TShiftState);
   private
     { Private declarations }
-    FID : Integer;
-    DataCompra : TDateTime;
-    function CalcValorDesc : Currency;
-    function CalcPorcentDesc : Currency;
+    FID: Integer;
+    DataCompra: TDateTime;
+    function CalcValorDesc: Currency;
+    function CalcPorcentDesc: Currency;
     procedure KeyPressValor(Sender: TObject; var Key: Char);
     procedure EditKeyPress(Sender: TObject; var Key: Char);
 
@@ -72,11 +87,14 @@ type
     procedure BaixarCP(Id: Integer);
 
   end;
+
 var
   frmBaixarCP: TfrmBaixarCP;
 
 implementation
+
 {$R *.dfm}
+
 uses
   SistemaFinanceiro.Model.dmCPagar,
   SistemaFinanceiro.Utilitarios,
@@ -85,13 +103,13 @@ uses
 { TfrmBaixarCP }
 procedure TfrmBaixarCP.BaixarCP(Id: Integer);
 var
-  ContaPagar : TModelCP;
+  ContaPagar: TModelCP;
 
 begin
 
-  FID := ID;
+  FID := Id;
 
-  //  Valida ID do CP
+  // Valida ID do CP
   if FID < 0 then
   begin
     raise Exception.Create('ID do contas a pagar Inválido!');
@@ -101,37 +119,37 @@ begin
 
   try
 
-    //  Se o status já for P irá ignorar
+    // Se o status já for P irá ignorar
     if ContaPagar.Status = 'P' then
     begin
       raise Exception.Create('Não é possível baixar uma conta já Paga!');
     end;
 
-    //  Se o status já for C irá ignorar
+    // Se o status já for C irá ignorar
     if ContaPagar.Status = 'C' then
     begin
       raise Exception.Create('Não é possível baixar uma conta cancelada!');
     end;
 
-    //  Carregando dados para as labels
-    lblIdConta.Caption       := IntToStr(FID);
-    lblParcela.Caption       := IntToStr(ContaPagar.Parcela);
-    lblVencimento.Caption    := FormatDateTime('dd/mm/yyyy', ContaPagar.DataVencimento);
-    lblValorParcela.Caption  := 'R$ ' + TUtilitario.FormatarValor(ContaPagar.ValorParcela);
-    lblDtCompra.Caption      := DateToStr(ContaPagar.DataCompra);
+    // Carregando dados para as labels
+    lblIdConta.Caption := IntToStr(FID);
+    lblParcela.Caption := IntToStr(ContaPagar.Parcela);
+    lblVencimento.Caption := FormatDateTime('dd/mm/yyyy', ContaPagar.DataVencimento);
+    lblValorParcela.Caption := 'R$ ' + TUtilitario.FormatarValor(ContaPagar.ValorParcela);
+    lblDtCompra.Caption := DateToStr(ContaPagar.DataCompra);
     lblValorRestante.Caption := 'R$ ' + TUtilitario.FormatarValor((ContaPagar.ValorParcela - ContaPagar.ValorAbatido));
-    lblCodFornec.Caption     := IntToStr(ContaPagar.IdFornecedor);
+    lblCodFornec.Caption := IntToStr(ContaPagar.IdFornecedor);
 
     if ContaPagar.Doc = '' then
     begin
       lblDoc.Caption := 'Não Informado';
     end
-      else
-      begin
-        lblDoc.Caption := ContaPagar.Doc;
-      end;
+    else
+    begin
+      lblDoc.Caption := ContaPagar.Doc;
+    end;
 
-    //  Puxa a data da compra
+    // Puxa a data da compra
     DataCompra := ContaPagar.DataCompra;
 
     edtObs.Clear;
@@ -139,7 +157,7 @@ begin
 
   finally
 
-    //  Libera da memoria
+    // Libera da memoria
     ContaPagar.Free;
 
   end;
@@ -153,18 +171,19 @@ end;
 
 procedure TfrmBaixarCP.btnConfirmarClick(Sender: TObject);
 var
-  CpDetalhe : TModelCpDetalhe;
-  ValorAbater : Currency;
-  ValorDesc : Currency;
+  CpDetalhe: TModelCpDetalhe;
+  ValorAbater: Currency;
+  ValorDesc: Currency;
 
 begin
 
-  //  Validações dos campos
+  // Validações dos campos
   if datePgto.Date > Date then
   begin
 
     datePgto.SetFocus;
-    Application.MessageBox('A data de pagamento não pode ser maior que a data atual!', 'Atenção', MB_OK + MB_ICONWARNING);
+    Application.MessageBox('A data de pagamento não pode ser maior que a data atual!', 'Atenção',
+      MB_OK + MB_ICONWARNING);
     abort;
 
   end;
@@ -173,24 +192,23 @@ begin
   begin
 
     datePgto.SetFocus;
-    Application.MessageBox('A data de pagamento não pode ser menor que a data da compra!', 'Atenção', MB_OK + MB_ICONWARNING);
+    Application.MessageBox('A data de pagamento não pode ser menor que a data da compra!', 'Atenção',
+      MB_OK + MB_ICONWARNING);
     abort;
 
   end;
 
-
   ValorAbater := 0;
-  ValorDesc   := 0;
+  ValorDesc := 0;
 
-
-  if (not TryStrToCurr(edtValor.Text, ValorAbater)) or (ValorAbater <= 0)  then
+  if (not TryStrToCurr(edtValor.Text, ValorAbater)) or (ValorAbater <= 0) then
   begin
     edtValor.SetFocus;
     Application.MessageBox('Valor inválido!', 'Atenção', MB_OK + MB_ICONWARNING);
     abort;
   end;
 
-  if ValorAbater > dmCPagar.cdsCPagarVALOR_PARCELA.AsCurrency  then
+  if ValorAbater > dmCPagar.cdsCPagarVALOR_PARCELA.AsCurrency then
   begin
     edtValor.SetFocus;
     Application.MessageBox('Valor pago não pode ser maior que o valor da parcela!', 'Atenção', MB_OK + MB_ICONWARNING);
@@ -214,40 +232,42 @@ begin
   CpDetalhe := TModelCpDetalhe.Create;
 
   try
-    CpDetalhe.IdCP      := FID;
-    CpDetalhe.Detalhes  := Trim(edtObs.Text);
-    CpDetalhe.Valor     := ValorAbater;
-    CpDetalhe.Data      := datePgto.Date;
-    CpDetalhe.Usuario   := inttostr(dmUsuarios.GetUsuarioLogado.Id);
+    CpDetalhe.IdCP := FID;
+    CpDetalhe.Detalhes := Trim(edtObs.Text);
+    CpDetalhe.Valor := ValorAbater;
+    CpDetalhe.Data := datePgto.Date;
+    CpDetalhe.Usuario := dmUsuarios.GetUsuarioLogado.Id;
     CpDetalhe.ValorDesc := ValorDesc;
 
-    //  Forma de pgto
+    // Forma de pgto
     try
 
-      //  Cria o form
-      frmFrPgtoBaixaCp:= TfrmFrPgtoBaixaCp.Create(Self);
+      // Cria o form
+      frmFrPgtoBaixaCp := TfrmFrPgtoBaixaCp.Create(Self);
 
-      //  Passa as informações para a tela de pgto
+      // Passa as informações para a tela de pgto
       frmFrPgtoBaixaCp.FrPgtoCp(FID, ValorAbater);
 
-      //  Exibe o form
+      // Exibe o form
       frmFrPgtoBaixaCp.ShowModal;
 
-    except on E : Exception do
+    except
+      on E: Exception do
 
-      Application.MessageBox(PWideChar(E.Message), 'Erro na forma de pagamento do documento!', MB_OK + MB_ICONWARNING);
+        Application.MessageBox(PWideChar(E.Message), 'Erro na forma de pagamento do documento!',
+          MB_OK + MB_ICONWARNING);
 
     end;
 
-    //  Verifica se deu tudo certo com as formas de pgto
+    // Verifica se deu tudo certo com as formas de pgto
     if frmFrPgtoBaixaCp.ModalResult <> mrOk then
     begin
       abort;
     end
-      else
-      begin
-        FreeAndNil(frmFrPgtoBaixaCp);
-      end;
+    else
+    begin
+      FreeAndNil(frmFrPgtoBaixaCp);
+    end;
 
     try
 
@@ -255,8 +275,9 @@ begin
       Application.MessageBox('Conta baixada com sucesso!', 'Atenção', MB_OK + MB_ICONINFORMATION);
       ModalResult := mrOk;
 
-    except on E : Exception do
-      Application.MessageBox(PWideChar(E.Message), 'Erro ao baixar documento!', MB_OK + MB_ICONWARNING);
+    except
+      on E: Exception do
+        Application.MessageBox(PWideChar(E.Message), 'Erro ao baixar documento!', MB_OK + MB_ICONWARNING);
     end;
 
   finally
@@ -269,55 +290,55 @@ end;
 
 function TfrmBaixarCP.CalcPorcentDesc: Currency;
 var
-  ValorFinal : Currency;
-  PorcentDesc : Currency;
-  ValorDesc : Currency;
-  ValorCp : Currency;
+  ValorFinal: Currency;
+  PorcentDesc: Currency;
+  ValorDesc: Currency;
+  ValorCp: Currency;
 
 begin
 
-  ValorCp     := dmCPagar.cdsCPagarVALOR_PARCELA.AsCurrency;
-  ValorDesc   := 0;
-  ValorFinal  := 0;
+  ValorCp := dmCPagar.cdsCPagarVALOR_PARCELA.AsCurrency;
+  ValorDesc := 0;
+  ValorFinal := 0;
   PorcentDesc := 0;
-  Result      := 0;
+  Result := 0;
 
   TryStrToCurr(edtPorcDesc.Text, PorcentDesc);
   TryStrToCurr(edtValorDesc.Text, ValorDesc);
 
   if PorcentDesc > 0 then
-    begin
+  begin
 
-      //  Calcula o valor do desconto
-      ValorDesc := (PorcentDesc / 100) * ValorCp;
+    // Calcula o valor do desconto
+    ValorDesc := (PorcentDesc / 100) * ValorCp;
 
-      //  Atribui o valor do desconto ao campo
-      edtValorDesc.Text := CurrToStr(ValorDesc);
+    // Atribui o valor do desconto ao campo
+    edtValorDesc.Text := CurrToStr(ValorDesc);
 
-      //  Calcula o valor final
-      ValorFinal := ValorCp - ValorDesc;
+    // Calcula o valor final
+    ValorFinal := ValorCp - ValorDesc;
 
-      //  retorna o valor final
-      Result := ValorFinal;
+    // retorna o valor final
+    Result := ValorFinal;
 
-    end;
+  end;
 
 end;
 
 function TfrmBaixarCP.CalcValorDesc: Currency;
 var
-  ValorCp     : Currency;
-  ValorDesc   : Currency;
-  ValorFinal : Currency;
-  PorcentDesc : Currency;
+  ValorCp: Currency;
+  ValorDesc: Currency;
+  ValorFinal: Currency;
+  PorcentDesc: Currency;
 
 begin
 
   Result := 0;
 
   ValorCp := dmCPagar.cdsCPagarVALOR_PARCELA.AsCurrency;
-  ValorDesc   := 0;
-  ValorFinal  := 0;
+  ValorDesc := 0;
+  ValorFinal := 0;
   PorcentDesc := 0;
 
   TryStrToCurr(edtPorcDesc.Text, PorcentDesc);
@@ -326,16 +347,16 @@ begin
   if ValorDesc > 0 then
   begin
 
-    //  Calcula a porcentagem de desconto
+    // Calcula a porcentagem de desconto
     PorcentDesc := (ValorDesc / ValorCp) * 100;
 
-    //  Atribui a porcentagem no campo
+    // Atribui a porcentagem no campo
     edtPorcDesc.Text := CurrToStr(PorcentDesc);
 
-    //  Calcula o valor final
+    // Calcula o valor final
     ValorFinal := ValorCp - ValorDesc;
 
-    //  retorna o valor final
+    // retorna o valor final
     Result := ValorFinal;
 
   end;
@@ -348,26 +369,25 @@ begin
   if checkDesconto.Checked then
   begin
 
-    //  Libera e mostra os campos do desconto
+    // Libera e mostra os campos do desconto
     edtValorDesc.Enabled := True;
     edtValorDesc.Visible := True;
-    edtPorcDesc.Visible  := True;
-    edtPorcDesc.Enabled  := True;
-    lblDesconto.Visible  := True;
+    edtPorcDesc.Visible := True;
+    edtPorcDesc.Enabled := True;
+    lblDesconto.Visible := True;
     lblValorDesc.Visible := True;
 
   end
   else
   begin
 
-    //  Bloqueia e oculta os campos do desconto
+    // Bloqueia e oculta os campos do desconto
     edtValorDesc.Enabled := False;
     edtValorDesc.Visible := False;
-    edtPorcDesc.Visible  := False;
-    edtPorcDesc.Enabled  := False;
-    lblDesconto.Visible  := False;
+    edtPorcDesc.Visible := False;
+    edtPorcDesc.Enabled := False;
+    lblDesconto.Visible := False;
     lblValorDesc.Visible := False;
-
 
   end;
 
@@ -377,10 +397,10 @@ procedure TfrmBaixarCP.EditKeyPress(Sender: TObject; var Key: Char);
 begin
   if Key = #13 then
   begin
-    //  Verifica se a tecla pressionada é o Enter
-    //  Cancela o efeito do enter
+    // Verifica se a tecla pressionada é o Enter
+    // Cancela o efeito do enter
     Key := #0;
-    //  Pula para o proximo
+    // Pula para o proximo
     Perform(WM_NEXTDLGCTL, 0, 0);
   end;
 end;
@@ -428,10 +448,10 @@ procedure TfrmBaixarCP.edtValorKeyPress(Sender: TObject; var Key: Char);
 begin
   if Key = #13 then
   begin
-    //  Verifica se a tecla pressionada é o Enter
-    //  Cancela o efeito do enter
+    // Verifica se a tecla pressionada é o Enter
+    // Cancela o efeito do enter
     Key := #0;
-    //  Pula para o proximo
+    // Pula para o proximo
     Perform(WM_NEXTDLGCTL, 0, 0);
   end;
 end;
@@ -439,13 +459,12 @@ end;
 procedure TfrmBaixarCP.FormCreate(Sender: TObject);
 begin
 
-  //  Coloca no KeyPress o enter para ir para o proximo campo
-  edtObs.OnKeyPress        := EditKeyPress;
-  datePgto.OnKeyPress      := EditKeyPress;
-  edtValor.OnKeyPress      := KeyPressValor;
-  edtValorDesc.OnKeyPress  := KeyPressValor;
-  edtPorcDesc.OnKeyPress   := KeyPressValor;
-
+  // Coloca no KeyPress o enter para ir para o proximo campo
+  edtObs.OnKeyPress := EditKeyPress;
+  datePgto.OnKeyPress := EditKeyPress;
+  edtValor.OnKeyPress := KeyPressValor;
+  edtValorDesc.OnKeyPress := KeyPressValor;
+  edtPorcDesc.OnKeyPress := KeyPressValor;
 
   datePgto.Date := now;
 
@@ -456,21 +475,21 @@ begin
 
   if Key = #13 then
   begin
-    //  Verifica se a tecla pressionada é o Enter
-    //  Cancela o efeito do enter
+    // Verifica se a tecla pressionada é o Enter
+    // Cancela o efeito do enter
     Key := #0;
-    //  Pula para o proximo
+    // Pula para o proximo
     Perform(WM_NEXTDLGCTL, 0, 0);
   end;
 
-  //  Se for digitado um ponto, será convertido para virgula
+  // Se for digitado um ponto, será convertido para virgula
   if Key = FormatSettings.ThousandSeparator then
-   begin
-      Key := #0;
-    end;
+  begin
+    Key := #0;
+  end;
 
   // Permite apenas digitar os caracteres dentro do charinset
-  if not (CharInSet(Key, ['0'..'9', FormatSettings.DecimalSeparator, #8, #13])) then
+  if not(CharInSet(Key, ['0' .. '9', FormatSettings.DecimalSeparator, #8, #13])) then
   begin
     Key := #0;
   end;

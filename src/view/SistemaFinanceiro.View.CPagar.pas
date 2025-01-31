@@ -226,6 +226,8 @@ type
     function ValidaDadosGeraisIncCp: Boolean;
     function ValidaCadParcelamento: Boolean;
     function ValidaStatusCp: Boolean;
+    function ValidaCancelamentoBaixa: Boolean;
+    function ValidaGerarParcelas: Boolean;
     procedure InicializaAlteracaoCp;
     procedure CarregaDadosAlteracao;
     function CarregaGrupoParcelas: Boolean;
@@ -248,13 +250,13 @@ implementation
 
 
 uses
-  SistemaFinanceiro.Model.dmCPagar,
   SistemaFinanceiro.Utilitarios,
   SistemaFinanceiro.Model.dmFornecedores,
   SistemaFinanceiro.Model.dmFaturaCartao,
   SistemaFinanceiro.Model.dmUsuarios,
   SistemaFinanceiro.View.Principal,
-  SistemaFinanceiro.Model.Entidades.LancamentoPadraoContas;
+  SistemaFinanceiro.Model.Entidades.LancamentoPadraoContas,
+  SistemaFinanceiro.Services.BaixaContaPagar;
 
 procedure TfrmContasPagar.btnAlterarClick(Sender: TObject);
 begin
@@ -263,28 +265,22 @@ end;
 
 procedure TfrmContasPagar.btnBaixarCPClick(Sender: TObject);
 begin
-
   ExibeTelaBaixar(DataSourceCPagar.DataSet.FieldByName('ID').AsInteger);
-
 end;
 
 procedure TfrmContasPagar.btnBxMultiplaClick(Sender: TObject);
 begin
-
   ExibeTelaBxMultipla;
-
 end;
 
 procedure TfrmContasPagar.btnDetalhesClick(Sender: TObject);
 begin
   inherited;
 
-  if DataSourceCPagar.DataSet.FieldByName('STATUS').AsString <> 'P' then
+  if (DataSourceCPagar.DataSet.FieldByName('STATUS').AsString <> 'P') then
   begin
 
-    Application.MessageBox
-      ('Conta não paga, realize a baixa para ver os detalhes!', 'Atenção',
-      MB_OK + MB_ICONEXCLAMATION);
+    TfrmMensagem.TelaMensagem('Atenção', 'Conta não paga, realize a baixa para ver os detalhes!', tmAviso);
     exit;
 
   end;
@@ -520,7 +516,7 @@ procedure TfrmContasPagar.btnSalvarClick(Sender: TObject);
 var
   lContaGravada: Boolean;
 begin
-  lContaGravada := False;
+
   try
 
     if not(ValidaDadosGeraisIncCp) then
@@ -566,9 +562,7 @@ begin
 
     if NomeFatCartao = '' then
     begin
-
-      Application.MessageBox('Fatura de Cartão não encontrada!', 'Atenção',
-        MB_OK + MB_ICONEXCLAMATION);
+      TfrmMensagem.TelaMensagem('Atenção', 'Fatura de Cartão não encontrada!', tmAviso);
       edtCodFatCartao.SetFocus;
       edtCodFatCartao.Clear;
       exit;
@@ -600,12 +594,9 @@ begin
 
     if NomeFornecedor = '' then
     begin
-
-      Application.MessageBox('Fornecedor não encontrado!', 'Atenção',
-        MB_OK + MB_ICONEXCLAMATION);
+      TfrmMensagem.TelaMensagem('Atenção', 'Fornecedor não encontrado!', tmAviso);
       edtFornecedor.SetFocus;
       edtFornecedor.Clear;
-
     end;
 
     lblNomeFornecedor.Visible := True;
@@ -807,55 +798,41 @@ end;
 procedure TfrmContasPagar.CancelarBaixa1Click(Sender: TObject);
 var
   IdCp: Integer;
-  option: Word;
-
 begin
 
-  // Valida se o user logado é adm
-  if not(dmUsuarios.GetUsuarioLogado.User_Admin = 'S') then
-  begin
-
-    Application.MessageBox('Somente Administradores podem cancelar uma Baixa!',
-      'Erro', MB_OK + MB_ICONERROR);
+  if not(ValidaCancelamentoBaixa) then
     exit;
 
-  end;
+  try
 
-  if not DataSourceCPagar.DataSet.IsEmpty then
-  begin
-
-    // Bloqueia o cancelamento se a conta não estiver como PAGA
-    if DataSourceCPagar.DataSet.FieldByName('STATUS').AsString <> 'P' then
+    if not DataSourceCPagar.DataSet.IsEmpty then
     begin
 
-      Application.MessageBox('Conta não baixada!!', 'Erro',
-        MB_OK + MB_ICONERROR);
-      exit;
+      if (TfrmMensagem.TelaEscolha('Atenção', 'Deseja cancelar o pagamento/baixa da conta selecionada?', tmEscolha)
+        = mrYes) then
+      begin
+        // Pega a id da conta
+        IdCp := DataSourceCPagar.DataSet.FieldByName('ID').AsInteger;
+
+        // Chama a procedure que fara o trabalho
+        TBaixarContaPagar.CancelarBaixa(IdCp);
+
+        TfrmMensagem.TelaMensagem('Informação', 'Cancelamento da baixa da conta completada com sucesso!', tmSucesso);
+
+        Pesquisar;
+
+        // Atualiza relatorio tela principal
+        frmPrincipal.TotalCP;
+        frmPrincipal.ResumoMensalCaixa;
+      end;
 
     end;
-
-    option := Application.MessageBox('Deseja cancelar o registro? ',
-      'Confirmação', MB_YESNO + MB_ICONQUESTION);
-
-    if option = IDNO then
+  except
+    on E: Exception do
     begin
-      exit;
+      TfrmMensagem.TelaMensagem('Erro ao cancelar a baixa', E.Message, tmErro);
     end;
-
-    // Pega a id da conta
-    IdCp := DataSourceCPagar.DataSet.FieldByName('ID').AsInteger;
-
-    // Chama a procedure que fara o trabalho
-    dmCPagar.CancBxCP(IdCp);
-
-    Pesquisar;
-
-    // Atualiza relatorio tela principal
-    frmPrincipal.TotalCP;
-    frmPrincipal.ResumoMensalCaixa;
-
   end;
-
 end;
 
 procedure TfrmContasPagar.CardCadastroEnter(Sender: TObject);
@@ -1083,30 +1060,17 @@ begin
     if dmFaturaCartao.GetStatusFatCartao(Trim(edtCodFatCartao.Text)) = False
     then
     begin
-
+      TfrmMensagem.TelaMensagem('Atenção', 'Fatura de Cartão não está Ativa, verifique o cadastro!', tmAviso);
       edtCodFatCartao.Clear;
       edtCodFatCartao.SetFocus;
       lblNomeFatCartao.Caption := '';
-      Application.MessageBox
-        ('Fatura de Cartão não está Ativa, verifique o cadastro!', 'Atenção',
-        MB_OK + MB_ICONEXCLAMATION);
-      exit;
-
     end;
 
     if toggleParcelamento.State = tssOn then
-    begin
-
       FatCartaoAtiva;
 
-    end;
-
     if edtQtdParcelas.Text <> '' then
-    begin
-
       GeraParcelas;
-
-    end;
 
   end;
 
@@ -1123,14 +1087,11 @@ begin
 
     if dmFornecedores.GetStatus(Trim(edtFornecedor.Text)) = False then
     begin
-
+      TfrmMensagem.TelaMensagem('Atenção', 'Fornecedor não está Ativo, verifique o cadastro!', tmAviso);
       edtFornecedor.Clear;
       edtFornecedor.SetFocus;
       lblNomeFornecedor.Caption := '';
-      Application.MessageBox('Fornecedor não está Ativo, verifique o cadastro!',
-        'Atenção', MB_OK + MB_ICONEXCLAMATION);
       exit;
-
     end;
 
   end;
@@ -1289,8 +1250,8 @@ end;
 
 procedure TfrmContasPagar.FormShow(Sender: TObject);
 begin
-  inherited;
   InicializaTela;
+  inherited;
 end;
 
 procedure TfrmContasPagar.GeraParcelas;
@@ -1303,49 +1264,15 @@ var
   lContador: Integer;
   lDiaFixoVcto: Integer;
   lDataPrimeiraParcela: TDateTime;
-
-  function ValidarCampos: Boolean;
-  begin
-    Result := True;
-
-    if (not TryStrToFloat(edtValorCompra.Text, lValorCompra)) or
-      (lValorCompra <= 0) then
-    begin
-      edtValorCompra.SetFocus;
-      Application.MessageBox('Valor da compra Inválido!', 'Atenção',
-        MB_OK + MB_ICONEXCLAMATION);
-      Result := False;
-    end
-    else if dateCompra.Date > Now then
-    begin
-      dateCompra.SetFocus;
-      Application.MessageBox
-        ('Data de compra não pode ser maior que a data atual!', 'Atenção',
-        MB_OK + MB_ICONEXCLAMATION);
-      Result := False;
-    end
-    else if not TryStrToInt(edtQtdParcelas.Text, lQtdParcelas) or
-      (lQtdParcelas <= 1) then
-    begin
-      edtQtdParcelas.SetFocus;
-      Application.MessageBox('Números de Parcelas Inválido!', 'Atenção',
-        MB_OK + MB_ICONEXCLAMATION);
-      Result := False;
-    end
-    else if not TryStrToInt(edtIntervaloDias.Text, lIntervaloDias) then
-    begin
-      edtIntervaloDias.SetFocus;
-      Application.MessageBox('Intervalo de dias Inválido!', 'Atenção',
-        MB_OK + MB_ICONEXCLAMATION);
-      Result := False;
-    end;
-  end;
-
 begin
 
   lDataPrimeiraParcela := 0;
-  if not ValidarCampos then
+  if not(ValidaGerarParcelas) then
     exit;
+
+  lValorCompra := StrToFloat(edtValorCompra.Text);
+  lQtdParcelas := StrToInt(edtQtdParcelas.Text);
+  lIntervaloDias := StrToInt(edtIntervaloDias.Text);
 
   // Calculando valores das parcelas
   lValorParcela := (Trunc(lValorCompra / lQtdParcelas * 100) / 100);
@@ -1374,9 +1301,8 @@ begin
     if not TryStrToInt(edtDiaFixoVcto.Text, lDiaFixoVcto) or (lDiaFixoVcto > 28)
       or (lDiaFixoVcto < 1) then
     begin
+      TfrmMensagem.TelaMensagem('Atenção', 'Dia fixo de vencimento Inválido!', tmAviso);
       edtDiaFixoVcto.SetFocus;
-      Application.MessageBox('Dia fixo de vencimento Inválido!', 'Atenção',
-        MB_OK + MB_ICONEXCLAMATION);
       exit;
     end;
 
@@ -1703,7 +1629,7 @@ end;
 procedure TfrmContasPagar.InicializaAlteracaoCp;
 begin
   // Coloca o numero do registro no titulo
-  lblTitulo.Caption := 'Alterando Registro Nº ' + dmCPagar.cdsCPagarID.AsString;
+  lblTitulo.Caption := 'Alterando Registro Nº ' + DBGrid1.DataSource.DataSet.FieldByName('ID').AsString;
 
   toggleParcelamento.Enabled := False;
   toggleParcelamento.State := tssOff;
@@ -1827,7 +1753,7 @@ begin
 
     pnlFundoAvisoFatura.Visible := True;
 
-    if not(dmCPagar.cdsCPagar.State in [dsEdit]) then
+    if not(FOpCad = ocAlterar) then
       CheckFatVirada.Visible := True;
 
   end;
@@ -1937,6 +1863,25 @@ begin
   Result := True;
 end;
 
+function TfrmContasPagar.ValidaCancelamentoBaixa: Boolean;
+begin
+  Result := False;
+  // Valida se o user logado é adm
+  if not(dmUsuarios.GetUsuarioLogado.User_Admin = 'S') then
+  begin
+    TfrmMensagem.TelaMensagem('Atenção!', 'Somente Administradores podem cancelar uma Baixa!', tmAviso);
+    exit;
+  end;
+
+  // Bloqueia o cancelamento se a conta não estiver como PAGA
+  if (DBGrid1.DataSource.DataSet.FieldByName('STATUS').AsString <> 'P') then
+  begin
+    TfrmMensagem.TelaMensagem('Atenção', 'Só é possível cancelar o pagamento/baixa de uma conta já paga!', tmAviso);
+    exit;
+  end;
+  Result := True;
+end;
+
 function TfrmContasPagar.ValidaDadosGeraisIncCp: Boolean;
 var
   lValorCompra: Double;
@@ -1973,6 +1918,26 @@ begin
     TfrmMensagem.TelaMensagem('Atenção!',
       'Data de compra não pode ser maior que a data atual!', tmAviso);
     dateCompra.SetFocus;
+    exit;
+  end;
+
+  Result := True;
+end;
+
+function TfrmContasPagar.ValidaGerarParcelas: Boolean;
+var
+  lQtdParcelas: Integer;
+begin
+  Result := False;
+
+  if not(ValidaDadosGeraisIncCp) then
+    exit;
+
+  if not TryStrToInt(edtQtdParcelas.Text, lQtdParcelas) or
+    (lQtdParcelas <= 1) then
+  begin
+    TfrmMensagem.TelaMensagem('Atenção', 'Números de Parcelas Inválido!', tmAviso);
+    edtQtdParcelas.SetFocus;
     exit;
   end;
 

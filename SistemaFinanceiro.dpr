@@ -75,10 +75,13 @@ uses
   SistemaFinanceiro.View.Relatorios.LancamentoPadrao in 'src\view\Relatorios\SistemaFinanceiro.View.Relatorios.LancamentoPadrao.pas' {frmRelLancamentoPadrao},
   fTesteDaoRTTI in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\view\fTesteDaoRTTI.pas' {frmTesteDaoRTTI},
   uUsuario in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\view\uUsuario.pas',
-  uContasPagarExceptions in 'src\exceptions\uContasPagarExceptions.pas',
-  uContasPagarDetalheExceptions in 'src\exceptions\uContasPagarDetalheExceptions.pas',
   SistemaFinanceiro.Model.Entidades.PgtoBxCp in 'src\model\Entidades\SistemaFinanceiro.Model.Entidades.PgtoBxCp.pas',
-  uBaixaCpExceptions in 'src\exceptions\uBaixaCpExceptions.pas';
+  SistemaFinanceiro.Services.BaixaContaPagar in 'src\services\SistemaFinanceiro.Services.BaixaContaPagar.pas',
+  SistemaFinanceiro.Exceptions.BaixaCp in 'src\exceptions\SistemaFinanceiro.Exceptions.BaixaCp.pas',
+  SistemaFinanceiro.Exceptions.ContasPagar in 'src\exceptions\SistemaFinanceiro.Exceptions.ContasPagar.pas',
+  SistemaFinanceiro.Exceptions.ContasPagarDetalhe in 'src\exceptions\SistemaFinanceiro.Exceptions.ContasPagarDetalhe.pas',
+  SistemaFinanceiro.Exceptions.LancamentoCaixa in 'src\exceptions\SistemaFinanceiro.Exceptions.LancamentoCaixa.pas',
+  SistemaFinanceiro.Exceptions.PgtoBaixaCp in 'src\exceptions\SistemaFinanceiro.Exceptions.PgtoBaixaCp.pas';
 
 {$R *.res}
 

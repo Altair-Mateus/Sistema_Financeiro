@@ -60,9 +60,8 @@ type
 
 implementation
 
-{ TModelPgtoBxCp }
-
-uses uBaixaCpExceptions;
+uses
+  SistemaFinanceiro.Exceptions.BaixaCp;
 
 procedure TModelPgtoBxCp.AddPropertyToWhere(const APropertyName: String);
 begin

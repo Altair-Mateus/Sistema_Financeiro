@@ -18,7 +18,7 @@ type
     FDetalhes: String;
     FId: Integer;
     FIdCP: Integer;
-    FUsuario: String;
+    FUsuario: Integer;
     FData: TDate;
     FValorDesc: Currency;
 
@@ -34,7 +34,7 @@ type
     [TDBColumn('DATA')]
     property Data: TDate read FData write FData;
     [TDBColumn('USUARIO')]
-    property Usuario: String read FUsuario write FUsuario;
+    property Usuario: Integer read FUsuario write FUsuario;
     [TDBColumn('DESCONTO_BX')]
     property ValorDesc: Currency read FValorDesc write FValorDesc;
 
@@ -63,7 +63,9 @@ implementation
 
 { TModelCpDetalhe }
 
-uses SistemaFinanceiro.Model.uSFQuery, uContasPagarDetalheExceptions;
+uses
+  SistemaFinanceiro.Model.uSFQuery,
+  SistemaFinanceiro.Exceptions.ContasPagarDetalhe;
 
 procedure TModelCpDetalhe.AddPropertyToWhere(const APropertyName: String);
 begin
@@ -129,7 +131,7 @@ begin
     except
       on E: Exception do
       begin
-        raise ECpDetalheExiste.Create(E.Message);
+        raise ECpDetalheNaoExiste.Create(E.Message);
       end;
     end;
   finally
@@ -170,7 +172,7 @@ begin
     except
       on E: Exception do
       begin
-        raise ECpDetalheExiste.Create(E.Message);
+        raise ECpDetalheNaoExiste.Create(E.Message);
       end;
     end;
   finally

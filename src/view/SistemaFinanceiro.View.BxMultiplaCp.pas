@@ -217,7 +217,7 @@ begin
         CpDetalhe.IdCP      := DBGrid1.DataSource.DataSet.FieldByName('ID').AsInteger;
         CpDetalhe.Detalhes  := 'CP baixada pela rotina de Baixa Múltipla';
         CpDetalhe.Data      := DtPgto;
-        CpDetalhe.Usuario   := inttostr(dmUsuarios.GetUsuarioLogado.Id);
+        CpDetalhe.Usuario   := dmUsuarios.GetUsuarioLogado.Id;
         CpDetalhe.ValorDesc := CalcDescBx(ValorCpSel, ValorTotCpSel, ValorDesc);
 
 

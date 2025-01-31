@@ -6,6 +6,8 @@ inherited frmContasPagar: TfrmContasPagar
   WindowState = wsMaximized
   OnClose = FormClose
   OnDestroy = FormDestroy
+  ExplicitLeft = -305
+  ExplicitTop = -140
   ExplicitWidth = 1335
   ExplicitHeight = 679
   TextHeight = 19
@@ -3694,6 +3696,7 @@ inherited frmContasPagar: TfrmContasPagar
             ParentColor = False
             ParentFont = False
             TabOrder = 0
+            OnClick = PesquisaClick
           end
           object rbValorParcela: TRadioButton
             Left = 127
@@ -3710,6 +3713,7 @@ inherited frmContasPagar: TfrmContasPagar
             ParentColor = False
             ParentFont = False
             TabOrder = 1
+            OnClick = PesquisaClick
           end
           object rbValorCompra: TRadioButton
             Left = 127
@@ -3726,6 +3730,7 @@ inherited frmContasPagar: TfrmContasPagar
             ParentColor = False
             ParentFont = False
             TabOrder = 2
+            OnClick = PesquisaClick
           end
           object rbDataCompra: TRadioButton
             Left = 3
@@ -3742,6 +3747,7 @@ inherited frmContasPagar: TfrmContasPagar
             ParentColor = False
             ParentFont = False
             TabOrder = 3
+            OnClick = PesquisaClick
           end
           object rbId: TRadioButton
             Left = 3
@@ -3760,6 +3766,7 @@ inherited frmContasPagar: TfrmContasPagar
             ParentFont = False
             TabOrder = 4
             TabStop = True
+            OnClick = PesquisaClick
           end
         end
         object cbData: TComboBox

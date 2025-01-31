@@ -9,7 +9,9 @@ uses
   Vcl.Dialogs,
   System.SysUtils,
   Vcl.Forms,
-  Winapi.Windows, SistemaFinanceiro.Model.Entidades.ResumoCaixa;
+  Winapi.Windows,
+  SistemaFinanceiro.Model.Entidades.ResumoCaixa,
+  uEnumsUtils;
 
 type
 
@@ -63,9 +65,8 @@ type
     procedure AddPropertyToWhere(const APropertyName: String);
 
     procedure GeraCodigo;
-    function Existe(const pId: Integer;
-      const pCarrega: Boolean = false): Boolean;
-    function ExistePorCr(const pIdCr: Integer;
+    function Existe(const pId: Integer; const pCarrega: Boolean = false): Boolean;
+    function ExistePorOrigem(const pIdOrigem: Integer; const pTpLancamento: TTipoLancamento;
       const pCarrega: Boolean = false): Boolean;
     class function ResumoCaixa(pDtIni, pDtFim: TDate): TModelResumoCaixa;
 
@@ -149,7 +150,7 @@ begin
 
 end;
 
-function TModelLancamentoCaixa.ExistePorCr(const pIdCr: Integer;
+function TModelLancamentoCaixa.ExistePorOrigem(const pIdOrigem: Integer; const pTpLancamento: TTipoLancamento;
   const pCarrega: Boolean): Boolean;
 var
   lQuery: TSFQuery;
@@ -162,8 +163,17 @@ begin
       lQuery.SQL.Clear;
       lQuery.SQL.Add(' SELECT ID FROM CAIXA         ');
       lQuery.SQL.Add(' WHERE ID_ORIGEM = :ID_ORIGEM ');
-      lQuery.SQL.Add(' AND ORIGEM = ''CR''          ');
-      lQuery.ParamByName('ID_ORIGEM').AsInteger := pIdCr;
+      lQuery.SQL.Add(' AND ORIGEM = :ORIGEM         ');
+      lQuery.ParamByName('ID_ORIGEM').AsInteger := pIdOrigem;
+
+      case pTpLancamento of
+        tlCr:
+          lQuery.ParamByName('ORIGEM').AsString := 'CR';
+
+        tlCp:
+          lQuery.ParamByName('ORIGEM').AsString := 'CP';
+      end;
+
       lQuery.Open;
 
       if (lQuery.RecordCount > 0) then
@@ -180,7 +190,8 @@ begin
       end;
 
     except
-      on E: Exception do
+      on E:
+        Exception do
       begin
         Application.MessageBox(PWideChar('Erro ao realizar a consulta: ' +
           E.Message), 'Atenção', MB_OK + MB_ICONERROR);

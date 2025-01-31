@@ -261,7 +261,7 @@ begin
           edtDtPag.Text     := FormatDateTime('DD/MM/YYYY', CpDet.Data);
           edtValPago.Text   := TUtilitario.FormatoMoeda(CpDet.Valor);
           edtValorDesc.Text := TUtilitario.FormatoMoeda(CpDet.ValorDesc);
-          edtUser.Text      := CpDet.Usuario;
+          edtUser.Text      := IntToStr(CpDet.Usuario);
           memObsPag.Text    := CpDet.Detalhes;
 
 

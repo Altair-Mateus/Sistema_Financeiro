@@ -367,10 +367,13 @@
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\view\uUsuario.pas"/>
-        <DCCReference Include="src\exceptions\uContasPagarExceptions.pas"/>
-        <DCCReference Include="src\exceptions\uContasPagarDetalheExceptions.pas"/>
         <DCCReference Include="src\model\Entidades\SistemaFinanceiro.Model.Entidades.PgtoBxCp.pas"/>
-        <DCCReference Include="src\exceptions\uBaixaCpExceptions.pas"/>
+        <DCCReference Include="src\services\SistemaFinanceiro.Services.BaixaContaPagar.pas"/>
+        <DCCReference Include="src\exceptions\SistemaFinanceiro.Exceptions.BaixaCp.pas"/>
+        <DCCReference Include="src\exceptions\SistemaFinanceiro.Exceptions.ContasPagar.pas"/>
+        <DCCReference Include="src\exceptions\SistemaFinanceiro.Exceptions.ContasPagarDetalhe.pas"/>
+        <DCCReference Include="src\exceptions\SistemaFinanceiro.Exceptions.LancamentoCaixa.pas"/>
+        <DCCReference Include="src\exceptions\SistemaFinanceiro.Exceptions.PgtoBaixaCp.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

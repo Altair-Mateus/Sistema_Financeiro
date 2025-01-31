@@ -3,9 +3,22 @@ unit SistemaFinanceiro.View.CpDetalhe;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Data.DB, Vcl.StdCtrls, Vcl.Grids,
-  Vcl.DBGrids, Vcl.ExtCtrls, System.ImageList, Vcl.ImgList;
+  Winapi.Windows,
+  Winapi.Messages,
+  System.SysUtils,
+  System.Variants,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  Data.DB,
+  Vcl.StdCtrls,
+  Vcl.Grids,
+  Vcl.DBGrids,
+  Vcl.ExtCtrls,
+  System.ImageList,
+  Vcl.ImgList;
 
 type
   TfrmCpDetalhe = class(TForm)
@@ -54,7 +67,7 @@ type
     { Private declarations }
   public
     { Public declarations }
-    procedure ExibirCPDetalhes(IDCp : integer);
+    procedure ExibirCPDetalhes(IDCp: integer);
   end;
 
 var
@@ -64,9 +77,12 @@ implementation
 
 {$R *.dfm}
 
-uses SistemaFinanceiro.Model.dmCPagar,
+
+uses
+  SistemaFinanceiro.Model.dmCPagar,
   SistemaFinanceiro.Model.Entidades.CP.Detalhe,
-  SistemaFinanceiro.Model.Entidades.CP, SistemaFinanceiro.Utilitarios;
+  SistemaFinanceiro.Model.Entidades.CP,
+  SistemaFinanceiro.Utilitarios;
 
 { TfrmCpDetalhe }
 
@@ -77,11 +93,11 @@ end;
 
 procedure TfrmCpDetalhe.ExibirCPDetalhes(IDCp: integer);
 var
-  Cp          : TModelCp;
-  CpDet       : TModelCpDetalhe;
-  SQL         : String;
-  SqlPgto     : String;
-  SQLParciais : String;
+  CP: TModelCp;
+  CpDet: TModelCpDetalhe;
+  SQL: String;
+  SqlPgto: String;
+  SQLParciais: String;
 
 begin
 
@@ -90,57 +106,56 @@ begin
     raise Exception.Create('ID do contas a pagar inválido!');
   end;
 
-  Cp := dmCPagar.GetCp(IDCp);
+  CP := dmCPagar.GetCp(IDCp);
 
   try
 
-    if Cp.ID <= 0 then
+    if CP.ID <= 0 then
     begin
       raise Exception.Create('Conta a pagar não encontrado!');
     end;
 
-    //  Carrega os dados da CR
-    if Cp.Doc <> '' then
+    // Carrega os dados da CR
+    if CP.Doc <> '' then
     begin
-      lblNumDoc.Caption := Cp.Doc;
+      lblNumDoc.Caption := CP.Doc;
     end
-      else
-      begin
-        lblNumDoc.Caption := 'Não Informado';
-      end;
+    else
+    begin
+      lblNumDoc.Caption := 'Não Informado';
+    end;
 
-    lblDesc.Caption         := Cp.Desc;
-    lblVencimento.Caption   := FormatDateTime('DD/MM/YYYY', Cp.DataVencimento);
-    lblNumParcela.Caption   := IntToStr(Cp.Parcela);
-    lblValorCompra.Caption  := TUtilitario.FormatoMoeda(Cp.ValorCompra);
-    lblValorParcela.Caption := TUtilitario.FormatoMoeda(Cp.ValorParcela);
-    lblCodFornec.Caption    := IntToStr(Cp.IdFornecedor);
+    lblDesc.Caption := CP.Desc;
+    lblVencimento.Caption := FormatDateTime('DD/MM/YYYY', CP.DataVencimento);
+    lblNumParcela.Caption := IntToStr(CP.Parcela);
+    lblValorCompra.Caption := TUtilitario.FormatoMoeda(CP.ValorCompra);
+    lblValorParcela.Caption := TUtilitario.FormatoMoeda(CP.ValorParcela);
+    lblCodFornec.Caption := IntToStr(CP.IdFornecedor);
 
   finally
 
-    Cp.Free;
+    CP.Free;
 
   end;
-
 
   CpDet := dmCPagar.GetCpDet(IDCp);
 
   try
 
-    edtDtPag.Text   := FormatDateTime('DD/MM/YYYY', CpDet.Data);
+    edtDtPag.Text := FormatDateTime('DD/MM/YYYY', CpDet.Data);
     edtValPago.Text := TUtilitario.FormatoMoeda(CpDet.Valor);
     edtValDesc.Text := TUtilitario.FormatoMoeda(CpDet.ValorDesc);
-    edtUser.Text    := CpDet.Usuario;
-    edtObsPag.Text  := CpDet.Detalhes;
+    edtUser.Text := IntToStr(CpDet.Usuario);
+    edtObsPag.Text := CpDet.Detalhes;
 
   finally
     CpDet.Free;
   end;
 
-  //  Montando o SQL dos pagamentos
+  // Montando o SQL dos pagamentos
   SqlPgto := 'SELECT PG.*, FR.NOME_FR FROM PGTO_BX_CP PG ' +
-             'LEFT JOIN FR_PGTO FR ON PG.ID_FR_PGTO = FR.ID_FR ' +
-             'WHERE PG.ID_CP = :IDCP';
+    'LEFT JOIN FR_PGTO FR ON PG.ID_FR_PGTO = FR.ID_FR ' +
+    'WHERE PG.ID_CP = :IDCP';
 
   dmCPagar.FDQueryPgtoCp.Close;
   dmCPagar.FDQueryPgtoCp.SQL.Clear;
@@ -151,13 +166,12 @@ begin
   dmCPagar.FDQueryPgtoCp.Prepare;
   dmCPagar.FDQueryPgtoCp.Open();
 
-
-  //  Montando o SQL das Parciais
+  // Montando o SQL das Parciais
   SQLParciais := 'SELECT * FROM CONTAS_PAGAR WHERE PARCIAL = ''S'' ' +
-                 ' AND CP_ORIGEM = :IDCP';
+    ' AND CP_ORIGEM = :IDCP';
 
   dmCPagar.FDQueryCpParciais.Close;
-  dmCPagar.FDQueryCpParciais.SQl.Clear;
+  dmCPagar.FDQueryCpParciais.SQL.Clear;
   dmCPagar.FDQueryCpParciais.Params.Clear;
   dmCPagar.FDQueryCpParciais.SQL.Add(SQLParciais);
 
@@ -165,18 +179,14 @@ begin
   dmCPagar.FDQueryCpParciais.Prepare;
   dmCPagar.FDQueryCpParciais.Open;
 
-
-  //  Se não exisitir nenhuma CP Parcial ira ocultar
-  //  O grid das parciais e diminuir a altura da tela
+  // Se não exisitir nenhuma CP Parcial ira ocultar
+  // O grid das parciais e diminuir a altura da tela
   if dmCPagar.FDQueryCpParciais.IsEmpty then
   begin
     pnlGridParciais.Visible := False;
     frmCpDetalhe.Height := 540;
   end;
 
-
 end;
-
-
 
 end.
