@@ -81,16 +81,16 @@ uses
   SistemaFinanceiro.Exceptions.ContasPagar in 'src\exceptions\SistemaFinanceiro.Exceptions.ContasPagar.pas',
   SistemaFinanceiro.Exceptions.ContasPagarDetalhe in 'src\exceptions\SistemaFinanceiro.Exceptions.ContasPagarDetalhe.pas',
   SistemaFinanceiro.Exceptions.LancamentoCaixa in 'src\exceptions\SistemaFinanceiro.Exceptions.LancamentoCaixa.pas',
-  SistemaFinanceiro.Exceptions.PgtoBaixaCp in 'src\exceptions\SistemaFinanceiro.Exceptions.PgtoBaixaCp.pas';
+  SistemaFinanceiro.Exceptions.PgtoBaixaCp in 'src\exceptions\SistemaFinanceiro.Exceptions.PgtoBaixaCp.pas',
+  SistemaFinanceiro.Exceptions.ConexaoBanco in 'src\exceptions\SistemaFinanceiro.Exceptions.ConexaoBanco.pas';
 
 {$R *.res}
 
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := False;
-  Application.CreateForm(TfrmPrincipal, frmPrincipal);
-  Application.CreateForm(TfrmTesteDaoRTTI, frmTesteDaoRTTI);
   Application.CreateForm(TDataModule1, DataModule1);
+  Application.CreateForm(TfrmPrincipal, frmPrincipal);
   Application.CreateForm(TdmUsuarios, dmUsuarios);
   Application.CreateForm(TdmCaixa, dmCaixa);
   Application.CreateForm(TdmCPagar, dmCPagar);
@@ -100,7 +100,5 @@ begin
   Application.CreateForm(TdmPgtoBxCr, dmPgtoBxCr);
   Application.CreateForm(TdmPgtoBxCp, dmPgtoBxCp);
   Application.CreateForm(TdmFaturaCartao, dmFaturaCartao);
-  Application.CreateForm(TfrmMensagem, frmMensagem);
-  Application.CreateForm(TfrmRelLancamentoPadrao, frmRelLancamentoPadrao);
   Application.Run;
 end.

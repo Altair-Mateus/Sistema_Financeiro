@@ -1,47 +1,78 @@
 unit SistemaFinanceiro.Model.udmDados;
+
 interface
+
 uses
-  System.Classes, FireDAC.Stan.Intf, FireDAC.Stan.Option,
-  FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def,
-  FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys, FireDAC.Phys.FB,
-  FireDAC.Phys.FBDef, FireDAC.VCLUI.Wait, Data.DB, FireDAC.Comp.Client,
-  Vcl.Forms, uDaoRTTI;
+  System.Classes,
+  FireDAC.Stan.Intf,
+  FireDAC.Stan.Option,
+  FireDAC.Stan.Error,
+  FireDAC.UI.Intf,
+  FireDAC.Phys.Intf,
+  FireDAC.Stan.Def,
+  FireDAC.Stan.Pool,
+  FireDAC.Stan.Async,
+  FireDAC.Phys,
+  FireDAC.Phys.FB,
+  FireDAC.Phys.FBDef,
+  FireDAC.VCLUI.Wait,
+  Data.DB,
+  FireDAC.Comp.Client,
+  Vcl.Forms,
+  uDaoRTTI,
+  System.SysUtils;
+
 type
   TDataModule1 = class(TDataModule)
     FDConnection: TFDConnection;
     procedure DataModuleCreate(Sender: TObject);
 
   private
-    { Private declarations }
-    const ARQUIVOCONFIGURACAO = 'ConfigBanco.ini';
+    const
+    ARQUIVOCONFIGURACAO = 'ConfigBanco.ini';
 
   public
-    { Public declarations }
-    procedure ConectarBd;
-    procedure DesconectarBd;
-    procedure Conexao;
+    function ConectarBd: Boolean;
+    function DesconectarBd: Boolean;
+    procedure BuscaArquivoIni;
 
   end;
+
 var
   DataModule1: TDataModule1;
 
 implementation
 
-uses
-  System.SysUtils;
-{%CLASSGROUP 'Vcl.Controls.TControl'}
 {$R *.dfm}
+{
+  Após migrar todos os CRUDs para classes e objetos, deve ser
+  migrado o datamodule principal
+}
+
+uses
+  SistemaFinanceiro.Exceptions.ConexaoBanco;
 
 { TDataModule1 }
 
-procedure TDataModule1.ConectarBd;
+function TDataModule1.ConectarBd: Boolean;
 begin
+  Result := False;
 
-  FDConnection.Connected := True;
+  try
+    if not(FDConnection.Connected) then
+      FDConnection.Open;
+
+    Result := True;
+  except
+    on E: Exception do
+    begin
+      raise EConnectionOpen.Create(E.Message);
+    end;
+  end;
 
 end;
 
-procedure TDataModule1.Conexao;
+procedure TDataModule1.BuscaArquivoIni;
 begin
 
   if FileExists(ARQUIVOCONFIGURACAO) then
@@ -50,31 +81,36 @@ begin
   end
   else
   begin
-
     FDConnection.Params.Database := ExtractFilePath(Application.ExeName) + 'dados\SISTEMAFINANCEIRO.FDB';
-
     FDConnection.Params.SaveToFile(ARQUIVOCONFIGURACAO);
-
   end;
 
 end;
 
 procedure TDataModule1.DataModuleCreate(Sender: TObject);
 begin
-
-  //  Chama a procedure que le as info do .ini
-  Conexao;
-
-  //  Conecta no banco
+  BuscaArquivoIni;
   ConectarBd;
-
   TDaoRTTI.Connection := FDConnection;
-
 end;
 
-procedure TDataModule1.DesconectarBd;
+function TDataModule1.DesconectarBd: Boolean;
 begin
-  FDConnection.Connected := False;
+  Result := False;
+
+  try
+
+    if (FDConnection.Connected) then
+      FDConnection.Close;
+
+    Result := True;
+
+  except
+    on E: Exception do
+    begin
+      raise EConnectionClose.Create(E.Message);
+    end;
+  end;
 end;
 
 end.
