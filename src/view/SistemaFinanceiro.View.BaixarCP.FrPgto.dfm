@@ -11,8 +11,12 @@ object frmFrPgtoBaixaCp: TfrmFrPgtoBaixaCp
   Font.Height = -16
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   Position = poScreenCenter
+  OnActivate = FormActivate
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnKeyPress = FormKeyPress
   OnShow = FormShow
   TextHeight = 19
   object pnlBotoes: TPanel
@@ -61,7 +65,6 @@ object frmFrPgtoBaixaCp: TfrmFrPgtoBaixaCp
       Images = ImageList1
       ParentBiDiMode = False
       TabOrder = 1
-      OnClick = btnCancelarClick
       ExplicitLeft = 196
     end
   end
@@ -179,6 +182,7 @@ object frmFrPgtoBaixaCp: TfrmFrPgtoBaixaCp
       Height = 27
       TabOrder = 1
       OnEnter = edtValorFormaEnter
+      OnKeyPress = KeyPressValor
     end
     object edtValorCp: TEdit
       Left = 151
@@ -187,6 +191,7 @@ object frmFrPgtoBaixaCp: TfrmFrPgtoBaixaCp
       Height = 27
       ReadOnly = True
       TabOrder = 5
+      OnKeyPress = KeyPressValor
     end
     object edtValorRest: TEdit
       Left = 16
@@ -195,6 +200,7 @@ object frmFrPgtoBaixaCp: TfrmFrPgtoBaixaCp
       Height = 27
       ReadOnly = True
       TabOrder = 6
+      OnKeyPress = KeyPressValor
     end
     object btnAdiciona: TButton
       Left = 129

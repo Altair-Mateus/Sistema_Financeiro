@@ -374,6 +374,7 @@
         <DCCReference Include="src\exceptions\SistemaFinanceiro.Exceptions.ContasPagarDetalhe.pas"/>
         <DCCReference Include="src\exceptions\SistemaFinanceiro.Exceptions.LancamentoCaixa.pas"/>
         <DCCReference Include="src\exceptions\SistemaFinanceiro.Exceptions.PgtoBaixaCp.pas"/>
+        <DCCReference Include="src\exceptions\SistemaFinanceiro.Exceptions.ConexaoBanco.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

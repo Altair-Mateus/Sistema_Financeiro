@@ -1141,22 +1141,21 @@ begin
 end;
 
 procedure TfrmContasPagar.ExibeTelaBaixar(pCodCP: Integer);
+var
+  lFormulario: TfrmBaixarCP;
 begin
 
   // Cria o form
-  frmBaixarCP := TfrmBaixarCP.Create(Self);
-
+  lFormulario := TfrmBaixarCP.Create(Self);
   try
 
-    frmBaixarCP.BaixarCP(pCodCP);
+    lFormulario.IdCp := pCodCP;
 
     // Exibe o form
-    frmBaixarCP.ShowModal;
+    lFormulario.ShowModal;
 
   finally
-
-    FreeAndNil(frmBaixarCP);
-
+    lFormulario.Free;
   end;
 
   Pesquisar;

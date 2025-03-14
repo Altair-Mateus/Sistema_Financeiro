@@ -6,7 +6,6 @@ inherited frmContasPagar: TfrmContasPagar
   WindowState = wsMaximized
   OnClose = FormClose
   OnDestroy = FormDestroy
-  ExplicitLeft = -305
   ExplicitTop = -140
   ExplicitWidth = 1335
   ExplicitHeight = 679
