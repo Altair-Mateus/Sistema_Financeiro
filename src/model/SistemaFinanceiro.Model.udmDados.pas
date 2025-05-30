@@ -91,7 +91,6 @@ procedure TDataModule1.DataModuleCreate(Sender: TObject);
 begin
   BuscaArquivoIni;
   ConectarBd;
-  TDaoRTTI.Connection := FDConnection;
 end;
 
 function TDataModule1.DesconectarBd: Boolean;

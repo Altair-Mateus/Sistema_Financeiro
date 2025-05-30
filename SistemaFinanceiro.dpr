@@ -73,8 +73,6 @@ uses
   SistemaFinanceiro.Model.Entidades.Cliente in 'src\model\Entidades\SistemaFinanceiro.Model.Entidades.Cliente.pas',
   SistemaFinanceiro.Model.Entidades.Fornecedor in 'src\model\Entidades\SistemaFinanceiro.Model.Entidades.Fornecedor.pas',
   SistemaFinanceiro.View.Relatorios.LancamentoPadrao in 'src\view\Relatorios\SistemaFinanceiro.View.Relatorios.LancamentoPadrao.pas' {frmRelLancamentoPadrao},
-  fTesteDaoRTTI in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\view\fTesteDaoRTTI.pas' {frmTesteDaoRTTI},
-  uUsuario in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\view\uUsuario.pas',
   SistemaFinanceiro.Model.Entidades.PgtoBxCp in 'src\model\Entidades\SistemaFinanceiro.Model.Entidades.PgtoBxCp.pas',
   SistemaFinanceiro.Services.BaixaContaPagar in 'src\services\SistemaFinanceiro.Services.BaixaContaPagar.pas',
   SistemaFinanceiro.Exceptions.BaixaCp in 'src\exceptions\SistemaFinanceiro.Exceptions.BaixaCp.pas',
@@ -82,13 +80,29 @@ uses
   SistemaFinanceiro.Exceptions.ContasPagarDetalhe in 'src\exceptions\SistemaFinanceiro.Exceptions.ContasPagarDetalhe.pas',
   SistemaFinanceiro.Exceptions.LancamentoCaixa in 'src\exceptions\SistemaFinanceiro.Exceptions.LancamentoCaixa.pas',
   SistemaFinanceiro.Exceptions.PgtoBaixaCp in 'src\exceptions\SistemaFinanceiro.Exceptions.PgtoBaixaCp.pas',
-  SistemaFinanceiro.Exceptions.ConexaoBanco in 'src\exceptions\SistemaFinanceiro.Exceptions.ConexaoBanco.pas';
+  SistemaFinanceiro.Exceptions.ConexaoBanco in 'src\exceptions\SistemaFinanceiro.Exceptions.ConexaoBanco.pas',
+  uDbConfig in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\config\uDbConfig.pas',
+  uDBConnectorFB in 'src\model\db\uDBConnectorFB.pas', System.SysUtils,
+  Winapi.Windows;
 
 {$R *.res}
 
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := False;
+
+  try
+
+    TDBConnectorFB.Connect;
+
+  except
+    on E: Exception do
+    begin
+      TfrmMensagem.TelaMensagem('Erro!', E.Message, tmErro);
+      ExitProcess(1); // encerra o processo de forma limpa
+    end;
+  end;
+
   Application.CreateForm(TDataModule1, DataModule1);
   Application.CreateForm(TfrmPrincipal, frmPrincipal);
   Application.CreateForm(TdmUsuarios, dmUsuarios);
@@ -101,4 +115,6 @@ begin
   Application.CreateForm(TdmPgtoBxCp, dmPgtoBxCp);
   Application.CreateForm(TdmFaturaCartao, dmFaturaCartao);
   Application.Run;
+
+  TDbConfig.Finalize;
 end.
