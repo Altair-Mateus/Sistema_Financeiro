@@ -1,6 +1,7 @@
 unit SistemaFinanceiro.View.Principal;
 
 interface
+
 uses
   Winapi.Messages,
   System.SysUtils,
@@ -29,11 +30,12 @@ uses
   SistemaFinanceiro.View.Fornecedores,
   SistemaFinanceiro.View.FrPgto,
   SistemaFinanceiro.View.CadAdmin,
-  System.IOUtils,
+
   SistemaFinanceiro.View.Ajuda,
   SistemaFinanceiro.View.FaturaCartao,
   SistemaFinanceiro.View.GeraRelResumoMensalCp,
-  SistemaFinanceiro.View.GeraRelResumoMensalCr, Vcl.Buttons,
+  SistemaFinanceiro.View.GeraRelResumoMensalCr,
+  Vcl.Buttons,
   SistemaFinanceiro.Model.Entidades.CR,
   SistemaFinanceiro.Model.Entidades.LancamentoCaixa,
   SistemaFinanceiro.View.Consulta.ConsultaLancamentoPadraoContas;
@@ -159,8 +161,9 @@ type
     procedure mnuLancamentoPadraoClick(Sender: TObject);
 
   private
-    FDtIni : TDate;
-    FDtFim : TDate;
+    FDtIni: TDate;
+    FDtFim: TDate;
+
     procedure ExibeTelaUsuario;
     procedure ExibeTelaCPagar;
     procedure ExibeTelaCReceber;
@@ -174,7 +177,11 @@ type
     procedure ExibeTelaRelMensalCP;
     procedure ExibeTelaRelMensalCR;
     procedure ExibeTelaLancamentoPadrao;
+
     procedure CarregaImgPrincipal;
+
+    procedure AtualizaTotaisCP;
+    procedure AtualizaTotaisCR;
 
   public
     { Public declarations }
@@ -183,11 +190,14 @@ type
     procedure TotalCR;
 
   end;
+
 var
   frmPrincipal: TfrmPrincipal;
 
 implementation
+
 {$R *.dfm}
+
 
 uses
   SistemaFinanceiro.Model.dmUsuarios,
@@ -201,11 +211,11 @@ uses
 
 procedure TfrmPrincipal.mnuAltImgPrincipalClick(Sender: TObject);
 var
-  NomeImg, DestImg : String;
+  NomeImg, DestImg: String;
 
 begin
 
-  //  Setando tipos de arquivos do open dialog
+  // Setando tipos de arquivos do open dialog
   OpenDialog1.Filter := 'Imagens (*.png)|*.png';
 
   if OpenDialog1.Execute() then
@@ -214,13 +224,13 @@ begin
     // pega o nome da imagem
     NomeImg := OpenDialog1.FileName;
 
-    //  Define o destino e nome padrao
+    // Define o destino e nome padrao
     DestImg := ExtractFilePath(Application.ExeName) + 'img_logo' + ExtractFileExt(NomeImg);
 
-    //  Copia a logo para o local onde está o exe
+    // Copia a logo para o local onde está o exe
     try
 
-      CopyFile(PChar(NomeImg), Pchar(DestImg), False);
+      CopyFile(PChar(NomeImg), PChar(DestImg), False);
 
       ShowMessage('Nova logo principal Configurada!')
 
@@ -232,9 +242,21 @@ begin
 
   end;
 
-  //  Atualiza Logo Principal
+  // Atualiza Logo Principal
   CarregaImgPrincipal;
 
+end;
+
+procedure TfrmPrincipal.AtualizaTotaisCP;
+begin
+  TotalCP;
+  ResumoMensalCaixa;
+end;
+
+procedure TfrmPrincipal.AtualizaTotaisCR;
+begin
+  TotalCR;
+  ResumoMensalCaixa;
 end;
 
 procedure TfrmPrincipal.btnCaixaClick(Sender: TObject);
@@ -293,7 +315,7 @@ var
   Bitmap: TBitmap;
 begin
 
-  //  Carrega a logo da tela principal
+  // Carrega a logo da tela principal
   if FileExists('img_logo.png') then
   begin
     imgLogo.Picture.LoadFromFile('img_logo.png');
@@ -314,21 +336,21 @@ end;
 procedure TfrmPrincipal.ExibeTelaFrPgto;
 begin
 
-  //Cria o form
+  // Cria o form
   frmFrPgto := TfrmFrPgto.Create(Self);
 
   try
-    //  Exibe o form
+    // Exibe o form
     frmFrPgto.ShowModal;
   finally
-    //  Libera da memoria
+    // Libera da memoria
     FreeAndNil(frmFrPgto);
   end;
 end;
 
 procedure TfrmPrincipal.ExibeTelaLancamentoPadrao;
 var
-  lFormulario : TfrmConsultaLancamentoPadraoContas;
+  lFormulario: TfrmConsultaLancamentoPadraoContas;
 begin
 
   lFormulario := TfrmConsultaLancamentoPadraoContas.Create(Self, tlTodos);
@@ -343,11 +365,11 @@ end;
 procedure TfrmPrincipal.ExibeTelaRelMensalCP;
 begin
 
-  //  Cria o Form
+  // Cria o Form
   frmGeraRelResumoMensalCp := TfrmGeraRelResumoMensalCp.Create(Self);
 
   try
-    //  Exibe o form
+    // Exibe o form
     frmGeraRelResumoMensalCp.ShowModal;
   finally
     FreeAndNil(frmGeraRelResumoMensalCp);
@@ -358,11 +380,11 @@ end;
 procedure TfrmPrincipal.ExibeTelaRelMensalCR;
 begin
 
-  //  Cria o Form
+  // Cria o Form
   frmGeraRelResumoMensalCr := TfrmGeraRelResumoMensalCr.Create(Self);
 
   try
-    //  Exibe o form
+    // Exibe o form
     frmGeraRelResumoMensalCr.ShowModal;
   finally
     FreeAndNil(frmGeraRelResumoMensalCr);
@@ -373,14 +395,14 @@ end;
 procedure TfrmPrincipal.ExibeTelaAjuda;
 begin
 
-   //Cria o form
+  // Cria o form
   frmAjuda := TfrmAjuda.Create(Self);
 
   try
-    //  Exibe o form
+    // Exibe o form
     frmAjuda.ShowModal;
   finally
-    //  Libera da memoria
+    // Libera da memoria
     FreeAndNil(frmAjuda);
   end;
 
@@ -389,14 +411,14 @@ end;
 procedure TfrmPrincipal.ExibeTelaCaixa;
 begin
 
-  //Cria o form
+  // Cria o form
   frmCaixa := TfrmCaixa.Create(Self);
 
   try
-    //  Exibe o form
+    // Exibe o form
     frmCaixa.ShowModal;
   finally
-    //  Libera da memoria
+    // Libera da memoria
     FreeAndNil(frmCaixa);
   end;
 
@@ -405,46 +427,47 @@ end;
 procedure TfrmPrincipal.ExibeTelaClientes;
 begin
 
-  //  Cria o Form
+  // Cria o Form
   frmCliente := TfrmCliente.Create(Self);
 
   try
-    //  Exibe o Form
+    // Exibe o Form
     frmCliente.ShowModal;
   finally
-    //  Libera da memoria
+    // Libera da memoria
     FreeAndNil(frmCliente);
   end;
 
 end;
 
 procedure TfrmPrincipal.ExibeTelaCPagar;
+var
+  lFormulario: TfrmContasPagar;
 begin
 
-  //  Cria o Form
-  frmContasPagar := TfrmContasPagar.Create(Self);
-
+  lFormulario := TfrmContasPagar.Create(Self);
   try
-    //  Exibe o Form
-    frmContasPagar.ShowModal;
+
+    lFormulario.EventoAttTotaisCp := AtualizaTotaisCP;
+    lFormulario.ShowModal;
+
   finally
-    //  Libera da memoria
-    FreeAndNil(frmContasPagar);
+    lFormulario.Free;
   end;
 end;
 
 procedure TfrmPrincipal.ExibeTelaCReceber;
 var
-  lFormulario : TfrmContasReceber;
+  lFormulario: TfrmContasReceber;
 begin
 
-  //  Cria o Form
+  // Cria o Form
   lFormulario := TfrmContasReceber.Create(Self);
   try
-    //  Exibe o Form
+    // Exibe o Form
     lFormulario.ShowModal;
   finally
-    //  Libera da memoria
+    // Libera da memoria
     lFormulario.Free;
   end
 
@@ -453,14 +476,14 @@ end;
 procedure TfrmPrincipal.ExibeTelaFaturaCartao;
 begin
 
-  //  Cria o form
+  // Cria o form
   frmFaturaCartao := TfrmFaturaCartao.Create(Self);
 
   try
-    //  Exibe o form
+    // Exibe o form
     frmFaturaCartao.ShowModal;
   finally
-    //  Libera da memoria
+    // Libera da memoria
     FreeAndNil(frmFaturaCartao);
   end;
 
@@ -469,14 +492,14 @@ end;
 procedure TfrmPrincipal.ExibeTelaFonecedores;
 begin
 
-  //  Cria o Form
+  // Cria o Form
   frmFornecedores := TfrmFornecedores.Create(Self);
 
   try
-    //  Exibe o form
+    // Exibe o form
     frmFornecedores.ShowModal;
   finally
-    //  Libera da memoria
+    // Libera da memoria
     FreeAndNil(frmFornecedores);
   end;
 
@@ -485,14 +508,14 @@ end;
 procedure TfrmPrincipal.ExibeTelaSaldoCaixa;
 begin
 
-   //  Cria o Form
+  // Cria o Form
   frmSaldoCaixa := TfrmSaldoCaixa.Create(Self);
 
   try
-    //  Exibe o form
+    // Exibe o form
     frmSaldoCaixa.ShowModal;
   finally
-    //  Libera da memoria
+    // Libera da memoria
     FreeAndNil(frmSaldoCaixa);
   end;
 end;
@@ -500,14 +523,14 @@ end;
 procedure TfrmPrincipal.ExibeTelaUsuario;
 begin
 
-  //  Cria o Form
+  // Cria o Form
   frmUsuarios := TfrmUsuarios.Create(Self);
 
   try
-    //  Exibe o Form
+    // Exibe o Form
     frmUsuarios.ShowModal;
   finally
-    //  Libera da memoria
+    // Libera da memoria
     FreeAndNil(frmUsuarios);
   end
 end;
@@ -525,10 +548,10 @@ end;
 procedure TfrmPrincipal.FormCreate(Sender: TObject);
 begin
 
-  //  Mostra o Usuario logado
+  // Mostra o Usuario logado
   KeyPreview := True;
 
-  //  Pega as datas do mês para os relatorios iniciais
+  // Pega as datas do mês para os relatorios iniciais
   FDtIni := StartOfTheMonth(Now);
   FDtFim := EndOfTheMonth(Now);
 
@@ -538,9 +561,9 @@ procedure TfrmPrincipal.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
 
- if Key = VK_F5 then
+  if Key = VK_F5 then
   begin
-    //  Atualiza os valores da tela inicial
+    // Atualiza os valores da tela inicial
     ResumoMensalCaixa;
     TotalCP;
     TotalCR;
@@ -550,24 +573,23 @@ end;
 procedure TfrmPrincipal.FormShow(Sender: TObject);
 begin
 
-  //  Cria o Form do splash
+  // Cria o Form do splash
   frmSplash := TfrmSplash.Create(Self);
   try
-    //  Exibe o form
+    // Exibe o form
     frmSplash.ShowModal;
   finally
-    //  Libera da memoria
+    // Libera da memoria
     FreeAndNil(frmSplash);
   end;
 
-
   if dmUsuarios.TblUsuariosVazia = True then
   begin
-    //  Cria o form
+    // Cria o form
     frmCadAdmin := TfrmCadAdmin.Create(Self);
     try
 
-      //  Exibe o form
+      // Exibe o form
       frmCadAdmin.ShowModal;
 
       if frmCadAdmin.ModalResult <> mrOk then
@@ -579,11 +601,11 @@ begin
 
   end;
 
-  //  Cria o Form do Login
+  // Cria o Form do Login
   frmLogin := TfrmLogin.Create(Self);
   try
 
-    //  Exibe o form
+    // Exibe o form
     frmLogin.ShowModal;
 
     if frmLogin.ModalResult <> mrOk then
@@ -591,7 +613,7 @@ begin
 
   finally
 
-    //  Libera da memoria
+    // Libera da memoria
     FreeAndNil(frmLogin);
 
   end;
@@ -633,7 +655,7 @@ end;
 
 procedure TfrmPrincipal.imgBtnFornecedoreClick(Sender: TObject);
 begin
-ExibeTelaFonecedores
+  ExibeTelaFonecedores
 end;
 
 procedure TfrmPrincipal.mnuAjudaClick(Sender: TObject);
@@ -670,14 +692,14 @@ end;
 
 procedure TfrmPrincipal.ResumoMensalCaixa;
 var
-  lResumoCaixa : TModelResumoCaixa;
-  lDtIni : TDateTime;
-  lDtFim   : TDateTime;
+  lResumoCaixa: TModelResumoCaixa;
+  lDtIni: TDateTime;
+  lDtFim: TDateTime;
 
 begin
 
   lDtIni := IncMonth(FDtIni, -2);
-  lDtFim   := FDtFim;
+  lDtFim := FDtFim;
   lResumoCaixa := TModelLancamentoCaixa.ResumoCaixa(lDtIni, lDtFim);
   lblValor.Caption := TUtilitario.FormatoMoeda(lResumoCaixa.SaldoFinal);
 

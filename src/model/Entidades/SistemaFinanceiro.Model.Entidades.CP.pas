@@ -7,7 +7,8 @@ uses
   uDaoRTTI,
   SistemaFinanceiro.Model.uSFQuery,
   System.SysUtils,
-  FireDAC.Stan.Param;
+  FireDAC.Stan.Param,
+  System.Math;
 
 type
 
@@ -57,7 +58,7 @@ type
     property DataCadastro: TDate read FDataCadastro write FDataCadastro;
     [TDBColumn('DATA_VENCIMENTO')]
     property DataVencimento: TDate read FDataVencimento write FDataVencimento;
-    [TDBColumn('DATA_PAGAMENTO')]
+    [TDBColumn('DATA_PAGAMENTO'), TDBAcceptNull]
     property DataPagamento: TDate read FDataPagamento write FDataPagamento;
     [TDBColumn('STATUS')]
     property Status: String read FStatus write FStatus;
@@ -94,7 +95,7 @@ type
 
     function Existe(const pId: Integer;
       const pCarrega: Boolean = false): Boolean;
-    procedure GeraCodigo;
+    procedure GeraCodigo(const pUltimoCod: Integer = 0);
 
     class function TotalCP(pDtIni, pDtFim: TDate): Double;
     class function GetIdGrupoParcelas: Integer;
@@ -172,19 +173,27 @@ begin
 
 end;
 
-procedure TModelCP.GeraCodigo;
+procedure TModelCP.GeraCodigo(const pUltimoCod: Integer);
 var
   lQuery: TSFQuery;
 begin
   lQuery := TSFQuery.Create(nil);
   try
     try
+
+      // Codigo para multiplos inserts ao mesmo tempo
+      if (pUltimoCod > 0) then
+      begin
+        FID := (pUltimoCod + 1);
+        Exit;
+      end;
+
       lQuery.Close;
       lQuery.SQL.Clear;
       lQuery.Open('SELECT COALESCE(MAX(ID), 0) AS ID FROM CONTAS_PAGAR');
 
       // Ultimo codigo usado + 1
-      FID := lQuery.FieldByName('ID').AsInteger + 1;
+      FID := (lQuery.FieldByName('ID').AsInteger + 1);
 
       // Insere o registro no final da tabela
       lQuery.Append;

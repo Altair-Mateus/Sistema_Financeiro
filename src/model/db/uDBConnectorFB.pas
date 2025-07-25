@@ -7,11 +7,15 @@ uses
   FireDAC.Comp.Client,
   FireDAC.Stan.Def,
   FireDAC.Phys.FB,
-  uDbConfig, Vcl.Forms;
+  uDbConfig,
+  Vcl.Forms;
 
 type
   TDBConnectorFB = class
-  private const
+  private
+    class var FConnection: TFDConnection;
+
+  const
     ARQUIVOCONFIGURACAO = 'ConfigBanco.ini';
   public
     class procedure Connect;
@@ -21,33 +25,36 @@ implementation
 
 { TDBConnectorFB }
 
-uses SistemaFinanceiro.Exceptions.ConexaoBanco;
+uses
+  SistemaFinanceiro.Exceptions.ConexaoBanco;
 
 class procedure TDBConnectorFB.Connect;
 var
-  lConexao: TFDConnection;
   lCaminhobanco: String;
 begin
 
-  lConexao := TFDConnection.Create(nil);
+  if (Assigned(FConnection)) then
+    FreeAndNil(FConnection);
+
+  FConnection := TFDConnection.Create(nil);
   try
 
     lCaminhobanco := ExtractFilePath(Application.ExeName) +
-        'dados\SISTEMAFINANCEIRO.FDB';
+      'dados\SISTEMAFINANCEIRO.FDB';
 
     if FileExists(ARQUIVOCONFIGURACAO) then
     begin
-      lConexao.Params.LoadFromFile(ARQUIVOCONFIGURACAO);
+      FConnection.Params.LoadFromFile(ARQUIVOCONFIGURACAO);
     end
     else
     begin
-      lConexao.Params.Database := lCaminhobanco;
-      lConexao.Params.SaveToFile(ARQUIVOCONFIGURACAO);
+      FConnection.Params.Database := lCaminhobanco;
+      FConnection.Params.SaveToFile(ARQUIVOCONFIGURACAO);
     end;
 
-    lConexao.Connected := True;
+    FConnection.Connected := True;
 
-    TDbConfig.InitConnection(lConexao);
+    TDbConfig.InitConnection(FConnection);
 
   except
     on E: Exception do

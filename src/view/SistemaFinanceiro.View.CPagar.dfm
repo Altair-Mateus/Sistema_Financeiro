@@ -4,27 +4,29 @@ inherited frmContasPagar: TfrmContasPagar
   ClientWidth = 1323
   Position = poDesigned
   WindowState = wsMaximized
+  StyleElements = [seFont, seClient, seBorder]
   OnClose = FormClose
   OnDestroy = FormDestroy
-  ExplicitTop = -140
-  ExplicitWidth = 1335
-  ExplicitHeight = 679
+  ExplicitWidth = 1339
+  ExplicitHeight = 680
   TextHeight = 19
   inherited CardPanelPrincipal: TCardPanel
     Width = 1323
     Height = 641
-    ActiveCard = CardPesquisa
-    ExplicitWidth = 1319
-    ExplicitHeight = 640
+    StyleElements = [seFont, seClient, seBorder]
+    ExplicitWidth = 1323
+    ExplicitHeight = 641
     inherited CardCadastro: TCard
       Width = 1323
       Height = 641
+      StyleElements = [seFont, seClient, seBorder]
       OnEnter = CardCadastroEnter
       ExplicitWidth = 1323
       ExplicitHeight = 641
       inherited pnlBotoesCad: TPanel
         Top = 572
         Width = 1323
+        StyleElements = [seFont, seClient, seBorder]
         ExplicitTop = 572
         ExplicitWidth = 1323
         inherited btnSalvar: TButton
@@ -53,6 +55,7 @@ inherited frmContasPagar: TfrmContasPagar
       inherited PanelCampos: TPanel
         Width = 1323
         Height = 531
+        StyleElements = [seFont, seClient, seBorder]
         ExplicitWidth = 1323
         ExplicitHeight = 531
         object lblDesc: TLabel
@@ -104,7 +107,7 @@ inherited frmContasPagar: TfrmContasPagar
           Height = 19
           Caption = 'lblNomeFornecedor'
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = 5737262
+          Font.Color = clSeagreen
           Font.Height = -16
           Font.Name = 'Tahoma'
           Font.Style = []
@@ -133,7 +136,7 @@ inherited frmContasPagar: TfrmContasPagar
           Height = 19
           Caption = 'lblNomeFatCartao'
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = 5737262
+          Font.Color = clSeagreen
           Font.Height = -16
           Font.Name = 'Tahoma'
           Font.Style = []
@@ -225,18 +228,18 @@ inherited frmContasPagar: TfrmContasPagar
           Width = 84
           Height = 21
           Color = 9750962
-          DisabledColor = 5737262
+          DisabledColor = clSeagreen
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBtnText
           Font.Height = -16
           Font.Name = 'Tahoma'
           Font.Style = []
-          FrameColor = 5737262
+          FrameColor = clSeagreen
           ParentFont = False
           StateCaptions.CaptionOn = 'Sim'
           StateCaptions.CaptionOff = 'N'#227'o'
           TabOrder = 5
-          ThumbColor = 5737262
+          ThumbColor = clSeagreen
           OnClick = toggleParcelamentoClick
         end
         object CardPanelParcela: TCardPanel
@@ -557,18 +560,18 @@ inherited frmContasPagar: TfrmContasPagar
           Width = 84
           Height = 21
           Color = 9750963
-          DisabledColor = 5737262
+          DisabledColor = clSeagreen
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBtnText
           Font.Height = -16
           Font.Name = 'Tahoma'
           Font.Style = []
-          FrameColor = 5737262
+          FrameColor = clSeagreen
           ParentFont = False
           StateCaptions.CaptionOn = 'Sim'
           StateCaptions.CaptionOff = 'N'#227'o'
           TabOrder = 8
-          ThumbColor = 5737262
+          ThumbColor = clSeagreen
           OnClick = toggleFaturaClick
         end
         object edtCodFatCartao: TEdit
@@ -816,9 +819,11 @@ inherited frmContasPagar: TfrmContasPagar
       end
       inherited PanelTitulo: TPanel
         Width = 1323
+        StyleElements = [seFont, seClient, seBorder]
         ExplicitWidth = 1323
         inherited lblTitulo: TLabel
           Left = 23
+          StyleElements = [seFont, seClient, seBorder]
           ExplicitLeft = 23
         end
       end
@@ -826,18 +831,21 @@ inherited frmContasPagar: TfrmContasPagar
     inherited CardPesquisa: TCard
       Width = 1323
       Height = 641
+      StyleElements = [seFont, seClient, seBorder]
       ExplicitLeft = 0
       ExplicitTop = 0
-      ExplicitWidth = 1319
-      ExplicitHeight = 640
+      ExplicitWidth = 1323
+      ExplicitHeight = 641
       inherited pnlPesquisa: TPanel
         Width = 1323
         Height = 153
-        ExplicitWidth = 1319
+        StyleElements = [seFont, seClient, seBorder]
+        ExplicitWidth = 1323
         ExplicitHeight = 153
         inherited lblPesquisar: TLabel
           Left = 192
           Top = 8
+          StyleElements = [seFont, seClient, seBorder]
           ExplicitLeft = 192
           ExplicitTop = 8
         end
@@ -3626,6 +3634,7 @@ inherited frmContasPagar: TfrmContasPagar
           Left = 192
           Top = 32
           Width = 297
+          StyleElements = [seFont, seClient, seBorder]
           OnChange = PesquisaClick
           ExplicitLeft = 192
           ExplicitTop = 32
@@ -3640,7 +3649,7 @@ inherited frmContasPagar: TfrmContasPagar
           Margins.Bottom = 30
           ImageIndex = 6
           OnClick = PesquisaClick
-          ExplicitLeft = 1193
+          ExplicitLeft = 1197
           ExplicitTop = 30
           ExplicitHeight = 93
         end
@@ -3908,8 +3917,9 @@ inherited frmContasPagar: TfrmContasPagar
         Top = 572
         Width = 1323
         BevelOuter = bvNone
-        ExplicitTop = 571
-        ExplicitWidth = 1319
+        StyleElements = [seFont, seClient, seBorder]
+        ExplicitTop = 572
+        ExplicitWidth = 1323
         inherited btnIncluir: TButton
           Left = 3
           Top = 3
@@ -3952,7 +3962,7 @@ inherited frmContasPagar: TfrmContasPagar
           Top = 3
           Height = 63
           ImageIndex = 14
-          ExplicitLeft = 1196
+          ExplicitLeft = 1200
           ExplicitTop = 3
           ExplicitHeight = 63
         end
@@ -3971,7 +3981,6 @@ inherited frmContasPagar: TfrmContasPagar
           Font.Style = []
           ParentFont = False
           TabOrder = 5
-          ExplicitLeft = 1000
           object lblPagas: TLabel
             Left = 31
             Top = 16
@@ -4088,9 +4097,10 @@ inherited frmContasPagar: TfrmContasPagar
         Top = 153
         Width = 1323
         Height = 390
+        StyleElements = [seFont, seClient, seBorder]
         ExplicitTop = 153
-        ExplicitWidth = 1319
-        ExplicitHeight = 389
+        ExplicitWidth = 1323
+        ExplicitHeight = 390
         inherited DBGrid1: TDBGrid
           Width = 1321
           Height = 388
@@ -4203,8 +4213,6 @@ inherited frmContasPagar: TfrmContasPagar
         Color = clWindow
         ParentBackground = False
         TabOrder = 3
-        ExplicitTop = 542
-        ExplicitWidth = 1319
         object lblQtdCp: TLabel
           AlignWithMargins = True
           Left = 914

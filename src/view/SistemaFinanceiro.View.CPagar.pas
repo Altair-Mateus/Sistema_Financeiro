@@ -42,6 +42,8 @@ uses
   SistemaFinanceiro.View.BaixarCP.FrPgto;
 
 type
+  TEventoAttTotaisCP = procedure of object;
+
   TfrmContasPagar = class(TfrmCadastroPadrao)
     DataSourceCPagar: TDataSource;
     lblDesc: TLabel;
@@ -198,6 +200,7 @@ type
     DataVctoFat: Integer;
     FQueryPesquisa, FQueryGrupoParcelas: TSFQuery;
     FCp: TModelCP;
+    FEventoAttTotaisCp: TEventoAttTotaisCP;
 
     procedure HabilitaBotoes;
     function CadParcelaUnica: Boolean;
@@ -216,6 +219,7 @@ type
     procedure ExibeTelaLancPadrao;
     procedure CarregaLancPadrao(pCod: Integer);
     function DtVencimentoCheckContaPaga: TDate;
+    procedure InicializaObjCp;
 
     function ValidaPesquisa: Boolean;
     procedure QuerySTATUSGetText(Sender: TField; var Text: string;
@@ -233,8 +237,10 @@ type
     function CarregaGrupoParcelas: Boolean;
     procedure InicializaTela;
 
+    procedure AtualizaTotaisTelaPrincipal;
+
   public
-    { Public declarations }
+    property EventoAttTotaisCp: TEventoAttTotaisCP read FEventoAttTotaisCp write FEventoAttTotaisCp;
 
   protected
     procedure Pesquisar; override;
@@ -254,9 +260,15 @@ uses
   SistemaFinanceiro.Model.dmFornecedores,
   SistemaFinanceiro.Model.dmFaturaCartao,
   SistemaFinanceiro.Model.dmUsuarios,
-  SistemaFinanceiro.View.Principal,
   SistemaFinanceiro.Model.Entidades.LancamentoPadraoContas,
-  SistemaFinanceiro.Services.BaixaContaPagar;
+  SistemaFinanceiro.Services.BaixaContaPagar,
+  uTransactionScope;
+
+procedure TfrmContasPagar.AtualizaTotaisTelaPrincipal;
+begin
+  if Assigned(FEventoAttTotaisCp) then
+    FEventoAttTotaisCp;
+end;
 
 procedure TfrmContasPagar.btnAlterarClick(Sender: TObject);
 begin
@@ -300,7 +312,7 @@ begin
   lCp := TModelCP.Create;
   try
     try
-      if (TfrmMensagem.TelaEscolha('Atenção', 'Deseja cancelar a conta selecionada? ', tmEscolha) = mrYes) then
+      if (TfrmMensagem.TelaEscolha('Atenção', 'Deseja excluir a conta selecionada? ', tmEscolha) = mrYes) then
       begin
 
         lCp.ID := DBGrid1.DataSource.DataSet.FieldByName('ID').AsInteger;
@@ -316,7 +328,8 @@ begin
         Pesquisar;
 
         // Atualiza o relatorio na tela inicial
-        frmPrincipal.TotalCP;
+        AtualizaTotaisTelaPrincipal;
+
       end;
     finally
       lCp.Free;
@@ -536,8 +549,8 @@ begin
     // Atualiza a lista
     Pesquisar;
 
-    // Atualiza relatorio tela principal
-    frmPrincipal.TotalCP;
+    // Atualiza o relatorio na tela inicial
+    AtualizaTotaisTelaPrincipal;
   except
     on E: Exception do
     begin
@@ -610,6 +623,8 @@ function TfrmContasPagar.CadParcelamento: Boolean;
 var
   lParcelaCp: TModelCP;
   lQtdParcelas, lIdGrupoParcelas: Integer;
+  lTransaction: TTransactionScope;
+  lUltCod: Integer;
 begin
 
   Result := False;
@@ -617,59 +632,72 @@ begin
   if not(ValidaCadParcelamento) then
     exit;
 
-  lQtdParcelas := cdsParcelas.RecordCount;
-  lIdGrupoParcelas := TModelCP.GetIdGrupoParcelas;
+  lTransaction := TTransactionScope.Create;
+  try
 
-  // Posiciona no primeiro registro do cds
-  cdsParcelas.First;
+    lQtdParcelas := cdsParcelas.RecordCount;
+    lIdGrupoParcelas := TModelCP.GetIdGrupoParcelas;
 
-  // Gravando Parcelas
-  while not cdsParcelas.Eof do
-  begin
+    // Posiciona no primeiro registro do cds
+    cdsParcelas.First;
 
-    lParcelaCp := TModelCP.Create;
-    try
+    // Gravando Parcelas
+    while not cdsParcelas.Eof do
+    begin
 
-      lParcelaCp.GeraCodigo;
-      lParcelaCp.DataCadastro := Now;
-      lParcelaCp.Status := 'A';
-      lParcelaCp.ValorAbatido := 0;
-      lParcelaCp.Doc := Trim(cdsParcelasDOCUMENTO.AsString);
-      lParcelaCp.Desc := Format('%s - Parcela %d',
-        [memDesc.Text, cdsParcelasPARCELA.AsInteger]);
-      lParcelaCp.ValorCompra := StrToFloat(edtValorCompra.Text);
-      lParcelaCp.DataCompra := dateCompra.Date;
-      lParcelaCp.Parcela := cdsParcelasPARCELA.AsInteger;
-      lParcelaCp.ValorParcela := cdsParcelasVALOR.AsCurrency;
-      lParcelaCp.DataVencimento := cdsParcelasVENCIMENTO.AsDateTime;
-      lParcelaCp.Parcial := 'N';
-      lParcelaCp.FatCartao := 'N';
-      lParcelaCp.IdFornecedor := StrToInt(edtFornecedor.Text);
-      lParcelaCp.NumTotalParcelas := lQtdParcelas;
-      lParcelaCp.IdGrupoParcelas := lIdGrupoParcelas;
+      lParcelaCp := TModelCP.Create;
+      try
 
-      if (toggleFatura.State = tssOn) then
-      begin
-        lParcelaCp.FatCartao := 'S';
-        lParcelaCp.IdFatCartao := StrToInt(edtCodFatCartao.Text);
+        // Gera o ID
+        if (cdsParcelasPARCELA.AsInteger = 1) then
+          lParcelaCp.GeraCodigo
+        else
+          lParcelaCp.GeraCodigo(lUltCod);
+
+        lParcelaCp.DataCadastro := Now;
+        lParcelaCp.Status := 'A';
+        lParcelaCp.ValorAbatido := 0;
+        lParcelaCp.Doc := Trim(cdsParcelasDOCUMENTO.AsString);
+        lParcelaCp.Desc := Format('%s - Parcela %d', [memDesc.Text, cdsParcelasPARCELA.AsInteger]);
+        lParcelaCp.ValorCompra := StrToFloat(edtValorCompra.Text);
+        lParcelaCp.DataCompra := dateCompra.Date;
+        lParcelaCp.Parcela := cdsParcelasPARCELA.AsInteger;
+        lParcelaCp.ValorParcela := cdsParcelasVALOR.AsCurrency;
+        lParcelaCp.DataVencimento := cdsParcelasVENCIMENTO.AsDateTime;
+        lParcelaCp.Parcial := 'N';
+        lParcelaCp.FatCartao := 'N';
+        lParcelaCp.IdFornecedor := StrToInt(edtFornecedor.Text);
+        lParcelaCp.NumTotalParcelas := lQtdParcelas;
+        lParcelaCp.IdGrupoParcelas := lIdGrupoParcelas;
+
+        if (toggleFatura.State = tssOn) then
+        begin
+          lParcelaCp.FatCartao := 'S';
+          lParcelaCp.IdFatCartao := StrToInt(edtCodFatCartao.Text);
+        end;
+
+        lUltCod := lParcelaCp.ID;
+
+        // Gravando no banco
+        lParcelaCp.Insert;
+
+      finally
+        lParcelaCp.Free;
       end;
 
-      // Gravando no banco
-      lParcelaCp.Insert;
+      cdsParcelas.Next;
 
-    finally
-      lParcelaCp.Free;
     end;
 
-    cdsParcelas.Next;
+    lTransaction.Commit;
 
+    Result := True;
+
+    TfrmMensagem.TelaMensagem('Informação', 'Parcelas Cadastradas com Sucesso!!',
+      tmSucesso);
+  finally
+    lTransaction.Free;
   end;
-
-  Result := True;
-
-  TfrmMensagem.TelaMensagem('Informação', 'Parcelas Cadastradas com Sucesso!!',
-    tmSucesso);
-
 end;
 
 function TfrmContasPagar.CadParcelaUnica: Boolean;
@@ -821,9 +849,8 @@ begin
 
         Pesquisar;
 
-        // Atualiza relatorio tela principal
-        frmPrincipal.TotalCP;
-        frmPrincipal.ResumoMensalCaixa;
+        // Atualiza o relatorio na tela inicial
+        AtualizaTotaisTelaPrincipal;
       end;
 
     end;
@@ -847,28 +874,34 @@ var
 begin
   lLancamento := TModelLancamentoPadrao.Create;
   try
-    if (lLancamento.Existe(pCod, True)) then
-    begin
-
-      if (lLancamento.Status = Smallint(scInativo)) then
+    try
+      if (lLancamento.Existe(pCod, True)) then
       begin
-        TfrmMensagem.TelaMensagem('Cadastro Inativo!',
-          'Lançamento Padrão inativo, altere o cadastro do mesmo e tente novamente.',
-          tmAviso);
-        exit;
-      end;
 
-      memDesc.Text := lLancamento.Descricao;
-      if (lLancamento.Id_Fornecedor > 0) then
-        edtFornecedor.Text := IntToStr(lLancamento.Id_Fornecedor);
-      BuscaNomeFornecedor;
-      memDesc.SetFocus;
-    end
-    else
-    begin
-      TfrmMensagem.TelaMensagem('Erro!',
-        'Erro ao recuperar os dados do cadastro do Lançamento Padrão escolhido',
-        tmErro);
+        if (lLancamento.Status = Smallint(scInativo)) then
+        begin
+          TfrmMensagem.TelaMensagem('Cadastro Inativo!',
+            'Lançamento Padrão inativo, altere o cadastro do mesmo e tente novamente.',
+            tmAviso);
+          exit;
+        end;
+
+        memDesc.Text := lLancamento.Descricao;
+
+        if (lLancamento.Id_Fornecedor > 0) then
+          edtFornecedor.Text := IntToStr(lLancamento.Id_Fornecedor);
+
+        BuscaNomeFornecedor;
+        memDesc.SetFocus;
+
+      end;
+    except
+      on E: Exception do
+      begin
+        TfrmMensagem.TelaMensagem('Erro!',
+          'Erro ao recuperar os dados do cadastro do Lançamento Padrão escolhido',
+          tmErro);
+      end;
     end;
   finally
     lLancamento.Free;
@@ -1016,10 +1049,7 @@ begin
 
   FOpCad := ocAlterar;
 
-  if Assigned(FCp) then
-    FreeAndNil(FCp);
-
-  FCp := TModelCP.Create;
+  InicializaObjCp;
 
   try
 
@@ -1160,9 +1190,8 @@ begin
 
   Pesquisar;
 
-  // Atualiza relatorio tela principal
-  frmPrincipal.TotalCP;
-  frmPrincipal.ResumoMensalCaixa;
+  // Atualiza o relatorio na tela inicial
+  AtualizaTotaisTelaPrincipal;
 
 end;
 
@@ -1185,9 +1214,8 @@ begin
 
   Pesquisar;
 
-  // Atualiza relatorio tela principal
-  frmPrincipal.TotalCP;
-  frmPrincipal.ResumoMensalCaixa;
+  // Atualiza o relatorio na tela inicial
+  AtualizaTotaisTelaPrincipal;
 
 end;
 
@@ -1198,8 +1226,7 @@ begin
   lFormulario := TfrmConsultaLancamentoPadraoContas.Create(Self, tlCp);
   try
     lFormulario.ShowModal;
-    CarregaLancPadrao(lFormulario.grdLancPadrao.DataSource.DataSet.FieldByName
-      ('ID').AsInteger);
+    CarregaLancPadrao(lFormulario.RetornaCodigo);
   finally
     lFormulario.Free;
   end;
@@ -1646,6 +1673,14 @@ begin
   cdsParcelas.EmptyDataSet;
 end;
 
+procedure TfrmContasPagar.InicializaObjCp;
+begin
+  if Assigned(FCp) then
+    FreeAndNil(FCp);
+
+  FCp := TModelCP.Create;
+end;
+
 procedure TfrmContasPagar.PreparaInclusaoCp;
 begin
   lblTitulo.Caption := 'Inserindo um novo lançamento no Contas a Pagar';
@@ -1683,11 +1718,7 @@ end;
 procedure TfrmContasPagar.IncluirContaPagar;
 begin
   PreparaInclusaoCp;
-
-  if (Assigned(FCp)) then
-    FreeAndNil(FCp);
-
-  FCp := TModelCP.Create;
+  InicializaObjCp;
 end;
 
 procedure TfrmContasPagar.QuerySTATUSGetText(Sender: TField; var Text: string;

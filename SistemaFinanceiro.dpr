@@ -61,7 +61,7 @@ uses
   SistemaFinanceiro.View.Relatorios.ResumoMensalCr in 'src\view\Relatorios\SistemaFinanceiro.View.Relatorios.ResumoMensalCr.pas' {frmRelMensalCr},
   SistemaFinanceiro.View.DetalhesOrigemCpCr in 'src\view\SistemaFinanceiro.View.DetalhesOrigemCpCr.pas' {frmDetalhesOrigemCpCr},
   uDaoRTTI in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\model\uDaoRTTI.pas',
-  uDBAttributes in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\model\uDBAttributes.pas' {$R *.res},
+  uDBAttributes in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\model\uDBAttributes.pas',
   SistemaFinanceiro.Model.uSFQuery in 'src\model\SistemaFinanceiro.Model.uSFQuery.pas',
   SistemaFinanceiro.Model.Entidades.PgtoBxCr in 'src\model\Entidades\SistemaFinanceiro.Model.Entidades.PgtoBxCr.pas',
   SistemaFinanceiro.Model.Entidades.LancamentoPadraoContas in 'src\model\Entidades\SistemaFinanceiro.Model.Entidades.LancamentoPadraoContas.pas',
@@ -82,8 +82,13 @@ uses
   SistemaFinanceiro.Exceptions.PgtoBaixaCp in 'src\exceptions\SistemaFinanceiro.Exceptions.PgtoBaixaCp.pas',
   SistemaFinanceiro.Exceptions.ConexaoBanco in 'src\exceptions\SistemaFinanceiro.Exceptions.ConexaoBanco.pas',
   uDbConfig in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\config\uDbConfig.pas',
-  uDBConnectorFB in 'src\model\db\uDBConnectorFB.pas', System.SysUtils,
-  Winapi.Windows;
+  uDBConnectorFB in 'src\model\db\uDBConnectorFB.pas',
+  System.SysUtils,
+  Winapi.Windows,
+  uDaoRTTIExceptions in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\exceptions\uDaoRTTIExceptions.pas',
+  uDbConfigExceptions in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\exceptions\uDbConfigExceptions.pas',
+  uTransactionScope in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\transactions\uTransactionScope.pas',
+  uITransactionScope in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\interfaces\uITransactionScope.pas';
 
 {$R *.res}
 

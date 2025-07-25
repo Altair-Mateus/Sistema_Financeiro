@@ -24,7 +24,7 @@ object frmBaixarCP: TfrmBaixarCP
     Height = 544
     Align = alClient
     BevelOuter = bvNone
-    Color = 5737262
+    Color = clSeagreen
     ParentBackground = False
     TabOrder = 0
     ExplicitWidth = 610
