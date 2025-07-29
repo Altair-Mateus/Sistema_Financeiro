@@ -716,7 +716,7 @@ inherited frmContasPagar: TfrmContasPagar
                 Left = 10
                 Top = 10
                 Width = 333
-                Height = 76
+                Height = 78
                 Margins.Left = 10
                 Margins.Top = 10
                 Margins.Right = 10
@@ -732,6 +732,7 @@ inherited frmContasPagar: TfrmContasPagar
                 Font.Style = [fsBold]
                 ParentFont = False
                 WordWrap = True
+                ExplicitHeight = 76
               end
             end
           end
@@ -750,7 +751,7 @@ inherited frmContasPagar: TfrmContasPagar
             AlignWithMargins = True
             Left = 3
             Top = 3
-            Width = 128
+            Width = 437
             Height = 19
             Align = alTop
             Caption = 'Grupo de Parcelas'
@@ -760,6 +761,7 @@ inherited frmContasPagar: TfrmContasPagar
             Font.Name = 'Tahoma'
             Font.Style = []
             ParentFont = False
+            ExplicitWidth = 128
           end
           object grdGrupoParcelas: TDBGrid
             AlignWithMargins = True

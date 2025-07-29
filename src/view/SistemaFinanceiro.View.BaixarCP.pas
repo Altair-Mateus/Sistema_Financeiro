@@ -17,11 +17,12 @@ uses
   System.ImageList,
   Vcl.ImgList,
   SistemaFinanceiro.Model.Entidades.CP,
-  SistemaFinanceiro.Model.Entidades.CP.Detalhe,
   Vcl.ComCtrls,
   SistemaFinanceiro.View.BaixarCP.FrPgto,
   fMensagem,
-  uEnumsUtils;
+  uEnumsUtils,
+  System.StrUtils,
+  SistemaFinanceiro.Model.Entidades.CP.Detalhe;
 
 type
   TfrmBaixarCP = class(TForm)
@@ -61,7 +62,6 @@ type
     edtValorDesc: TEdit;
     checkDesconto: TCheckBox;
     edtPorcDesc: TEdit;
-    procedure btnConfirmarClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure edtValorExit(Sender: TObject);
     procedure checkDescontoClick(Sender: TObject);
@@ -70,23 +70,33 @@ type
     procedure edtPorcDescKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure edtValorDescKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormActivate(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
     procedure EditKeyPress(Sender: TObject; var Key: Char);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
   private
     FTelaAtiva: Boolean;
     DataCompra: TDateTime;
-    FIdCp: Integer;
     FCp: TModelCP;
+    FCpDetalhe: TModelCpDetalhe;
 
+    // Cálculos de Desconto
     function CalcValorDesc: Currency;
     function CalcPorcentDesc: Currency;
-    procedure InicializaBaixa;
-    function ValidaContaPagar: Boolean;
+
+    // Funções de Inicialização
+    procedure InicializaCampos;
+
+    // Funções de Validação
     function ValidaCampos: Boolean;
+
+    // Funções de formatação
     procedure KeyPressValor(Sender: TObject; var Key: Char);
 
+    procedure Confirmar;
+
   public
-    property IdCp: Integer read FIdCp write FIdCp;
+    property CP: TModelCP read FCp write FCp;
+
+    function ObterDetalhes: TModelCpDetalhe;
 
   end;
 
@@ -99,15 +109,12 @@ implementation
 
 
 uses
-  SistemaFinanceiro.Model.dmCPagar,
   SistemaFinanceiro.Utilitarios,
   SistemaFinanceiro.Model.dmUsuarios;
 
 { TfrmBaixarCP }
-procedure TfrmBaixarCP.InicializaBaixa;
+procedure TfrmBaixarCP.InicializaCampos;
 begin
-
-  // Carregando dados para as labels
   lblIdConta.Caption := IntToStr(FCp.id);
   lblParcela.Caption := IntToStr(FCp.Parcela);
   lblVencimento.Caption := FormatDateTime('dd/mm/yyyy', FCp.DataVencimento);
@@ -115,84 +122,10 @@ begin
   lblDtCompra.Caption := DateToStr(FCp.DataCompra);
   lblValorRestante.Caption := 'R$ ' + TUtilitario.FormatarValor((FCp.ValorParcela - FCp.ValorAbatido));
   lblCodFornec.Caption := IntToStr(FCp.IdFornecedor);
-
-  if (Trim(FCp.Doc).IsEmpty) then
-    lblDoc.Caption := 'Não Informado'
-  else
-    lblDoc.Caption := FCp.Doc;
-
+  lblDoc.Caption := IfThen(FCp.Doc.Trim.IsEmpty, 'Não Informado', FCp.Doc);
   DataCompra := FCp.DataCompra;
   edtValor.Text := FloatToStr(FCp.ValorParcela);
-  edtObs.Clear;
-end;
-
-procedure TfrmBaixarCP.btnConfirmarClick(Sender: TObject);
-var
-  CpDetalhe: TModelCpDetalhe;
-  ValorAbater: Currency;
-  ValorDesc: Currency;
-begin
-
-  if not(ValidaCampos) then
-    Exit;
-
-  CpDetalhe := TModelCpDetalhe.Create;
-
-  try
-    CpDetalhe.IdCp := FIdCp;
-    CpDetalhe.Detalhes := Trim(edtObs.Text);
-    CpDetalhe.Valor := ValorAbater;
-    CpDetalhe.Data := datePgto.Date;
-    CpDetalhe.Usuario := dmUsuarios.GetUsuarioLogado.id;
-    CpDetalhe.ValorDesc := ValorDesc;
-
-    // Forma de pgto
-    try
-
-      // Cria o form
-      frmFrPgtoBaixaCp := TfrmFrPgtoBaixaCp.Create(Self);
-
-      // Passa as informações para a tela de pgto
-      frmFrPgtoBaixaCp.FrPgtoCp(FIdCp, ValorAbater);
-
-      // Exibe o form
-      frmFrPgtoBaixaCp.ShowModal;
-
-    except
-      on E: Exception do
-
-        Application.MessageBox(PWideChar(E.Message), 'Erro na forma de pagamento do documento!',
-          MB_OK + MB_ICONWARNING);
-
-    end;
-
-    // Verifica se deu tudo certo com as formas de pgto
-    if frmFrPgtoBaixaCp.ModalResult <> mrOk then
-    begin
-      abort;
-    end
-    else
-    begin
-      FreeAndNil(frmFrPgtoBaixaCp);
-    end;
-
-    try
-
-      dmCPagar.BaixarCP(CpDetalhe);
-      Application.MessageBox('Conta baixada com sucesso!', 'Atenção', MB_OK + MB_ICONINFORMATION);
-      ModalResult := mrOk;
-
-    except
-      on E: Exception do
-        Application.MessageBox(PWideChar(E.Message), 'Erro ao baixar documento!', MB_OK + MB_ICONWARNING);
-    end;
-
-  finally
-
-    CpDetalhe.Free;
-
-  end;
-
+  datePgto.DateTime := Now;
 end;
 
 function TfrmBaixarCP.CalcPorcentDesc: Currency;
@@ -204,7 +137,7 @@ var
 
 begin
 
-  ValorCp := dmCPagar.cdsCPagarVALOR_PARCELA.AsCurrency;
+  ValorCp := FCp.ValorParcela;
   ValorDesc := 0;
   ValorFinal := 0;
   PorcentDesc := 0;
@@ -243,7 +176,7 @@ begin
 
   Result := 0;
 
-  ValorCp := dmCPagar.cdsCPagarVALOR_PARCELA.AsCurrency;
+  ValorCp := FCp.ValorParcela;
   ValorDesc := 0;
   ValorFinal := 0;
   PorcentDesc := 0;
@@ -280,6 +213,19 @@ begin
   edtPorcDesc.Enabled := checkDesconto.Checked;
   lblDesconto.Visible := checkDesconto.Checked;
   lblValorDesc.Visible := checkDesconto.Checked;
+end;
+
+procedure TfrmBaixarCP.Confirmar;
+begin
+  FCpDetalhe := TModelCpDetalhe.Create;
+
+  FCpDetalhe.IdCP := FCp.id;
+  FCpDetalhe.Detalhes := Trim(edtObs.Text);
+  FCpDetalhe.Valor := StrToFloatDef(Trim(edtValor.Text), 0);
+  FCpDetalhe.Data := datePgto.Date;
+  FCpDetalhe.Usuario := dmUsuarios.GetUsuarioLogado.id;
+  FCpDetalhe.ValorDesc := StrToFloatDef(Trim(edtValorDesc.Text), 0);
+
 end;
 
 procedure TfrmBaixarCP.EditKeyPress(Sender: TObject; var Key: Char);
@@ -328,35 +274,44 @@ begin
   if not(FTelaAtiva) then
   begin
 
-    FTelaAtiva := True;
-    FCp.id := FIdCp;
-
-    if not(ValidaContaPagar) then
+    if not(Assigned(FCp)) then
     begin
       TUtilitario.FecharFormulario(Self);
       Exit;
     end;
 
-    InicializaBaixa;
+    InicializaCampos;
+    FTelaAtiva := True;
 
   end;
+end;
+
+procedure TfrmBaixarCP.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+begin
+  CanClose := False;
+
+  if (ModalResult = mrOk) then
+  begin
+
+    if not(ValidaCampos) then
+      Exit;
+
+    Confirmar;
+
+  end;
+
+  CanClose := True;
 end;
 
 procedure TfrmBaixarCP.FormCreate(Sender: TObject);
 begin
   FTelaAtiva := False;
-  FCp := TModelCP.Create;
 
   // Coloca no KeyPress o enter para ir para o proximo campo
   edtValor.OnKeyPress := KeyPressValor;
   edtValorDesc.OnKeyPress := KeyPressValor;
   edtPorcDesc.OnKeyPress := KeyPressValor;
 
-end;
-
-procedure TfrmBaixarCP.FormDestroy(Sender: TObject);
-begin
-  FCp.Free;
 end;
 
 procedure TfrmBaixarCP.KeyPressValor(Sender: TObject; var Key: Char);
@@ -389,6 +344,11 @@ begin
     Key := #0;
   end;
 
+end;
+
+function TfrmBaixarCP.ObterDetalhes: TModelCpDetalhe;
+begin
+  Result := FCpDetalhe;
 end;
 
 function TfrmBaixarCP.ValidaCampos: Boolean;
@@ -433,33 +393,6 @@ begin
       edtValorDesc.SetFocus;
       Exit;
     end;
-  end;
-
-  Result := True;
-end;
-
-function TfrmBaixarCP.ValidaContaPagar: Boolean;
-begin
-  Result := False;
-
-  if not(FCp.LoadObjectByPK) then
-  begin
-    TfrmMensagem.TelaMensagem('Erro!', Format('Não foi possível carregar os dados da conta nº %d', [FCp.id]), tmErro);
-    Exit;
-  end;
-
-  // Se o documento já foi baixado cancela a edição
-  if (FCp.Status = 'P') then
-  begin
-    TfrmMensagem.TelaMensagem('Erro!', 'Conta já paga!', tmErro);
-    Exit;
-  end;
-
-  // Se o documento foi cancelado, a edição é cancelada
-  if (FCp.Status = 'C') then
-  begin
-    TfrmMensagem.TelaMensagem('Erro!', 'Conta cancelada não pode ser baixada!', tmErro);
-    Exit;
   end;
 
   Result := True;

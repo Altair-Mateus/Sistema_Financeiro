@@ -21,6 +21,10 @@ type
     constructor Create(const pError: String);
   end;
 
+  ECpDetalheObter = class(Exception)
+    constructor Create;
+  end;
+
 implementation
 
 { ECpDetalheExiste }
@@ -42,6 +46,13 @@ end;
 constructor ECpDetalheExcluir.Create(const pError: String);
 begin
   inherited Create('Erro ao excluir detalhes da conta a pagar: ' + pError);
+end;
+
+{ ECpDetalheObter }
+
+constructor ECpDetalheObter.Create;
+begin
+  inherited Create('Erro ao obter detalhes para realizar a baixa da conta.');
 end;
 
 end.

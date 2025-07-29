@@ -1134,21 +1134,15 @@ begin
 end;
 
 procedure TfrmContasPagar.ExibeTelaBaixar(pCodCP: Integer);
-var
-  lFormulario: TfrmBaixarCP;
 begin
 
-  // Cria o form
-  lFormulario := TfrmBaixarCP.Create(Self);
   try
-
-    lFormulario.IdCp := pCodCP;
-
-    // Exibe o form
-    lFormulario.ShowModal;
-
-  finally
-    lFormulario.Free;
+    TBaixarContaPagar.Baixar(DataSourceCPagar.DataSet.FieldByName('ID').AsInteger);
+  except
+    on E: Exception do
+    begin
+      TfrmMensagem.TelaMensagem('Erro ao Baixar CP', E.Message, tmErro);
+    end;
   end;
 
   Pesquisar;

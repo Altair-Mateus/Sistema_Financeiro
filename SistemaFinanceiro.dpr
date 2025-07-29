@@ -88,7 +88,8 @@ uses
   uDaoRTTIExceptions in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\exceptions\uDaoRTTIExceptions.pas',
   uDbConfigExceptions in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\exceptions\uDbConfigExceptions.pas',
   uTransactionScope in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\transactions\uTransactionScope.pas',
-  uITransactionScope in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\interfaces\uITransactionScope.pas';
+  uITransactionScope in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\interfaces\uITransactionScope.pas',
+  SistemaFinanceiro.Model.Entidades.FrPgto in 'src\model\Entidades\SistemaFinanceiro.Model.Entidades.FrPgto.pas';
 
 {$R *.res}
 
