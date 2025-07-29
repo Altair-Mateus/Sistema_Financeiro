@@ -197,7 +197,7 @@ type
   private
     FTelaAtiva: Boolean;
     FOpCad: TOperacaoCadastro;
-    DataVctoFat: Integer;
+    FDataVctoFat: Integer;
     FQueryPesquisa, FQueryGrupoParcelas: TSFQuery;
     FCp: TModelCP;
     FEventoAttTotaisCp: TEventoAttTotaisCP;
@@ -236,6 +236,8 @@ type
     procedure CarregaDadosAlteracao;
     function CarregaGrupoParcelas: Boolean;
     procedure InicializaTela;
+
+    procedure Imprimir;
 
     procedure AtualizaTotaisTelaPrincipal;
 
@@ -351,29 +353,7 @@ end;
 procedure TfrmContasPagar.btnImprimirClick(Sender: TObject);
 begin
   inherited;
-
-  // Cria o form
-  frmRelCp := TfrmRelCp.Create(Self);
-
-  try
-
-    // Desativa a atualização visual do grid
-    DataSourceCPagar.DataSet.DisableControls;
-    frmRelCp.DataSourceCp.DataSet := DataSourceCPagar.DataSet;
-
-    // Mostra a pre visualização
-    frmRelCp.RLReport.Preview();
-
-  finally
-
-    FreeAndNil(frmRelCp);
-    // Ativa a atualização visual do grid novamente
-    DataSourceCPagar.DataSet.EnableControls;
-
-  end;
-
-  Pesquisar;
-
+  Imprimir;
 end;
 
 procedure TfrmContasPagar.btnIncluirClick(Sender: TObject);
@@ -406,7 +386,7 @@ begin
 
   edtQtdParcelas.Clear;
 
-  if DataVctoFat = 0 then
+  if FDataVctoFat = 0 then
   begin
 
     checkDiaFixoVcto.Checked := False;
@@ -563,17 +543,16 @@ end;
 
 procedure TfrmContasPagar.BuscaNomeFatCartao;
 var
-  NomeFatCartao: String;
-
+  lNomeFatCartao: String;
 begin
-
-  if Trim(edtCodFatCartao.Text) <> '' then
+  lblNomeFatCartao.Caption := '';
+  if not(Trim(edtCodFatCartao.Text).IsEmpty) then
   begin
 
-    NomeFatCartao := dmFaturaCartao.GetNomeFatCartao
+    lNomeFatCartao := dmFaturaCartao.GetNomeFatCartao
       (Trim(edtCodFatCartao.Text));
 
-    if NomeFatCartao = '' then
+    if (lNomeFatCartao.Trim.IsEmpty) then
     begin
       TfrmMensagem.TelaMensagem('Atenção', 'Fatura de Cartão não encontrada!', tmAviso);
       edtCodFatCartao.SetFocus;
@@ -582,12 +561,26 @@ begin
 
     end;
 
-    lblNomeFatCartao.Caption := NomeFatCartao;
+    if not(dmFaturaCartao.GetStatusFatCartao(Trim(edtCodFatCartao.Text))) then
+    begin
+      TfrmMensagem.TelaMensagem('Atenção', 'Fatura de Cartão não está Ativa, verifique o cadastro!', tmAviso);
+      edtCodFatCartao.Clear;
+      edtCodFatCartao.SetFocus;
+      exit;
+    end;
+
+    lblNomeFatCartao.Caption := lNomeFatCartao;
     lblNomeFatCartao.Visible := True;
 
-    DataVctoFat := dmFaturaCartao.GetDataVcto(Trim(edtCodFatCartao.Text));
+    FDataVctoFat := dmFaturaCartao.GetDataVcto(Trim(edtCodFatCartao.Text));
     dateVencimento.Date := EncodeDate(YearOf(dateVencimento.Date),
-      MonthOf(dateVencimento.Date), DataVctoFat);
+      MonthOf(dateVencimento.Date), FDataVctoFat);
+
+    if (toggleParcelamento.State = tssOn) then
+      FatCartaoAtiva;
+
+    if not(Trim(edtQtdParcelas.Text).IsEmpty) then
+      GeraParcelas;
 
   end;
 
@@ -595,25 +588,33 @@ end;
 
 procedure TfrmContasPagar.BuscaNomeFornecedor;
 var
-  NomeFornecedor: String;
-
+  lNomeFornecedor: String;
 begin
-
-  if Trim(edtFornecedor.Text) <> '' then
+  lblNomeFornecedor.Caption := '';
+  if not(Trim(edtFornecedor.Text).IsEmpty) then
   begin
 
-    NomeFornecedor := dmFornecedores.GetNomeFornecedor
+    lNomeFornecedor := dmFornecedores.GetNomeFornecedor
       (Trim(edtFornecedor.Text));
 
-    if NomeFornecedor = '' then
+    if (lNomeFornecedor.Trim.IsEmpty) then
     begin
       TfrmMensagem.TelaMensagem('Atenção', 'Fornecedor não encontrado!', tmAviso);
       edtFornecedor.SetFocus;
       edtFornecedor.Clear;
+      exit;
+    end;
+
+    if not(dmFornecedores.GetStatus(Trim(edtFornecedor.Text))) then
+    begin
+      TfrmMensagem.TelaMensagem('Atenção', 'Fornecedor não está Ativo, verifique o cadastro!', tmAviso);
+      edtFornecedor.Clear;
+      edtFornecedor.SetFocus;
+      exit;
     end;
 
     lblNomeFornecedor.Visible := True;
-    lblNomeFornecedor.Caption := NomeFornecedor;
+    lblNomeFornecedor.Caption := lNomeFornecedor;
 
   end;
 
@@ -628,6 +629,7 @@ var
 begin
 
   Result := False;
+  lUltCod := 0;
 
   if not(ValidaCadParcelamento) then
     exit;
@@ -736,7 +738,7 @@ begin
     then
     begin
       dateVencimento.Date := EncodeDate(YearOf(dateVencimento.Date),
-        MonthOf(dateVencimento.Date), DataVctoFat);
+        MonthOf(dateVencimento.Date), FDataVctoFat);
 
       FCp.FatCartao := 'S';
       FCp.IdFatCartao := StrToInt(edtCodFatCartao.Text);
@@ -1081,29 +1083,7 @@ end;
 
 procedure TfrmContasPagar.edtCodFatCartaoExit(Sender: TObject);
 begin
-
   BuscaNomeFatCartao;
-
-  if Trim(edtCodFatCartao.Text) <> '' then
-  begin
-
-    if dmFaturaCartao.GetStatusFatCartao(Trim(edtCodFatCartao.Text)) = False
-    then
-    begin
-      TfrmMensagem.TelaMensagem('Atenção', 'Fatura de Cartão não está Ativa, verifique o cadastro!', tmAviso);
-      edtCodFatCartao.Clear;
-      edtCodFatCartao.SetFocus;
-      lblNomeFatCartao.Caption := '';
-    end;
-
-    if toggleParcelamento.State = tssOn then
-      FatCartaoAtiva;
-
-    if edtQtdParcelas.Text <> '' then
-      GeraParcelas;
-
-  end;
-
 end;
 
 procedure TfrmContasPagar.edtFornecedorExit(Sender: TObject);
@@ -1111,20 +1091,6 @@ begin
   inherited;
 
   BuscaNomeFornecedor;
-
-  if Trim(edtFornecedor.Text) <> '' then
-  begin
-
-    if dmFornecedores.GetStatus(Trim(edtFornecedor.Text)) = False then
-    begin
-      TfrmMensagem.TelaMensagem('Atenção', 'Fornecedor não está Ativo, verifique o cadastro!', tmAviso);
-      edtFornecedor.Clear;
-      edtFornecedor.SetFocus;
-      lblNomeFornecedor.Caption := '';
-      exit;
-    end;
-
-  end;
 
 end;
 
@@ -1150,22 +1116,19 @@ begin
 end;
 
 procedure TfrmContasPagar.ExibeDetalhe;
+var
+  lFormulario: TfrmCpDetalhe;
 begin
 
   // cria o form
-  frmCpDetalhe := TfrmCpDetalhe.Create(Self);
+  lFormulario := TfrmCpDetalhe.Create(Self);
   try
 
-    frmCpDetalhe.ExibirCPDetalhes(DataSourceCPagar.DataSet.FieldByName('ID')
-      .AsInteger);
-
-    // Exibe o form
-    frmCpDetalhe.ShowModal;
+    lFormulario.IdCp := DataSourceCPagar.DataSet.FieldByName('ID').AsInteger;
+    lFormulario.ShowModal;
 
   finally
-
-    FreeAndNil(frmCpDetalhe);
-
+    lFormulario.Free;
   end;
 
 end;
@@ -1240,7 +1203,7 @@ begin
 
     checkDiaFixoVcto.Checked := True;
     checkDiaFixoVcto.Enabled := False;
-    edtDiaFixoVcto.Text := IntToStr(DataVctoFat);
+    edtDiaFixoVcto.Text := IntToStr(FDataVctoFat);
     edtDiaFixoVcto.Enabled := False;
 
   end;
@@ -1311,7 +1274,7 @@ begin
   if (toggleFatura.State = tssOn) and (edtCodFatCartao.Text <> '') then
   begin
     FatCartaoAtiva;
-    lDiaFixoVcto := DataVctoFat;
+    lDiaFixoVcto := FDataVctoFat;
 
     if CheckFatVirada.Checked then
       lDataPrimeiraParcela := IncMonth(dateCompra.Date, 2)
@@ -1715,6 +1678,32 @@ begin
   memDesc.SetFocus;
 end;
 
+procedure TfrmContasPagar.Imprimir;
+var
+  lRelatorio: TfrmRelCp;
+begin
+
+  lRelatorio := TfrmRelCp.Create(Self);
+  try
+
+    // Desativa a atualização visual do grid
+    DataSourceCPagar.DataSet.DisableControls;
+    lRelatorio.DataSourceCp.DataSet := DataSourceCPagar.DataSet;
+
+    // Mostra a pre visualização
+    lRelatorio.RLReport.Preview();
+
+  finally
+
+    lRelatorio.Free;
+    // Ativa a atualização visual do grid novamente
+    DataSourceCPagar.DataSet.EnableControls;
+
+  end;
+
+  Pesquisar;
+end;
+
 procedure TfrmContasPagar.IncluirContaPagar;
 begin
   PreparaInclusaoCp;
@@ -1755,7 +1744,7 @@ begin
     edtCodFatCartao.Visible := False;
     btnPesqFat.Visible := False;
 
-    DataVctoFat := 0;
+    FDataVctoFat := 0;
 
     if toggleParcelamento.State = tssOn then
     begin

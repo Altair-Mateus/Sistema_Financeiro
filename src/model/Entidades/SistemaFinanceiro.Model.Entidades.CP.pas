@@ -64,11 +64,11 @@ type
     property Status: String read FStatus write FStatus;
     [TDBColumn('PARCIAL')]
     property Parcial: String read FParcial write FParcial;
-    [TDBColumn('CP_ORIGEM')]
+    [TDBColumn('CP_ORIGEM'), TDBAcceptNull]
     property CpOrigem: Integer read FCpOrigem write FCpOrigem;
     [TDBColumn('ID_FORNECEDOR')]
     property IdFornecedor: Integer read FIdFornecedor write FIdFornecedor;
-    [TDBColumn('FATURA_cART')]
+    [TDBColumn('FATURA_CART')]
     property FatCartao: String read FFatCartao write FFatCartao;
     [TDBColumn('ID_FATURA'), TDBAcceptNull]
     property IdFatCartao: Integer read FIdFatCartao write FIdFatCartao;

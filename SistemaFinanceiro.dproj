@@ -373,6 +373,10 @@
         <DCCReference Include="src\exceptions\SistemaFinanceiro.Exceptions.ConexaoBanco.pas"/>
         <DCCReference Include="..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\config\uDbConfig.pas"/>
         <DCCReference Include="src\model\db\uDBConnectorFB.pas"/>
+        <DCCReference Include="..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\exceptions\uDaoRTTIExceptions.pas"/>
+        <DCCReference Include="..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\exceptions\uDbConfigExceptions.pas"/>
+        <DCCReference Include="..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\transactions\uTransactionScope.pas"/>
+        <DCCReference Include="..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\interfaces\uITransactionScope.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

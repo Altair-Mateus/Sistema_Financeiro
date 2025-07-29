@@ -310,9 +310,6 @@ begin
 end;
 
 procedure TfrmPrincipal.CarregaImgPrincipal;
-var
-  Png: TPngImage;
-  Bitmap: TBitmap;
 begin
 
   // Carrega a logo da tela principal
