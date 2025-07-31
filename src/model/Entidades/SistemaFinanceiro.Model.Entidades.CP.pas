@@ -29,10 +29,10 @@ type
     FDoc: String;
     FDesc: String;
     FParcela: Integer;
-    FParcial: String;
+    FParcial: Boolean;
     FCpOrigem: Integer;
     FIdFornecedor: Integer;
-    FFatCartao: String;
+    FFatCartao: Boolean;
     FIdFatCartao: Integer;
     FIdGrupoParcelas: Integer;
     FNumTotalParcelas: Integer;
@@ -62,14 +62,14 @@ type
     property DataPagamento: TDate read FDataPagamento write FDataPagamento;
     [TDBColumn('STATUS')]
     property Status: String read FStatus write FStatus;
-    [TDBColumn('PARCIAL')]
-    property Parcial: String read FParcial write FParcial;
+    [TDBColumn('PARCIAL'), TDBSaveBoolean(btSN)]
+    property Parcial: Boolean read FParcial write FParcial;
     [TDBColumn('CP_ORIGEM'), TDBAcceptNull]
     property CpOrigem: Integer read FCpOrigem write FCpOrigem;
     [TDBColumn('ID_FORNECEDOR')]
     property IdFornecedor: Integer read FIdFornecedor write FIdFornecedor;
-    [TDBColumn('FATURA_CART')]
-    property FatCartao: String read FFatCartao write FFatCartao;
+    [TDBColumn('FATURA_CART'), TDBSaveBoolean(btSN)]
+    property FatCartao: Boolean read FFatCartao write FFatCartao;
     [TDBColumn('ID_FATURA'), TDBAcceptNull]
     property IdFatCartao: Integer read FIdFatCartao write FIdFatCartao;
     [TDBColumn('NUM_TOT_PARCELAS'), TDBAcceptNull]

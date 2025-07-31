@@ -191,6 +191,8 @@ begin
   FQueryParcias.ParamByName('IDCP').AsInteger := FIdCp;
   FQueryParcias.Open;
 
+  ShowMessage(IntToStr(FQueryParcias.RecordCount));
+
   DBGridParciais.DataSource.DataSet := FQueryParcias;
 
 end;

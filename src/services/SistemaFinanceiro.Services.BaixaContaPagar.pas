@@ -6,10 +6,12 @@ uses
   uEnumsUtils,
   SistemaFinanceiro.Model.Entidades.CP,
   SistemaFinanceiro.Model.Entidades.CP.Detalhe,
+  SistemaFinanceiro.Model.Entidades.PgtoBxCp,
   System.SysUtils,
   SistemaFinanceiro.View.BaixarCP.FrPgto,
   SistemaFinanceiro.View.BaixarCP,
-  System.UITypes;
+  System.UITypes,
+  System.Generics.Collections;
 
 type
   TBaixarContaPagar = class
@@ -17,13 +19,22 @@ type
     FCp: TModelCP;
     FDetalhesCp: TModelCpDetalhe;
     FIdCp: Integer;
+    FListaPgtos: TObjectList<TModelPgtoBxCp>;
+
+  const
+    TOLERANCIAVALORCP: Double = 0.01;
 
     function ExisteConta: Boolean;
     function ObterDetalhesBaixa: Boolean;
     function ObterPgtosBaixa: Boolean;
 
+    procedure BaixarCP;
+    procedure GerarParcial;
+    procedure GravarDetalhesCp;
+    procedure GravarPgtosCp;
+    procedure GravarLctoCaixa;
+
   public
-    constructor Create;
     destructor Destroy; override;
 
     property IdCp: Integer read FIdCp write FIdCp;
@@ -37,8 +48,6 @@ implementation
 { TBaixarContaPagar }
 
 uses
-
-  SistemaFinanceiro.Model.Entidades.PgtoBxCp,
   SistemaFinanceiro.Model.Entidades.LancamentoCaixa,
   SistemaFinanceiro.Exceptions.BaixaCp,
   SistemaFinanceiro.Exceptions.ContasPagar,
@@ -68,6 +77,14 @@ begin
       if not(lBaixa.ObterDetalhesBaixa) then
         Exit;
 
+      if not(lBaixa.ObterPgtosBaixa) then
+        Exit;
+
+      lBaixa.BaixarCP;
+      lBaixa.GravarDetalhesCp;
+      lBaixa.GravarPgtosCp;
+      lBaixa.GravarLctoCaixa;
+
       lTransaction.Commit;
       Result := True;
 
@@ -81,6 +98,19 @@ begin
     lBaixa.Free;
     lTransaction.Free;
   end;
+
+end;
+
+procedure TBaixarContaPagar.BaixarCP;
+begin
+  FCp.ValorAbatido := (FCp.ValorAbatido + FDetalhesCp.Valor);
+  FCp.Status := 'P';
+  FCp.DataPagamento := FDetalhesCp.Data;
+
+  FCp.UpdateByPK;
+
+  if ((Abs((FCp.ValorParcela - FDetalhesCp.Valor) - FDetalhesCp.ValorDesc)) > TOLERANCIAVALORCP) then
+    GerarParcial;
 
 end;
 
@@ -156,14 +186,16 @@ begin
 
 end;
 
-constructor TBaixarContaPagar.Create;
-begin
-
-end;
-
 destructor TBaixarContaPagar.Destroy;
 begin
+  if Assigned(FCp) then
+    FCp.Free;
 
+  if Assigned(FDetalhesCp) then
+    FDetalhesCp.Free;
+
+  if Assigned(FListaPgtos) then
+    FListaPgtos.Free;
   inherited;
 end;
 
@@ -178,6 +210,123 @@ begin
     raise ECPagarNaoExiste.Create(Format('Não foi possível carregar os dados da conta nº %d', [FCp.ID]));
 
   Result := True;
+end;
+
+procedure TBaixarContaPagar.GerarParcial;
+var
+  lParcial: TModelCP;
+begin
+  lParcial := TModelCP.Create;
+  try
+    try
+
+      lParcial.GeraCodigo;
+      lParcial.DataCadastro := Now;
+      lParcial.Status := 'A';
+      lParcial.ValorAbatido := 0;
+
+      if ((FCp.Doc.Trim.IsEmpty) or (FCp.Parcial)) then
+      begin
+        lParcial.Doc := FCp.Doc;
+      end
+      else
+      begin
+        lParcial.Doc := Copy(Format('%s-P', [FCp.Doc]), 1, 20);
+      end;
+
+      lParcial.Desc := Format('Parcial - Restante da Conta ID Nº %d - Doc Nº %s', [FCp.ID, FCp.Doc]);
+      lParcial.ValorCompra := FCp.ValorCompra;
+      lParcial.DataCompra := FCp.DataCompra;
+      lParcial.Parcela := FCp.Parcela;
+      lParcial.ValorParcela := ((FCp.ValorParcela - FDetalhesCp.Valor) - FDetalhesCp.ValorDesc);
+      lParcial.DataVencimento := FCp.DataVencimento;
+      lParcial.Parcial := True;
+      lParcial.CpOrigem := FCp.ID;
+      lParcial.IdFornecedor := FCp.IdFornecedor;
+      lParcial.FatCartao := FCp.FatCartao;
+      lParcial.NumTotalParcelas := FCp.NumTotalParcelas;
+      lParcial.IdGrupoParcelas := FCp.IdGrupoParcelas;
+
+      if (lParcial.FatCartao) then
+      begin
+        lParcial.IdFatCartao := FCp.IdFatCartao;
+      end;
+
+      lParcial.Insert;
+
+    except
+      on E: Exception do
+      begin
+        raise ECPagarGerarParcial.Create;
+      end;
+    end;
+  finally
+    lParcial.Free;
+  end;
+end;
+
+procedure TBaixarContaPagar.GravarDetalhesCp;
+begin
+  try
+    FDetalhesCp.Insert;
+  except
+    on E: Exception do
+    begin
+      raise ECpDetalheGravar.Create(E.Message);
+    end;
+  end;
+end;
+
+procedure TBaixarContaPagar.GravarLctoCaixa;
+var
+  lCaixa: TModelLancamentoCaixa;
+begin
+  lCaixa := TModelLancamentoCaixa.Create;
+  try
+    try
+
+      lCaixa.GeraCodigo;
+      lCaixa.NumDoc := FCp.Doc;
+      lCaixa.Desc := Format('Baixa Conta ID Nº %d Pagar - Nº Documento: %s - Parcela: %d',
+        [FCp.ID, FCp.Doc, FCp.Parcela]);
+      lCaixa.Valor := FDetalhesCp.Valor;
+      lCaixa.Tipo := 'D';
+      lCaixa.DataCadastro := FDetalhesCp.Data;
+      lCaixa.Origem := 'CP';
+      lCaixa.IdOrigem := FCp.ID;
+
+      lCaixa.Insert;
+
+    except
+      on E: Exception do
+      begin
+        raise ELancCaixaGravar.Create(E.Message);
+      end;
+    end;
+  finally
+    lCaixa.Free;
+  end;
+end;
+
+procedure TBaixarContaPagar.GravarPgtosCp;
+var
+  lPgto: TModelPgtoBxCp;
+begin
+
+  try
+
+    for lPgto in FListaPgtos do
+    begin
+      lPgto.Insert;
+    end;
+
+  except
+    on E: Exception do
+    begin
+      raise EPgtoCpGravar.Create(E.Message);
+    end;
+  end;
+
 end;
 
 function TBaixarContaPagar.ObterDetalhesBaixa: Boolean;
@@ -206,7 +355,7 @@ begin
     except
       on E: Exception do
       begin
-        raise ECpDetalheObter.Create;
+        raise ECpObterDetalhe.Create;
       end;
     end;
   finally
@@ -216,8 +365,38 @@ begin
 end;
 
 function TBaixarContaPagar.ObterPgtosBaixa: Boolean;
+var
+  lFormPgto: TfrmFrPgtoBaixaCp;
 begin
   Result := False;
+
+  lFormPgto := TfrmFrPgtoBaixaCp.Create(nil);
+  try
+    try
+
+      lFormPgto.IdCp := FCp.ID;
+      lFormPgto.ValorAbater := FDetalhesCp.Valor;
+      lFormPgto.ShowModal;
+
+      if (lFormPgto.ModalResult = mrOk) then
+      begin
+        FListaPgtos := lFormPgto.ObterPagamentos;
+
+        if not Assigned(FListaPgtos) then
+          Exit;
+
+        Result := True;
+      end;
+
+    except
+      on E: Exception do
+      begin
+        raise ECpObterPgtos.Create;
+      end;
+    end;
+  finally
+    lFormPgto.Free;
+  end;
 end;
 
 end.

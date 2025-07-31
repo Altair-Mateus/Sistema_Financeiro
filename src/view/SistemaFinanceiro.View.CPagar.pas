@@ -89,12 +89,6 @@ type
     pnlCancelada: TPanel;
     edtNDoc: TEdit;
     lblNDoc: TLabel;
-    gbFiltros: TGroupBox;
-    rbDataVenc: TRadioButton;
-    rbValorParcela: TRadioButton;
-    rbValorCompra: TRadioButton;
-    rbDataCompra: TRadioButton;
-    rbId: TRadioButton;
     cbData: TComboBox;
     lblData: TLabel;
     dateFinal: TDateTimePicker;
@@ -158,6 +152,7 @@ type
     grdGrupoParcelas: TDBGrid;
     btnLancPadrao: TButton;
     dsGrupoParcelas: TDataSource;
+    rdgOrdemConsulta: TRadioGroup;
     procedure btnExcluirClick(Sender: TObject);
     procedure btnIncluirClick(Sender: TObject);
     procedure btnSalvarClick(Sender: TObject);
@@ -240,6 +235,7 @@ type
     procedure Imprimir;
 
     procedure AtualizaTotaisTelaPrincipal;
+    procedure Baixar;
 
   public
     property EventoAttTotaisCp: TEventoAttTotaisCP read FEventoAttTotaisCp write FEventoAttTotaisCp;
@@ -272,6 +268,27 @@ begin
     FEventoAttTotaisCp;
 end;
 
+procedure TfrmContasPagar.Baixar;
+var
+  lId: Integer;
+begin
+  try
+
+    lId := DBGrid1.DataSource.DataSet.FieldByName('ID').AsInteger;
+    if (TBaixarContaPagar.Baixar(lId)) then
+      TfrmMensagem.TelaMensagem('Sucesso!', 'Conta a Pagar baixada com sucesso.', tmSucesso);
+
+    Pesquisar;
+
+  except
+    on E: Exception do
+    begin
+      TfrmMensagem.TelaMensagem('Erro ao baixar CP', E.Message, tmErro);
+    end;
+  end;
+
+end;
+
 procedure TfrmContasPagar.btnAlterarClick(Sender: TObject);
 begin
   EditarRegCPagar;
@@ -279,7 +296,7 @@ end;
 
 procedure TfrmContasPagar.btnBaixarCPClick(Sender: TObject);
 begin
-  ExibeTelaBaixar(DataSourceCPagar.DataSet.FieldByName('ID').AsInteger);
+  Baixar;
 end;
 
 procedure TfrmContasPagar.btnBxMultiplaClick(Sender: TObject);
@@ -666,15 +683,15 @@ begin
         lParcelaCp.Parcela := cdsParcelasPARCELA.AsInteger;
         lParcelaCp.ValorParcela := cdsParcelasVALOR.AsCurrency;
         lParcelaCp.DataVencimento := cdsParcelasVENCIMENTO.AsDateTime;
-        lParcelaCp.Parcial := 'N';
-        lParcelaCp.FatCartao := 'N';
+        lParcelaCp.Parcial := False;
+        lParcelaCp.FatCartao := False;
         lParcelaCp.IdFornecedor := StrToInt(edtFornecedor.Text);
         lParcelaCp.NumTotalParcelas := lQtdParcelas;
         lParcelaCp.IdGrupoParcelas := lIdGrupoParcelas;
 
         if (toggleFatura.State = tssOn) then
         begin
-          lParcelaCp.FatCartao := 'S';
+          lParcelaCp.FatCartao := True;
           lParcelaCp.IdFatCartao := StrToInt(edtCodFatCartao.Text);
         end;
 
@@ -727,10 +744,10 @@ begin
     FCp.ValorParcela := StrToFloat(edtValorParcela.Text);
     FCp.ValorCompra := StrToFloat(edtValorCompra.Text);
     FCp.DataCompra := dateCompra.Date;
-    FCp.Parcial := 'N';
+    FCp.Parcial := False;
     FCp.ValorAbatido := 0;
     FCp.Status := 'A';
-    FCp.FatCartao := 'N';
+    FCp.FatCartao := False;
 
     // Verifica se é fatura, se for a data de vcto
     // será pega a da fatura
@@ -740,7 +757,7 @@ begin
       dateVencimento.Date := EncodeDate(YearOf(dateVencimento.Date),
         MonthOf(dateVencimento.Date), FDataVctoFat);
 
-      FCp.FatCartao := 'S';
+      FCp.FatCartao := True;
       FCp.IdFatCartao := StrToInt(edtCodFatCartao.Text);
     end;
 
@@ -880,7 +897,7 @@ begin
       if (lLancamento.Existe(pCod, True)) then
       begin
 
-        if (lLancamento.Status = Smallint(scInativo)) then
+        if (lLancamento.Status = scInativo) then
         begin
           TfrmMensagem.TelaMensagem('Cadastro Inativo!',
             'Lançamento Padrão inativo, altere o cadastro do mesmo e tente novamente.',
@@ -1239,14 +1256,22 @@ end;
 
 procedure TfrmContasPagar.GeraParcelas;
 var
-  lQtdParcelas: Integer;
-  lIntervaloDias: Integer;
-  lValorCompra: Double;
-  lValorParcela: Double;
-  lValorResiduo: Double;
-  lContador: Integer;
-  lDiaFixoVcto: Integer;
-  lDataPrimeiraParcela: TDateTime;
+  lQtdParcelas:
+    Integer;
+  lIntervaloDias:
+    Integer;
+  lValorCompra:
+    Double;
+  lValorParcela:
+    Double;
+  lValorResiduo:
+    Double;
+  lContador:
+    Integer;
+  lDiaFixoVcto:
+    Integer;
+  lDataPrimeiraParcela:
+    TDateTime;
 begin
 
   lDataPrimeiraParcela := 0;
@@ -1460,18 +1485,20 @@ begin
       LFiltro := LFiltro + 'AND FATURA_CART = ''N'' ';
 
     // Ordem de pesquisa
-    if rbId.Checked then
-      LOrdem := ' ORDER BY CP.ID DESC'
-    else if rbDataVenc.Checked then
-      LOrdem := ' ORDER BY CP.DATA_VENCIMENTO'
-    else if rbValorParcela.Checked then
-      LOrdem := ' ORDER BY CP.VALOR_PARCELA DESC'
-    else if rbValorCompra.Checked then
-      LOrdem := ' ORDER BY CP.VALOR_COMPRA DESC'
-    else if rbDataCompra.Checked then
-      LOrdem := ' ORDER BY CP.DATA_COMPRA DESC'
+    case rdgOrdemConsulta.ItemIndex of
+      0:
+        LOrdem := ' ORDER BY CP.DATA_VENCIMENTO';
+      1:
+        LOrdem := ' ORDER BY CP.DATA_COMPRA DESC';
+      2:
+        LOrdem := ' ORDER BY CP.ID DESC';
+      3:
+        LOrdem := ' ORDER BY CP.VALOR_PARCELA DESC';
+      4:
+        LOrdem := ' ORDER BY CP.VALOR_COMPRA DESC';
     else
       LOrdem := ' ORDER BY CP.ID DESC';
+    end;
 
     FQueryPesquisa.Close;
     FQueryPesquisa.SQL.Clear;
@@ -1552,7 +1579,7 @@ begin
   BuscaNomeFornecedor;
 
   // Verifica se a CP foi vinculado a uma fatura de cartão
-  if (FCp.FatCartao = 'S') then
+  if (FCp.FatCartao) then
   begin
     toggleFatura.State := tssOn;
     lblCodFatCartao.Visible := True;

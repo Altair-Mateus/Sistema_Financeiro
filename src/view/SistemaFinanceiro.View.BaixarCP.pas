@@ -219,6 +219,7 @@ procedure TfrmBaixarCP.Confirmar;
 begin
   FCpDetalhe := TModelCpDetalhe.Create;
 
+  FCpDetalhe.GeraCodigo;
   FCpDetalhe.IdCP := FCp.id;
   FCpDetalhe.Detalhes := Trim(edtObs.Text);
   FCpDetalhe.Valor := StrToFloatDef(Trim(edtValor.Text), 0);

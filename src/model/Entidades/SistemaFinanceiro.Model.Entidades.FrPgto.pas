@@ -4,7 +4,8 @@ interface
 
 uses
   uDBAttributes,
-  uDaoRTTI;
+  uDaoRTTI,
+  System.SysUtils;
 
 type
 
@@ -15,7 +16,7 @@ type
     FIdFr: Integer;
     FNomeFr: String;
     FDesc: String;
-    FStatus: String;
+    FStatus: Boolean;
     FDataCadastro: TDateTime;
     FDataAlteracao: TDateTime;
     FMetodoPag: String;
@@ -27,8 +28,8 @@ type
     property NomeFr: String read FNomeFr write FNomeFr;
     [TDBColumn('DESC'), TDBAcceptNull]
     property Desc: String read FDesc write FDesc;
-    [TDBColumn('STATUS')]
-    property Status: String read FStatus write FStatus;
+    [TDBColumn('STATUS'), TDBSaveBoolean(btAI)]
+    property Status: Boolean read FStatus write FStatus;
     [TDBColumn('DATA_CADASTRO')]
     property DataCadastro: TDateTime read FDataCadastro write FDataCadastro;
     [TDBColumn('DATA_ALTERACAO'), TDBAcceptNull]
@@ -57,6 +58,10 @@ type
 implementation
 
 { TModelFrPgto }
+
+uses
+  SistemaFinanceiro.Model.uSFQuery,
+  SistemaFinanceiro.Exceptions.FrPgto;
 
 procedure TModelFrPgto.AddPropertyToWhere(const pPropertyName: String);
 begin
@@ -92,12 +97,62 @@ end;
 
 function TModelFrPgto.Existe(const pId: Integer;
   const pCarrega: Boolean): Boolean;
+var
+  lQuery: TSFQuery;
 begin
   Result := False;
+  lQuery := TSFQuery.Create(nil);
+  try
+    lQuery.Close;
+    lQuery.SQL.Clear;
+    lQuery.SQL.Add(' SELECT ID_FR FROM FR_PGTO   ');
+    lQuery.SQL.Add(' WHERE ID_FR = :ID           ');
+    lQuery.ParamByName('ID').AsInteger := pId;
+    lQuery.Open;
+
+    if (lQuery.RecordCount > 0) then
+    begin
+      if (pCarrega) then
+      begin
+        IdFr := pId;
+        Result := LoadObjectByPK;
+      end
+      else
+      begin
+        Result := True;
+      end;
+    end;
+  finally
+    lQuery.Free;
+  end;
 end;
 
 procedure TModelFrPgto.GeraCodigo;
+var
+  lQuery: TSFQuery;
 begin
+  lQuery := TSFQuery.Create(nil);
+  try
+    try
+
+      lQuery.Close;
+      lQuery.SQL.Clear;
+      lQuery.Open('SELECT COALESCE(MAX(ID_FR), 0) AS ID FROM FR_PGTO ');
+
+      // Ultimo codigo usado + 1
+      FIdFr := (lQuery.FieldByName('ID').AsInteger + 1);
+
+      // Insere o registro no final da tabela
+      lQuery.Append;
+    except
+      on E: Exception do
+      begin
+        raise EFrPgtoId.Create(E.Message);
+      end;
+    end;
+  finally
+    lQuery.Free;
+  end;
 
 end;
 

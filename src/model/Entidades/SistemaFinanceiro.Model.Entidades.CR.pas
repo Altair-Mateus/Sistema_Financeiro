@@ -154,6 +154,8 @@ begin
       lCrParcial.Parcial := 'S';
       lCrParcial.CrOrigem := pCr.ID;
       lCrParcial.IdCliente := pCr.IdCliente;
+      lCrParcial.NumTotalParcelas := pCr.NumTotalParcelas;
+      lCrParcial.IdGrupoParcelas := pCr.IdGrupoParcelas;
 
       // Gravando no BD
       if not lCrParcial.Insert then

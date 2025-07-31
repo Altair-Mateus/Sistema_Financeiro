@@ -21,8 +21,14 @@ type
     constructor Create(const pError: String);
   end;
 
-  ECpDetalheObter = class(Exception)
+  ECpObterDetalhe = class(Exception)
+  public
     constructor Create;
+  end;
+
+  ECpDetalheGravar = class(Exception)
+  public
+    constructor Create(const pError: String);
   end;
 
 implementation
@@ -31,28 +37,35 @@ implementation
 
 constructor ECpDetalheNaoExiste.Create(const pError: String);
 begin
-  inherited Create('Erro ao localizar detalhes do Contas a Pagar: ' + pError);
+  inherited Create('Falha ao localizar detalhes do Contas a Pagar: ' + pError);
 end;
 
 { ECpDetalheId }
 
 constructor ECpDetalheId.Create(const pError: String);
 begin
-  inherited Create('Erro ao obter próximo ID de detalhes do Contas a Pagar: ' + pError);
+  inherited Create('Falha ao obter próximo ID de detalhes do Contas a Pagar: ' + pError);
 end;
 
 { ECpDetalheExcluir }
 
 constructor ECpDetalheExcluir.Create(const pError: String);
 begin
-  inherited Create('Erro ao excluir detalhes da conta a pagar: ' + pError);
+  inherited Create('Falha ao excluir detalhes da conta a pagar: ' + pError);
 end;
 
 { ECpDetalheObter }
 
-constructor ECpDetalheObter.Create;
+constructor ECpObterDetalhe.Create;
 begin
-  inherited Create('Erro ao obter detalhes para realizar a baixa da conta.');
+  inherited Create('Falha ao obter detalhes para realizar a baixa da conta.');
+end;
+
+{ ECpDetalheGravar }
+
+constructor ECpDetalheGravar.Create(const pError: String);
+begin
+  inherited Create('Falha ao salvar os detalhes da baixa da CP: ' + pError);
 end;
 
 end.

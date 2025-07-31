@@ -27,7 +27,6 @@ object frmBaixarCP: TfrmBaixarCP
     Color = clSeagreen
     ParentBackground = False
     TabOrder = 0
-    ExplicitWidth = 614
     object pnlDocInfo: TPanel
       AlignWithMargins = True
       Left = 10
@@ -42,7 +41,6 @@ object frmBaixarCP: TfrmBaixarCP
       Color = clWhite
       ParentBackground = False
       TabOrder = 0
-      ExplicitWidth = 594
       object gbDocInfo: TGroupBox
         AlignWithMargins = True
         Left = 21
@@ -59,7 +57,6 @@ object frmBaixarCP: TfrmBaixarCP
         ParentBackground = False
         ParentColor = False
         TabOrder = 0
-        ExplicitWidth = 552
         object lblNDoc: TLabel
           Left = 290
           Top = 75
@@ -236,7 +233,6 @@ object frmBaixarCP: TfrmBaixarCP
       Color = clWhite
       ParentBackground = False
       TabOrder = 1
-      ExplicitWidth = 594
       object gbDetalhes: TGroupBox
         AlignWithMargins = True
         Left = 21
@@ -250,7 +246,6 @@ object frmBaixarCP: TfrmBaixarCP
         Align = alClient
         Caption = 'Detalhes'
         TabOrder = 0
-        ExplicitWidth = 552
         object lblObs: TLabel
           Left = 28
           Top = 32
@@ -293,6 +288,7 @@ object frmBaixarCP: TfrmBaixarCP
           Top = 31
           Width = 425
           Height = 27
+          MaxLength = 200
           TabOrder = 0
           OnKeyPress = EditKeyPress
         end
@@ -357,7 +353,6 @@ object frmBaixarCP: TfrmBaixarCP
       Color = clWindow
       ParentBackground = False
       TabOrder = 2
-      ExplicitWidth = 614
       object btnConfirmar: TButton
         AlignWithMargins = True
         Left = 191
@@ -393,7 +388,6 @@ object frmBaixarCP: TfrmBaixarCP
         ModalResult = 2
         ParentBiDiMode = False
         TabOrder = 1
-        ExplicitLeft = 303
       end
     end
   end

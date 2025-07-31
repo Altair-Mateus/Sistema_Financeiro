@@ -3,8 +3,13 @@ unit SistemaFinanceiro.Model.Entidades.LancamentoPadraoContas;
 interface
 
 uses
-  uDBAttributes, uDaoRTTI, SistemaFinanceiro.Model.uSFQuery,
-  System.SysUtils, Winapi.Windows, Vcl.Forms;
+  uDBAttributes,
+  uDaoRTTI,
+  SistemaFinanceiro.Model.uSFQuery,
+  System.SysUtils,
+  Winapi.Windows,
+  Vcl.Forms,
+  uEnumsUtils;
 
 type
 
@@ -14,10 +19,10 @@ type
   private
     FDaoRTTI: TDaoRTTI;
     FId: Integer;
-    FTipo: Integer;
+    FTipo: TTipoLancamento;
     FData_Cadastro: TDateTime;
     FData_Alteracao: TDateTime;
-    FStatus: SmallInt;
+    FStatus: TStatusCadastro;
     FDescricao: String;
     FId_Fornecedor: Integer;
     FId_Cliente: Integer;
@@ -26,14 +31,13 @@ type
     [TDBColumnAttribute('ID'), TDBIsPrimaryKey, TDBIsAutoIncrement]
     property Id: Integer read FId write FId;
     [TDBColumnAttribute('TIPO')]
-    property Tipo: Integer read FTipo write FTipo;
+    property Tipo: TTipoLancamento read FTipo write FTipo;
     [TDBColumnAttribute('DATA_CADASTRO')]
     property Data_Cadastro: TDateTime read FData_Cadastro write FData_Cadastro;
     [TDBColumnAttribute('DATA_ALTERACAO'), TDBAcceptNull]
-    property Data_Alteracao: TDateTime read FData_Alteracao
-      write FData_Alteracao;
+    property Data_Alteracao: TDateTime read FData_Alteracao write FData_Alteracao;
     [TDBColumnAttribute('STATUS')]
-    property Status: SmallInt read FStatus write FStatus;
+    property Status: TStatusCadastro read FStatus write FStatus;
     [TDBColumnAttribute('DESCRICAO'), TDBAcceptNull]
     property Descricao: String read FDescricao write FDescricao;
     [TDBColumnAttribute('ID_FORNECEDOR'), TDBAcceptNull]

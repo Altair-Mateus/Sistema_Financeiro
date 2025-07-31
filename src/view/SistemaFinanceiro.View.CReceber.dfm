@@ -3,28 +3,32 @@ inherited frmContasReceber: TfrmContasReceber
   ClientHeight = 642
   ClientWidth = 1327
   WindowState = wsMaximized
+  StyleElements = [seFont, seClient, seBorder]
   OnClose = FormClose
   OnDestroy = FormDestroy
-  ExplicitWidth = 1339
-  ExplicitHeight = 680
+  ExplicitWidth = 1343
+  ExplicitHeight = 681
   TextHeight = 19
   inherited CardPanelPrincipal: TCardPanel
     Width = 1327
     Height = 642
     ActiveCard = CardPesquisa
-    ExplicitWidth = 1323
-    ExplicitHeight = 641
+    StyleElements = [seFont, seClient, seBorder]
+    ExplicitWidth = 1327
+    ExplicitHeight = 642
     inherited CardCadastro: TCard
       Width = 1327
       Height = 642
+      StyleElements = [seFont, seClient, seBorder]
       OnEnter = CardCadastroEnter
-      ExplicitWidth = 1323
-      ExplicitHeight = 641
+      ExplicitWidth = 1327
+      ExplicitHeight = 642
       inherited pnlBotoesCad: TPanel
         Top = 573
         Width = 1327
-        ExplicitTop = 572
-        ExplicitWidth = 1323
+        StyleElements = [seFont, seClient, seBorder]
+        ExplicitTop = 573
+        ExplicitWidth = 1327
         inherited btnSalvar: TButton
           OnClick = btnSalvarClick
         end
@@ -47,8 +51,9 @@ inherited frmContasReceber: TfrmContasReceber
       inherited PanelCampos: TPanel
         Width = 1327
         Height = 532
-        ExplicitWidth = 1323
-        ExplicitHeight = 531
+        StyleElements = [seFont, seClient, seBorder]
+        ExplicitWidth = 1327
+        ExplicitHeight = 532
         object lblDataVend: TLabel
           Left = 258
           Top = 159
@@ -98,7 +103,7 @@ inherited frmContasReceber: TfrmContasReceber
           Height = 19
           Caption = 'lblNomeCliente'
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = 5737262
+          Font.Color = clSeagreen
           Font.Height = -16
           Font.Name = 'Tahoma'
           Font.Style = []
@@ -465,18 +470,18 @@ inherited frmContasReceber: TfrmContasReceber
           Width = 84
           Height = 21
           Color = 9750963
-          DisabledColor = 5737262
+          DisabledColor = clSeagreen
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBtnText
           Font.Height = -16
           Font.Name = 'Tahoma'
           Font.Style = []
-          FrameColor = 5737262
+          FrameColor = clSeagreen
           ParentFont = False
           StateCaptions.CaptionOn = 'Sim'
           StateCaptions.CaptionOff = 'N'#227'o'
           TabOrder = 5
-          ThumbColor = 5737262
+          ThumbColor = clSeagreen
           OnClick = toggleParcelamentoClick
         end
         object edtNDoc: TEdit
@@ -593,24 +598,31 @@ inherited frmContasReceber: TfrmContasReceber
       end
       inherited PanelTitulo: TPanel
         Width = 1327
-        ExplicitWidth = 1323
+        StyleElements = [seFont, seClient, seBorder]
+        ExplicitWidth = 1327
+        inherited lblTitulo: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
       end
     end
     inherited CardPesquisa: TCard
       Width = 1327
       Height = 642
+      StyleElements = [seFont, seClient, seBorder]
       ExplicitLeft = 0
       ExplicitTop = 0
-      ExplicitWidth = 1323
-      ExplicitHeight = 641
+      ExplicitWidth = 1327
+      ExplicitHeight = 642
       inherited pnlPesquisa: TPanel
         Width = 1327
         Height = 137
-        ExplicitWidth = 1323
+        StyleElements = [seFont, seClient, seBorder]
+        ExplicitWidth = 1327
         ExplicitHeight = 137
         inherited lblPesquisar: TLabel
           Left = 213
           Top = 14
+          StyleElements = [seFont, seClient, seBorder]
           ExplicitLeft = 213
           ExplicitTop = 14
         end
@@ -4785,6 +4797,7 @@ inherited frmContasReceber: TfrmContasReceber
           Left = 213
           Top = 37
           Width = 297
+          StyleElements = [seFont, seClient, seBorder]
           OnChange = PesquisaClick
           ExplicitLeft = 213
           ExplicitTop = 37
@@ -4823,10 +4836,10 @@ inherited frmContasReceber: TfrmContasReceber
           Width = 236
           Height = 109
           Caption = 'Ordenar consulta por'
-          Color = clWhite
+          Color = clBlack
           DefaultHeaderFont = False
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWhite
+          Font.Color = clBlack
           Font.Height = -16
           Font.Name = 'Tahoma'
           Font.Style = []
@@ -5046,6 +5059,7 @@ inherited frmContasReceber: TfrmContasReceber
       inherited pnlBotoes: TPanel
         Top = 573
         Width = 1327
+        StyleElements = [seFont, seClient, seBorder]
         ExplicitTop = 573
         ExplicitWidth = 1327
         inherited btnExcluir: TButton
@@ -5188,6 +5202,7 @@ inherited frmContasReceber: TfrmContasReceber
         Top = 137
         Width = 1327
         Height = 407
+        StyleElements = [seFont, seClient, seBorder]
         ExplicitTop = 137
         ExplicitWidth = 1327
         ExplicitHeight = 407

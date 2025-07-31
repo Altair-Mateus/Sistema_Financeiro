@@ -32,7 +32,8 @@ uses
   SistemaFinanceiro.View.BxMultiplaCr,
   uEnumsUtils,
   SistemaFinanceiro.Model.Entidades.Cr,
-  SistemaFinanceiro.Model.uSFQuery, fMensagem,
+  SistemaFinanceiro.Model.uSFQuery,
+  fMensagem,
   SistemaFinanceiro.View.Consulta.ConsultaLancamentoPadraoContas;
 
 type
@@ -203,6 +204,7 @@ var
 implementation
 
 {$R *.dfm}
+
 
 uses
   SistemaFinanceiro.Utilitarios,
@@ -879,7 +881,7 @@ begin
     if (lLancamento.Existe(pCod, True)) then
     begin
 
-      if (lLancamento.Status = Smallint(scInativo)) then
+      if (lLancamento.Status = scInativo) then
       begin
         TfrmMensagem.TelaMensagem('Cadastro Inativo!',
           'Lançamento Padrão inativo, altere o cadastro do mesmo e tente novamente.',

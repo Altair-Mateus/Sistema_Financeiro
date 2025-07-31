@@ -58,12 +58,11 @@ type
     procedure btnPesqFrPgtoClick(Sender: TObject);
     procedure btnLimparClick(Sender: TObject);
     procedure btnAdicionaClick(Sender: TObject);
-    procedure btnConfirmarClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure KeyPressValor(Sender: TObject; var Key: Char);
     procedure FormKeyPress(Sender: TObject; var Key: Char);
     procedure FormActivate(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
   private
     FTelaAtiva: Boolean;
     FIdCp: Integer;
@@ -74,14 +73,16 @@ type
     function ValidaIniciarPagamentos: Boolean;
     procedure InicializaTela;
     procedure AdicionaPagamento;
+    procedure LimparLabels;
 
-    procedure SetIdCp(const Value: Integer);
     procedure SetValorAbater(const Value: Double);
     procedure AdicionaPgtoGrid(const pValorForma: Double);
 
-    procedure ConfirmarPagamentos;
+    function ConfirmarPagamentos: Boolean;
+    procedure AddPgtosNaLista;
+
   public
-    property IdCp: Integer read FIdCp write SetIdCp;
+    property IdCp: Integer read FIdCp write FIdCp;
     property ValorAbater: Double read FValorAbater write SetValorAbater;
 
     function ObterPagamentos: TObjectList<TModelPgtoBxCp>;
@@ -99,7 +100,48 @@ implementation
 uses
   SistemaFinanceiro.Model.dmFrPgto,
   SistemaFinanceiro.Model.dmPgtoBxCp,
-  SistemaFinanceiro.Utilitarios;
+  SistemaFinanceiro.Utilitarios,
+  SistemaFinanceiro.Model.Entidades.FrPgto;
+
+procedure TfrmFrPgtoBaixaCp.AddPgtosNaLista;
+var
+  lFormaPgto: TModelPgtoBxCp;
+  lContador, lUltCod: Integer;
+begin
+
+  lContador := 0;
+  lUltCod := 0;
+
+  // Coloca na primeira posição do dataset
+  cdsFrPgto.First;
+
+  // Adicionando as formas em uma lista de objetos
+  // para serem salvas pela tela que a invocar
+  while not cdsFrPgto.Eof do
+  begin
+
+    lContador := lContador + 1;
+
+    lFormaPgto := TModelPgtoBxCp.Create;
+
+    if (lContador = 1) then
+      lFormaPgto.GeraCodigo
+    else
+      lFormaPgto.GeraCodigo(lUltCod);
+
+    lFormaPgto.IdCp := FIdCp;
+    lFormaPgto.IdFrPgto := cdsFrPgtoID_FR.AsInteger;
+    lFormaPgto.NrPgto := lContador;
+    lFormaPgto.DataHora := Now;
+    lFormaPgto.ValorPago := cdsFrPgtoVALORPAGO.AsFloat;
+
+    lUltCod := lFormaPgto.Id;
+    FListaPagamentos.Add(lFormaPgto);
+
+    cdsFrPgto.Next;
+
+  end;
+end;
 
 procedure TfrmFrPgtoBaixaCp.AdicionaPagamento;
 var
@@ -107,7 +149,6 @@ var
   lValorRest: Double;
 begin
 
-  // Valida Campos
   if (not TryStrToFloat(edtValorRest.Text, lValorRest)) then
   begin
     TfrmMensagem.TelaMensagem('Atenção!', 'Valor Restante Inválido!', tmAviso);
@@ -137,7 +178,7 @@ begin
   end;
 
   // Calculando o valor restante
-  lValorRest := lValorRest - lValorForma;
+  lValorRest := (lValorRest - lValorForma);
   edtValorRest.Text := FloatToStr(lValorRest);
 
   AdicionaPgtoGrid(lValorForma);
@@ -150,11 +191,6 @@ end;
 procedure TfrmFrPgtoBaixaCp.btnAdicionaClick(Sender: TObject);
 begin
   AdicionaPagamento;
-end;
-
-procedure TfrmFrPgtoBaixaCp.btnConfirmarClick(Sender: TObject);
-begin
-  ConfirmarPagamentos;
 end;
 
 procedure TfrmFrPgtoBaixaCp.btnLimparClick(Sender: TObject);
@@ -175,66 +211,74 @@ begin
 end;
 
 procedure TfrmFrPgtoBaixaCp.btnPesqFrPgtoClick(Sender: TObject);
+var
+  lFormulario: TfrmFrPgto;
 begin
-  // Cria o form
-  frmFrPgto := TfrmFrPgto.Create(Self);
 
+  lFormulario := TfrmFrPgto.Create(Self);
   try
 
-    // Exibe o form
-    frmFrPgto.ShowModal;
-
-  finally
+    lFormulario.ShowModal;
 
     // Pega a ID da forma de pgto selecionado
-    edtCodFrPgto.Text := frmFrPgto.DataSourceFrPgto.DataSet.FieldByName('ID_FR').AsString;
+    edtCodFrPgto.Text := lFormulario.RetornaCodigo;
+    edtCodFrPgto.SetFocus;
 
-    // Libera da  memoria
-    FreeAndNil(frmFrPgto);
-
+  finally
+    lFormulario.Free;
   end;
-
-  edtCodFrPgto.SetFocus;
 
 end;
 
 procedure TfrmFrPgtoBaixaCp.BuscaNomeFrPgto;
 var
-  NomeFrPgto: String;
-
+  lFormaPgto: TModelFrPgto;
+  lCod: Integer;
 begin
+  lblNomeFrPgto.Caption := '';
 
-  if Trim(edtCodFrPgto.Text) <> '' then
+  if not(Trim(edtCodFrPgto.Text).IsEmpty) then
   begin
 
-    NomeFrPgto := dmFrPgto.GetNomeFrPgto(Trim(edtCodFrPgto.Text));
+    lFormaPgto := TModelFrPgto.Create;
+    try
 
-    if (Trim(edtCodFrPgto.Text) = '') or (NomeFrPgto = '') then
-    begin
+      lCod := StrToIntDef(Trim(edtCodFrPgto.Text), 0);
+      if not(lFormaPgto.Existe(lCod, True)) then
+      begin
+        TfrmMensagem.TelaMensagem('Atenção', 'Forma de Pagamento não encontrada!', tmAviso);
+        edtCodFrPgto.SetFocus;
+        edtCodFrPgto.Clear;
+        Exit;
+      end;
 
-      Application.MessageBox('Forma de Pagamento não encontrada!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
-      edtCodFrPgto.SetFocus;
-      edtCodFrPgto.Clear;
+      if not(lFormaPgto.Status) then
+      begin
+        TfrmMensagem.TelaMensagem('Atenção', 'Forma de Pagamento não está Ativa!!', tmAviso);
+        edtCodFrPgto.SetFocus;
+        edtCodFrPgto.Clear;
+        Exit;
+      end;
 
+      lblNomeFrPgto.Caption := lFormaPgto.NomeFr;
+
+    finally
+      lFormaPgto.Free;
     end;
-
-    lblNomeFrPgto.Visible := True;
-    lblNomeFrPgto.Caption := NomeFrPgto;
-
   end;
 
 end;
 
-procedure TfrmFrPgtoBaixaCp.ConfirmarPagamentos;
+function TfrmFrPgtoBaixaCp.ConfirmarPagamentos: Boolean;
 var
-  lContador: Integer;
   lTotalPgtos: Double;
   lValorCp: Double;
-  lFormaPgto: TModelPgtoBxCp;
+
 begin
 
+  Result := False;
+
   lTotalPgtos := 0;
-  lContador := 0;
 
   if (cdsFrPgto.IsEmpty) then
   begin
@@ -266,52 +310,15 @@ begin
     Exit;
   end;
 
-  // Coloca na primeira posição do dataset
-  cdsFrPgto.First;
+  AddPgtosNaLista;
 
-  // Adicionando as formas em uma lista de objetos
-  // para serem salvas pela tela que a invocar
-  while not cdsFrPgto.Eof do
-  begin
-
-    lContador := lContador + 1;
-
-    lFormaPgto := TModelPgtoBxCp.Create;
-    lFormaPgto.GeraCodigo;
-    lFormaPgto.IdCp := FIdCp;
-    lFormaPgto.IdFrPgto := cdsFrPgtoID_FR.AsInteger;
-    lFormaPgto.NrPgto := lContador;
-    lFormaPgto.DataHora := Now;
-    lFormaPgto.ValorPago := cdsFrPgtoVALORPAGO.AsFloat;
-
-    FListaPagamentos.Add(lFormaPgto);
-
-  end;
-
-  // Fecha a tela
-  Modalresult := mrOk;
+  Result := True;
 
 end;
 
 procedure TfrmFrPgtoBaixaCp.edtCodFrPgtoExit(Sender: TObject);
 begin
-
   BuscaNomeFrPgto;
-
-  if Trim(edtCodFrPgto.Text) <> '' then
-  begin
-    if dmFrPgto.GetStatus(Trim(edtCodFrPgto.Text)) = False then
-    begin
-
-      edtCodFrPgto.Clear;
-      edtCodFrPgto.SetFocus;
-      lblNomeFrPgto.Caption := '';
-      Application.MessageBox('Forma de Pagamento não está Ativa!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
-      abort;
-
-    end;
-  end;
-
 end;
 
 procedure TfrmFrPgtoBaixaCp.edtValorFormaEnter(Sender: TObject);
@@ -336,15 +343,24 @@ begin
   end;
 end;
 
+procedure TfrmFrPgtoBaixaCp.FormCloseQuery(Sender: TObject;
+  var CanClose: Boolean);
+begin
+  CanClose := False;
+
+  if (ModalResult = mrOk) then
+  begin
+    if not(ConfirmarPagamentos) then
+      Exit;
+  end;
+
+  CanClose := True;
+end;
+
 procedure TfrmFrPgtoBaixaCp.FormCreate(Sender: TObject);
 begin
   FTelaAtiva := False;
   FListaPagamentos := TObjectList<TModelPgtoBxCp>.Create;
-end;
-
-procedure TfrmFrPgtoBaixaCp.FormDestroy(Sender: TObject);
-begin
-  FListaPagamentos.Free;
 end;
 
 procedure TfrmFrPgtoBaixaCp.FormKeyPress(Sender: TObject; var Key: Char);
@@ -366,6 +382,7 @@ end;
 
 procedure TfrmFrPgtoBaixaCp.InicializaTela;
 begin
+  LimparLabels;
   edtCodFrPgto.SetFocus;
 end;
 
@@ -401,6 +418,11 @@ begin
 
 end;
 
+procedure TfrmFrPgtoBaixaCp.LimparLabels;
+begin
+  lblNomeFrPgto.Caption := '';
+end;
+
 function TfrmFrPgtoBaixaCp.ObterPagamentos: TObjectList<TModelPgtoBxCp>;
 begin
   Result := FListaPagamentos;
@@ -425,11 +447,6 @@ begin
   edtCodFrPgto.SetFocus;
   lblNomeFrPgto.Caption := '';
 
-end;
-
-procedure TfrmFrPgtoBaixaCp.SetIdCp(const Value: Integer);
-begin
-  FIdCp := Value;
 end;
 
 procedure TfrmFrPgtoBaixaCp.SetValorAbater(const Value: Double);

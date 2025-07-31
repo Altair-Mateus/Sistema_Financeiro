@@ -27,16 +27,14 @@ object frmCadLancamentoPadrao: TfrmCadLancamentoPadrao
     object pnlCampos: TPanel
       Left = 0
       Top = 41
-      Width = 718
-      Height = 352
+      Width = 714
+      Height = 351
       Margins.Top = 0
       Align = alClient
       BevelOuter = bvNone
       Color = clWhite
       ParentBackground = False
       TabOrder = 0
-      ExplicitWidth = 714
-      ExplicitHeight = 351
       object lblDescricao: TLabel
         Left = 32
         Top = 16
@@ -162,19 +160,19 @@ object frmCadLancamentoPadrao: TfrmCadLancamentoPadrao
         Width = 105
         Height = 21
         Color = 9750962
-        DisabledColor = 5737262
+        DisabledColor = clSeagreen
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBtnText
         Font.Height = -16
         Font.Name = 'Tahoma'
         Font.Style = []
-        FrameColor = 5737262
+        FrameColor = clSeagreen
         ParentFont = False
         State = tssOn
         StateCaptions.CaptionOn = 'Ativo'
         StateCaptions.CaptionOff = 'Inativo'
         TabOrder = 4
-        ThumbColor = 5737262
+        ThumbColor = clSeagreen
       end
     end
     object pnlTitulo: TPanel

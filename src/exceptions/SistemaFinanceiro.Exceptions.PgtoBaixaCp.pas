@@ -16,20 +16,44 @@ type
     constructor Create(const pError: String);
   end;
 
+  ECpObterPgtos = class(Exception)
+  public
+    constructor Create;
+  end;
+
+  EPgtoCpGravar = class(Exception)
+  public
+    constructor Create(const pError: String);
+  end;
+
 implementation
 
 { EPgtoCpNaoExiste }
 
 constructor EPgtoCpNaoExiste.Create(const pError: String);
 begin
-  inherited Create('Erro ao localizar pagamento da conta a pagar: ' + pError);
+  inherited Create('Falha ao localizar pagamento da conta a pagar: ' + pError);
 end;
 
 { EPgtoCpExcluir }
 
 constructor EPgtoCpExcluir.Create(const pError: String);
 begin
-  inherited Create('Erro ao excluir pagamentos da baixa: ' + pError);
+  inherited Create('Falha ao excluir pagamentos da baixa: ' + pError);
+end;
+
+{ ECpObterPgtos }
+
+constructor ECpObterPgtos.Create;
+begin
+  inherited Create('Falha ao obter pagamentos para realizar a baixa da conta.');
+end;
+
+{ EPgtoCpGravar }
+
+constructor EPgtoCpGravar.Create(const pError: String);
+begin
+  inherited Create('Falha ao salvar pagamentos da baixa da CP: ' + pError);
 end;
 
 end.

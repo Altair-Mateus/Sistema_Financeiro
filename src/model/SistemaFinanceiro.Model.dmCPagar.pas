@@ -23,7 +23,8 @@ uses
   SistemaFinanceiro.Model.Entidades.CP.Detalhe,
   Vcl.Dialogs,
   Vcl.Forms,
-  Winapi.Windows;
+  Winapi.Windows,
+  System.StrUtils;
 
 type
   TdmCPagar = class(TDataModule)
@@ -201,7 +202,7 @@ begin
         cdsCPagarVALOR_ABATIDO.AsCurrency := 0;
 
         // Passando os dados para o dataset
-        if (ContaPagar.Doc = '') or (ContaPagar.Parcial = 'S') then
+        if (ContaPagar.Doc = '') or (ContaPagar.Parcial) then
         begin
           cdsCPagarNUMERO_DOC.AsString := ContaPagar.Doc;
         end
@@ -222,9 +223,9 @@ begin
         cdsCPagarPARCIAL.AsString := 'S';
         cdsCPagarCP_ORIGEM.AsString := IntToStr(ContaPagar.Id);
         cdsCPagarID_FORNECEDOR.AsInteger := ContaPagar.IdFornecedor;
-        cdsCPagarFATURA_CART.AsString := ContaPagar.FatCartao;
+        cdsCPagarFATURA_CART.AsString := ifthen(ContaPagar.FatCartao, 'S', 'N');
 
-        if ContaPagar.FatCartao = 'S' then
+        if ContaPagar.FatCartao then
         begin
           cdsCPagarID_FATURA.AsInteger := ContaPagar.IdFatCartao;
         end;
@@ -493,10 +494,10 @@ begin
       Result.DataPagamento := FDQueryCP.FieldByName('DATA_PAGAMENTO')
         .AsDateTime;
       Result.Status := FDQueryCP.FieldByName('STATUS').AsString;
-      Result.Parcial := FDQueryCP.FieldByName('PARCIAL').AsString;
+      Result.Parcial := FDQueryCP.FieldByName('PARCIAL').AsBoolean;
       Result.CpOrigem := FDQueryCP.FieldByName('CP_ORIGEM').AsInteger;
       Result.IdFornecedor := FDQueryCP.FieldByName('ID_FORNECEDOR').AsInteger;
-      Result.FatCartao := FDQueryCP.FieldByName('FATURA_CART').AsString;
+      Result.FatCartao := FDQueryCP.FieldByName('FATURA_CART').AsBoolean;
       Result.IdFatCartao := FDQueryCP.FieldByName('ID_FATURA').AsInteger;
 
     except

@@ -51,11 +51,9 @@ type
     procedure ResetPropertiesToDefault;
     procedure AddPropertyToWhere(const APropertyName: String);
 
-    function Existe(const pId: Integer;
-      const pCarrega: Boolean = false): Boolean;
-    function ExistePorCp(const pIdCp: Integer;
-      const pCarrega: Boolean = false): Boolean;
-    procedure GeraCodigo;
+    function Existe(const pId: Integer; const pCarrega: Boolean = false): Boolean;
+    function ExistePorCp(const pIdCp: Integer; const pCarrega: Boolean = false): Boolean;
+    procedure GeraCodigo(const pUltimoCod: Integer = 0);
   end;
 
 implementation
@@ -178,13 +176,21 @@ begin
 
 end;
 
-procedure TModelPgtoBxCp.GeraCodigo;
+procedure TModelPgtoBxCp.GeraCodigo(const pUltimoCod: Integer);
 var
   lQuery: TSFQuery;
 begin
   lQuery := TSFQuery.Create(nil);
   try
     try
+
+      // Codigo para multiplos inserts ao mesmo tempo
+      if (pUltimoCod > 0) then
+      begin
+        FId := (pUltimoCod + 1);
+        Exit;
+      end;
+
       lQuery.Close;
       lQuery.SQL.Clear;
       lQuery.Open('SELECT COALESCE(MAX(ID), 0) AS ID FROM PGTO_BX_CP');
