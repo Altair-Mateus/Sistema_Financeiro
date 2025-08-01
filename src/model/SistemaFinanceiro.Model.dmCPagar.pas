@@ -212,7 +212,7 @@ begin
         end;
 
         cdsCPagarDESCRICAO.AsString :=
-          Format('Parcial - Restante da Conta ID Nº %s - Doc Nº %s',
+          Format('Parcial - Restante da Conta ID Nº %d - Doc Nº %s',
           [ContaPagar.Id, ContaPagar.Doc]);
         cdsCPagarVALOR_COMPRA.AsCurrency := ContaPagar.ValorCompra;
         cdsCPagarDATA_COMPRA.AsDateTime := ContaPagar.DataCompra;
@@ -281,7 +281,7 @@ begin
         LancarCaixa.Id := dmCaixa.GeraId;
         LancarCaixa.NumDoc := ContaPagar.Doc;
         LancarCaixa.Desc :=
-          Format('Baixa Conta ID Nº %s Pagar - Nº Documento: %s - Parcela: %d',
+          Format('Baixa Conta ID Nº %d Pagar - Nº Documento: %s - Parcela: %d',
           [ContaPagar.Id, ContaPagar.Doc, ContaPagar.Parcela]);
         LancarCaixa.Valor := BaixaCP.Valor;
         LancarCaixa.Tipo := 'D';

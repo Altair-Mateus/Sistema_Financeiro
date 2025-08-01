@@ -3,6 +3,7 @@ inherited frmCaixa: TfrmCaixa
   ClientHeight = 605
   ClientWidth = 1255
   WindowState = wsMaximized
+  StyleElements = [seFont, seClient, seBorder]
   OnDestroy = FormDestroy
   ExplicitWidth = 1271
   ExplicitHeight = 644
@@ -11,27 +12,31 @@ inherited frmCaixa: TfrmCaixa
     Width = 1255
     Height = 605
     ActiveCard = CardPesquisa
+    StyleElements = [seFont, seClient, seBorder]
     ExplicitWidth = 1255
     ExplicitHeight = 605
     inherited CardCadastro: TCard
-      Width = 1259
-      Height = 606
-      ExplicitWidth = 1259
-      ExplicitHeight = 606
+      Width = 1255
+      Height = 605
+      StyleElements = [seFont, seClient, seBorder]
+      ExplicitWidth = 1255
+      ExplicitHeight = 605
       inherited pnlBotoesCad: TPanel
-        Top = 537
-        Width = 1259
-        ExplicitTop = 537
-        ExplicitWidth = 1259
+        Top = 536
+        Width = 1255
+        StyleElements = [seFont, seClient, seBorder]
+        ExplicitTop = 536
+        ExplicitWidth = 1255
         inherited btnSalvar: TButton
           OnClick = btnSalvarClick
         end
       end
       inherited PanelCampos: TPanel
-        Width = 1259
-        Height = 496
-        ExplicitWidth = 1259
-        ExplicitHeight = 496
+        Width = 1255
+        Height = 495
+        StyleElements = [seFont, seClient, seBorder]
+        ExplicitWidth = 1255
+        ExplicitHeight = 495
         object lblNDoc: TLabel
           Left = 40
           Top = 48
@@ -67,7 +72,7 @@ inherited frmCaixa: TfrmCaixa
           Height = 23
           Caption = 'Receita: Lucros, contas a receber.'
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = 5737262
+          Font.Color = clSeagreen
           Font.Height = -19
           Font.Name = 'Calibri'
           Font.Style = []
@@ -81,7 +86,7 @@ inherited frmCaixa: TfrmCaixa
           Height = 23
           Caption = 'Despesa: Gastos em gerais.'
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = 5737262
+          Font.Color = clSeagreen
           Font.Height = -19
           Font.Name = 'Calibri'
           Font.Style = []
@@ -190,30 +195,35 @@ inherited frmCaixa: TfrmCaixa
         end
       end
       inherited PanelTitulo: TPanel
-        Width = 1259
-        ExplicitWidth = 1259
+        Width = 1255
+        StyleElements = [seFont, seClient, seBorder]
+        ExplicitWidth = 1255
         inherited lblTitulo: TLabel
-          Width = 325
+          Width = 343
           Caption = 'Inserindo um novo Lan'#231'amento no Caixa'
-          ExplicitWidth = 325
+          StyleElements = [seFont, seClient, seBorder]
+          ExplicitWidth = 343
         end
       end
     end
     inherited CardPesquisa: TCard
-      Width = 1259
-      Height = 606
+      Width = 1255
+      Height = 605
+      StyleElements = [seFont, seClient, seBorder]
       ExplicitLeft = 0
       ExplicitTop = 0
       ExplicitWidth = 1255
       ExplicitHeight = 605
       inherited pnlPesquisa: TPanel
-        Width = 1259
+        Width = 1255
         Height = 145
+        StyleElements = [seFont, seClient, seBorder]
         ExplicitWidth = 1255
         ExplicitHeight = 145
         inherited lblPesquisar: TLabel
           Left = 185
           Top = 13
+          StyleElements = [seFont, seClient, seBorder]
           ExplicitLeft = 185
           ExplicitTop = 13
         end
@@ -1731,13 +1741,14 @@ inherited frmCaixa: TfrmCaixa
           Left = 185
           Top = 37
           Width = 297
+          StyleElements = [seFont, seClient, seBorder]
           OnChange = edtPesquisarChange
           ExplicitLeft = 185
           ExplicitTop = 37
           ExplicitWidth = 297
         end
         inherited btnPesquisae: TButton
-          Left = 1135
+          Left = 1131
           Top = 30
           Height = 85
           Margins.Top = 30
@@ -1881,6 +1892,7 @@ inherited frmCaixa: TfrmCaixa
       inherited pnlBotoes: TPanel
         Top = 536
         Width = 1255
+        StyleElements = [seFont, seClient, seBorder]
         ExplicitTop = 536
         ExplicitWidth = 1255
         inherited btnExcluir: TButton
@@ -1890,12 +1902,12 @@ inherited frmCaixa: TfrmCaixa
           OnClick = btnImprimirClick
         end
         inherited btnSair: TButton
-          Left = 1135
+          Left = 1131
           ExplicitLeft = 1131
         end
         object gbLegenda: TGroupBox
           AlignWithMargins = True
-          Left = 1001
+          Left = 997
           Top = 4
           Width = 128
           Height = 61
@@ -1908,7 +1920,6 @@ inherited frmCaixa: TfrmCaixa
           Font.Style = []
           ParentFont = False
           TabOrder = 5
-          ExplicitLeft = 997
           object lblCorReceita: TLabel
             Left = 31
             Top = 16
@@ -1944,7 +1955,7 @@ inherited frmCaixa: TfrmCaixa
         end
         object pnlValoresEntSai: TPanel
           AlignWithMargins = True
-          Left = 866
+          Left = 862
           Top = 4
           Width = 122
           Height = 61
@@ -1952,12 +1963,11 @@ inherited frmCaixa: TfrmCaixa
           Align = alRight
           BevelOuter = bvNone
           TabOrder = 6
-          ExplicitLeft = 862
           object lblVTotalEnt: TLabel
             AlignWithMargins = True
-            Left = 18
+            Left = 3
             Top = 3
-            Width = 101
+            Width = 116
             Height = 19
             Align = alTop
             Alignment = taRightJustify
@@ -1970,12 +1980,14 @@ inherited frmCaixa: TfrmCaixa
             Font.Style = [fsBold]
             ParentColor = False
             ParentFont = False
+            ExplicitLeft = 18
+            ExplicitWidth = 101
           end
           object lblVTotalSai: TLabel
             AlignWithMargins = True
-            Left = 20
+            Left = 3
             Top = 28
-            Width = 99
+            Width = 116
             Height = 19
             Align = alTop
             Alignment = taRightJustify
@@ -1988,23 +2000,24 @@ inherited frmCaixa: TfrmCaixa
             Font.Style = [fsBold]
             ParentColor = False
             ParentFont = False
+            ExplicitLeft = 20
+            ExplicitWidth = 99
           end
         end
         object pnlTitTotEntSai: TPanel
           AlignWithMargins = True
-          Left = 724
+          Left = 720
           Top = 4
           Width = 136
           Height = 61
           Align = alRight
           BevelOuter = bvNone
           TabOrder = 7
-          ExplicitLeft = 720
           object lblTotalEntradas: TLabel
             AlignWithMargins = True
-            Left = 25
+            Left = 3
             Top = 3
-            Width = 108
+            Width = 130
             Height = 19
             Align = alTop
             Alignment = taRightJustify
@@ -2017,12 +2030,14 @@ inherited frmCaixa: TfrmCaixa
             Font.Style = []
             ParentColor = False
             ParentFont = False
+            ExplicitLeft = 25
+            ExplicitWidth = 108
           end
           object lblTotalSaidas: TLabel
             AlignWithMargins = True
-            Left = 41
+            Left = 3
             Top = 28
-            Width = 92
+            Width = 130
             Height = 19
             Align = alTop
             Alignment = taRightJustify
@@ -2035,6 +2050,8 @@ inherited frmCaixa: TfrmCaixa
             Font.Style = []
             ParentColor = False
             ParentFont = False
+            ExplicitLeft = 41
+            ExplicitWidth = 92
           end
         end
       end
@@ -2042,12 +2059,13 @@ inherited frmCaixa: TfrmCaixa
         Top = 145
         Width = 1255
         Height = 391
+        StyleElements = [seFont, seClient, seBorder]
         ExplicitTop = 145
         ExplicitWidth = 1255
         ExplicitHeight = 391
         inherited DBGrid1: TDBGrid
-          Width = 1257
-          Height = 390
+          Width = 1253
+          Height = 389
           DataSource = DataSourceCaixa
           PopupMenu = PopupMenu1
           Columns = <

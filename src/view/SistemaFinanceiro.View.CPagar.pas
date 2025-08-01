@@ -235,7 +235,7 @@ type
     procedure Imprimir;
 
     procedure AtualizaTotaisTelaPrincipal;
-    procedure Baixar;
+    procedure Baixar(const pCod: Integer);
 
   public
     property EventoAttTotaisCp: TEventoAttTotaisCP read FEventoAttTotaisCp write FEventoAttTotaisCp;
@@ -268,17 +268,16 @@ begin
     FEventoAttTotaisCp;
 end;
 
-procedure TfrmContasPagar.Baixar;
-var
-  lId: Integer;
+procedure TfrmContasPagar.Baixar(const pCod: Integer);
 begin
   try
 
-    lId := DBGrid1.DataSource.DataSet.FieldByName('ID').AsInteger;
-    if (TBaixarContaPagar.Baixar(lId)) then
+    if (TBaixarContaPagar.Baixar(pCod)) then
       TfrmMensagem.TelaMensagem('Sucesso!', 'Conta a Pagar baixada com sucesso.', tmSucesso);
 
     Pesquisar;
+    // Atualiza o relatorio na tela inicial
+    AtualizaTotaisTelaPrincipal;
 
   except
     on E: Exception do
@@ -296,7 +295,7 @@ end;
 
 procedure TfrmContasPagar.btnBaixarCPClick(Sender: TObject);
 begin
-  Baixar;
+  Baixar(DBGrid1.DataSource.DataSet.FieldByName('ID').AsInteger);
 end;
 
 procedure TfrmContasPagar.btnBxMultiplaClick(Sender: TObject);
@@ -782,7 +781,7 @@ begin
 
     // Se foi marcado para baixar ao salvar e a conta foi salva irá exibir a tela da baixa
     if ((lRegGravado) and (chkBaixarAoSalvar.Checked)) then
-      ExibeTelaBaixar(FCp.ID);
+      Baixar(FCp.ID);
 
     Result := True;
 
@@ -1692,6 +1691,7 @@ begin
   edtValorParcela.ReadOnly := True;
   lblNomeFornecedor.Visible := False;
   lblNomeFatCartao.Visible := False;
+  pnlFundoGrupoParcelas.Visible := False;
 
   // Coloca a data atual no datetimepicker
   dateCompra.DateTime := Now;
@@ -1747,7 +1747,7 @@ begin
 
   Result := dateVencimento.Date;
 
-  if (chkBaixarAoSalvar.Checked) and (DataSourceCPagar.State = dsInsert) then
+  if (chkBaixarAoSalvar.Checked) and (FOpCad = ocIncluir) then
     Result := dateCompra.Date;
 
 end;

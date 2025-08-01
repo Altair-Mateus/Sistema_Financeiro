@@ -11,6 +11,8 @@ object frmDetalhesOrigemCpCr: TfrmDetalhesOrigemCpCr
   Font.Name = 'Tahoma'
   Font.Style = []
   WindowState = wsMaximized
+  OnActivate = FormActivate
+  OnCreate = FormCreate
   OnDestroy = FormDestroy
   TextHeight = 19
   object pnlPrincipal: TPanel
@@ -21,12 +23,10 @@ object frmDetalhesOrigemCpCr: TfrmDetalhesOrigemCpCr
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitWidth = 1168
-    ExplicitHeight = 756
     object pnlTitulo: TPanel
       Left = 0
       Top = 0
-      Width = 1172
+      Width = 1164
       Height = 57
       Align = alTop
       BevelOuter = bvNone
@@ -40,20 +40,17 @@ object frmDetalhesOrigemCpCr: TfrmDetalhesOrigemCpCr
       ParentBackground = False
       ParentFont = False
       TabOrder = 0
-      ExplicitWidth = 1168
     end
     object pnlBotoes: TPanel
       Left = 0
-      Top = 688
-      Width = 1172
+      Top = 686
+      Width = 1164
       Height = 69
       Align = alBottom
       TabOrder = 1
-      ExplicitTop = 687
-      ExplicitWidth = 1168
       object btnSair: TButton
         AlignWithMargins = True
-        Left = 1048
+        Left = 1040
         Top = 4
         Width = 120
         Height = 61
@@ -63,20 +60,17 @@ object frmDetalhesOrigemCpCr: TfrmDetalhesOrigemCpCr
         Images = ImageList1
         TabOrder = 0
         OnClick = btnSairClick
-        ExplicitLeft = 1044
       end
     end
     object pnlInfo: TPanel
       Left = 0
       Top = 57
-      Width = 1172
-      Height = 631
+      Width = 1164
+      Height = 629
       Align = alClient
       Color = clWhite
       ParentBackground = False
       TabOrder = 2
-      ExplicitWidth = 1168
-      ExplicitHeight = 630
       object lblDesc: TLabel
         Left = 44
         Top = 88
