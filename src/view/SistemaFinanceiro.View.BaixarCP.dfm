@@ -16,6 +16,7 @@ object frmBaixarCP: TfrmBaixarCP
   OnActivate = FormActivate
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
   TextHeight = 19
   object pnlPrincipal: TPanel
     Left = 0

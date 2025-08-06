@@ -39,7 +39,10 @@ uses
   FireDAC.Stan.Param,
   System.DateUtils,
   SistemaFinanceiro.View.Relatorios.CP,
-  SistemaFinanceiro.View.BaixarCP.FrPgto;
+  SistemaFinanceiro.View.BaixarCP.FrPgto,
+  SistemaFinanceiro.Model.Entidades.CP.Detalhe,
+  SistemaFinanceiro.Model.Entidades.PgtoBxCp,
+  System.Generics.Collections;
 
 type
   TEventoAttTotaisCP = procedure of object;
@@ -201,7 +204,6 @@ type
     function CadParcelaUnica: Boolean;
     function CadParcelamento: Boolean;
     procedure EditarRegCPagar;
-    procedure ExibeTelaBaixar(pCodCP: Integer);
     procedure ExibeTelaBxMultipla;
     procedure ExibeDetalhe;
     procedure BuscaNomeFornecedor;
@@ -233,9 +235,13 @@ type
     procedure InicializaTela;
 
     procedure Imprimir;
+    procedure SalvarCp;
 
     procedure AtualizaTotaisTelaPrincipal;
+
     procedure Baixar(const pCod: Integer);
+    function ObterDetalhesBaixa(const pIdCp: Integer): TModelCpDetalhe;
+    function ObterPgtosBaixa(const pIdCp: Integer; const pValorAbater: Double): TObjectList<TModelPgtoBxCp>;
 
   public
     property EventoAttTotaisCp: TEventoAttTotaisCP read FEventoAttTotaisCp write FEventoAttTotaisCp;
@@ -259,8 +265,10 @@ uses
   SistemaFinanceiro.Model.dmFaturaCartao,
   SistemaFinanceiro.Model.dmUsuarios,
   SistemaFinanceiro.Model.Entidades.LancamentoPadraoContas,
-  SistemaFinanceiro.Services.BaixaContaPagar,
-  uTransactionScope;
+  SistemaFinanceiro.Controller.BaixaContaPagar,
+  uTransactionScope,
+  SistemaFinanceiro.Exceptions.ContasPagarDetalhe,
+  SistemaFinanceiro.Exceptions.PgtoBaixaCp;
 
 procedure TfrmContasPagar.AtualizaTotaisTelaPrincipal;
 begin
@@ -269,21 +277,43 @@ begin
 end;
 
 procedure TfrmContasPagar.Baixar(const pCod: Integer);
+var
+  lDetalhes: TModelCpDetalhe;
+  lPgtos: TObjectList<TModelPgtoBxCp>;
 begin
+
+  lDetalhes := ObterDetalhesBaixa(pCod);
+  if not(Assigned(lDetalhes)) then
+    Exit;
+
+  lPgtos := ObterPgtosBaixa(pCod, lDetalhes.Valor);
+  if not(Assigned(lPgtos)) then
+    Exit;
+
   try
+    try
 
-    if (TBaixarContaPagar.Baixar(pCod)) then
-      TfrmMensagem.TelaMensagem('Sucesso!', 'Conta a Pagar baixada com sucesso.', tmSucesso);
+      if (TControllerBaixaCp.Baixar(pCod, lDetalhes, lPgtos)) then
+        TfrmMensagem.TelaMensagem('Sucesso!', 'Conta a Pagar baixada com sucesso.', tmSucesso);
 
-    Pesquisar;
-    // Atualiza o relatorio na tela inicial
-    AtualizaTotaisTelaPrincipal;
+      Pesquisar;
+      // Atualiza o relatorio na tela inicial
+      AtualizaTotaisTelaPrincipal;
 
-  except
-    on E: Exception do
-    begin
-      TfrmMensagem.TelaMensagem('Erro ao baixar CP', E.Message, tmErro);
+    except
+      on E: Exception do
+      begin
+        TfrmMensagem.TelaMensagem('Erro ao baixar CP', E.Message, tmErro);
+      end;
     end;
+  finally
+
+    if (Assigned(lDetalhes)) then
+      lDetalhes.Free;
+
+    if (Assigned(lPgtos)) then
+      lPgtos.Free;
+
   end;
 
 end;
@@ -311,7 +341,7 @@ begin
   begin
 
     TfrmMensagem.TelaMensagem('Atenção', 'Conta não paga, realize a baixa para ver os detalhes!', tmAviso);
-    exit;
+    Exit;
 
   end;
 
@@ -325,7 +355,7 @@ var
 begin
 
   if not(ValidaStatusCp) then
-    exit;
+    Exit;
 
   lCp := TModelCP.Create;
   try
@@ -337,7 +367,7 @@ begin
         if not(lCp.LoadObjectByPK) then
         begin
           TfrmMensagem.TelaMensagem('Erro!', 'Conta inválida!', tmErro);
-          exit;
+          Exit;
         end;
 
         lCp.Status := 'C';
@@ -522,39 +552,8 @@ begin
 end;
 
 procedure TfrmContasPagar.btnSalvarClick(Sender: TObject);
-var
-  lContaGravada: Boolean;
 begin
-
-  try
-
-    if not(ValidaDadosGeraisIncCp) then
-      exit;
-
-    if (toggleParcelamento.State = tssOff) then
-      lContaGravada := CadParcelaUnica
-    else
-      lContaGravada := CadParcelamento;
-
-    if not(lContaGravada) then
-      exit;
-
-    // Retorna ao card de pesquisa
-    CardPanelPrincipal.ActiveCard := CardPesquisa;
-
-    // Atualiza a lista
-    Pesquisar;
-
-    // Atualiza o relatorio na tela inicial
-    AtualizaTotaisTelaPrincipal;
-  except
-    on E: Exception do
-    begin
-      TfrmMensagem.TelaMensagem('Erro', 'Erro ao salvar Conta a Pagar: ' +
-        E.Message, tmErro);
-    end;
-  end;
-
+  SalvarCp;
 end;
 
 procedure TfrmContasPagar.BuscaNomeFatCartao;
@@ -573,7 +572,7 @@ begin
       TfrmMensagem.TelaMensagem('Atenção', 'Fatura de Cartão não encontrada!', tmAviso);
       edtCodFatCartao.SetFocus;
       edtCodFatCartao.Clear;
-      exit;
+      Exit;
 
     end;
 
@@ -582,7 +581,7 @@ begin
       TfrmMensagem.TelaMensagem('Atenção', 'Fatura de Cartão não está Ativa, verifique o cadastro!', tmAviso);
       edtCodFatCartao.Clear;
       edtCodFatCartao.SetFocus;
-      exit;
+      Exit;
     end;
 
     lblNomeFatCartao.Caption := lNomeFatCartao;
@@ -618,7 +617,7 @@ begin
       TfrmMensagem.TelaMensagem('Atenção', 'Fornecedor não encontrado!', tmAviso);
       edtFornecedor.SetFocus;
       edtFornecedor.Clear;
-      exit;
+      Exit;
     end;
 
     if not(dmFornecedores.GetStatus(Trim(edtFornecedor.Text))) then
@@ -626,7 +625,7 @@ begin
       TfrmMensagem.TelaMensagem('Atenção', 'Fornecedor não está Ativo, verifique o cadastro!', tmAviso);
       edtFornecedor.Clear;
       edtFornecedor.SetFocus;
-      exit;
+      Exit;
     end;
 
     lblNomeFornecedor.Visible := True;
@@ -640,7 +639,7 @@ function TfrmContasPagar.CadParcelamento: Boolean;
 var
   lParcelaCp: TModelCP;
   lQtdParcelas, lIdGrupoParcelas: Integer;
-  lTransaction: TTransactionScope;
+
   lUltCod: Integer;
 begin
 
@@ -648,74 +647,67 @@ begin
   lUltCod := 0;
 
   if not(ValidaCadParcelamento) then
-    exit;
+    Exit;
 
-  lTransaction := TTransactionScope.Create;
-  try
+  lQtdParcelas := cdsParcelas.RecordCount;
+  lIdGrupoParcelas := TModelCP.GetIdGrupoParcelas;
 
-    lQtdParcelas := cdsParcelas.RecordCount;
-    lIdGrupoParcelas := TModelCP.GetIdGrupoParcelas;
+  // Posiciona no primeiro registro do cds
+  cdsParcelas.First;
 
-    // Posiciona no primeiro registro do cds
-    cdsParcelas.First;
+  // Gravando Parcelas
+  while not cdsParcelas.Eof do
+  begin
 
-    // Gravando Parcelas
-    while not cdsParcelas.Eof do
-    begin
+    lParcelaCp := TModelCP.Create;
+    try
 
-      lParcelaCp := TModelCP.Create;
-      try
+      // Gera o ID
+      if (cdsParcelasPARCELA.AsInteger = 1) then
+        lParcelaCp.GeraCodigo
+      else
+        lParcelaCp.GeraCodigo(lUltCod);
 
-        // Gera o ID
-        if (cdsParcelasPARCELA.AsInteger = 1) then
-          lParcelaCp.GeraCodigo
-        else
-          lParcelaCp.GeraCodigo(lUltCod);
+      lParcelaCp.DataCadastro := Now;
+      lParcelaCp.Status := 'A';
+      lParcelaCp.ValorAbatido := 0;
+      lParcelaCp.Doc := Trim(cdsParcelasDOCUMENTO.AsString);
+      lParcelaCp.Desc := Format('%s - Parcela %d', [memDesc.Text, cdsParcelasPARCELA.AsInteger]);
+      lParcelaCp.ValorCompra := StrToFloat(edtValorCompra.Text);
+      lParcelaCp.DataCompra := dateCompra.Date;
+      lParcelaCp.Parcela := cdsParcelasPARCELA.AsInteger;
+      lParcelaCp.ValorParcela := cdsParcelasVALOR.AsCurrency;
+      lParcelaCp.DataVencimento := cdsParcelasVENCIMENTO.AsDateTime;
+      lParcelaCp.Parcial := False;
+      lParcelaCp.FatCartao := False;
+      lParcelaCp.IdFornecedor := StrToInt(edtFornecedor.Text);
+      lParcelaCp.NumTotalParcelas := lQtdParcelas;
+      lParcelaCp.IdGrupoParcelas := lIdGrupoParcelas;
 
-        lParcelaCp.DataCadastro := Now;
-        lParcelaCp.Status := 'A';
-        lParcelaCp.ValorAbatido := 0;
-        lParcelaCp.Doc := Trim(cdsParcelasDOCUMENTO.AsString);
-        lParcelaCp.Desc := Format('%s - Parcela %d', [memDesc.Text, cdsParcelasPARCELA.AsInteger]);
-        lParcelaCp.ValorCompra := StrToFloat(edtValorCompra.Text);
-        lParcelaCp.DataCompra := dateCompra.Date;
-        lParcelaCp.Parcela := cdsParcelasPARCELA.AsInteger;
-        lParcelaCp.ValorParcela := cdsParcelasVALOR.AsCurrency;
-        lParcelaCp.DataVencimento := cdsParcelasVENCIMENTO.AsDateTime;
-        lParcelaCp.Parcial := False;
-        lParcelaCp.FatCartao := False;
-        lParcelaCp.IdFornecedor := StrToInt(edtFornecedor.Text);
-        lParcelaCp.NumTotalParcelas := lQtdParcelas;
-        lParcelaCp.IdGrupoParcelas := lIdGrupoParcelas;
-
-        if (toggleFatura.State = tssOn) then
-        begin
-          lParcelaCp.FatCartao := True;
-          lParcelaCp.IdFatCartao := StrToInt(edtCodFatCartao.Text);
-        end;
-
-        lUltCod := lParcelaCp.ID;
-
-        // Gravando no banco
-        lParcelaCp.Insert;
-
-      finally
-        lParcelaCp.Free;
+      if (toggleFatura.State = tssOn) then
+      begin
+        lParcelaCp.FatCartao := True;
+        lParcelaCp.IdFatCartao := StrToInt(edtCodFatCartao.Text);
       end;
 
-      cdsParcelas.Next;
+      lUltCod := lParcelaCp.ID;
 
+      // Gravando no banco
+      lParcelaCp.Insert;
+
+    finally
+      lParcelaCp.Free;
     end;
 
-    lTransaction.Commit;
+    cdsParcelas.Next;
 
-    Result := True;
-
-    TfrmMensagem.TelaMensagem('Informação', 'Parcelas Cadastradas com Sucesso!!',
-      tmSucesso);
-  finally
-    lTransaction.Free;
   end;
+
+  Result := True;
+
+  TfrmMensagem.TelaMensagem('Informação', 'Parcelas Cadastradas com Sucesso!!',
+    tmSucesso);
+
 end;
 
 function TfrmContasPagar.CadParcelaUnica: Boolean;
@@ -726,12 +718,12 @@ begin
   lRegGravado := False;
 
   if not(ValidaCadParcelaUnica) then
-    exit;
+    Exit;
 
   if not(Assigned(FCp)) then
   begin
     TfrmMensagem.TelaMensagem('Erro', 'Erro ao inicializar processo para gravar a Conta', tmErro);
-    exit;
+    Exit;
   end;
 
   try
@@ -847,7 +839,7 @@ var
 begin
 
   if not(ValidaCancelamentoBaixa) then
-    exit;
+    Exit;
 
   try
 
@@ -861,7 +853,7 @@ begin
         IdCp := DataSourceCPagar.DataSet.FieldByName('ID').AsInteger;
 
         // Chama a procedure que fara o trabalho
-        TBaixarContaPagar.CancelarBaixa(IdCp);
+        TControllerBaixaCp.CancelarBaixa(IdCp);
 
         TfrmMensagem.TelaMensagem('Informação', 'Cancelamento da baixa da conta completada com sucesso!', tmSucesso);
 
@@ -901,7 +893,7 @@ begin
           TfrmMensagem.TelaMensagem('Cadastro Inativo!',
             'Lançamento Padrão inativo, altere o cadastro do mesmo e tente novamente.',
             tmAviso);
-          exit;
+          Exit;
         end;
 
         memDesc.Text := lLancamento.Descricao;
@@ -1063,7 +1055,7 @@ procedure TfrmContasPagar.EditarRegCPagar;
 begin
 
   if not(ValidaStatusCp) then
-    exit;
+    Exit;
 
   FOpCad := ocAlterar;
 
@@ -1076,7 +1068,7 @@ begin
     if not(FCp.LoadObjectByPK) then
     begin
       TfrmMensagem.TelaMensagem('Erro!', 'Erro ao carregar dados da conta', tmErro);
-      exit;
+      Exit;
     end;
 
     // Abre a tela de cadastro
@@ -1149,40 +1141,18 @@ begin
 
 end;
 
-procedure TfrmContasPagar.ExibeTelaBaixar(pCodCP: Integer);
-begin
-
-  try
-    TBaixarContaPagar.Baixar(DataSourceCPagar.DataSet.FieldByName('ID').AsInteger);
-  except
-    on E: Exception do
-    begin
-      TfrmMensagem.TelaMensagem('Erro ao Baixar CP', E.Message, tmErro);
-    end;
-  end;
-
-  Pesquisar;
-
-  // Atualiza o relatorio na tela inicial
-  AtualizaTotaisTelaPrincipal;
-
-end;
-
 procedure TfrmContasPagar.ExibeTelaBxMultipla;
+var
+  lFormulario: TfrmBxMultiplaCP;
 begin
 
-  // Cria o form
-  frmBxMultiplaCP := TfrmBxMultiplaCP.Create(Self);
-
+  lFormulario := TfrmBxMultiplaCP.Create(Self);
   try
 
-    // Exibe o form
-    frmBxMultiplaCP.ShowModal;
+    lFormulario.ShowModal;
 
   finally
-
-    FreeAndNil(frmBxMultiplaCP);
-
+    lFormulario.Free;
   end;
 
   Pesquisar;
@@ -1275,7 +1245,7 @@ begin
 
   lDataPrimeiraParcela := 0;
   if not(ValidaGerarParcelas) then
-    exit;
+    Exit;
 
   lValorCompra := StrToFloat(edtValorCompra.Text);
   lQtdParcelas := StrToInt(edtQtdParcelas.Text);
@@ -1310,7 +1280,7 @@ begin
     begin
       TfrmMensagem.TelaMensagem('Atenção', 'Dia fixo de vencimento Inválido!', tmAviso);
       edtDiaFixoVcto.SetFocus;
-      exit;
+      Exit;
     end;
 
     lDataPrimeiraParcela := IncMonth(dateCompra.Date, 1);
@@ -1395,6 +1365,68 @@ begin
 
 end;
 
+function TfrmContasPagar.ObterDetalhesBaixa(const pIdCp: Integer): TModelCpDetalhe;
+var
+  lFormDet: TfrmBaixarCP;
+begin
+  Result := nil;
+
+  lFormDet := TfrmBaixarCP.Create(nil);
+  try
+    try
+
+      lFormDet.IdCp := pIdCp;
+      lFormDet.ShowModal;
+
+      if (lFormDet.ModalResult = mrOk) then
+      begin
+        Result := lFormDet.ObterDetalhes;
+      end;
+
+    except
+      on E: Exception do
+      begin
+        raise ECpObterDetalhe.Create;
+      end;
+    end;
+  finally
+    lFormDet.Free;
+  end;
+
+end;
+
+function TfrmContasPagar.ObterPgtosBaixa(const pIdCp: Integer; const pValorAbater: Double)
+  : TObjectList<TModelPgtoBxCp>;
+var
+  lFormPgto: TfrmFrPgtoBaixaCp;
+begin
+  Result := nil;
+
+  lFormPgto := TfrmFrPgtoBaixaCp.Create(nil);
+  try
+    try
+
+      lFormPgto.IdCp := pIdCp;
+      lFormPgto.ValorAbater := pValorAbater;
+      lFormPgto.ShowModal;
+
+      if (lFormPgto.ModalResult = mrOk) then
+      begin
+        Result := lFormPgto.ObterPagamentos;
+      end;
+
+    except
+      on E: Exception do
+      begin
+        raise ECpObterPgtos.Create;
+      end;
+    end;
+  finally
+    lFormPgto.Free;
+  end;
+
+end;
+
 procedure TfrmContasPagar.PesquisaClick(Sender: TObject);
 begin
   if (FTelaAtiva) then
@@ -1414,7 +1446,7 @@ begin
   LOrdem := '';
 
   if not(ValidaPesquisa) then
-    exit;
+    Exit;
 
   if (Assigned(FQueryPesquisa)) then
     FreeAndNil(FQueryPesquisa);
@@ -1742,6 +1774,51 @@ begin
     Text := 'CANCELADA';
 end;
 
+procedure TfrmContasPagar.SalvarCp;
+var
+  lContaGravada: Boolean;
+  lTransaction: TTransactionScope;
+begin
+
+  lTransaction := TTransactionScope.Create;
+  try
+    try
+
+      if not(ValidaDadosGeraisIncCp) then
+        Exit;
+
+      if (toggleParcelamento.State = tssOff) then
+        lContaGravada := CadParcelaUnica
+      else
+        lContaGravada := CadParcelamento;
+
+      if not(lContaGravada) then
+        Exit;
+
+      lTransaction.Commit;
+
+      // Retorna ao card de pesquisa
+      CardPanelPrincipal.ActiveCard := CardPesquisa;
+
+      // Atualiza a lista
+      Pesquisar;
+
+      // Atualiza o relatorio na tela inicial
+      AtualizaTotaisTelaPrincipal;
+    except
+      on E: Exception do
+      begin
+        lTransaction.Rollback;
+        TfrmMensagem.TelaMensagem('Erro', 'Erro ao salvar Conta a Pagar: ' +
+          E.Message, tmErro);
+      end;
+    end;
+  finally
+    lTransaction.Free;
+  end;
+
+end;
+
 function TfrmContasPagar.DtVencimentoCheckContaPaga: TDate;
 begin
 
@@ -1833,7 +1910,7 @@ begin
       'Informando que a conta é parcelada porém as Parcelas não foram geradas!',
       tmAviso);
     edtQtdParcelas.SetFocus;
-    exit;
+    Exit;
   end;
 
   // Valida todos os registros do cds
@@ -1844,14 +1921,14 @@ begin
     begin
       TfrmMensagem.TelaMensagem('Atenção!',
         'Número de parcela gerado inválido!', tmAviso);
-      exit;
+      Exit;
     end;
 
     if (cdsParcelasVALOR.AsCurrency < 0.01) then
     begin
       TfrmMensagem.TelaMensagem('Atenção!',
         'Valor da Parcela Inválido!', tmAviso);
-      exit;
+      Exit;
     end;
 
     // Avança para o próximo registro
@@ -1874,7 +1951,7 @@ begin
     TfrmMensagem.TelaMensagem('Atenção!',
       'Número da parcela Inválido!', tmAviso);
     edtParcela.SetFocus;
-    exit;
+    Exit;
   end;
 
   if (dateVencimento.Date < dateCompra.Date) then
@@ -1882,7 +1959,7 @@ begin
     TfrmMensagem.TelaMensagem('Atenção!',
       'Data de vencimento não pode ser inferior a data de compra!', tmAviso);
     dateVencimento.SetFocus;
-    exit;
+    Exit;
   end;
 
   if (Trim(edtValorParcela.Text).IsEmpty) then
@@ -1890,14 +1967,14 @@ begin
     TfrmMensagem.TelaMensagem('Atenção!', 'Valor da parcela Inválido!',
       tmAviso);
     edtValorParcela.SetFocus;
-    exit;
+    Exit;
   end;
 
   if not(Assigned(FCp)) then
   begin
     TfrmMensagem.TelaMensagem('Erro',
       'Erro ao inicializar processo para gravar a Conta', tmErro);
-    exit;
+    Exit;
   end;
 
   Result := True;
@@ -1910,14 +1987,14 @@ begin
   if not(dmUsuarios.GetUsuarioLogado.User_Admin = 'S') then
   begin
     TfrmMensagem.TelaMensagem('Atenção!', 'Somente Administradores podem cancelar uma Baixa!', tmAviso);
-    exit;
+    Exit;
   end;
 
   // Bloqueia o cancelamento se a conta não estiver como PAGA
   if (DBGrid1.DataSource.DataSet.FieldByName('STATUS').AsString <> 'P') then
   begin
     TfrmMensagem.TelaMensagem('Atenção', 'Só é possível cancelar o pagamento/baixa de uma conta já paga!', tmAviso);
-    exit;
+    Exit;
   end;
   Result := True;
 end;
@@ -1934,7 +2011,7 @@ begin
     TfrmMensagem.TelaMensagem('Atenção!',
       'Campo DESCRICAO não pode estar vazio!', tmAviso);
     memDesc.SetFocus;
-    exit;
+    Exit;
   end;
 
   if (Trim(edtFornecedor.Text).IsEmpty) then
@@ -1942,7 +2019,7 @@ begin
     TfrmMensagem.TelaMensagem('Atenção!',
       'Campo FORNECEDOR não pode estar vazio!', tmAviso);
     edtFornecedor.SetFocus;
-    exit;
+    Exit;
   end;
 
   if (not(TryStrToFloat(edtValorCompra.Text, lValorCompra)) or
@@ -1950,7 +2027,7 @@ begin
   begin
     TfrmMensagem.TelaMensagem('Atenção!', 'Valor da compra Inválido!', tmAviso);
     edtValorCompra.SetFocus;
-    exit;
+    Exit;
   end;
 
   if (dateCompra.Date > Now) then
@@ -1958,7 +2035,7 @@ begin
     TfrmMensagem.TelaMensagem('Atenção!',
       'Data de compra não pode ser maior que a data atual!', tmAviso);
     dateCompra.SetFocus;
-    exit;
+    Exit;
   end;
 
   Result := True;
@@ -1971,14 +2048,14 @@ begin
   Result := False;
 
   if not(ValidaDadosGeraisIncCp) then
-    exit;
+    Exit;
 
   if not TryStrToInt(edtQtdParcelas.Text, lQtdParcelas) or
     (lQtdParcelas <= 1) then
   begin
     TfrmMensagem.TelaMensagem('Atenção', 'Números de Parcelas Inválido!', tmAviso);
     edtQtdParcelas.SetFocus;
-    exit;
+    Exit;
   end;
 
   Result := True;
@@ -1996,14 +2073,14 @@ begin
   if (lStatus = 'P') then
   begin
     TfrmMensagem.TelaMensagem('Atenção!', 'Documento já pago não pode ser alterado!', tmAviso);
-    exit;
+    Exit;
   end;
 
   // Se o documento foi cancelado, a edição é cancelada
   if (lStatus = 'C') then
   begin
     TfrmMensagem.TelaMensagem('Atenção!', 'Documento já cancelado não pode ser alterado!', tmAviso);
-    exit;
+    Exit;
   end;
 
   Result := True;
@@ -2018,7 +2095,7 @@ begin
     TfrmMensagem.TelaMensagem('Atenção',
       'Data Inicial não pode ser maior que a data Final!', tmAviso);
     dateFinal.SetFocus;
-    exit;
+    Exit;
   end;
 
   if (cbStatus.ItemIndex < 0) then
@@ -2026,14 +2103,14 @@ begin
     TfrmMensagem.TelaMensagem('Atenção',
       'Selecione um tipo de STATUS!', tmAviso);
     cbStatus.SetFocus;
-    exit;
+    Exit;
   end;
 
   if (cbData.ItemIndex < 0) then
   begin
     TfrmMensagem.TelaMensagem('Atenção', 'Selecione um tipo de Data!', tmAviso);
     cbData.SetFocus;
-    exit;
+    Exit;
   end;
   Result := True;
 end;

@@ -13,7 +13,6 @@ inherited frmContasPagar: TfrmContasPagar
   inherited CardPanelPrincipal: TCardPanel
     Width = 1323
     Height = 641
-    ActiveCard = CardPesquisa
     StyleElements = [seFont, seClient, seBorder]
     ExplicitWidth = 1323
     ExplicitHeight = 641

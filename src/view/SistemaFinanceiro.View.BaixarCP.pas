@@ -72,18 +72,21 @@ type
     procedure FormActivate(Sender: TObject);
     procedure EditKeyPress(Sender: TObject; var Key: Char);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure FormDestroy(Sender: TObject);
   private
     FTelaAtiva: Boolean;
     DataCompra: TDateTime;
     FCp: TModelCP;
     FCpDetalhe: TModelCpDetalhe;
+    FIdCp: Integer;
 
     // Cálculos de Desconto
     function CalcValorDesc: Currency;
     function CalcPorcentDesc: Currency;
 
     // Funções de Inicialização
-    procedure InicializaCampos;
+    procedure CarregaDadosCP;
+    function CarregaCP: Boolean;
 
     // Funções de Validação
     function ValidaCampos: Boolean;
@@ -94,10 +97,8 @@ type
     procedure Confirmar;
 
   public
-    property CP: TModelCP read FCp write FCp;
-
+    property IdCp: Integer read FIdCp write FIdCp;
     function ObterDetalhes: TModelCpDetalhe;
-
   end;
 
 var
@@ -113,7 +114,12 @@ uses
   SistemaFinanceiro.Model.dmUsuarios;
 
 { TfrmBaixarCP }
-procedure TfrmBaixarCP.InicializaCampos;
+function TfrmBaixarCP.CarregaCP: Boolean;
+begin
+  Result := FCp.Existe(FIdCp, True);
+end;
+
+procedure TfrmBaixarCP.CarregaDadosCP;
 begin
   lblIdConta.Caption := IntToStr(FCp.id);
   lblParcela.Caption := IntToStr(FCp.Parcela);
@@ -220,7 +226,7 @@ begin
   FCpDetalhe := TModelCpDetalhe.Create;
 
   FCpDetalhe.GeraCodigo;
-  FCpDetalhe.IdCP := FCp.id;
+  FCpDetalhe.IdCp := FCp.id;
   FCpDetalhe.Detalhes := Trim(edtObs.Text);
   FCpDetalhe.Valor := StrToFloatDef(Trim(edtValor.Text), 0);
   FCpDetalhe.Data := datePgto.Date;
@@ -275,13 +281,14 @@ begin
   if not(FTelaAtiva) then
   begin
 
-    if not(Assigned(FCp)) then
+    if not(CarregaCP) then
     begin
+      TfrmMensagem.TelaMensagem('Erro!', 'Erro ao carregar dados da CP.', tmErro);
       TUtilitario.FecharFormulario(Self);
       Exit;
     end;
 
-    InicializaCampos;
+    CarregaDadosCP;
     FTelaAtiva := True;
 
   end;
@@ -307,12 +314,18 @@ end;
 procedure TfrmBaixarCP.FormCreate(Sender: TObject);
 begin
   FTelaAtiva := False;
+  FCp := TModelCP.Create;
 
   // Coloca no KeyPress o enter para ir para o proximo campo
   edtValor.OnKeyPress := KeyPressValor;
   edtValorDesc.OnKeyPress := KeyPressValor;
   edtPorcDesc.OnKeyPress := KeyPressValor;
 
+end;
+
+procedure TfrmBaixarCP.FormDestroy(Sender: TObject);
+begin
+  FCp.Free;
 end;
 
 procedure TfrmBaixarCP.KeyPressValor(Sender: TObject; var Key: Char);

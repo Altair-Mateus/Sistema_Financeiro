@@ -73,7 +73,6 @@ uses
   SistemaFinanceiro.Model.Entidades.Fornecedor in 'src\model\Entidades\SistemaFinanceiro.Model.Entidades.Fornecedor.pas',
   SistemaFinanceiro.View.Relatorios.LancamentoPadrao in 'src\view\Relatorios\SistemaFinanceiro.View.Relatorios.LancamentoPadrao.pas' {frmRelLancamentoPadrao},
   SistemaFinanceiro.Model.Entidades.PgtoBxCp in 'src\model\Entidades\SistemaFinanceiro.Model.Entidades.PgtoBxCp.pas',
-  SistemaFinanceiro.Services.BaixaContaPagar in 'src\services\SistemaFinanceiro.Services.BaixaContaPagar.pas',
   SistemaFinanceiro.Exceptions.BaixaCp in 'src\exceptions\SistemaFinanceiro.Exceptions.BaixaCp.pas',
   SistemaFinanceiro.Exceptions.ContasPagar in 'src\exceptions\SistemaFinanceiro.Exceptions.ContasPagar.pas',
   SistemaFinanceiro.Exceptions.ContasPagarDetalhe in 'src\exceptions\SistemaFinanceiro.Exceptions.ContasPagarDetalhe.pas',
@@ -89,7 +88,9 @@ uses
   uTransactionScope in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\transactions\uTransactionScope.pas',
   uITransactionScope in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\interfaces\uITransactionScope.pas',
   SistemaFinanceiro.Model.Entidades.FrPgto in 'src\model\Entidades\SistemaFinanceiro.Model.Entidades.FrPgto.pas',
-  SistemaFinanceiro.Exceptions.FrPgto in 'src\exceptions\SistemaFinanceiro.Exceptions.FrPgto.pas';
+  SistemaFinanceiro.Exceptions.FrPgto in 'src\exceptions\SistemaFinanceiro.Exceptions.FrPgto.pas',
+  SistemaFinanceiro.Controller.BaixaMultCp in 'src\controller\SistemaFinanceiro.Controller.BaixaMultCp.pas',
+  SistemaFinanceiro.Controller.BaixaContaPagar in 'src\controller\SistemaFinanceiro.Controller.BaixaContaPagar.pas';
 
 {$R *.res}
 
