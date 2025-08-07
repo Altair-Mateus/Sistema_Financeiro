@@ -11,10 +11,12 @@ object frmBxMultiplaCp: TfrmBxMultiplaCp
   Font.Height = -16
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   Position = poScreenCenter
   WindowState = wsMaximized
-  OnCreate = FormCreate
-  OnShow = FormShow
+  OnActivate = FormActivate
+  OnDestroy = FormDestroy
+  OnKeyPress = FormKeyPress
   TextHeight = 19
   object pnlPrincipal: TPanel
     Left = 0
@@ -26,10 +28,6 @@ object frmBxMultiplaCp: TfrmBxMultiplaCp
     Color = clWhite
     ParentBackground = False
     TabOrder = 0
-    ExplicitLeft = 568
-    ExplicitTop = 344
-    ExplicitWidth = 185
-    ExplicitHeight = 41
     object pgcBaixaMult: TPageControl
       Left = 0
       Top = 0
@@ -50,10 +48,6 @@ object frmBxMultiplaCp: TfrmBxMultiplaCp
           Color = clWhite
           ParentBackground = False
           TabOrder = 0
-          ExplicitLeft = 552
-          ExplicitTop = 304
-          ExplicitWidth = 185
-          ExplicitHeight = 41
           object pnlFiltros: TPanel
             Left = 0
             Top = 0
@@ -121,7 +115,6 @@ object frmBxMultiplaCp: TfrmBxMultiplaCp
               Font.Name = 'Tahoma'
               Font.Style = []
               ParentFont = False
-              Visible = False
             end
             object lblCodFatCartao: TLabel
               Left = 344
@@ -148,7 +141,6 @@ object frmBxMultiplaCp: TfrmBxMultiplaCp
               Font.Name = 'Tahoma'
               Font.Style = []
               ParentFont = False
-              Visible = False
             end
             object lblData: TLabel
               Left = 18
@@ -245,7 +237,7 @@ object frmBxMultiplaCp: TfrmBxMultiplaCp
               NumbersOnly = True
               TabOrder = 3
               TextHint = 'Clique no bot'#227'o ao lado'
-              OnChange = edtFornecedorChange
+              OnChange = PesquisaClick
               OnExit = edtFornecedorExit
             end
             object btnPesquisaFornecedor: TButton
@@ -269,7 +261,7 @@ object frmBxMultiplaCp: TfrmBxMultiplaCp
               NumbersOnly = True
               TabOrder = 5
               TextHint = 'Clique no bot'#227'o ao lado'
-              OnChange = edtCodFatCartaoChange
+              OnChange = PesquisaClick
               OnExit = edtCodFatCartaoExit
             end
             object btnPesqFat: TButton
@@ -340,9 +332,7 @@ object frmBxMultiplaCp: TfrmBxMultiplaCp
             Color = clWhite
             ParentBackground = False
             TabOrder = 1
-            ExplicitTop = 0
-            ExplicitHeight = 581
-            object DBGrid1: TDBGrid
+            object grdCp: TDBGrid
               Left = 0
               Top = 0
               Width = 1289
@@ -358,9 +348,9 @@ object frmBxMultiplaCp: TfrmBxMultiplaCp
               TitleFont.Height = -16
               TitleFont.Name = 'Tahoma'
               TitleFont.Style = []
-              OnCellClick = DBGrid1CellClick
-              OnDrawColumnCell = DBGrid1DrawColumnCell
-              OnKeyDown = DBGrid1KeyDown
+              OnCellClick = grdCpCellClick
+              OnDrawColumnCell = grdCpDrawColumnCell
+              OnKeyDown = grdCpKeyDown
               Columns = <
                 item
                   Expanded = False
@@ -626,10 +616,6 @@ object frmBxMultiplaCp: TfrmBxMultiplaCp
           Color = clWhite
           ParentBackground = False
           TabOrder = 0
-          ExplicitLeft = 552
-          ExplicitTop = 304
-          ExplicitWidth = 185
-          ExplicitHeight = 41
           object memLogErros: TMemo
             Left = 0
             Top = 0

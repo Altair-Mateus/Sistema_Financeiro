@@ -3,23 +3,26 @@ inherited frmFornecedores: TfrmFornecedores
   ClientHeight = 645
   ClientWidth = 1339
   WindowState = wsMaximized
-  ExplicitTop = -144
-  ExplicitWidth = 1351
-  ExplicitHeight = 683
+  StyleElements = [seFont, seClient, seBorder]
+  ExplicitWidth = 1355
+  ExplicitHeight = 684
   TextHeight = 19
   inherited CardPanelPrincipal: TCardPanel
     Width = 1339
     Height = 645
+    StyleElements = [seFont, seClient, seBorder]
     ExplicitWidth = 1335
     ExplicitHeight = 644
     inherited CardCadastro: TCard
       Width = 1339
       Height = 645
+      StyleElements = [seFont, seClient, seBorder]
       ExplicitWidth = 1335
       ExplicitHeight = 644
       inherited pnlBotoesCad: TPanel
         Top = 576
         Width = 1339
+        StyleElements = [seFont, seClient, seBorder]
         ExplicitTop = 575
         ExplicitWidth = 1335
         inherited btnSalvar: TButton
@@ -29,6 +32,7 @@ inherited frmFornecedores: TfrmFornecedores
       inherited PanelCampos: TPanel
         Width = 1339
         Height = 535
+        StyleElements = [seFont, seClient, seBorder]
         ExplicitWidth = 1335
         ExplicitHeight = 534
         object LabelNome: TLabel
@@ -346,19 +350,19 @@ inherited frmFornecedores: TfrmFornecedores
           Width = 105
           Height = 21
           Color = 9750962
-          DisabledColor = 5737262
+          DisabledColor = clSeagreen
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBtnText
           Font.Height = -16
           Font.Name = 'Tahoma'
           Font.Style = []
-          FrameColor = 5737262
+          FrameColor = clSeagreen
           ParentFont = False
           State = tssOn
           StateCaptions.CaptionOn = 'Ativo'
           StateCaptions.CaptionOff = 'Inativo'
           TabOrder = 15
-          ThumbColor = 5737262
+          ThumbColor = clSeagreen
         end
         object edtCep: TMaskEdit
           Left = 208
@@ -373,18 +377,21 @@ inherited frmFornecedores: TfrmFornecedores
       end
       inherited PanelTitulo: TPanel
         Width = 1339
+        StyleElements = [seFont, seClient, seBorder]
         ExplicitWidth = 1335
         inherited lblTitulo: TLabel
-          Width = 245
+          Width = 260
           Caption = 'Inserindo um novo Fornecedor'
           Color = 5934893
-          ExplicitWidth = 245
+          StyleElements = [seFont, seClient, seBorder]
+          ExplicitWidth = 260
         end
       end
     end
     inherited CardPesquisa: TCard
       Width = 1339
       Height = 645
+      StyleElements = [seFont, seClient, seBorder]
       ExplicitLeft = 0
       ExplicitTop = 0
       ExplicitWidth = 1339
@@ -392,11 +399,13 @@ inherited frmFornecedores: TfrmFornecedores
       inherited pnlPesquisa: TPanel
         Width = 1339
         Height = 137
+        StyleElements = [seFont, seClient, seBorder]
         ExplicitWidth = 1339
         ExplicitHeight = 137
         inherited lblPesquisar: TLabel
           Left = 182
           Top = 40
+          StyleElements = [seFont, seClient, seBorder]
           ExplicitLeft = 182
           ExplicitTop = 40
         end
@@ -718,6 +727,7 @@ inherited frmFornecedores: TfrmFornecedores
           Left = 182
           Top = 64
           Width = 297
+          StyleElements = [seFont, seClient, seBorder]
           OnChange = edtPesquisarChange
           ExplicitLeft = 182
           ExplicitTop = 64
@@ -844,6 +854,7 @@ inherited frmFornecedores: TfrmFornecedores
       inherited pnlBotoes: TPanel
         Top = 576
         Width = 1339
+        StyleElements = [seFont, seClient, seBorder]
         ExplicitTop = 576
         ExplicitWidth = 1339
         inherited btnExcluir: TButton
@@ -861,6 +872,7 @@ inherited frmFornecedores: TfrmFornecedores
         Top = 137
         Width = 1339
         Height = 439
+        StyleElements = [seFont, seClient, seBorder]
         ExplicitTop = 137
         ExplicitWidth = 1339
         ExplicitHeight = 439

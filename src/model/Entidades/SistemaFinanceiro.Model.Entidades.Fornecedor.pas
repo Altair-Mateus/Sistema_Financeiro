@@ -3,8 +3,12 @@ unit SistemaFinanceiro.Model.Entidades.Fornecedor;
 interface
 
 uses
-  uDBAttributes, uDaoRTTI, SistemaFinanceiro.Model.uSFQuery,
-  System.SysUtils, fMensagem, uEnumsUtils;
+  uDBAttributes,
+  uDaoRTTI,
+  SistemaFinanceiro.Model.uSFQuery,
+  System.SysUtils,
+  fMensagem,
+  uEnumsUtils;
 
 type
   TModelFornecedor = class
@@ -17,7 +21,7 @@ type
     FBairro: String;
     FRazao_Social: String;
     FData_Cadastro: TDateTime;
-    FStatus_For: String;
+    FStatus_For: Boolean;
     FCpf: String;
     FCep: String;
     FIe: String;
@@ -71,8 +75,8 @@ type
     [TDBColumn('DATA_ALTERACAO'), TDBAcceptNull]
     property Data_Alteracao: TDateTime read FData_Alteracao
       write FData_Alteracao;
-    [TDBColumn('STATUS_FOR')]
-    property Status_For: String read FStatus_For write FStatus_For;
+    [TDBColumn('STATUS_FOR'), TDBSaveBoolean(btAI)]
+    property Status_For: Boolean read FStatus_For write FStatus_For;
 
     constructor Create;
     destructor Destroy; override;

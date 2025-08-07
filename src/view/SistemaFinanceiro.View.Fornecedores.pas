@@ -3,10 +3,27 @@ unit SistemaFinanceiro.View.Fornecedores;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, SistemaFinanceiro.View.CadastroPadrao,
-  Data.DB, System.ImageList, Vcl.ImgList, Vcl.Grids, Vcl.DBGrids, Vcl.ExtCtrls,
-  Vcl.StdCtrls, Vcl.WinXPanels, Vcl.Imaging.pngimage, Vcl.Mask, Vcl.WinXCtrls;
+  Winapi.Windows,
+  Winapi.Messages,
+  System.SysUtils,
+  System.Variants,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  SistemaFinanceiro.View.CadastroPadrao,
+  Data.DB,
+  System.ImageList,
+  Vcl.ImgList,
+  Vcl.Grids,
+  Vcl.DBGrids,
+  Vcl.ExtCtrls,
+  Vcl.StdCtrls,
+  Vcl.WinXPanels,
+  Vcl.Imaging.pngimage,
+  Vcl.Mask,
+  Vcl.WinXCtrls;
 
 type
   TfrmFornecedores = class(TfrmCadastroPadrao)
@@ -80,7 +97,7 @@ type
     procedure EditarFornecedor;
 
   public
-    { Public declarations }
+    function RetornaCodigo: String;
 
   protected
     procedure Pesquisar; override;
@@ -94,7 +111,10 @@ implementation
 
 {$R *.dfm}
 
-uses SistemaFinanceiro.Model.dmFornecedores, SistemaFinanceiro.Utilitarios,
+
+uses
+  SistemaFinanceiro.Model.dmFornecedores,
+  SistemaFinanceiro.Utilitarios,
   SistemaFinanceiro.View.Relatorios.Fornecedores;
 
 procedure TfrmFornecedores.btnAlterarClick(Sender: TObject);
@@ -109,14 +129,14 @@ procedure TfrmFornecedores.btnCancelarClick(Sender: TObject);
 begin
   inherited;
 
-  //  Cancelando a inclusão
+  // Cancelando a inclusão
   dmFornecedores.cdsFornecedores.Cancel;
 
 end;
 
 procedure TfrmFornecedores.btnExcluirClick(Sender: TObject);
 var
-  option : Word;
+  option: Word;
 
 begin
   inherited;
@@ -131,23 +151,22 @@ begin
   if dmFornecedores.GetCpFornec(DataSourceFornecedor.DataSet.FieldByName('ID_FORNEC').AsInteger) = True then
   begin
 
-    Application.MessageBox('Não é possível excluir um fornecedor com Conta a Pagar Cadastrada!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+    Application.MessageBox('Não é possível excluir um fornecedor com Conta a Pagar Cadastrada!', 'Atenção',
+      MB_OK + MB_ICONEXCLAMATION);
     exit;
 
   end;
 
-
   try
 
-    //  Excluindo registro
+    // Excluindo registro
     dmFornecedores.cdsFornecedores.Delete;
     dmFornecedores.cdsFornecedores.ApplyUpdates(0);
 
-  except on E : Exception do
-    Application.MessageBox(PWidechar(E.Message), 'Erro ao excluir Fornecedor', MB_OK + MB_ICONERROR);
+  except
+    on E: Exception do
+      Application.MessageBox(PWidechar(E.Message), 'Erro ao excluir Fornecedor', MB_OK + MB_ICONERROR);
   end;
-
-
 
 end;
 
@@ -155,14 +174,14 @@ procedure TfrmFornecedores.btnImprimirClick(Sender: TObject);
 begin
   inherited;
 
-   //  Cria o form
+  // Cria o form
   frmRelFornecedores := TfrmRelFornecedores.Create(Self);
 
   try
 
     frmRelFornecedores.DataSourceFornecedores.DataSet := DataSourceFornecedor.DataSet;
 
-    //  Mostra a pre vizualizacao
+    // Mostra a pre vizualizacao
     frmRelFornecedores.RLReport.Preview;
 
   finally
@@ -181,24 +200,23 @@ begin
 
   lblTitulo.Caption := 'Inserindo um novo Fornecedor';
 
-  if not (dmFornecedores.cdsFornecedores.State in [dsEdit, dsInsert]) then
+  if not(dmFornecedores.cdsFornecedores.State in [dsEdit, dsInsert]) then
   begin
 
-    //  Colocando o data set em modo de inserção de dados
+    // Colocando o data set em modo de inserção de dados
     dmFornecedores.cdsFornecedores.Insert;
 
   end;
 
   edtNome.SetFocus;
 
-  //  Defindo tipo de fornecedor previamente como PJ
+  // Defindo tipo de fornecedor previamente como PJ
   rbJuridica.Checked;
-  edtCpf.Enabled  := False;
+  edtCpf.Enabled := False;
   edtCnpj.Enabled := True;
-  edtIe.Enabled   := True;
+  edtIe.Enabled := True;
 
   cbUf.ItemIndex := -1;
-
 
 end;
 
@@ -212,18 +230,18 @@ end;
 
 procedure TfrmFornecedores.btnSalvarClick(Sender: TObject);
 var
-  TipoFornecedor : String;
-  Cpf            : String;
-  Cnpj           : String;
-  Status         : String;
-  Cep            : String;
+  TipoFornecedor: String;
+  Cpf: String;
+  Cnpj: String;
+  Status: String;
+  Cep: String;
 
 begin
 
-  //  Valida os campos obrigatórios
+  // Valida os campos obrigatórios
   ValidaCampos;
 
-  //  Se for um novo fornecedor
+  // Se for um novo fornecedor
   if (dmFornecedores.cdsFornecedores.State in [dsInsert]) then
   begin
 
@@ -232,7 +250,7 @@ begin
 
   end;
 
-  //  Se for uma edição
+  // Se for uma edição
   if (dmFornecedores.cdsFornecedores.State in [dsEdit]) then
   begin
 
@@ -240,20 +258,19 @@ begin
 
   end;
 
-
-  //  Ignora a mascara do cpf
+  // Ignora a mascara do cpf
   Cpf := StringReplace(edtCpf.Text, '.', '', [rfReplaceAll]);
   Cpf := StringReplace(Cpf, '-', '', [rfReplaceAll]);
 
-  //  Ignora a mascara do cnpj
+  // Ignora a mascara do cnpj
   Cnpj := StringReplace(edtCnpj.Text, '.', '', [rfReplaceAll]);
   Cnpj := StringReplace(Cnpj, '-', '', [rfReplaceAll]);
   Cnpj := StringReplace(Cnpj, '/', '', [rfReplaceAll]);
 
-  //  Ignora a mascara do CEP
+  // Ignora a mascara do CEP
   Cep := StringReplace(edtCep.Text, '-', '', [rfReplaceAll]);
 
-  //  Define o status do fornecedor
+  // Define o status do fornecedor
   if ToggleStatus.State = tssOn then
   begin
     Status := 'A';
@@ -263,7 +280,7 @@ begin
     Status := 'I';
   end;
 
-  //  Define o tipo de fornecedor
+  // Define o tipo de fornecedor
   if rbFisica.Checked then
   begin
     TipoFornecedor := 'F';
@@ -273,33 +290,33 @@ begin
     TipoFornecedor := 'J';
   end;
 
-  //  Passando os dados para o dataset
-  dmFornecedores.cdsFornecedoresRAZAO_SOCIAL.AsString  := Trim(edtNome.Text);
+  // Passando os dados para o dataset
+  dmFornecedores.cdsFornecedoresRAZAO_SOCIAL.AsString := Trim(edtNome.Text);
   dmFornecedores.cdsFornecedoresNOME_FANTASIA.AsString := Trim(edtNomeFantasia.Text);
-  dmFornecedores.cdsFornecedoresTIPO.AsString          := TipoFornecedor;
-  dmFornecedores.cdsFornecedoresCPF.AsString           := Trim(Cpf);
-  dmFornecedores.cdsFornecedoresCNPJ.AsString          := Trim(Cnpj);
-  dmFornecedores.cdsFornecedoresIE.AsString            := Trim(edtIe.Text);
-  dmFornecedores.cdsFornecedoresENDERECO.AsString      := Trim(edtEndereco.Text);
-  dmFornecedores.cdsFornecedoresN_LOGRADOURO.AsString  := Trim(edtNumLog.Text);
-  dmFornecedores.cdsFornecedoresBAIRRO.AsString        := Trim(edtBairro.Text);
-  dmFornecedores.cdsFornecedoresCIDADE.AsString        := Trim(edtCidade.Text);
-  dmFornecedores.cdsFornecedoresESTADO.AsString        := cbUf.Text;
-  dmFornecedores.cdsFornecedoresCEP.AsString           := Trim(Cep);
-  dmFornecedores.cdsFornecedoresCELULAR.AsString       := Trim(edtCelular.Text);
-  dmFornecedores.cdsFornecedoresTELEFONE.AsString      := Trim(edtTelefone.Text);
-  dmFornecedores.cdsFornecedoresCOMPLEMENTO.AsString   := Trim(edtComplemento.Text);
-  dmFornecedores.cdsFornecedoresEMAIL.AsString         := Trim(edtEmail.Text);
-  dmFornecedores.cdsFornecedoresSTATUS_FOR.AsString    := Status;
+  dmFornecedores.cdsFornecedoresTIPO.AsString := TipoFornecedor;
+  dmFornecedores.cdsFornecedoresCPF.AsString := Trim(Cpf);
+  dmFornecedores.cdsFornecedoresCNPJ.AsString := Trim(Cnpj);
+  dmFornecedores.cdsFornecedoresIE.AsString := Trim(edtIe.Text);
+  dmFornecedores.cdsFornecedoresENDERECO.AsString := Trim(edtEndereco.Text);
+  dmFornecedores.cdsFornecedoresN_LOGRADOURO.AsString := Trim(edtNumLog.Text);
+  dmFornecedores.cdsFornecedoresBAIRRO.AsString := Trim(edtBairro.Text);
+  dmFornecedores.cdsFornecedoresCIDADE.AsString := Trim(edtCidade.Text);
+  dmFornecedores.cdsFornecedoresESTADO.AsString := cbUf.Text;
+  dmFornecedores.cdsFornecedoresCEP.AsString := Trim(Cep);
+  dmFornecedores.cdsFornecedoresCELULAR.AsString := Trim(edtCelular.Text);
+  dmFornecedores.cdsFornecedoresTELEFONE.AsString := Trim(edtTelefone.Text);
+  dmFornecedores.cdsFornecedoresCOMPLEMENTO.AsString := Trim(edtComplemento.Text);
+  dmFornecedores.cdsFornecedoresEMAIL.AsString := Trim(edtEmail.Text);
+  dmFornecedores.cdsFornecedoresSTATUS_FOR.AsString := Status;
 
-  //  Gravando no banco de dados
+  // Gravando no banco de dados
   dmFornecedores.cdsFornecedores.Post;
   dmFornecedores.cdsFornecedores.ApplyUpdates(0);
 
-  //  Retorna ao cardPesquisa;
+  // Retorna ao cardPesquisa;
   CardPanelPrincipal.ActiveCard := CardPesquisa;
 
-  //  Atualiza a lista de pesquisa
+  // Atualiza a lista de pesquisa
   Pesquisar;
 
 end;
@@ -328,45 +345,46 @@ end;
 
 procedure TfrmFornecedores.EditarFornecedor;
 var
-  IndexCb : Integer;
+  IndexCb: Integer;
 
 begin
 
-  //  Coloca o dataset em modo de edição
+  // Coloca o dataset em modo de edição
   dmFornecedores.cdsFornecedores.Edit;
 
-  //  Coloca o nome do fornecedor no titulo
-  lblTitulo.Caption := dmFornecedores.cdsFornecedoresId.AsString + ' - ' + dmFornecedores.cdsFornecedoresRAZAO_SOCIAL.AsString;
+  // Coloca o nome do fornecedor no titulo
+  lblTitulo.Caption := dmFornecedores.cdsFornecedoresId.AsString + ' - ' +
+    dmFornecedores.cdsFornecedoresRAZAO_SOCIAL.AsString;
 
   if dmFornecedores.cdsFornecedoresSTATUS_FOR.AsString = 'A' then
   begin
     ToggleStatus.State := tssOn;
   end
-    else
-    begin
-      ToggleStatus.State := tssOff;
-    end;
+  else
+  begin
+    ToggleStatus.State := tssOff;
+  end;
 
-  //  Carrega os dados
-  edtNome.Text         := dmFornecedores.cdsFornecedoresRAZAO_SOCIAL.AsString;
+  // Carrega os dados
+  edtNome.Text := dmFornecedores.cdsFornecedoresRAZAO_SOCIAL.AsString;
   edtNomeFantasia.Text := dmFornecedores.cdsFornecedoresNOME_FANTASIA.AsString;
-  edtCpf.Text          := dmFornecedores.cdsFornecedoresCPF.AsString;
-  edtCnpj.Text         := dmFornecedores.cdsFornecedoresCNPJ.AsString;
-  edtIe.Text           := dmFornecedores.cdsFornecedoresIE.AsString;
-  edtEndereco.Text     := dmFornecedores.cdsFornecedoresENDERECO.AsString;
-  edtNumLog.Text       := dmFornecedores.cdsFornecedoresN_LOGRADOURO.AsString;
-  edtBairro.Text       := dmFornecedores.cdsFornecedoresBAIRRO.AsString;
-  edtCidade.Text       := dmFornecedores.cdsFornecedoresCIDADE.AsString;
-  edtCep.Text          := dmFornecedores.cdsFornecedoresCEP.AsString;
-  edtCelular.Text      := dmFornecedores.cdsFornecedoresCELULAR.AsString;
-  edtTelefone.Text     := dmFornecedores.cdsFornecedoresTELEFONE.AsString;
-  edtComplemento.Text  := dmFornecedores.cdsFornecedoresCOMPLEMENTO.AsString;
-  edtEmail.Text        := dmFornecedores.cdsFornecedoresEMAIL.AsString;
+  edtCpf.Text := dmFornecedores.cdsFornecedoresCPF.AsString;
+  edtCnpj.Text := dmFornecedores.cdsFornecedoresCNPJ.AsString;
+  edtIe.Text := dmFornecedores.cdsFornecedoresIE.AsString;
+  edtEndereco.Text := dmFornecedores.cdsFornecedoresENDERECO.AsString;
+  edtNumLog.Text := dmFornecedores.cdsFornecedoresN_LOGRADOURO.AsString;
+  edtBairro.Text := dmFornecedores.cdsFornecedoresBAIRRO.AsString;
+  edtCidade.Text := dmFornecedores.cdsFornecedoresCIDADE.AsString;
+  edtCep.Text := dmFornecedores.cdsFornecedoresCEP.AsString;
+  edtCelular.Text := dmFornecedores.cdsFornecedoresCELULAR.AsString;
+  edtTelefone.Text := dmFornecedores.cdsFornecedoresTELEFONE.AsString;
+  edtComplemento.Text := dmFornecedores.cdsFornecedoresCOMPLEMENTO.AsString;
+  edtEmail.Text := dmFornecedores.cdsFornecedoresEMAIL.AsString;
 
   // Procura a sigla do estado no cb
   IndexCb := cbUf.Items.IndexOf(dmFornecedores.cdsFornecedoresESTADO.AsString);
 
-  //  Ao localizar define a mesma no cb
+  // Ao localizar define a mesma no cb
   if IndexCb >= 0 then
   begin
     cbUf.ItemIndex := IndexCb;
@@ -376,16 +394,15 @@ begin
     cbUf.ItemIndex := -1;
   end;
 
-
   if dmFornecedores.cdsFornecedoresTIPO.AsString = 'F' then
   begin
 
     rbFisica.Checked := True;
     rbJuridica.Checked := False;
 
-    edtCpf.Enabled  := True;
+    edtCpf.Enabled := True;
     edtCnpj.Enabled := False;
-    edtIe.Enabled   := False;
+    edtIe.Enabled := False;
 
   end
   else
@@ -394,11 +411,10 @@ begin
     rbJuridica.Checked := True;
     rbFisica.Checked := False;
 
-    edtCpf.Enabled  := False;
+    edtCpf.Enabled := False;
     edtCnpj.Enabled := True;
-    edtIe.Enabled   := True;
+    edtIe.Enabled := True;
   end;
-
 
 end;
 
@@ -413,8 +429,8 @@ end;
 procedure TfrmFornecedores.HabilitaBotoes;
 begin
 
-  btnAlterar.Enabled  := not DataSourceFornecedor.DataSet.IsEmpty;
-  btnExcluir.Enabled  := not DataSourceFornecedor.DataSet.IsEmpty;
+  btnAlterar.Enabled := not DataSourceFornecedor.DataSet.IsEmpty;
+  btnExcluir.Enabled := not DataSourceFornecedor.DataSet.IsEmpty;
   btnImprimir.Enabled := not DataSourceFornecedor.DataSet.IsEmpty;
 
 end;
@@ -422,14 +438,13 @@ end;
 procedure TfrmFornecedores.Pesquisar;
 var
   LFiltroEdit: String;
-  LFiltro : String;
-  LOrdem : String;
+  LFiltro: String;
+  LOrdem: String;
 
 begin
 
-
   if cbTipo.ItemIndex < 0 then
-   begin
+  begin
 
     cbTipo.SetFocus;
     Application.MessageBox('Selecione um tipo de FORNECEDOR!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
@@ -443,19 +458,23 @@ begin
 
   dmFornecedores.cdsFornecedores.Params.Clear;
 
-  //  Pesquisa por tipo
+  // Pesquisa por tipo
   case cbTipo.ItemIndex of
 
-    1 : LFiltroEdit := LFiltro + ' AND TIPO = ''F'' ';
-    2 : LFiltroEdit := LFiltro + ' AND TIPO = ''J'' ';
+    1:
+      LFiltroEdit := LFiltro + ' AND TIPO = ''F'' ';
+    2:
+      LFiltroEdit := LFiltro + ' AND TIPO = ''J'' ';
 
   end;
 
-  //  Pesquisa por status
+  // Pesquisa por status
   case cbStatus.ItemIndex of
 
-    1 : LFiltroEdit := LFiltro + ' AND STATUS = ''A'' ';
-    2 : LFiltroEdit := LFiltro + ' AND STATUS = ''I'' ';
+    1:
+      LFiltroEdit := LFiltro + ' AND STATUS = ''A'' ';
+    2:
+      LFiltroEdit := LFiltro + ' AND STATUS = ''I'' ';
 
   end;
 
@@ -465,25 +484,24 @@ begin
     LOrdem := ' ORDER BY ID_FORNEC';
   end
   else if rbDataCad.Checked then
-       begin
-         LOrdem := 'ORDER BY DATA_CADASTRO';
-       end
-       else if rbNome.Checked then
-            begin
-              LOrdem := 'ORDER BY RAZAO_SOCIAL';
-            end
-            else
-            begin
-              LOrdem := ' ORDER BY ID_FORNEC';
-            end;
-
+  begin
+    LOrdem := 'ORDER BY DATA_CADASTRO';
+  end
+  else if rbNome.Checked then
+  begin
+    LOrdem := 'ORDER BY RAZAO_SOCIAL';
+  end
+  else
+  begin
+    LOrdem := ' ORDER BY ID_FORNEC';
+  end;
 
   dmFornecedores.cdsFornecedores.Close;
-  dmFornecedores.cdsFornecedores.CommandText := 'SELECT * FROM FORNECEDORES WHERE 1 = 1 ' + LFiltroEdit +  lFiltro + LOrdem;
+  dmFornecedores.cdsFornecedores.CommandText := 'SELECT * FROM FORNECEDORES WHERE 1 = 1 ' + LFiltroEdit +
+    LFiltro + LOrdem;
   dmFornecedores.cdsFornecedores.Open;
 
   HabilitaBotoes;
-
 
   inherited;
 
@@ -501,9 +519,9 @@ procedure TfrmFornecedores.rbFisicaClick(Sender: TObject);
 begin
   inherited;
 
-  edtCpf.Enabled  := True;
+  edtCpf.Enabled := True;
   edtCnpj.Enabled := False;
-  edtIe.Enabled   := False;
+  edtIe.Enabled := False;
 
   edtCnpj.Clear;
   edtIe.Clear;
@@ -523,8 +541,8 @@ begin
   inherited;
 
   edtCnpj.Enabled := True;
-  edtIe.Enabled   := True;
-  edtCpf.Enabled  := False;
+  edtIe.Enabled := True;
+  edtCpf.Enabled := False;
 
   edtCpf.Clear;
 
@@ -536,6 +554,11 @@ begin
 
   Pesquisar;
 
+end;
+
+function TfrmFornecedores.RetornaCodigo: String;
+begin
+  Result := DBGrid1.DataSource.DataSet.FieldByName('ID_FORNEC').AsString;
 end;
 
 procedure TfrmFornecedores.ValidaCampos;

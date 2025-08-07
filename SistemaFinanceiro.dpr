@@ -90,7 +90,9 @@ uses
   SistemaFinanceiro.Model.Entidades.FrPgto in 'src\model\Entidades\SistemaFinanceiro.Model.Entidades.FrPgto.pas',
   SistemaFinanceiro.Exceptions.FrPgto in 'src\exceptions\SistemaFinanceiro.Exceptions.FrPgto.pas',
   SistemaFinanceiro.Controller.BaixaMultCp in 'src\controller\SistemaFinanceiro.Controller.BaixaMultCp.pas',
-  SistemaFinanceiro.Controller.BaixaContaPagar in 'src\controller\SistemaFinanceiro.Controller.BaixaContaPagar.pas';
+  SistemaFinanceiro.Controller.BaixaContaPagar in 'src\controller\SistemaFinanceiro.Controller.BaixaContaPagar.pas',
+  SistemaFinanceiro.Model.Entidades.FaturaCartao in 'src\model\Entidades\SistemaFinanceiro.Model.Entidades.FaturaCartao.pas',
+  SistemaFinanceiro.Exceptions.FaturaCartao in 'src\exceptions\SistemaFinanceiro.Exceptions.FaturaCartao.pas';
 
 {$R *.res}
 
