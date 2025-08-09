@@ -3,11 +3,28 @@ unit SistemaFinanceiro.View.BxMultiplaCr;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Data.DB, Vcl.StdCtrls, Vcl.ComCtrls,
-  Vcl.Grids, Vcl.DBGrids, Vcl.ExtCtrls, System.ImageList, Vcl.ImgList,
-  SistemaFinanceiro.View.Clientes, SistemaFinanceiro.View.BxMulti.InfosBx,
-  SistemaFinanceiro.Model.Entidades.CR, SistemaFinanceiro.Model.uSFQuery;
+  Winapi.Windows,
+  Winapi.Messages,
+  System.SysUtils,
+  System.Variants,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  Data.DB,
+  Vcl.StdCtrls,
+  Vcl.ComCtrls,
+  Vcl.Grids,
+  Vcl.DBGrids,
+  Vcl.ExtCtrls,
+  System.ImageList,
+  Vcl.ImgList,
+  SistemaFinanceiro.View.Clientes,
+
+  SistemaFinanceiro.Model.Entidades.CR,
+  SistemaFinanceiro.Model.uSFQuery,
+  SistemaFinanceiro.View.BxMulti.InfosBxCr;
 
 type
   TfrmBxMultiplaCR = class(TForm)
@@ -68,7 +85,7 @@ type
     procedure FormKeyPress(Sender: TObject; var Key: Char);
     procedure FormDestroy(Sender: TObject);
   private
-    FQueryPesquisa : TSFQuery;
+    FQueryPesquisa: TSFQuery;
     procedure Pesquisar;
     procedure BuscaNomeCliente;
     procedure SelAllReg(DBGrid: TDBGrid);
@@ -76,8 +93,8 @@ type
     procedure CalcQtdCrGrid;
     procedure CalcQtdCrSel;
 
-    function CalcCrSel : Currency;
-    function CalcDescBx(ValorCr, ValorTot, ValorDesc : Currency) : Currency;
+    function CalcCrSel: Currency;
+    function CalcDescBx(ValorCr, ValorTot, ValorDesc: Currency): Currency;
 
   public
     { Public declarations }
@@ -90,99 +107,101 @@ implementation
 
 {$R *.dfm}
 
+
 uses
   SistemaFinanceiro.Model.dmUsuarios,
   SistemaFinanceiro.Model.dmClientes,
   SistemaFinanceiro.Utilitarios,
   System.DateUtils,
   SistemaFinanceiro.Model.Entidades.CR.Detalhe,
-  Math, SistemaFinanceiro.Model.Entidades.PgtoBxCr;
+  Math,
+  SistemaFinanceiro.Model.Entidades.PgtoBxCr;
 
 procedure TfrmBxMultiplaCR.btnConfirmarClick(Sender: TObject);
 var
-  lCrDetalhe         : TModelCrDetalhe;
-  lCr : TModelCR;
-  lFrPgtoBaixa : TModelPgtoBxCr;
-  lValorCrSel        : Currency;
-  lValorAbater       : Currency;
-  lValorDesc         : Currency;
-  lValorTotCrSel     : Currency;
-  lContador, lIdCr   : Integer;
-  lDtMaisAntiga      : TDateTime;
-  lDtCompraSel       : TDateTime;
-  lFrPgto            : Integer;
-  lDtPgto            : TDateTime;
+  lCrDetalhe: TModelCrDetalhe;
+  lCr: TModelCR;
+  lFrPgtoBaixa: TModelPgtoBxCr;
+  lValorCrSel: Currency;
+  lValorAbater: Currency;
+  lValorDesc: Currency;
+  lValorTotCrSel: Currency;
+  lContador, lIdCr: Integer;
+  lDtMaisAntiga: TDateTime;
+  lDtCompraSel: TDateTime;
+  lFrPgto: Integer;
+  lDtPgto: TDateTime;
+  lDetalhes: TfrmInfoBxMultCr;
 begin
 
-  //  Inicialização das variaveis
-  lValorAbater   := 0;
-  lValorDesc     := 0;
-  lFrPgto        := 0;
-  lValorCrSel    := 0;
-  lIdCr          := 0;
+  // Inicialização das variaveis
+  lValorAbater := 0;
+  lValorDesc := 0;
+  lFrPgto := 0;
+  lValorCrSel := 0;
+  lIdCr := 0;
   lValorTotCrSel := CalcCrSel;
-  lDtPgto        := MaxDateTime;
-
+  lDtPgto := MaxDateTime;
 
   if DBGrid1.SelectedRows.Count > 0 then
   begin
 
-    {Pega a data mais antiga}
+    { Pega a data mais antiga }
     // Inicializa com o maior valor possível da data
-    lDtMaisAntiga      := MaxDateTime;
+    lDtMaisAntiga := MaxDateTime;
 
     for lContador := 0 to DBGrid1.SelectedRows.Count - 1 do
     begin
       DBGrid1.DataSource.DataSet.Bookmark := DBGrid1.SelectedRows[lContador];
 
-      //  Pega a data de venda
+      // Pega a data de venda
       lDtCompraSel := DBGrid1.DataSource.DataSet.FieldByName('DATA_VENDA').AsDateTime;
 
       if lDtCompraSel < lDtMaisAntiga then
         lDtMaisAntiga := lDtCompraSel;
     end;
 
-
-    {Chama a tela de Infos Baixa}
     try
+      { Chama a tela de Infos Baixa }
+      lDetalhes := TfrmInfoBxMultCr.Create(nil);
+      try
 
-      //  Cria o form
-      frmInfoBxMult := TfrmInfoBxMult.Create(Self);
+        // Passa o valor total das contas selecionadas e a data da mais antiga
+        lDetalhes.ValorPago := CalcCrSel;
+        lDetalhes.DtMaisAnt := lDtMaisAntiga;
 
-      //  Passa o valor total das contas selecionadas e a data da mais antiga
-      frmInfoBxMult.ValorPago   := CalcCrSel;
-      frmInfoBxMult.DtMaisAnt   := lDtMaisAntiga;
+        // Exibe o form
+        lDetalhes.ShowModal;
 
-      //  Exibe o form
-      frmInfoBxMult.ShowModal;
+      except
+        on E: Exception do
+          Application.MessageBox(PWideChar(E.Message), 'Erro na forma de pagamento do documento!',
+            MB_OK + MB_ICONWARNING);
+      end;
 
-    except
-      on E : Exception do
-        Application.MessageBox(PWideChar(E.Message), 'Erro na forma de pagamento do documento!', MB_OK + MB_ICONWARNING);
+      // Verifica se deu tudo certo com as info de pgto
+      if lDetalhes.ModalResult <> mrOk then
+      begin
+        abort;
+      end
+      else
+      begin
+        lFrPgto := lDetalhes.CodFrPgto;
+        lValorAbater := lDetalhes.ValorPago;
+        lValorDesc := lDetalhes.ValorDesc;
+        lDtPgto := lDetalhes.DataPgto;
+      end;
+
+    finally
+      lDetalhes.Free;
     end;
 
-    //  Verifica se deu tudo certo com as info de pgto
-    if frmInfoBxMult.ModalResult <> mrOk then
-    begin
-      abort;
-    end
-    else
-    begin
-      lFrPgto      := frmInfoBxMult.CodFrPgto;
-      lValorAbater := frmInfoBxMult.ValorPago;
-      lValorDesc   := frmInfoBxMult.ValorDesc;
-      lDtPgto      := frmInfoBxMult.DataPgto;
-
-      FreeAndNil(frmInfoBxMult);
-    end;
-
-
-    {Baixando as CRs}
+    { Baixando as CRs }
     for lContador := 0 to DBGrid1.SelectedRows.Count - 1 do
     begin
 
       DBGrid1.DataSource.DataSet.Bookmark := DBGrid1.SelectedRows[lContador];
-      lCrDetalhe  := TModelCrDetalhe.Create;
+      lCrDetalhe := TModelCrDetalhe.Create;
       lCr := TModelCR.Create;
       lFrPgtoBaixa := TModelPgtoBxCr.Create;
       lValorCrSel := 0;
@@ -194,62 +213,62 @@ begin
           exit;
         end;
 
-        //  Pegando o valor da conta
+        // Pegando o valor da conta
         lValorCrSel := DBGrid1.DataSource.DataSet.FieldByName('VALOR_PARCELA').AsCurrency;
 
-        lCrDetalhe.IdCR      := lCr.ID;
-        lCrDetalhe.Detalhes  := 'CR baixada pela rotina de Baixa Múltipla';
-        lCrDetalhe.Data      := lDtPgto;
-        lCrDetalhe.Usuario   := dmUsuarios.GetUsuarioLogado.Id;
+        lCrDetalhe.IdCR := lCr.ID;
+        lCrDetalhe.Detalhes := 'CR baixada pela rotina de Baixa Múltipla';
+        lCrDetalhe.Data := lDtPgto;
+        lCrDetalhe.Usuario := dmUsuarios.GetUsuarioLogado.ID;
         lCrDetalhe.ValorDesc := CalcDescBx(lValorCrSel, lValorTotCrSel, lValorDesc);
-
 
         if (lValorAbater - (lValorCrSel - lCrDetalhe.ValorDesc)) > 0 then
         begin
-          //  Se for maior que 0 vai baixar a conta total
+          // Se for maior que 0 vai baixar a conta total
           lCrDetalhe.Valor := (lValorCrSel - lCrDetalhe.ValorDesc);
         end
         else if lValorAbater > 0 then
         begin
-          //  Se ainda tiver ValorAbater mas não o suficiente
-          //  para baixar toda a CR, ira baixar apenas o valor
-          //  abater e o restante será gerado uma Cr Parcial
+          // Se ainda tiver ValorAbater mas não o suficiente
+          // para baixar toda a CR, ira baixar apenas o valor
+          // abater e o restante será gerado uma Cr Parcial
           lCrDetalhe.Valor := lValorAbater;
         end
         else
         begin
-          //  Caso ainda tenha alguma CR selecionada porem
-          //  ValorAbater já está zerado irá baixar a conta
-          //  e irá gerar uma Cr Parcial com o valor total
+          // Caso ainda tenha alguma CR selecionada porem
+          // ValorAbater já está zerado irá baixar a conta
+          // e irá gerar uma Cr Parcial com o valor total
           lCrDetalhe.Valor := 0;
         end;
 
-        //  Calcula o restante do valor abater
+        // Calcula o restante do valor abater
         lValorAbater := (lValorAbater - (lValorCrSel - lCrDetalhe.ValorDesc));
 
-        {Enviando a cp para ser baixada}
+        { Enviando a cp para ser baixada }
         try
           lCr.BaixarCr(lCrDetalhe, lCr);
-        except on E : Exception do
-          Application.MessageBox(PWideChar(E.Message), 'Erro ao baixar documento!', MB_OK + MB_ICONWARNING);
+        except
+          on E: Exception do
+            Application.MessageBox(PWideChar(E.Message), 'Erro ao baixar documento!', MB_OK + MB_ICONWARNING);
         end;
 
-
-        {Gravando a forma de pgto}
+        { Gravando a forma de pgto }
         try
 
           lFrPgtoBaixa.GeraCodigo;
-          lFrPgtoBaixa.IdCr       := lCr.Id;
-          lFrPgtoBaixa.IdFrPgto   := lFrPgto;
-          lFrPgtoBaixa.NrPgto     := 1;
-          lFrPgtoBaixa.DataHora   := Now;
+          lFrPgtoBaixa.IdCR := lCr.ID;
+          lFrPgtoBaixa.IdFrPgto := lFrPgto;
+          lFrPgtoBaixa.NrPgto := 1;
+          lFrPgtoBaixa.DataHora := Now;
           lFrPgtoBaixa.ValorPago := lCrDetalhe.Valor;
 
-          //  Gravando no banco
+          // Gravando no banco
           lFrPgtoBaixa.Insert;
 
-        except on E : Exception do
-          Application.MessageBox(PWideChar(E.Message), 'Erro ao salvar Forma de pagamento!', MB_OK + MB_ICONWARNING)
+        except
+          on E: Exception do
+            Application.MessageBox(PWideChar(E.Message), 'Erro ao salvar Forma de pagamento!', MB_OK + MB_ICONWARNING)
 
         end;
 
@@ -266,12 +285,12 @@ begin
   end
   else
   begin
-     Application.MessageBox('Selecione uma ou mais contas!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+    Application.MessageBox('Selecione uma ou mais contas!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
   end;
 
-  //  Desmarca os checks e atualiza o grid
+  // Desmarca os checks e atualiza o grid
   checkParciais.Checked := False;
-  checkSelAll.Checked   := False;
+  checkSelAll.Checked := False;
 
   Pesquisar;
 
@@ -280,17 +299,17 @@ end;
 procedure TfrmBxMultiplaCR.btnPesquisaFornecedorClick(Sender: TObject);
 begin
 
-  //  Cria o form
+  // Cria o form
   frmCliente := TfrmCliente.Create(Self);
 
   try
 
-    //  Exiobe na tela
+    // Exiobe na tela
     frmCliente.ShowModal;
 
   finally
 
-    //  Pega a id do cliente selecionado
+    // Pega a id do cliente selecionado
     edtCliente.Text := frmCliente.DataSourceCliente.DataSet.FieldByName('ID_CLI').AsString;
 
     FreeAndNil(frmCliente);
@@ -313,7 +332,7 @@ end;
 
 procedure TfrmBxMultiplaCR.BuscaNomeCliente;
 var
-  NomeCliente : String;
+  NomeCliente: String;
 
 begin
 
@@ -346,14 +365,14 @@ begin
 
   TotalCr := 0;
 
-  //  Percorre e soma
+  // Percorre e soma
   with DBGrid1.DataSource.DataSet do
   begin
 
-    //  Desativa o controle
+    // Desativa o controle
     DisableControls;
 
-    //  Posiciona no primeiro reg
+    // Posiciona no primeiro reg
     First;
 
     while not Eof do
@@ -365,7 +384,7 @@ begin
 
     end;
 
-    //  Reativa o controle
+    // Reativa o controle
     EnableControls;
 
     edtValorTotCR.Text := TUtilitario.FormatoMoeda(TotalCr);
@@ -407,26 +426,25 @@ begin
     end;
   end;
 
-
 end;
 
 function TfrmBxMultiplaCR.CalcDescBx(ValorCr, ValorTot,
   ValorDesc: Currency): Currency;
 var
-  PercentCr   : Currency;
-  ValorDescCr : Currency;
+  PercentCr: Currency;
+  ValorDescCr: Currency;
 
 begin
 
-  PercentCr   := 0;
+  PercentCr := 0;
   ValorDescCr := 0;
-  Result      := 0;
+  Result := 0;
 
   if (ValorCr < 0) then
   begin
     Application.MessageBox('Valor Conta a Receber < 0!', 'Atenção', MB_OK + MB_ICONWARNING);
   end
-  else if (ValorTot < 0)  then
+  else if (ValorTot < 0) then
   begin
     Application.MessageBox('Valor Total das Contas < 0!', 'Atenção', MB_OK + MB_ICONWARNING);
   end
@@ -437,10 +455,10 @@ begin
   else
   begin
 
-    //  Descobre o percentual da conta
+    // Descobre o percentual da conta
     PercentCr := (ValorCr / ValorTot);
 
-    //  Descobre o valor do desconto para a conta
+    // Descobre o valor do desconto para a conta
     ValorDescCr := (PercentCr * ValorDesc);
 
     Result := ValorDescCr;
@@ -457,10 +475,10 @@ begin
 
   QtdCr := 0;
 
-  //  Realiza a conta
+  // Realiza a conta
   QtdCr := DBGrid1.DataSource.DataSet.RecordCount;
 
-  //  Exibe na label
+  // Exibe na label
   edtQtdCr.Text := IntToStr(QtdCr);
 
 end;
@@ -468,13 +486,13 @@ end;
 procedure TfrmBxMultiplaCR.CalcQtdCrSel;
 begin
 
-   if Assigned(DBGrid1.SelectedRows) then
-    begin
+  if Assigned(DBGrid1.SelectedRows) then
+  begin
 
-      //  Exibe no edit
-      edtQtdSelecionada.Text := IntToStr(DBGrid1.SelectedRows.Count);
+    // Exibe no edit
+    edtQtdSelecionada.Text := IntToStr(DBGrid1.SelectedRows.Count);
 
-    end;
+  end;
 
 end;
 
@@ -491,10 +509,10 @@ end;
 procedure TfrmBxMultiplaCR.checkSelAllClick(Sender: TObject);
 begin
 
-  //  Seleciona todas as contas no dbgrid
+  // Seleciona todas as contas no dbgrid
   SelAllReg(DBGrid1);
 
-  //  Exibe o valor total das selecionadas
+  // Exibe o valor total das selecionadas
   edtValorSel.Text := TUtilitario.FormatoMoeda(CalcCrSel);
   CalcQtdCrSel;
 
@@ -513,7 +531,7 @@ end;
 procedure TfrmBxMultiplaCR.DBGrid1CellClick(Column: TColumn);
 begin
 
-  //  Atualiza valores e quantidades de crs selecionadas
+  // Atualiza valores e quantidades de crs selecionadas
   edtValorSel.Text := TUtilitario.FormatoMoeda(CalcCrSel);
   CalcQtdCrSel;
 
@@ -523,20 +541,20 @@ procedure TfrmBxMultiplaCR.DBGrid1DrawColumnCell(Sender: TObject;
   const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
 begin
 
-  //  Altera a cor das duplicatas vencidas
+  // Altera a cor das duplicatas vencidas
   if (not DBGrid1.DataSource.DataSet.IsEmpty) and
-      (DBGrid1.DataSource.DataSet.FieldByName('DATA_VENCIMENTO').AsDateTime < Date)
-      and (DBGrid1.DataSource.DataSet.FieldByName('STATUS').AsString = 'A')then
+    (DBGrid1.DataSource.DataSet.FieldByName('DATA_VENCIMENTO').AsDateTime < Date)
+    and (DBGrid1.DataSource.DataSet.FieldByName('STATUS').AsString = 'A') then
   begin
-    DBGrid1.Canvas.Font.Color := clRed;  // Define a cor do texto da célula
+    DBGrid1.Canvas.Font.Color := clRed; // Define a cor do texto da célula
   end;
 
-  //  Intercala a cor das contas não selecionadas
+  // Intercala a cor das contas não selecionadas
   if (gdSelected in State) then
   begin
 
-    DBGrid1.Canvas.Brush.Color := $00578B2E;  // Define a cor de fundo da célula selecionada
-    DBGrid1.Canvas.Font.Color := clWhite;  // Define a cor do texto da célula selecionada
+    DBGrid1.Canvas.Brush.Color := $00578B2E; // Define a cor de fundo da célula selecionada
+    DBGrid1.Canvas.Font.Color := clWhite; // Define a cor do texto da célula selecionada
 
   end;
 
@@ -551,9 +569,9 @@ procedure TfrmBxMultiplaCR.DBGrid1KeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
 
-  //  Realiza o calculo caso o user use o shift + seta para baixo
-  //  para selecionar as contas
-  if key = VK_DOWN then
+  // Realiza o calculo caso o user use o shift + seta para baixo
+  // para selecionar as contas
+  if Key = VK_DOWN then
   begin
 
     edtValorSel.Text := TUtilitario.FormatoMoeda(CalcCrSel);
@@ -566,7 +584,7 @@ end;
 procedure TfrmBxMultiplaCR.edtClienteChange(Sender: TObject);
 begin
 
-  //  Se apagar o cod do fornec apaga o nome do mesmo
+  // Se apagar o cod do fornec apaga o nome do mesmo
   if ((GetKeyState(VK_BACK) and $8000) <> 0) then
     lblNomeCliente.Caption := '';
 
@@ -593,16 +611,15 @@ begin
 
     end;
 
-
   end;
 
 end;
 
 procedure TfrmBxMultiplaCR.FormCreate(Sender: TObject);
 begin
-  //  Define as datas da consulta
+  // Define as datas da consulta
   dateInicial.Date := StartOfTheMonth(Now);
-  dateFinal.Date   := EndOfTheMonth(Now);
+  dateFinal.Date := EndOfTheMonth(Now);
 end;
 
 procedure TfrmBxMultiplaCR.FormDestroy(Sender: TObject);
@@ -615,10 +632,10 @@ procedure TfrmBxMultiplaCR.FormKeyPress(Sender: TObject; var Key: Char);
 begin
   if Key = #13 then
   begin
-    //  Verifica se a tecla pressionada é o Enter
-    //  Cancela o efeito do enter
+    // Verifica se a tecla pressionada é o Enter
+    // Cancela o efeito do enter
     Key := #0;
-    //  Pula para o proximo
+    // Pula para o proximo
     Perform(WM_NEXTDLGCTL, 0, 0);
   end;
 end;
@@ -626,7 +643,7 @@ end;
 procedure TfrmBxMultiplaCR.FormShow(Sender: TObject);
 begin
 
-  //  Fecha o dataset para limpar o dbgrid;
+  // Fecha o dataset para limpar o dbgrid;
   if Assigned(DataSourceBxMultiplaCr) and Assigned(DataSourceBxMultiplaCr.DataSet) then
   begin
     DataSourceBxMultiplaCr.DataSet.Close; // Fecha o conjunto de dados
@@ -636,8 +653,8 @@ end;
 
 procedure TfrmBxMultiplaCR.Pesquisar;
 var
-  LFiltro    : String;
-  LOrdem     : String;
+  LFiltro: String;
+  LOrdem: String;
 begin
 
   if Assigned(FQueryPesquisa) then
@@ -646,16 +663,17 @@ begin
   FQueryPesquisa := TSFQuery.Create(nil);
 
   try
-    //  Validações
+    // Validações
     if dateInicial.Date > dateFinal.Date then
     begin
       dateFinal.SetFocus;
-      Application.MessageBox('Data Inicial não pode ser maior que a data Final!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+      Application.MessageBox('Data Inicial não pode ser maior que a data Final!', 'Atenção',
+        MB_OK + MB_ICONEXCLAMATION);
       exit;
     end;
 
     if cbData.ItemIndex < 0 then
-     begin
+    begin
       cbData.SetFocus;
       Application.MessageBox('Selecione um tipo de DATA!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
       exit;
@@ -667,29 +685,30 @@ begin
       exit;
     end;
 
-    LFiltro     := '';
-    LOrdem      := '';
+    LFiltro := '';
+    LOrdem := '';
 
-    //  Pesquisa por data
+    // Pesquisa por data
     if (dateInicial.Checked) and (dateFinal.Checked) then
     begin
       case cbData.ItemIndex of
-        0 : LFiltro := LFiltro + ' AND CR.DATA_VENDA BETWEEN :DTINI AND :DTFIM ';
-        1 : LFiltro := LFiltro + ' AND CR.DATA_VENCIMENTO BETWEEN :DTINI AND :DTFIM ';
+        0:
+          LFiltro := LFiltro + ' AND CR.DATA_VENDA BETWEEN :DTINI AND :DTFIM ';
+        1:
+          LFiltro := LFiltro + ' AND CR.DATA_VENCIMENTO BETWEEN :DTINI AND :DTFIM ';
       end;
     end;
 
-    //  Pesquisa parciais
+    // Pesquisa parciais
     if checkParciais.Checked then
       LFiltro := LFiltro + ' AND CR.PARCIAL = ''S'' ';
 
-    //  Pesquisa por Cliente
+    // Pesquisa por Cliente
     if Trim(edtCliente.Text) <> '' then
       LFiltro := LFiltro + ' AND CR.ID_CLIENTE = :ID ';
 
-    //  Ordem de pesquisa
-    lOrdem := ' ORDER BY Cr.DATA_VENCIMENTO ';
-
+    // Ordem de pesquisa
+    LOrdem := ' ORDER BY Cr.DATA_VENCIMENTO ';
 
     FQueryPesquisa.Close;
     FQueryPesquisa.SQL.Clear;
@@ -710,17 +729,17 @@ begin
     FQueryPesquisa.Open;
     DBGrid1.DataSource.DataSet := FQueryPesquisa;
 
-    //  Calcula a quantidade e valor
+    // Calcula a quantidade e valor
     CalcCrGrid;
     CalcQtdCrGrid;
 
-    //  Coloca na primeira posição
+    // Coloca na primeira posição
     DBGrid1.DataSource.DataSet.First;
   except
-    on e: Exception do
+    on E: Exception do
     begin
-      Application.MessageBox(PWidechar('Erro ao realizar a consulta: ' +
-        e.Message), 'Atenção', MB_OK + MB_ICONERROR);
+      Application.MessageBox(PWideChar('Erro ao realizar a consulta: ' +
+        E.Message), 'Atenção', MB_OK + MB_ICONERROR);
     end;
   end;
 
@@ -728,7 +747,7 @@ end;
 
 procedure TfrmBxMultiplaCR.SelAllReg(DBGrid: TDBGrid);
 var
-  i: Integer;
+  I: Integer;
 
 begin
 
@@ -747,12 +766,12 @@ begin
         // Desativa controles de atualização para melhorar o desempenho
         DBGrid.DataSource.DataSet.DisableControls;
 
-        //  Coloca na primeira posição
-        DBGrid.DataSource.DataSet.first;
+        // Coloca na primeira posição
+        DBGrid.DataSource.DataSet.First;
 
         try
 
-          for i := 0 to DBGrid.DataSource.DataSet.RecordCount - 1 do
+          for I := 0 to DBGrid.DataSource.DataSet.RecordCount - 1 do
           begin
 
             if checkSelAll.Checked then

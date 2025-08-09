@@ -282,16 +282,18 @@ var
   lPgtos: TObjectList<TModelPgtoBxCp>;
 begin
 
-  lDetalhes := ObterDetalhesBaixa(pCod);
-  if not(Assigned(lDetalhes)) then
-    Exit;
-
-  lPgtos := ObterPgtosBaixa(pCod, lDetalhes.Valor);
-  if not(Assigned(lPgtos)) then
-    Exit;
-
+  lDetalhes := nil;
+  lPgtos := nil;
   try
     try
+
+      lDetalhes := ObterDetalhesBaixa(pCod);
+      if not(Assigned(lDetalhes)) then
+        Exit;
+
+      lPgtos := ObterPgtosBaixa(pCod, lDetalhes.Valor);
+      if not(Assigned(lPgtos)) then
+        Exit;
 
       if (TControllerBaixaCp.Baixar(pCod, lDetalhes, lPgtos)) then
         TfrmMensagem.TelaMensagem('Sucesso!', 'Conta a Pagar baixada com sucesso.', tmSucesso);
@@ -307,13 +309,8 @@ begin
       end;
     end;
   finally
-
-    if (Assigned(lDetalhes)) then
-      lDetalhes.Free;
-
-    if (Assigned(lPgtos)) then
-      lPgtos.Free;
-
+    lDetalhes.Free;
+    lPgtos.Free;
   end;
 
 end;

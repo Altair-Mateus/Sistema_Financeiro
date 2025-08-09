@@ -98,8 +98,6 @@ implementation
 
 
 uses
-  SistemaFinanceiro.Model.dmFrPgto,
-  SistemaFinanceiro.Model.dmPgtoBxCp,
   SistemaFinanceiro.Utilitarios,
   SistemaFinanceiro.Model.Entidades.FrPgto;
 

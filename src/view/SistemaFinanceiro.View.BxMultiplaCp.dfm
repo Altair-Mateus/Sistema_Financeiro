@@ -3284,7 +3284,6 @@ object frmBxMultiplaCp: TfrmBxMultiplaCp
       000000000000}
   end
   object DataSourceBxMultiplaCP: TDataSource
-    DataSet = dmCPagar.cdsBxMultipla
     Left = 64
     Top = 281
   end

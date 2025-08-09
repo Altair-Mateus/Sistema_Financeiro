@@ -23,7 +23,6 @@ uses
   Vcl.Grids,
   Vcl.DBGrids,
   System.DateUtils,
-  Datasnap.DBClient,
   SistemaFinanceiro.View.BxMulti.InfosBx,
   fMensagem,
   SistemaFinanceiro.Model.uSFQuery,
@@ -111,15 +110,18 @@ type
     procedure CalcQtdCpGrid;
     procedure CalcQtdCpSel;
 
-    function CalcCpSel: Currency;
+    function CalcCpSel: Double;
     function CalcDescBx(ValorCP, ValorTot, ValorDesc: Currency): Currency;
 
     procedure AbreTelaFornecedor;
     procedure AbreTelaFaturas;
 
     procedure Confirmar;
-    function ObterDetalhesBaixa(const pIdCp: Integer): TModelCpDetalhe;
-    function ObterPgtosBaixa(const pIdCp: Integer; const pValorAbater: Double): TObjectList<TModelPgtoBxCp>;
+    function ObterDetalhesBaixa(const pDtMaisAnt: TDate; const pValorSel: Double; out pOutCodPgto: Integer)
+      : TModelCpDetalhe;
+    function CarregaPgto(const pIdFrPgto: Integer): TObjectList<TModelPgtoBxCp>;
+
+    procedure RegistrarLogsErros(const Logs: TStringList);
 
   public
     { Public declarations }
@@ -136,10 +138,12 @@ implementation
 uses
   FireDAC.Stan.Param,
   SistemaFinanceiro.Utilitarios,
-  SistemaFinanceiro.Model.dmUsuarios,
   uEnumsUtils,
   SistemaFinanceiro.Model.Entidades.Fornecedor,
-  SistemaFinanceiro.Model.Entidades.FaturaCartao;
+  SistemaFinanceiro.Model.Entidades.FaturaCartao,
+  SistemaFinanceiro.Exceptions.ContasPagarDetalhe,
+  SistemaFinanceiro.Exceptions.PgtoBaixaCp,
+  SistemaFinanceiro.Controller.BaixaMultCp;
 
 procedure TfrmBxMultiplaCp.AbreTelaFaturas;
 var
@@ -315,39 +319,33 @@ begin
 
 end;
 
-function TfrmBxMultiplaCp.CalcCpSel: Currency;
+function TfrmBxMultiplaCp.CalcCpSel: Double;
 var
-  I, OriginalRecNo: Integer;
-
+  I: Integer;
+  lBmAtual: TBookmark;
 begin
-
   Result := 0.0;
 
   if grdCp.SelectedRows.Count > 0 then
   begin
+    with grdCp.DataSource.DataSet do
+    begin
+      DisableControls; // evita refresh visual
+      lBmAtual := Bookmark; // salva posição exata atual
 
-    // Salvar o RecNo original
-    OriginalRecNo := grdCp.DataSource.DataSet.RecNo;
+      try
+        for I := 0 to grdCp.SelectedRows.Count - 1 do
+        begin
+          Bookmark := grdCp.SelectedRows[I];
+          Result := Result + FieldByName('VALOR_PARCELA').AsCurrency;
+        end;
 
-    try
-      for I := 0 to grdCp.SelectedRows.Count - 1 do
-      begin
-
-        // Alterar para o Bookmark do item selecionado
-        grdCp.DataSource.DataSet.Bookmark := grdCp.SelectedRows[I];
-
-        // Adicionar ao resultado
-        Result := Result + grdCp.DataSource.DataSet.FieldByName('VALOR_PARCELA').AsCurrency;
-
+      finally
+        Bookmark := lBmAtual; // volta para o registro original
+        EnableControls;
       end;
-    finally
-
-      // Restaurar o RecNo original
-      grdCp.DataSource.DataSet.RecNo := OriginalRecNo;
-
     end;
   end;
-
 end;
 
 function TfrmBxMultiplaCp.CalcDescBx(ValorCP, ValorTot,
@@ -417,6 +415,36 @@ begin
 
 end;
 
+function TfrmBxMultiplaCp.CarregaPgto(const pIdFrPgto: Integer): TObjectList<TModelPgtoBxCp>;
+var
+  lListaPgtos: TObjectList<TModelPgtoBxCp>;
+  lPgto: TModelPgtoBxCp;
+begin
+  // Implementação de um unico pgto, no futuro adicionar multiplas formas
+  Result := nil;
+
+  try
+
+    lListaPgtos := TObjectList<TModelPgtoBxCp>.Create;
+    lPgto := TModelPgtoBxCp.Create;
+
+    lPgto.IdFrPgto := pIdFrPgto;
+    lPgto.NrPgto := 1;
+    lPgto.DataHora := Now;
+
+    lListaPgtos.Add(lPgto);
+
+    Result := lListaPgtos;
+
+  except
+    on E: Exception do
+    begin
+      raise ECpObterPgtos.Create;
+    end;
+  end;
+
+end;
+
 procedure TfrmBxMultiplaCp.checkSelAllClick(Sender: TObject);
 begin
 
@@ -430,11 +458,90 @@ begin
 end;
 
 procedure TfrmBxMultiplaCp.Confirmar;
+var
+  lDetalhes: TModelCpDetalhe;
+  lPgtos: TObjectList<TModelPgtoBxCp>;
+  lControllerBaixa: TControllerBaixaMultCp;
+  lListaCPs: TList<Integer>;
+  lDtCpMaisAntiga, lDtCompraSel: TDateTime;
+  I: Integer;
+  lIdFrPgto: Integer;
+  lBmAtual: TBookmark;
+  lTotalCpSelec: Double;
+  lVerErros: Boolean;
 begin
+
+  lIdFrPgto := 0;
+  lTotalCpSelec := 0;
+  lVerErros := False;
+
   if not(grdCp.SelectedRows.Count > 0) then
   begin
     TfrmMensagem.TelaMensagem('Atenção!', 'Selecione uma ou mais contas para baixar.', tmAviso);
     Exit;
+  end;
+
+  lDetalhes := nil;
+  lPgtos := nil;
+  lControllerBaixa := TControllerBaixaMultCp.Create;
+  lListaCPs := TList<Integer>.Create;
+  try
+
+    lDtCpMaisAntiga := MaxDateTime;
+
+    with grdCp.DataSource.DataSet do
+    begin
+      DisableControls; // evita refresh do grid
+      lBmAtual := Bookmark; // guarda a posição atual
+
+      try
+        for I := 0 to grdCp.SelectedRows.Count - 1 do
+        begin
+          Bookmark := grdCp.SelectedRows[I]; // vai até o registro selecionado
+
+          lListaCPs.Add(FieldByName('ID').AsInteger);
+          lDtCompraSel := FieldByName('DATA_COMPRA').AsDateTime;
+          if lDtCompraSel < lDtCpMaisAntiga then
+            lDtCpMaisAntiga := lDtCompraSel;
+        end;
+
+      finally
+        Bookmark := lBmAtual; // volta para o registro original
+        EnableControls; // reativa refresh do grid
+      end;
+    end;
+
+    lTotalCpSelec := CalcCpSel;
+    lDetalhes := ObterDetalhesBaixa(lDtCpMaisAntiga, lTotalCpSelec, lIdFrPgto);
+    if not(Assigned(lDetalhes)) then
+      Exit;
+
+    lPgtos := CarregaPgto(lIdFrPgto);
+    if not(Assigned(lPgtos)) then
+      Exit;
+
+    if (lControllerBaixa.Baixar(lListaCPs, lTotalCpSelec, lDetalhes, lPgtos)) then
+    begin
+      TfrmMensagem.TelaMensagem('Sucesso!', 'Conta a Pagar baixada com sucesso.', tmSucesso);
+    end
+    else
+    begin
+      lVerErros := (TfrmMensagem.TelaEscolha('Atenção!',
+        'Ocorreram falhas ao baixar algumas contas, deseja visualizar os logs?', tmEscolha) = mrYes);
+      if (lVerErros) then
+      begin
+        pgcBaixaMult.ActivePage := tbsLogErros;
+        memLogErros.SetFocus;
+      end;
+    end;
+
+    Pesquisar;
+
+  finally
+    lDetalhes.Free;
+    lPgtos.Free;
+    lControllerBaixa.Free;
+    lListaCPs.Free;
   end;
 
 end;
@@ -547,18 +654,37 @@ begin
   lblNomeFatCartao.Caption := '';
 end;
 
-function TfrmBxMultiplaCp.ObterDetalhesBaixa(
-  const pIdCp: Integer): TModelCpDetalhe;
-begin
-  Result := nil;
-end;
-
-function TfrmBxMultiplaCp.ObterPgtosBaixa(const pIdCp: Integer;
-  const pValorAbater: Double): TObjectList<TModelPgtoBxCp>;
+function TfrmBxMultiplaCp.ObterDetalhesBaixa(const pDtMaisAnt: TDate; const pValorSel: Double;
+  out pOutCodPgto: Integer)
+  : TModelCpDetalhe;
 var
-  lFOrmulario: TfrmInfoBxMult;
+  lFormulario: TfrmInfoBxMult;
 begin
   Result := nil;
+
+  lFormulario := TfrmInfoBxMult.Create(nil);
+  try
+    try
+      lFormulario.DtMaisAnt := pDtMaisAnt;
+      lFormulario.ValorCpSel := pValorSel;
+      lFormulario.ShowModal;
+
+      if (lFormulario.ModalResult = mrOk) then
+      begin
+        Result := lFormulario.ObterDetalhes;
+        pOutCodPgto := lFormulario.CodFrPgto;
+      end;
+    except
+      on E: Exception do
+      begin
+        raise ECpObterDetalhe.Create;
+      end;
+    end;
+
+  finally
+    lFormulario.Free;
+  end;
+
 end;
 
 procedure TfrmBxMultiplaCp.PesquisaClick(Sender: TObject);
@@ -574,6 +700,11 @@ var
 begin
   LFiltro := '';
   LOrdem := '';
+
+  if Assigned(FQueryPesquisa) then
+    FreeAndNil(FQueryPesquisa);
+
+  FQueryPesquisa := TSFQuery.Create(nil);
 
   try
     // Validações
@@ -636,7 +767,7 @@ begin
     FQueryPesquisa.Close;
     FQueryPesquisa.SQL.Clear;
     FQueryPesquisa.SQL.Add('SELECT CP.*, '''' SELECIONADO, F.RAZAO_SOCIAL FROM CONTAS_PAGAR CP ');
-    FQueryPesquisa.SQL.Add('   LEFT JOIN Fornecedores F ON CP.ID_FORNECEDOR = F.ID_FORNEC WHERE STATUS = '' A '' ');
+    FQueryPesquisa.SQL.Add('   LEFT JOIN Fornecedores F ON CP.ID_FORNECEDOR = F.ID_FORNEC WHERE STATUS = ''A'' ');
     FQueryPesquisa.SQL.Add(LFiltro);
     FQueryPesquisa.SQL.Add(LOrdem);
 
@@ -669,6 +800,12 @@ begin
     end;
   end;
 
+end;
+
+procedure TfrmBxMultiplaCp.RegistrarLogsErros(const Logs: TStringList);
+begin
+  memLogErros.Clear;
+  memLogErros.Lines.AddStrings(Logs);
 end;
 
 procedure TfrmBxMultiplaCp.SelAllReg;

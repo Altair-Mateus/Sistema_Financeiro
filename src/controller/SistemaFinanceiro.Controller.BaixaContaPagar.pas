@@ -309,13 +309,26 @@ end;
 procedure TControllerBaixaCp.GravarPgtosCp;
 var
   lPgto: TModelPgtoBxCp;
+  lContador, lUltCod: Integer;
 begin
 
+  lContador := 0;
+  lUltCod := 0;
   try
 
     for lPgto in FListaPgtos do
     begin
+      lContador := lContador + 1;
+
+      if (lContador = 1) then
+        lPgto.GeraCodigo
+      else
+        lPgto.GeraCodigo(lUltCod);
+
       lPgto.IdCP := FIdCp;
+      lPgto.NrPgto := lContador;
+
+      lUltCod := lPgto.ID;
       lPgto.Insert;
     end;
 

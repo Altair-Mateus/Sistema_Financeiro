@@ -20,7 +20,8 @@ uses
   Vcl.Imaging.pngimage,
   Vcl.ComCtrls,
   fMensagem,
-  SistemaFinanceiro.Model.Entidades.CP.Detalhe;
+  SistemaFinanceiro.Model.Entidades.CP.Detalhe,
+  SistemaFinanceiro.Model.Entidades.FrPgto;
 
 type
   TfrmInfoBxMult = class(TForm)
@@ -74,6 +75,7 @@ type
     FDtMaisAnt: TDate;
 
     procedure InicializaTela;
+    procedure LimparLabelsNomes;
     function ValidaInicializacao: Boolean;
     procedure BuscaNomeFrPgto;
     procedure EditKeyPress(Sender: TObject; var Key: Char);
@@ -114,53 +116,61 @@ begin
 end;
 
 procedure TfrmInfoBxMult.btnPesqFrPgtoClick(Sender: TObject);
+var
+  lFormulario: TfrmFrPgto;
 begin
 
-  // Cria o form
-  frmFrPgto := TfrmFrPgto.Create(Self);
-
+  lFormulario := TfrmFrPgto.Create(Self);
   try
 
-    // Exibe o form
-    frmFrPgto.ShowModal;
-
-  finally
+    lFormulario.ShowModal;
 
     // Pega a ID da forma de pgto selecionado
-    edtCodFrPgto.Text := frmFrPgto.DataSourceFrPgto.DataSet.FieldByName('ID_FR').AsString;
+    edtCodFrPgto.Text := lFormulario.RetornaCodigo;
+    edtCodFrPgto.SetFocus;
 
-    // Libera da  memoria
-    FreeAndNil(frmFrPgto);
-
+  finally
+    lFormulario.Free;
   end;
-
-  btnConfirmar.SetFocus;
 
 end;
 
 procedure TfrmInfoBxMult.BuscaNomeFrPgto;
 var
-  NomeFrPgto: String;
-
+  lFormaPgto: TModelFrPgto;
+  lCod: Integer;
 begin
+  lblNomeFrPgto.Caption := '';
 
-  if Trim(edtCodFrPgto.Text) <> '' then
+  if not(Trim(edtCodFrPgto.Text).IsEmpty) then
   begin
 
-    NomeFrPgto := dmFrPgto.GetNomeFrPgto(Trim(edtCodFrPgto.Text));
+    lFormaPgto := TModelFrPgto.Create;
+    try
 
-    if (Trim(edtCodFrPgto.Text) = '') or (NomeFrPgto = '') then
-    begin
+      lCod := StrToIntDef(Trim(edtCodFrPgto.Text), 0);
+      if not(lFormaPgto.Existe(lCod, True)) then
+      begin
+        TfrmMensagem.TelaMensagem('Atenção', 'Forma de Pagamento não encontrada!', tmAviso);
+        edtCodFrPgto.SetFocus;
+        edtCodFrPgto.Clear;
+        Exit;
+      end;
 
-      Application.MessageBox('Forma de Pagamento não encontrada!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
-      edtCodFrPgto.SetFocus;
-      edtCodFrPgto.Clear;
+      if not(lFormaPgto.Status) then
+      begin
+        TfrmMensagem.TelaMensagem('Atenção', 'Forma de Pagamento não está Ativa!!', tmAviso);
+        edtCodFrPgto.SetFocus;
+        edtCodFrPgto.Clear;
+        Exit;
+      end;
 
+      lblNomeFrPgto.Caption := lFormaPgto.NomeFr;
+      btnConfirmar.SetFocus;
+
+    finally
+      lFormaPgto.Free;
     end;
-
-    lblNomeFrPgto.Visible := True;
-    lblNomeFrPgto.Caption := NomeFrPgto;
-
   end;
 
 end;
@@ -242,30 +252,14 @@ end;
 procedure TfrmInfoBxMult.checkDescontoClick(Sender: TObject);
 begin
 
-  if checkDesconto.Checked then
-  begin
+  // Libera e mostra os campos do desconto
+  edtValorDesc.Enabled := (checkDesconto.Checked);
+  edtValorDesc.Visible := (checkDesconto.Checked);
+  edtPorcDesc.Visible := (checkDesconto.Checked);
+  edtPorcDesc.Enabled := (checkDesconto.Checked);
+  lblDesconto.Visible := (checkDesconto.Checked);
+  lblValorDesc.Visible := (checkDesconto.Checked);
 
-    // Libera e mostra os campos do desconto
-    edtValorDesc.Enabled := True;
-    edtValorDesc.Visible := True;
-    edtPorcDesc.Visible := True;
-    edtPorcDesc.Enabled := True;
-    lblDesconto.Visible := True;
-    lblValorDesc.Visible := True;
-
-  end
-  else
-  begin
-
-    // Bloqueia e oculta os campos do desconto
-    edtValorDesc.Enabled := False;
-    edtValorDesc.Visible := False;
-    edtPorcDesc.Visible := False;
-    edtPorcDesc.Enabled := False;
-    lblDesconto.Visible := False;
-    lblValorDesc.Visible := False;
-
-  end;
 end;
 
 procedure TfrmInfoBxMult.Confirmar;
@@ -276,7 +270,8 @@ begin
   FCpDetalhe.Valor := StrToFloatDef(Trim(edtValor.Text), 0);
   FCpDetalhe.Data := datePgto.Date;
   FCpDetalhe.Usuario := dmUsuarios.GetUsuarioLogado.id;
-  FCpDetalhe.ValorDesc := StrToFloatDef(Trim(edtValorDesc.Text), 0);
+  if (checkDesconto.Checked) then
+    FCpDetalhe.ValorDesc := StrToFloatDef(Trim(edtValorDesc.Text), 0);
 
   FCodFrPgto := StrToIntDef(Trim(edtCodFrPgto.Text), 0);
 
@@ -284,23 +279,7 @@ end;
 
 procedure TfrmInfoBxMult.edtCodFrPgtoExit(Sender: TObject);
 begin
-
   BuscaNomeFrPgto;
-
-  if Trim(edtCodFrPgto.Text) <> '' then
-  begin
-    if dmFrPgto.GetStatus(Trim(edtCodFrPgto.Text)) = False then
-    begin
-
-      edtCodFrPgto.Clear;
-      edtCodFrPgto.SetFocus;
-      lblNomeFrPgto.Caption := '';
-      Application.MessageBox('Forma de Pagamento não está Ativa!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
-      abort;
-
-    end;
-  end;
-
 end;
 
 procedure TfrmInfoBxMult.edtPorcDescKeyDown(Sender: TObject; var Key: Word;
@@ -380,7 +359,10 @@ end;
 
 procedure TfrmInfoBxMult.InicializaTela;
 begin
+  LimparLabelsNomes;
   datePgto.Date := Now;
+  edtValor.Text := FloatToStr(FValorCpSel);
+  edtValor.SetFocus;
 end;
 
 procedure TfrmInfoBxMult.KeyPressValor(Sender: TObject; var Key: Char);
@@ -413,9 +395,14 @@ begin
   end;
 end;
 
+procedure TfrmInfoBxMult.LimparLabelsNomes;
+begin
+  lblNomeFrPgto.Caption := '';
+end;
+
 function TfrmInfoBxMult.ObterDetalhes: TModelCpDetalhe;
 begin
-
+  Result := FCpDetalhe;
 end;
 
 function TfrmInfoBxMult.ValidaCampos: Boolean;
@@ -425,7 +412,7 @@ var
 begin
   Result := False;
 
-  if not(Trim(edtCodFrPgto.Text).IsEmpty) then
+  if (Trim(edtCodFrPgto.Text).IsEmpty) then
   begin
     TfrmMensagem.TelaMensagem('Atenção!', 'Forma de Pagamento não informada!', tmAviso);
     edtCodFrPgto.SetFocus;

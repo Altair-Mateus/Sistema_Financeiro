@@ -23,13 +23,13 @@ type
     FLogsErros: TLogsErroBaixaMultCp;
     FListaLogs: TStringList;
 
-    function DefineValorPago(const pValorCp: Double): Double;
+    function DefineValorPago(const pValorCp, pValorDesconto: Double): Double;
     function DefineValorDesconto(const pValorCp: Double): Double;
 
     procedure BaixarCP(const pCp: TModelCP; const pDetalhes: TModelCpDetalhe);
     procedure GerarParcial(const pCp: TModelCP; const pDetalhes: TModelCpDetalhe);
     procedure GravarDetalhesCp(const pIdCp: Integer; const pValorParcelaCp: Double; const pDetalhes: TModelCpDetalhe);
-    procedure GravarPgtosCp(const pIdCp: Integer);
+    procedure GravarPgtosCp(const pIdCp: Integer; const pValorPago: Double);
     procedure GravarLctoCaixa(const pCp: TModelCP; const pDetalhes: TModelCpDetalhe);
 
     function BaixaMultipla: Boolean;
@@ -88,7 +88,7 @@ begin
 
         GravarDetalhesCp(lId, lCp.ValorParcela, lDetalhesCp);
         BaixarCP(lCp, lDetalhesCp);
-        GravarPgtosCp(lId);
+        GravarPgtosCp(lId, lDetalhesCp.Valor);
         GravarLctoCaixa(lCp, lDetalhesCp);
 
         lTransaction.Commit;
@@ -109,7 +109,7 @@ begin
   end;
 
   // Retorna True somente se não teve nenhum log de erro
-  Result := (FListaLogs.Count > 0);
+  Result := (FListaLogs.Count <= 0);
 
 end;
 
@@ -135,7 +135,7 @@ begin
       Exit;
     FListaPgtos := pListaPgtos;
 
-    if not(pValorTotalCps > 0) then
+    if (pValorTotalCps > 0) then
       FValorTotalCps := pValorTotalCps;
 
     Result := BaixaMultipla;
@@ -167,8 +167,8 @@ end;
 function TControllerBaixaMultCp.DefineValorDesconto(
   const pValorCp: Double): Double;
 var
-  lPercentual: Currency;
-  lValorDesc: Currency;
+  lPercentual: Double;
+  lValorDesc: Double;
 begin
 
   lPercentual := 0;
@@ -185,13 +185,13 @@ begin
 
 end;
 
-function TControllerBaixaMultCp.DefineValorPago(const pValorCp: Double): Double;
+function TControllerBaixaMultCp.DefineValorPago(const pValorCp, pValorDesconto: Double): Double;
 begin
-  if (FDetalhesGeraisCp.Valor - (pValorCp - FDetalhesGeraisCp.ValorDesc)) > 0 then
+  if (FDetalhesGeraisCp.Valor - (pValorCp - pValorDesconto)) > 0 then
   begin
 
     // Se for maior que 0 vai baixar a conta total
-    Result := (pValorCp - FDetalhesGeraisCp.ValorDesc);
+    Result := (pValorCp - pValorDesconto);
 
   end
   else if FDetalhesGeraisCp.Valor > 0 then
@@ -214,7 +214,7 @@ begin
   end;
 
   // Calcula o restante do valor abater
-  FDetalhesGeraisCp.Valor := (FDetalhesGeraisCp.Valor - (pValorCp - FDetalhesGeraisCp.ValorDesc));
+  FDetalhesGeraisCp.Valor := (FDetalhesGeraisCp.Valor - (pValorCp - pValorDesconto));
 end;
 
 destructor TControllerBaixaMultCp.Destroy;
@@ -280,12 +280,14 @@ procedure TControllerBaixaMultCp.GravarDetalhesCp(const pIdCp: Integer; const pV
   const pDetalhes: TModelCpDetalhe);
 begin
   try
+    pDetalhes.GeraCodigo;
     pDetalhes.IdCP := pIdCp;
     pDetalhes.Detalhes := 'CP baixada pela rotina de Baixa Múltipla';
     pDetalhes.Data := FDetalhesGeraisCp.Data;
     pDetalhes.Usuario := FDetalhesGeraisCp.Usuario;
     pDetalhes.ValorDesc := DefineValorDesconto(pValorParcelaCp);
-    pDetalhes.Valor := DefineValorPago(pValorParcelaCp);
+    pDetalhes.Valor := DefineValorPago(pValorParcelaCp,pDetalhes.ValorDesc);
+    pDetalhes.Insert;
   except
     on E: Exception do
     begin
@@ -327,16 +329,29 @@ begin
 
 end;
 
-procedure TControllerBaixaMultCp.GravarPgtosCp(const pIdCp: Integer);
+procedure TControllerBaixaMultCp.GravarPgtosCp(const pIdCp: Integer;const pValorPago: Double);
 var
   lPgto: TModelPgtoBxCp;
+  lContador, lUltCod: Integer;
 begin
 
+  lContador := 0;
   try
 
     for lPgto in FListaPgtos do
     begin
+
+      lContador := lContador + 1;
+      if (lContador = 1) then
+        lPgto.GeraCodigo
+      else
+        lPgto.GeraCodigo(lUltCod);
+
+      lPgto.NrPgto := lContador;
       lPgto.IdCP := pIdCp;
+      lPgto.ValorPago := pValorPago;
+      lUltCod := lPgto.ID;
+
       lPgto.Insert;
     end;
 

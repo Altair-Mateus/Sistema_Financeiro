@@ -36,7 +36,7 @@ type
     property DataCadastro: TDateTime read FDataCadastro write FDataCadastro;
     [TDBColumn('DATA_ALTERACAO')]
     property DataAlteracao: TDateTime read FDataAlteracao write FDataAlteracao;
-    [TDBColumn('STATUS_FT')]
+    [TDBColumn('STATUS_FT'), TDBSaveBoolean(btAI)]
     property StatusFt: Boolean read FStatusFt write FStatusFt;
 
     constructor Create;
@@ -106,7 +106,7 @@ begin
   try
     lQuery.Close;
     lQuery.SQL.Clear;
-    lQuery.SQL.Add(' SELECT ID FROM FATURA_CARTAO   ');
+    lQuery.SQL.Add(' SELECT ID_FT FROM FATURA_CARTAO   ');
     lQuery.SQL.Add(' WHERE ID_FT = :ID               ');
     lQuery.ParamByName('ID').AsInteger := pId;
     lQuery.Open;

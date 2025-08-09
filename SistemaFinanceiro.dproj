@@ -375,6 +375,12 @@
         <DCCReference Include="src\exceptions\SistemaFinanceiro.Exceptions.FrPgto.pas"/>
         <DCCReference Include="src\controller\SistemaFinanceiro.Controller.BaixaMultCp.pas"/>
         <DCCReference Include="src\controller\SistemaFinanceiro.Controller.BaixaContaPagar.pas"/>
+        <DCCReference Include="src\model\Entidades\SistemaFinanceiro.Model.Entidades.FaturaCartao.pas"/>
+        <DCCReference Include="src\exceptions\SistemaFinanceiro.Exceptions.FaturaCartao.pas"/>
+        <DCCReference Include="src\view\SistemaFinanceiro.View.BxMulti.InfosBxCr.pas">
+            <Form>frmInfoBxMultCr</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

@@ -11,6 +11,8 @@ uses
   uEnumsUtils;
 
 type
+
+  [TDBTable('FORNECEDORES')]
   TModelFornecedor = class
   private
     FDaoRTTI: TDaoRTTI;

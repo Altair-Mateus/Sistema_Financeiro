@@ -231,7 +231,8 @@ begin
   FCpDetalhe.Valor := StrToFloatDef(Trim(edtValor.Text), 0);
   FCpDetalhe.Data := datePgto.Date;
   FCpDetalhe.Usuario := dmUsuarios.GetUsuarioLogado.id;
-  FCpDetalhe.ValorDesc := StrToFloatDef(Trim(edtValorDesc.Text), 0);
+  if (checkDesconto.Checked) then
+    FCpDetalhe.ValorDesc := StrToFloatDef(Trim(edtValorDesc.Text), 0);
 
 end;
 
