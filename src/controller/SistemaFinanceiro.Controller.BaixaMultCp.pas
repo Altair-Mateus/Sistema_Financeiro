@@ -16,7 +16,7 @@ type
 
   TControllerBaixaMultCp = class
   private
-    FListaIdCp: TList<Integer>;
+    FListaIdCp: TDictionary<Integer, Double>;
     FDetalhesGeraisCp: TModelCpDetalhe;
     FListaPgtos: TObjectList<TModelPgtoBxCp>;
     FValorTotalCps: Double;
@@ -45,7 +45,8 @@ type
     destructor Destroy; override;
     property LogsErros: TLogsErroBaixaMultCp read FLogsErros write FLogsErros;
 
-    function Baixar(const pListaIdCp: TList<Integer>; const pValorTotalCps: Double; const pDetalhesCp: TModelCpDetalhe;
+    function Baixar(const pListaCp: TDictionary<Integer, Double>; const pValorTotalCps: Double;
+      const pDetalhesCp: TModelCpDetalhe;
       const pListaPgtos: TObjectList<TModelPgtoBxCp>): Boolean;
   end;
 
@@ -63,14 +64,14 @@ uses
 
 function TControllerBaixaMultCp.BaixaMultipla: Boolean;
 var
-  lId: Integer;
+  lPairCp: TPair<Integer, Double>;
   lCp: TModelCP;
   lTransaction: TTransactionScope;
   lDetalhesCp: TModelCpDetalhe;
 begin
   Result := False;
 
-  for lId in FListaIdCp do
+  for lPairCp in FListaIdCp do
   begin
 
     lTransaction := TTransactionScope.Create;
@@ -79,16 +80,16 @@ begin
     try
       try
 
-        lCp.ID := lId;
+        lCp.ID := lPairCp.Key;
         if not(lCp.LoadObjectByPK) then
         begin
-          RegistrarLogErro(Format('Falha ao buscar/carregar conta ID nº %d', [lId]));
+          RegistrarLogErro(Format('Falha ao buscar/carregar conta ID nº %d', [lCp.ID]));
           Continue;
         end;
 
-        GravarDetalhesCp(lId, lCp.ValorParcela, lDetalhesCp);
+        GravarDetalhesCp(lCp.ID, lCp.ValorParcela, lDetalhesCp);
         BaixarCP(lCp, lDetalhesCp);
-        GravarPgtosCp(lId, lDetalhesCp.Valor);
+        GravarPgtosCp(lCp.ID, lDetalhesCp.Valor);
         GravarLctoCaixa(lCp, lDetalhesCp);
 
         lTransaction.Commit;
@@ -113,7 +114,7 @@ begin
 
 end;
 
-function TControllerBaixaMultCp.Baixar(const pListaIdCp: TList<Integer>; const pValorTotalCps: Double;
+function TControllerBaixaMultCp.Baixar(const pListaCp: TDictionary<Integer, Double>; const pValorTotalCps: Double;
   const pDetalhesCp: TModelCpDetalhe; const pListaPgtos: TObjectList<TModelPgtoBxCp>): Boolean;
 begin
 
@@ -121,10 +122,10 @@ begin
 
   try
 
-    if not(pListaIdCp.Count > 0) then
+    if not(pListaCp.Count > 0) then
       Exit;
 
-    FListaIdCp := pListaIdCp;
+    FListaIdCp := pListaCp;
 
     if not(Assigned(pDetalhesCp)) then
       Exit;
@@ -334,7 +335,7 @@ var
   lPgto: TModelPgtoBxCp;
   lContador, lUltCod: Integer;
 begin
-
+  lUltCod := 0;
   lContador := 0;
   try
 

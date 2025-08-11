@@ -87,44 +87,59 @@ type
       DataCol: Integer; Column: TColumn; State: TGridDrawState);
     procedure grdCpCellClick(Column: TColumn);
     procedure btnConfirmarClick(Sender: TObject);
-    procedure grdCpKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
     procedure checkSelAllClick(Sender: TObject);
     procedure PesquisaClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormKeyPress(Sender: TObject; var Key: Char);
+    procedure FormCreate(Sender: TObject);
 
   private
     FTelaAtiva: Boolean;
     FQueryPesquisa: TSFQuery;
+    FCpsSelecionadas: TDictionary<Integer, Double>;
+    FKeyField: string;
+    FDtCpMaisAntiga: TDate;
 
+    // Funções para seleção da conta
+    function IsIdSelected(const pId: Integer): Boolean;
+    procedure ToggleId(const pId: Integer; const pValor: Double; const pDtCompra: TDate);
+    function GetIdOfCurrentRow: Integer;
+    procedure SelAllReg;
+
+    // Funções de inicialização
     procedure InicializaTela;
     procedure InicializaFiltros;
     procedure LimparLabels;
+    procedure CriarObjetos;
+    procedure DestruirObjetos;
+    procedure InicializaVarControle;
+
+    // Funções de Buscas
     procedure BuscaNomeFornecedor;
     procedure BuscaNomeFatCartao;
-    procedure SelAllReg;
+
     procedure Pesquisar;
+
+    // Funções de cálculos
     procedure CalcCpGrid;
     procedure CalcQtdCpGrid;
     procedure CalcQtdCpSel;
-
     function CalcCpSel: Double;
-    function CalcDescBx(ValorCP, ValorTot, ValorDesc: Currency): Currency;
 
+    // Funções para abrir as telas auxiliares
     procedure AbreTelaFornecedor;
     procedure AbreTelaFaturas;
 
+    // Funções para realizar a baixa
     procedure Confirmar;
     function ObterDetalhesBaixa(const pDtMaisAnt: TDate; const pValorSel: Double; out pOutCodPgto: Integer)
       : TModelCpDetalhe;
     function CarregaPgto(const pIdFrPgto: Integer): TObjectList<TModelPgtoBxCp>;
-
     procedure RegistrarLogsErros(const Logs: TStringList);
 
   public
-    { Public declarations }
+
   end;
 
 var
@@ -321,69 +336,21 @@ end;
 
 function TfrmBxMultiplaCp.CalcCpSel: Double;
 var
-  I: Integer;
-  lBmAtual: TBookmark;
+  lTotal: Double;
+  lPairSel: TPair<Integer, Double>;
 begin
-  Result := 0.0;
-
-  if grdCp.SelectedRows.Count > 0 then
-  begin
-    with grdCp.DataSource.DataSet do
-    begin
-      DisableControls; // evita refresh visual
-      lBmAtual := Bookmark; // salva posição exata atual
-
-      try
-        for I := 0 to grdCp.SelectedRows.Count - 1 do
-        begin
-          Bookmark := grdCp.SelectedRows[I];
-          Result := Result + FieldByName('VALOR_PARCELA').AsCurrency;
-        end;
-
-      finally
-        Bookmark := lBmAtual; // volta para o registro original
-        EnableControls;
-      end;
-    end;
-  end;
-end;
-
-function TfrmBxMultiplaCp.CalcDescBx(ValorCP, ValorTot,
-  ValorDesc: Currency): Currency;
-var
-  PercentCp: Currency;
-  ValorDescCp: Currency;
-begin
-
-  PercentCp := 0;
-  ValorDescCp := 0;
   Result := 0;
+  lTotal := 0;
 
-  if (ValorCP < 0) then
+  if (FCpsSelecionadas.Count = 0) then
+    Exit;
+
+  for lPairSel in FCpsSelecionadas do
   begin
-    Application.MessageBox('Valor Conta a Pagar < 0!', 'Atenção', MB_OK + MB_ICONWARNING);
-  end
-  else if (ValorTot < 0) then
-  begin
-    Application.MessageBox('Valor Total das Contas < 0!', 'Atenção', MB_OK + MB_ICONWARNING);
-  end
-  else if (ValorDesc < 0) then
-  begin
-    Application.MessageBox('Valor Desconto < 0!', 'Atenção', MB_OK + MB_ICONWARNING);
-  end
-  else
-  begin
-
-    // Descobre o percentual da conta
-    PercentCp := (ValorCP / ValorTot);
-
-    // Descobre o valor do desconto para a conta
-    ValorDescCp := (PercentCp * ValorDesc);
-
-    Result := ValorDescCp;
-
+    lTotal := (lTotal + lPairSel.Value);
   end;
 
+  Result := lTotal;
 end;
 
 procedure TfrmBxMultiplaCp.CalcQtdCpGrid;
@@ -404,15 +371,7 @@ end;
 
 procedure TfrmBxMultiplaCp.CalcQtdCpSel;
 begin
-
-  if Assigned(grdCp.SelectedRows) then
-  begin
-
-    // Exibe no edit
-    edtQtdSelecionada.Text := IntToStr(grdCp.SelectedRows.Count);
-
-  end;
-
+  edtQtdSelecionada.Text := IntToStr(FCpsSelecionadas.Count);
 end;
 
 function TfrmBxMultiplaCp.CarregaPgto(const pIdFrPgto: Integer): TObjectList<TModelPgtoBxCp>;
@@ -462,8 +421,6 @@ var
   lDetalhes: TModelCpDetalhe;
   lPgtos: TObjectList<TModelPgtoBxCp>;
   lControllerBaixa: TControllerBaixaMultCp;
-  lListaCPs: TList<Integer>;
-  lDtCpMaisAntiga, lDtCompraSel: TDateTime;
   I: Integer;
   lIdFrPgto: Integer;
   lBmAtual: TBookmark;
@@ -475,7 +432,7 @@ begin
   lTotalCpSelec := 0;
   lVerErros := False;
 
-  if not(grdCp.SelectedRows.Count > 0) then
+  if not(FCpsSelecionadas.Count > 0) then
   begin
     TfrmMensagem.TelaMensagem('Atenção!', 'Selecione uma ou mais contas para baixar.', tmAviso);
     Exit;
@@ -484,36 +441,11 @@ begin
   lDetalhes := nil;
   lPgtos := nil;
   lControllerBaixa := TControllerBaixaMultCp.Create;
-  lListaCPs := TList<Integer>.Create;
   try
 
     lControllerBaixa.LogsErros := RegistrarLogsErros;
-    lDtCpMaisAntiga := MaxDateTime;
-
-    with grdCp.DataSource.DataSet do
-    begin
-      DisableControls; // evita refresh do grid
-      lBmAtual := Bookmark; // guarda a posição atual
-
-      try
-        for I := 0 to grdCp.SelectedRows.Count - 1 do
-        begin
-          Bookmark := grdCp.SelectedRows[I]; // vai até o registro selecionado
-
-          lListaCPs.Add(FieldByName('ID').AsInteger);
-          lDtCompraSel := FieldByName('DATA_COMPRA').AsDateTime;
-          if lDtCompraSel < lDtCpMaisAntiga then
-            lDtCpMaisAntiga := lDtCompraSel;
-        end;
-
-      finally
-        Bookmark := lBmAtual; // volta para o registro original
-        EnableControls; // reativa refresh do grid
-      end;
-    end;
-
     lTotalCpSelec := CalcCpSel;
-    lDetalhes := ObterDetalhesBaixa(lDtCpMaisAntiga, lTotalCpSelec, lIdFrPgto);
+    lDetalhes := ObterDetalhesBaixa(FDtCpMaisAntiga, lTotalCpSelec, lIdFrPgto);
     if not(Assigned(lDetalhes)) then
       Exit;
 
@@ -521,7 +453,7 @@ begin
     if not(Assigned(lPgtos)) then
       Exit;
 
-    if (lControllerBaixa.Baixar(lListaCPs, lTotalCpSelec, lDetalhes, lPgtos)) then
+    if (lControllerBaixa.Baixar(FCpsSelecionadas, lTotalCpSelec, lDetalhes, lPgtos)) then
     begin
       TfrmMensagem.TelaMensagem('Sucesso!', 'Conta a Pagar baixada com sucesso.', tmSucesso);
     end
@@ -542,60 +474,127 @@ begin
     lDetalhes.Free;
     lPgtos.Free;
     lControllerBaixa.Free;
-    lListaCPs.Free;
   end;
 
 end;
 
+procedure TfrmBxMultiplaCp.CriarObjetos;
+begin
+  FCpsSelecionadas := TDictionary<Integer, Double>.Create;
+end;
+
+procedure TfrmBxMultiplaCp.DestruirObjetos;
+begin
+  FCpsSelecionadas.Free;
+  if Assigned(FQueryPesquisa) then
+    FQueryPesquisa.Free;
+end;
+
 procedure TfrmBxMultiplaCp.grdCpCellClick(Column: TColumn);
+var
+  lId: Integer;
+  lDs: TDataSet;
+  lValor: Double;
+  lData: TDate;
 begin
 
-  // Atualiza valores e quantidades de cps selecionadas
-  edtValorSel.Text := TUtilitario.FormatoMoeda(CalcCpSel);
-  CalcQtdCpSel;
+  lId := 0;
+  lValor := 0;
 
+  // Só continua se for exatamente a coluna SELECIONADO
+  if SameText(Column.FieldName, 'SELECIONADO') then
+  begin
+    if (grdCp.DataSource = nil) then
+      Exit;
+
+    lDs := grdCp.DataSource.DataSet;
+    if (lDs = nil) or (not lDs.Active) or lDs.IsEmpty then
+      Exit;
+
+    lId := lDs.FieldByName(FKeyField).AsInteger;
+    lValor := lDs.FieldByName('VALOR_PARCELA').AsFloat;
+    lData := lDs.FieldByName('DATA_COMPRA').AsDateTime;
+    ToggleId(lId, lValor, lData);
+
+    edtValorSel.Text := TUtilitario.FormatoMoeda(CalcCpSel);
+    CalcQtdCpSel;
+    grdCp.Invalidate; // redesenha para refletir checkbox
+  end;
 end;
 
 procedure TfrmBxMultiplaCp.grdCpDrawColumnCell(Sender: TObject;
   const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+var
+  lId: Integer;
+  lIsChecked: Boolean;
+  lSelectedLine: Boolean;
+  lDataSet: TDataSet;
+  lVencimento: TDateTime;
+  lStatus: string;
+  lRect: TRect;
+  lFlags: Integer;
 begin
+  lDataSet := grdCp.DataSource.DataSet;
 
-  // Altera a cor das duplicatas vencidas
-  if (not grdCp.DataSource.DataSet.IsEmpty) and
-    (grdCp.DataSource.DataSet.FieldByName('DATA_VENCIMENTO').AsDateTime < Date)
-    and (grdCp.DataSource.DataSet.FieldByName('STATUS').AsString = 'A') then
+  if ((lDataSet <> nil) and (lDataSet.Active) and (not lDataSet.IsEmpty)) then
   begin
-    grdCp.Canvas.Font.Color := clRed; // Define a cor do texto da célula
+    lVencimento := lDataSet.FieldByName('DATA_VENCIMENTO').AsDateTime;
+    lStatus := lDataSet.FieldByName('STATUS').AsString;
+    lId := lDataSet.FieldByName(FKeyField).AsInteger;
+    lIsChecked := IsIdSelected(lId);
+  end
+  else
+  begin
+    lVencimento := 0;
+    lStatus := '';
+    lIsChecked := False;
   end;
 
-  // Intercala a cor das contas não selecionadas
-  if (gdSelected in State) then
+  // Define cor padrão da fonte
+  grdCp.Canvas.Font.Color := clBlack;
+
+  // Fonte vermelha para registros vencidos e ativos
+  if ((lVencimento < Date) and (lStatus = 'A')) then
+    grdCp.Canvas.Font.Color := clRed;
+
+  lSelectedLine := gdSelected in State;
+
+  // Define cor de fundo e fonte conforme seleção
+  if (lSelectedLine) then
   begin
-
-    grdCp.Canvas.Brush.Color := $00578B2E; // Define a cor de fundo da célula selecionada
-    grdCp.Canvas.Font.Color := clWhite; // Define a cor do texto da célula selecionada
-
+    grdCp.Canvas.Brush.Color := $00578B2E; // Verde escuro para linha atual
+    grdCp.Canvas.Font.Color := clWhite;
+  end
+  else if (lIsChecked) then
+  begin
+    grdCp.Canvas.Brush.Color := $008CD25A; // Cor para linhas marcadas
+  end
+  else
+  begin
+    grdCp.Canvas.Brush.Color := clWindow; // Fundo padrão
   end;
 
-  // Desenha a célula com as propriedades de cor atualizadas
+  // Desenha o restante da célula normalmente
   grdCp.DefaultDrawColumnCell(Rect, DataCol, Column, State);
 
+  // Formata moeda, se for o caso
   TUtilitario.FormatoMoedaGrid(TDBGrid(Sender), Column, Rect, State);
 
-end;
-
-procedure TfrmBxMultiplaCp.grdCpKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
-begin
-
-  // Realiza o calculo caso o user use o shift + seta para baixo
-  // para selecionar as contas
-  if Key = VK_DOWN then
+  // Se for a coluna SELECIONADO, desenha o checkbox customizado
+  if ((Column <> nil) and (Column.Field <> nil) and
+    SameText(Column.Field.FieldName, 'SELECIONADO')) then
   begin
+    grdCp.Canvas.FillRect(Rect);
+    lRect := Rect;
+    InflateRect(lRect, -6, -4);
+    lFlags := DFCS_BUTTONCHECK;
 
-    edtValorSel.Text := TUtilitario.FormatoMoeda(CalcCpSel);
-    CalcQtdCpSel;
+    if (lIsChecked) then
+      lFlags := lFlags or DFCS_CHECKED;
 
+    DrawFrameControl(grdCp.Canvas.Handle, lRect, DFC_BUTTON, lFlags);
+
+    Exit; // Evita DefaultDraw para a coluna checkbox
   end;
 
 end;
@@ -620,10 +619,15 @@ begin
   end;
 end;
 
+procedure TfrmBxMultiplaCp.FormCreate(Sender: TObject);
+begin
+  CriarObjetos;
+  InicializaVarControle;
+end;
+
 procedure TfrmBxMultiplaCp.FormDestroy(Sender: TObject);
 begin
-  if Assigned(FQueryPesquisa) then
-    FQueryPesquisa.Free;
+  DestruirObjetos;
 end;
 
 procedure TfrmBxMultiplaCp.FormKeyPress(Sender: TObject; var Key: Char);
@@ -639,6 +643,18 @@ begin
 
 end;
 
+function TfrmBxMultiplaCp.GetIdOfCurrentRow: Integer;
+begin
+  Result := 0;
+  if ((grdCp.DataSource = nil) or (grdCp.DataSource.DataSet = nil)) then
+    Exit;
+
+  if not(grdCp.DataSource.DataSet.Active) then
+    Exit;
+
+  Result := grdCp.DataSource.DataSet.FieldByName(FKeyField).AsInteger;
+end;
+
 procedure TfrmBxMultiplaCp.InicializaFiltros;
 begin
   dateInicial.Date := StartOfTheMonth(Now);
@@ -649,6 +665,18 @@ procedure TfrmBxMultiplaCp.InicializaTela;
 begin
   LimparLabels;
   pgcBaixaMult.ActivePage := tbsBaixa;
+end;
+
+procedure TfrmBxMultiplaCp.InicializaVarControle;
+begin
+  FKeyField := 'ID';
+  FDtCpMaisAntiga := MaxDateTime;
+  FTelaAtiva := False;
+end;
+
+function TfrmBxMultiplaCp.IsIdSelected(const pId: Integer): Boolean;
+begin
+  Result := FCpsSelecionadas.ContainsKey(pId);
 end;
 
 procedure TfrmBxMultiplaCp.LimparLabels;
@@ -704,11 +732,12 @@ begin
   LFiltro := '';
   LOrdem := '';
 
+  FCpsSelecionadas.Clear;
+
   if Assigned(FQueryPesquisa) then
     FreeAndNil(FQueryPesquisa);
 
   FQueryPesquisa := TSFQuery.Create(nil);
-
   try
     // Validações
     if (dateInicial.Date > dateFinal.Date) then
@@ -813,50 +842,60 @@ end;
 
 procedure TfrmBxMultiplaCp.SelAllReg;
 var
-  I: Integer;
-
+  lDs: TDataSet;
+  lId: Integer;
+  lValor: Double;
+  lData: TDate;
 begin
+  if (grdCp.DataSource = nil) or (grdCp.DataSource.DataSet = nil) then
+    Exit;
 
-  // Verifica se o DBGrid está conectado a um DataSource
-  if Assigned(grdCp.DataSource) and Assigned(grdCp.DataSource.DataSet) then
+  lDs := grdCp.DataSource.DataSet;
+  if not lDs.Active or lDs.IsEmpty then
+    Exit;
+
+  FCpsSelecionadas.Clear;
+  if checkSelAll.Checked then
   begin
+    lDs.DisableControls;
+    try
+      lDs.First;
 
-    // Verifica se o data set esta aberto
-    if grdCp.DataSource.DataSet.Active then
-    begin
-
-      // Verifica se o conjunto de dados não está vazio
-      if not grdCp.DataSource.DataSet.IsEmpty then
+      while not lDs.Eof do
       begin
 
-        // Desativa controles de atualização para melhorar o desempenho
-        grdCp.DataSource.DataSet.DisableControls;
-        try
+        lId := lDs.FieldByName(FKeyField).AsInteger;
+        lValor := lDs.FieldByName('VALOR_PARCELA').AsFloat;
+        lData := lDs.FieldByName('DATA_COMPRA').AsDateTime;
+        ToggleId(lId, lValor, lData);
 
-          // Coloca na primeira posição
-          grdCp.DataSource.DataSet.First;
-
-          for I := 0 to grdCp.DataSource.DataSet.RecordCount - 1 do
-          begin
-
-            grdCp.SelectedRows.CurrentRowSelected := (checkSelAll.Checked);
-            grdCp.DataSource.DataSet.Next;
-
-          end;
-
-        finally
-
-          // Reativa controles
-          grdCp.DataSource.DataSet.EnableControls;
-
-        end;
-
+        lDs.Next;
       end;
 
+    finally
+      lDs.EnableControls;
     end;
-
   end;
 
+  // atualiza displays
+  edtValorSel.Text := TUtilitario.FormatoMoeda(CalcCpSel);
+  CalcQtdCpSel;
+  grdCp.Invalidate;
+end;
+
+procedure TfrmBxMultiplaCp.ToggleId(const pId: Integer; const pValor: Double; const pDtCompra: TDate);
+var
+  lIdx: Integer;
+begin
+
+  if (FCpsSelecionadas.ContainsKey(pId)) then
+    FCpsSelecionadas.Remove(pId)
+  else
+    FCpsSelecionadas.Add(pId, pValor);
+
+  // Armazena data da compra mais antiga, usada em validações na baixa
+  if (pDtCompra < FDtCpMaisAntiga) then
+    FDtCpMaisAntiga := pDtCompra;
 end;
 
 end.

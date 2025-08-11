@@ -15,6 +15,7 @@ object frmBxMultiplaCp: TfrmBxMultiplaCp
   Position = poScreenCenter
   WindowState = wsMaximized
   OnActivate = FormActivate
+  OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnKeyPress = FormKeyPress
   TextHeight = 19
@@ -340,7 +341,7 @@ object frmBxMultiplaCp: TfrmBxMultiplaCp
               Align = alClient
               Color = clWhite
               DataSource = DataSourceBxMultiplaCP
-              Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgConfirmDelete, dgCancelOnExit, dgMultiSelect, dgTitleClick, dgTitleHotTrack]
+              Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgConfirmDelete, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
               ReadOnly = True
               TabOrder = 0
               TitleFont.Charset = DEFAULT_CHARSET
@@ -350,8 +351,14 @@ object frmBxMultiplaCp: TfrmBxMultiplaCp
               TitleFont.Style = []
               OnCellClick = grdCpCellClick
               OnDrawColumnCell = grdCpDrawColumnCell
-              OnKeyDown = grdCpKeyDown
               Columns = <
+                item
+                  Expanded = False
+                  FieldName = 'SELECIONADO'
+                  Title.Caption = 'Sel'
+                  Width = 40
+                  Visible = True
+                end
                 item
                   Expanded = False
                   FieldName = 'ID'
