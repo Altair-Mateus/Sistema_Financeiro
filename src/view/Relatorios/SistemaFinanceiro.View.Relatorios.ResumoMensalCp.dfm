@@ -1,7 +1,8 @@
 inherited frmRelMensalCp: TfrmRelMensalCp
   Caption = 'frmRelatorioPadrao1'
-  ClientHeight = 441
-  ClientWidth = 774
+  StyleElements = [seFont, seClient, seBorder]
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
   TextHeight = 15
   inherited RLReport: TRLReport
     DataSource = dsRelResumoMensal
@@ -76,7 +77,6 @@ inherited frmRelMensalCp: TfrmRelMensalCp
     inherited rlbDados: TRLBand
       Height = 30
       Borders.Style = bsClear
-      BeforePrint = rlbDadosBeforePrint
       ExplicitHeight = 30
       object rldbtMesAno: TRLDBText
         Left = 3
@@ -144,12 +144,17 @@ inherited frmRelMensalCp: TfrmRelMensalCp
       end
     end
     inherited rlbRodape: TRLBand
-      Top = 191
-      ExplicitTop = 191
+      Top = 226
+      ExplicitTop = 226
+    end
+    inherited bndFiltros: TRLBand
+      inherited lblFiltros: TLabel
+        StyleElements = [seFont, seClient, seBorder]
+      end
     end
     object RLBand1: TRLBand
       Left = 39
-      Top = 160
+      Top = 195
       Width = 716
       Height = 31
       BandType = btSummary
@@ -187,8 +192,14 @@ inherited frmRelMensalCp: TfrmRelMensalCp
       end
     end
   end
-  object dsRelResumoMensal: TDataSource
-    Left = 432
-    Top = 336
+  inherited RLPDFFilter: TRLPDFFilter
+    Top = 288
+  end
+  object dsRelResumoMensal: TDataSource [2]
+    Left = 160
+    Top = 288
+  end
+  inherited RLXLSXFilter: TRLXLSXFilter
+    Top = 368
   end
 end

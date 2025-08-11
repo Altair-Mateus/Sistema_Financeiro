@@ -3,9 +3,19 @@ unit SistemaFinanceiro.View.RelatoriosPadrao;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, RLReport, RLFilters, RLPDFFilter,
-  Vcl.StdCtrls;
+  Winapi.Windows,
+  Winapi.Messages,
+  System.SysUtils,
+  System.Variants,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  RLReport,
+  RLFilters,
+  RLPDFFilter,
+  Vcl.StdCtrls, RLXLSXFilter;
 
 type
   TfrmRelatorioPadrao = class(TForm)
@@ -25,6 +35,7 @@ type
     RLPDFFilter: TRLPDFFilter;
     bndFiltros: TRLBand;
     lblFiltros: TLabel;
+    RLXLSXFilter: TRLXLSXFilter;
     procedure RLReportBeforePrint(Sender: TObject;
       var PrintIt: Boolean);
     procedure rlbDadosBeforePrint(Sender: TObject; var PrintIt: Boolean);
@@ -49,13 +60,15 @@ implementation
 
 {$R *.dfm}
 
-uses SistemaFinanceiro.Model.dmUsuarios;
+
+uses
+  SistemaFinanceiro.Model.dmUsuarios;
 
 procedure TfrmRelatorioPadrao.rlbDadosBeforePrint(Sender: TObject;
   var PrintIt: Boolean);
 begin
 
-  //  Ajusta o tamanho
+  // Ajusta o tamanho
   if FHeightDetalhe > 0 then
     rlbDados.Height := FHeightDetalhe;
 
@@ -64,7 +77,7 @@ begin
   begin
 
     rlbDados.Borders.DrawBottom := True;
-    rlbDados.Borders.Width      := 1;
+    rlbDados.Borders.Width := 1;
 
   end;
 
@@ -83,7 +96,6 @@ begin
     end;
 
   end;
-
 
 end;
 

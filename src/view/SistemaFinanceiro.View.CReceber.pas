@@ -34,7 +34,8 @@ uses
   SistemaFinanceiro.Model.Entidades.Cr,
   SistemaFinanceiro.Model.uSFQuery,
   fMensagem,
-  SistemaFinanceiro.View.Consulta.ConsultaLancamentoPadraoContas;
+  SistemaFinanceiro.View.Consulta.ConsultaLancamentoPadraoContas,
+  FireDAC.Stan.Param;
 
 type
   TfrmContasReceber = class(TfrmCadastroPadrao)

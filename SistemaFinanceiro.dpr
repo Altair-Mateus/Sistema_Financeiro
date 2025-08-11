@@ -15,7 +15,6 @@ uses
   SistemaFinanceiro.View.Caixa in 'src\view\SistemaFinanceiro.View.Caixa.pas' {frmCaixa},
   SistemaFinanceiro.View.SaldoCaixa in 'src\view\SistemaFinanceiro.View.SaldoCaixa.pas' {frmSaldoCaixa},
   SistemaFinanceiro.Model.Entidades.ResumoCaixa in 'src\model\Entidades\SistemaFinanceiro.Model.Entidades.ResumoCaixa.pas',
-  SistemaFinanceiro.Model.dmCPagar in 'src\model\SistemaFinanceiro.Model.dmCPagar.pas' {dmCPagar: TDataModule},
   SistemaFinanceiro.View.CPagar in 'src\view\SistemaFinanceiro.View.CPagar.pas' {frmContasPagar},
   SistemaFinanceiro.View.CReceber in 'src\view\SistemaFinanceiro.View.CReceber.pas' {frmContasReceber},
   SistemaFinanceiro.View.BaixarCP in 'src\view\SistemaFinanceiro.View.BaixarCP.pas' {frmBaixarCP},
@@ -117,7 +116,6 @@ begin
   Application.CreateForm(TfrmPrincipal, frmPrincipal);
   Application.CreateForm(TdmUsuarios, dmUsuarios);
   Application.CreateForm(TdmCaixa, dmCaixa);
-  Application.CreateForm(TdmCPagar, dmCPagar);
   Application.CreateForm(TdmClientes, dmClientes);
   Application.CreateForm(TdmFornecedores, dmFornecedores);
   Application.CreateForm(TdmFrPgto, dmFrPgto);

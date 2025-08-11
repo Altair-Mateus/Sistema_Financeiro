@@ -12,7 +12,8 @@ object frmGeraRelResumoMensalCp: TfrmGeraRelResumoMensalCp
   Font.Name = 'Tahoma'
   Font.Style = []
   Position = poScreenCenter
-  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnShow = FormShow
   TextHeight = 19
   object pnlGeral: TPanel
     Left = 0
@@ -24,8 +25,6 @@ object frmGeraRelResumoMensalCp: TfrmGeraRelResumoMensalCp
     Color = clWhite
     ParentBackground = False
     TabOrder = 0
-    ExplicitWidth = 624
-    ExplicitHeight = 441
     object pnlFiltros: TPanel
       Left = 0
       Top = 49
@@ -35,8 +34,6 @@ object frmGeraRelResumoMensalCp: TfrmGeraRelResumoMensalCp
       Color = clWhite
       ParentBackground = False
       TabOrder = 0
-      ExplicitWidth = 624
-      ExplicitHeight = 326
       object lblDtIni: TLabel
         Left = 16
         Top = 24
@@ -200,7 +197,6 @@ object frmGeraRelResumoMensalCp: TfrmGeraRelResumoMensalCp
           ParentFont = False
           TabOrder = 0
           OnClick = checkNaoConsideraFatClick
-          ExplicitWidth = 221
         end
         object checkVencidas: TCheckBox
           Left = 5
@@ -216,7 +212,6 @@ object frmGeraRelResumoMensalCp: TfrmGeraRelResumoMensalCp
           Font.Style = []
           ParentFont = False
           TabOrder = 1
-          ExplicitWidth = 221
         end
         object checkParciais: TCheckBox
           Left = 5
@@ -232,7 +227,6 @@ object frmGeraRelResumoMensalCp: TfrmGeraRelResumoMensalCp
           Font.Style = []
           ParentFont = False
           TabOrder = 2
-          ExplicitWidth = 221
         end
         object checkAgrupaFatura: TCheckBox
           Left = 5
@@ -242,7 +236,6 @@ object frmGeraRelResumoMensalCp: TfrmGeraRelResumoMensalCp
           Align = alTop
           Caption = 'Agrupar Faturas'
           TabOrder = 3
-          ExplicitTop = 78
         end
         object checkTracoLinha: TCheckBox
           Left = 5
@@ -252,7 +245,6 @@ object frmGeraRelResumoMensalCp: TfrmGeraRelResumoMensalCp
           Align = alTop
           Caption = 'Tra'#231'o entre as Linhas'
           TabOrder = 4
-          ExplicitTop = 105
         end
         object checkDestacaLinha: TCheckBox
           Left = 5
@@ -274,8 +266,6 @@ object frmGeraRelResumoMensalCp: TfrmGeraRelResumoMensalCp
       Color = clWhite
       ParentBackground = False
       TabOrder = 1
-      ExplicitTop = 375
-      ExplicitWidth = 624
       object btnVisualizar: TButton
         AlignWithMargins = True
         Left = 4
@@ -288,6 +278,7 @@ object frmGeraRelResumoMensalCp: TfrmGeraRelResumoMensalCp
         Images = ImageList1
         TabOrder = 0
         OnClick = btnVisualizarClick
+        ExplicitTop = 6
       end
       object btnImprimir: TButton
         AlignWithMargins = True
@@ -312,8 +303,8 @@ object frmGeraRelResumoMensalCp: TfrmGeraRelResumoMensalCp
         Caption = 'Cancelar'
         ImageIndex = 2
         Images = ImageList1
+        ModalResult = 2
         TabOrder = 2
-        OnClick = btnCancelarClick
       end
     end
     object pnlTitulo: TPanel
@@ -324,7 +315,7 @@ object frmGeraRelResumoMensalCp: TfrmGeraRelResumoMensalCp
       Align = alTop
       BevelOuter = bvNone
       Caption = 'Resumo Mensal Contas a Pagar'
-      Color = 5737262
+      Color = clSeagreen
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWhite
       Font.Height = -19
@@ -333,7 +324,6 @@ object frmGeraRelResumoMensalCp: TfrmGeraRelResumoMensalCp
       ParentBackground = False
       ParentFont = False
       TabOrder = 2
-      ExplicitWidth = 624
     end
   end
   object ImageList1: TImageList

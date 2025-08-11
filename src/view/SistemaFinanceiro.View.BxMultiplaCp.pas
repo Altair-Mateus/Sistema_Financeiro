@@ -487,6 +487,7 @@ begin
   lListaCPs := TList<Integer>.Create;
   try
 
+    lControllerBaixa.LogsErros := RegistrarLogsErros;
     lDtCpMaisAntiga := MaxDateTime;
 
     with grdCp.DataSource.DataSet do
@@ -578,6 +579,8 @@ begin
 
   // Desenha a célula com as propriedades de cor atualizadas
   grdCp.DefaultDrawColumnCell(Rect, DataCol, Column, State);
+
+  TUtilitario.FormatoMoedaGrid(TDBGrid(Sender), Column, Rect, State);
 
 end;
 

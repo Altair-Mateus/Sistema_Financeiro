@@ -10,21 +10,22 @@ inherited frmFornecedores: TfrmFornecedores
   inherited CardPanelPrincipal: TCardPanel
     Width = 1339
     Height = 645
+    ActiveCard = CardPesquisa
     StyleElements = [seFont, seClient, seBorder]
-    ExplicitWidth = 1335
-    ExplicitHeight = 644
+    ExplicitWidth = 1339
+    ExplicitHeight = 645
     inherited CardCadastro: TCard
       Width = 1339
       Height = 645
       StyleElements = [seFont, seClient, seBorder]
-      ExplicitWidth = 1335
-      ExplicitHeight = 644
+      ExplicitWidth = 1339
+      ExplicitHeight = 645
       inherited pnlBotoesCad: TPanel
         Top = 576
         Width = 1339
         StyleElements = [seFont, seClient, seBorder]
-        ExplicitTop = 575
-        ExplicitWidth = 1335
+        ExplicitTop = 576
+        ExplicitWidth = 1339
         inherited btnSalvar: TButton
           OnClick = btnSalvarClick
         end
@@ -33,8 +34,8 @@ inherited frmFornecedores: TfrmFornecedores
         Width = 1339
         Height = 535
         StyleElements = [seFont, seClient, seBorder]
-        ExplicitWidth = 1335
-        ExplicitHeight = 534
+        ExplicitWidth = 1339
+        ExplicitHeight = 535
         object LabelNome: TLabel
           Left = 32
           Top = 48
@@ -378,7 +379,7 @@ inherited frmFornecedores: TfrmFornecedores
       inherited PanelTitulo: TPanel
         Width = 1339
         StyleElements = [seFont, seClient, seBorder]
-        ExplicitWidth = 1335
+        ExplicitWidth = 1339
         inherited lblTitulo: TLabel
           Width = 260
           Caption = 'Inserindo um novo Fornecedor'
@@ -766,17 +767,11 @@ inherited frmFornecedores: TfrmFornecedores
           Height = 92
           Caption = 'Ordenar consulta por'
           Color = clWhite
-          DefaultHeaderFont = False
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWhite
+          Font.Color = clBlack
           Font.Height = -16
           Font.Name = 'Tahoma'
           Font.Style = []
-          HeaderFont.Charset = DEFAULT_CHARSET
-          HeaderFont.Color = clWhite
-          HeaderFont.Height = -16
-          HeaderFont.Name = 'Tahoma'
-          HeaderFont.Style = []
           ParentBackground = False
           ParentColor = False
           ParentFont = False
@@ -905,20 +900,17 @@ inherited frmFornecedores: TfrmFornecedores
               Expanded = False
               FieldName = 'CELULAR'
               Title.Caption = 'Celular'
-              Width = 64
               Visible = True
             end
             item
               Expanded = False
               FieldName = 'TELEFONE'
               Title.Caption = 'Telefone'
-              Width = 64
               Visible = True
             end
             item
               Expanded = False
               FieldName = 'CNPJ'
-              Width = 64
               Visible = True
             end
             item

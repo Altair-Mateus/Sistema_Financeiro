@@ -2,23 +2,26 @@ inherited frmUsuarios: TfrmUsuarios
   Caption = 'Cadastro de Usu'#225'rios'
   ClientHeight = 510
   ClientWidth = 811
-  ExplicitTop = -97
-  ExplicitWidth = 823
-  ExplicitHeight = 548
+  StyleElements = [seFont, seClient, seBorder]
+  ExplicitWidth = 827
+  ExplicitHeight = 549
   TextHeight = 19
   inherited CardPanelPrincipal: TCardPanel
     Width = 811
     Height = 510
-    ExplicitWidth = 807
-    ExplicitHeight = 509
+    StyleElements = [seFont, seClient, seBorder]
+    ExplicitWidth = 811
+    ExplicitHeight = 510
     inherited CardCadastro: TCard
       Width = 811
       Height = 510
+      StyleElements = [seFont, seClient, seBorder]
       ExplicitWidth = 807
       ExplicitHeight = 509
       inherited pnlBotoesCad: TPanel
         Top = 441
         Width = 811
+        StyleElements = [seFont, seClient, seBorder]
         ExplicitTop = 440
         ExplicitWidth = 807
         inherited btnSalvar: TButton
@@ -30,6 +33,7 @@ inherited frmUsuarios: TfrmUsuarios
       inherited PanelCampos: TPanel
         Width = 811
         Height = 400
+        StyleElements = [seFont, seClient, seBorder]
         ExplicitWidth = 807
         ExplicitHeight = 399
         object LabelNome: TLabel
@@ -57,7 +61,7 @@ inherited frmUsuarios: TfrmUsuarios
           AlignWithMargins = True
           Left = 3
           Top = 351
-          Width = 805
+          Width = 797
           Height = 46
           Align = alBottom
           Caption = 
@@ -65,16 +69,13 @@ inherited frmUsuarios: TfrmUsuarios
             'Quando logar a primeira vez com seu usu'#225'rio voc'#234' poder'#225' alterar ' +
             'a mesma.'
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = 5737262
+          Font.Color = clSeagreen
           Font.Height = -19
           Font.Name = 'Calibri'
           Font.Style = []
           ParentFont = False
           Visible = False
           WordWrap = True
-          ExplicitLeft = 4
-          ExplicitTop = 349
-          ExplicitWidth = 797
         end
         object Label5: TLabel
           Left = 80
@@ -126,36 +127,37 @@ inherited frmUsuarios: TfrmUsuarios
           Width = 105
           Height = 21
           Color = 9750962
-          DisabledColor = 5737262
+          DisabledColor = clSeagreen
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBtnText
           Font.Height = -16
           Font.Name = 'Tahoma'
           Font.Style = []
-          FrameColor = 5737262
+          FrameColor = clSeagreen
           ParentFont = False
           State = tssOn
           StateCaptions.CaptionOn = 'Ativo'
           StateCaptions.CaptionOff = 'Inativo'
           TabOrder = 2
-          ThumbColor = 5737262
+          ThumbColor = clSeagreen
         end
       end
       inherited PanelTitulo: TPanel
         Width = 811
+        StyleElements = [seFont, seClient, seBorder]
         ExplicitWidth = 807
         inherited lblTitulo: TLabel
-          Width = 211
+          Width = 222
           Caption = 'Inserindo um novo usu'#225'rio'
-          ExplicitWidth = 211
+          StyleElements = [seFont, seClient, seBorder]
+          ExplicitWidth = 222
         end
       end
     end
     inherited CardPesquisa: TCard
       Width = 811
       Height = 510
-      ExplicitLeft = 0
-      ExplicitTop = 0
+      StyleElements = [seFont, seClient, seBorder]
       ExplicitWidth = 811
       ExplicitHeight = 510
       inherited pnlPesquisa: TPanel
@@ -164,8 +166,13 @@ inherited frmUsuarios: TfrmUsuarios
         Margins.Top = 0
         Margins.Right = 0
         Margins.Bottom = 0
+        StyleElements = [seFont, seClient, seBorder]
         ExplicitWidth = 811
+        inherited lblPesquisar: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
         inherited edtPesquisar: TEdit
+          StyleElements = [seFont, seClient, seBorder]
           OnChange = edtPesquisarChange
         end
         inherited btnPesquisae: TButton
@@ -177,6 +184,7 @@ inherited frmUsuarios: TfrmUsuarios
       inherited pnlBotoes: TPanel
         Top = 441
         Width = 811
+        StyleElements = [seFont, seClient, seBorder]
         ExplicitTop = 441
         ExplicitWidth = 811
         inherited btnExcluir: TButton
@@ -194,6 +202,7 @@ inherited frmUsuarios: TfrmUsuarios
       inherited pnlGrid: TPanel
         Width = 811
         Height = 360
+        StyleElements = [seFont, seClient, seBorder]
         ExplicitWidth = 811
         ExplicitHeight = 360
         inherited DBGrid1: TDBGrid

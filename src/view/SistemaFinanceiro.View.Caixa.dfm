@@ -11,7 +11,6 @@ inherited frmCaixa: TfrmCaixa
   inherited CardPanelPrincipal: TCardPanel
     Width = 1255
     Height = 605
-    ActiveCard = CardPesquisa
     StyleElements = [seFont, seClient, seBorder]
     ExplicitWidth = 1255
     ExplicitHeight = 605
@@ -210,8 +209,6 @@ inherited frmCaixa: TfrmCaixa
       Width = 1255
       Height = 605
       StyleElements = [seFont, seClient, seBorder]
-      ExplicitLeft = 0
-      ExplicitTop = 0
       ExplicitWidth = 1255
       ExplicitHeight = 605
       inherited pnlPesquisa: TPanel
@@ -1803,17 +1800,11 @@ inherited frmCaixa: TfrmCaixa
           Height = 67
           Caption = 'Ordenar consulta por'
           Color = clWhite
-          DefaultHeaderFont = False
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWhite
+          Font.Color = clBlack
           Font.Height = -16
           Font.Name = 'Tahoma'
           Font.Style = []
-          HeaderFont.Charset = DEFAULT_CHARSET
-          HeaderFont.Color = clWhite
-          HeaderFont.Height = -16
-          HeaderFont.Name = 'Tahoma'
-          HeaderFont.Style = []
           ParentBackground = False
           ParentColor = False
           ParentFont = False

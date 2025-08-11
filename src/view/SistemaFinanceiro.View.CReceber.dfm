@@ -529,7 +529,7 @@ inherited frmContasReceber: TfrmContasReceber
             AlignWithMargins = True
             Left = 3
             Top = 3
-            Width = 437
+            Width = 128
             Height = 19
             Align = alTop
             Caption = 'Grupo de Parcelas'
@@ -539,7 +539,6 @@ inherited frmContasReceber: TfrmContasReceber
             Font.Name = 'Tahoma'
             Font.Style = []
             ParentFont = False
-            ExplicitWidth = 128
           end
           object grdGrupoParcelas: TDBGrid
             AlignWithMargins = True

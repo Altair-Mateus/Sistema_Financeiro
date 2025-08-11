@@ -3,11 +3,24 @@ unit SistemaFinanceiro.View.GeraRelResumoMensalCp;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ComCtrls, Vcl.ExtCtrls,
-  System.ImageList, Vcl.ImgList, SistemaFinanceiro.View.FaturaCartao,
+  Winapi.Windows,
+  Winapi.Messages,
+  System.SysUtils,
+  System.Variants,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  Vcl.StdCtrls,
+  Vcl.ComCtrls,
+  Vcl.ExtCtrls,
+  System.ImageList,
+  Vcl.ImgList,
+  SistemaFinanceiro.View.FaturaCartao,
   SistemaFinanceiro.View.Fornecedores,
-  SistemaFinanceiro.View.Relatorios.ResumoMensalCp;
+  SistemaFinanceiro.View.Relatorios.ResumoMensalCp,
+  fMensagem;
 
 type
   TfrmGeraRelResumoMensalCp = class(TForm)
@@ -42,19 +55,22 @@ type
     checkAgrupaFatura: TCheckBox;
     checkTracoLinha: TCheckBox;
     checkDestacaLinha: TCheckBox;
-    procedure btnCancelarClick(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
     procedure btnPesqFornecClick(Sender: TObject);
     procedure btnPesqFatCartaoClick(Sender: TObject);
     procedure btnVisualizarClick(Sender: TObject);
     procedure btnImprimirClick(Sender: TObject);
     procedure checkNaoConsideraFatClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
 
   private
-    { Private declarations }
+    FRelatorio: TfrmRelMensalCp;
+
+    procedure CriaObjRelatorio;
     procedure GeraRelatorio;
-    procedure GeraConsulta;
+    procedure GeraFiltros;
     procedure GeraImpressao;
+    function ValidaFiltros: Boolean;
 
   public
     { Public declarations }
@@ -66,43 +82,37 @@ var
 implementation
 
 uses
-    System.DateUtils, SistemaFinanceiro.Model.dmCPagar;
+  System.DateUtils,
+  uEnumsUtils;
 
 {$R *.dfm}
 
-procedure TfrmGeraRelResumoMensalCp.btnCancelarClick(Sender: TObject);
-begin
-  Close;
-end;
 
 procedure TfrmGeraRelResumoMensalCp.btnImprimirClick(Sender: TObject);
 begin
+  if not(ValidaFiltros) then
+    Exit;
 
-  GeraConsulta;
-
+  CriaObjRelatorio;
+  GeraFiltros;
   GeraImpressao;
-
 end;
 
 procedure TfrmGeraRelResumoMensalCp.btnPesqFornecClick(Sender: TObject);
+var
+  lFormulario: TfrmFornecedores;
 begin
 
-  //  Cria o form
-  frmFornecedores := TfrmFornecedores.Create(Self);
-
+  lFormulario := TfrmFornecedores.Create(Self);
   try
 
-    //  Exibe o form
-    frmFornecedores.ShowModal;
+    lFormulario.ShowModal;
+
+    // Pega a ID do cliente selecionado
+    edtCodFornec.Text := lFormulario.RetornaCodigo;
 
   finally
-
-    //  Pega a ID do cliente selecionado
-    edtCodFornec.Text := frmFornecedores.DataSourceFornecedor.DataSet.FieldByName('ID_FORNEC').AsString;
-
-    //  Libera da  memoria
-    FreeAndNil(frmFornecedores);
-
+    lFormulario.Free;
   end;
 
   edtCodFornec.SetFocus;
@@ -111,259 +121,125 @@ end;
 
 procedure TfrmGeraRelResumoMensalCp.btnVisualizarClick(Sender: TObject);
 begin
+  if not(ValidaFiltros) then
+    Exit;
 
-  GeraConsulta;
-
+  CriaObjRelatorio;
+  GeraFiltros;
   GeraRelatorio;
-
 end;
 
 procedure TfrmGeraRelResumoMensalCp.checkNaoConsideraFatClick(Sender: TObject);
 begin
+  btnPesqFatCartao.Enabled := (not checkNaoConsideraFat.Checked);
+  edtCodFatCartao.Enabled := (not checkNaoConsideraFat.Checked);
+  checkAgrupaFatura.Checked := (not checkNaoConsideraFat.Checked);
+  checkAgrupaFatura.Enabled := (not checkNaoConsideraFat.Checked);
 
   if checkNaoConsideraFat.Checked then
-  begin
-
-    btnPesqFatCartao.Enabled := False;
-    edtCodFatCartao.Enabled  := False;
     edtCodFatCartao.Clear;
-
-    checkAgrupaFatura.Checked := False;
-    checkAgrupaFatura.Enabled := False;
-
-  end
-  else
-  begin
-
-    btnPesqFatCartao.Enabled  := True;
-    edtCodFatCartao.Enabled   := True;
-    checkAgrupaFatura.Enabled := True;
-
-  end;
 
 end;
 
+procedure TfrmGeraRelResumoMensalCp.CriaObjRelatorio;
+begin
+  if Assigned(FRelatorio) then
+    FreeAndNil(FRelatorio);
+
+  FRelatorio := TfrmRelMensalCp.Create(nil);
+end;
+
 procedure TfrmGeraRelResumoMensalCp.btnPesqFatCartaoClick(Sender: TObject);
+var
+  lFormulario: TfrmFaturaCartao;
 begin
 
-  //  Cria o form
-  frmFaturaCartao := TfrmFaturaCartao.Create(Self);
-
+  lFormulario := TfrmFaturaCartao.Create(Self);
   try
 
-    //  Exibe o form
-    frmFaturaCartao.ShowModal;
+    lFormulario.ShowModal;
+    // Pega a Id da fatura selecionada
+    edtCodFatCartao.Text := lFormulario.RetornaCodigo;
 
   finally
-
-    //  Pega a Id da fatura selecionada
-    edtCodFatCartao.Text := frmFaturaCartao.DataSourceFaturaCartao.DataSet.FieldByName('ID_FT').AsString;
-
-    //  Libera da memória
-    FreeAndNil(frmFaturaCartao);
-
+    lFormulario.Free;
   end;
 
   edtCodFatCartao.SetFocus;
 
 end;
 
-procedure TfrmGeraRelResumoMensalCp.FormCreate(Sender: TObject);
+procedure TfrmGeraRelResumoMensalCp.FormDestroy(Sender: TObject);
 begin
-
-  //  Define as datas previamente
-  dateIni.Date   := StartOfTheYear(Now);
-  dateFinal.Date := EndOfTheYear(Now);
-
+  if Assigned(FRelatorio) then
+    FRelatorio.Free;
 end;
 
-procedure TfrmGeraRelResumoMensalCp.GeraConsulta;
-var
-  SQL            : String;
-  LFiltro        : String;
-  LExtract       : String;
-  LSelectExtract : String;
-  LOrdem         : String;
-  LJoin          : String;
+procedure TfrmGeraRelResumoMensalCp.FormShow(Sender: TObject);
+begin
+  // Define as datas previamente
+  dateIni.Date := StartOfTheYear(Now);
+  dateFinal.Date := EndOfTheYear(Now);
+end;
 
+function TfrmGeraRelResumoMensalCp.ValidaFiltros: Boolean;
 begin
 
-  //  Validações
-  if dateIni.Date > dateFinal.Date then
-  begin
+  Result := False;
 
+  if (dateIni.Date > dateFinal.Date) then
+  begin
+    TfrmMensagem.TelaMensagem('Atenção!', 'Data Inicial não pode ser maior que a data Final!', tmAviso);
     dateFinal.SetFocus;
-    Application.MessageBox('Data Inicial não pode ser maior que a data Final!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
-    abort;
-
+    Exit;
   end;
 
-  if cbStatus.ItemIndex < 0 then
+  if (cbStatus.ItemIndex < 0) then
   begin
-
+    TfrmMensagem.TelaMensagem('Atenção!', 'Selecione um tipo de STATUS!', tmAviso);
     cbStatus.SetFocus;
-    Application.MessageBox('Selecione um tipo de STATUS!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
-    abort;
-
+    Exit;
   end;
 
-  LFiltro        := '';
-  SQL            := '';
-  LExtract       := '';
-  LSelectExtract := '';
-  LOrdem         := '';
-  LJoin          := '';
+  Result := True;
+end;
 
-  // Agrupa por Fatura
-  if checkAgrupaFatura.Checked then
-  begin
-    LSelectExtract := LSelectExtract + ' FT.NOME AS FATURA, ';
-    LJoin          := LJoin          + ' INNER JOIN FATURA_CARTAO FT ON CP.ID_FATURA = FT.ID_FT ';
-    LExtract       := LExtract       + ' CP.ID_FATURA, FT.NOME, ';
-    LOrdem         := LOrdem         + ' CP.ID_FATURA, ';
-  end;
+procedure TfrmGeraRelResumoMensalCp.GeraFiltros;
+begin
 
-  //  Pesquisa por data
-  if rbDtCompra.Checked then
-  begin
+  FRelatorio.DtInicial := dateIni.Date;
+  FRelatorio.DtFinal := dateFinal.Date;
+  FRelatorio.AgruparFatura := checkAgrupaFatura.Checked;
+  FRelatorio.ConsidDtCompra := rbDtCompra.Checked;
+  FRelatorio.ConsidDtVcto := rbDtVenc.Checked;
 
-    LFiltro        := LFiltro        + ' AND CP.DATA_COMPRA BETWEEN :DTINI AND :DTFIM ';
-    LExtract       := LExtract       + ' EXTRACT(MONTH FROM CP.DATA_COMPRA), EXTRACT(YEAR FROM CP.DATA_COMPRA) ';
-    LSelectExtract := LSelectExtract + ' EXTRACT(MONTH FROM CP.DATA_COMPRA) || ''/'' || EXTRACT(YEAR FROM CP.DATA_COMPRA) AS ano_mes ';
-    LOrdem         := LOrdem         + ' EXTRACT(YEAR FROM CP.DATA_COMPRA), EXTRACT(MONTH FROM CP.DATA_COMPRA) ';
-
-  end
-  else if rbDtVenc.Checked then
-  begin
-
-    LFiltro        := LFiltro        + ' AND CP.DATA_VENCIMENTO BETWEEN :DTINI AND :DTFIM ';
-    LExtract       := LExtract       + ' EXTRACT(MONTH FROM CP.DATA_VENCIMENTO), EXTRACT(YEAR FROM CP.DATA_VENCIMENTO) ';
-    LSelectExtract := LSelectExtract + ' EXTRACT(MONTH FROM CP.DATA_VENCIMENTO) || ''/'' || EXTRACT(YEAR FROM CP.DATA_VENCIMENTO) AS ano_mes ';
-    LOrdem         := LOrdem         + ' EXTRACT(YEAR FROM CP.DATA_VENCIMENTO), EXTRACT(MONTH FROM CP.DATA_VENCIMENTO) ';
-
-  end
-  else
-  begin
-
-    LFiltro        := LFiltro        + ' AND CP.DATA_PAGAMENTO BETWEEN :DTINI AND :DTFIM ';
-    LExtract       := LExtract       + ' EXTRACT(MONTH FROM CP.DATA_PAGAMENTO), EXTRACT(YEAR FROM CP.DATA_PAGAMENTO) ';
-    LSelectExtract := LSelectExtract + ' EXTRACT(MONTH FROM CP.DATA_PAGAMENTO) || ''/'' || EXTRACT(YEAR FROM CP.DATA_PAGAMENTO) AS ano_mes ';
-    LOrdem         := LOrdem         + ' EXTRACT(YEAR FROM CP.DATA_PAGAMENTO), EXTRACT(MONTH FROM CP.DATA_PAGAMENTO) ';
-
-  end;
-
-
-  //  Pesquisa por status
   case cbStatus.ItemIndex of
-    1 : LFiltro := LFiltro + ' AND CP.STATUS = ''P'' ';
-    2 : LFiltro := LFiltro + ' AND CP.STATUS = ''A'' ';
-    3 : LFiltro := LFiltro + ' AND CP.STATUS = ''C'' ';
+    1:
+      FRelatorio.StatusCp := sctPaga;
+    2:
+      FRelatorio.StatusCp := sctAberta;
+    3:
+      FRelatorio.StatusCp := sctCancelada;
   end;
 
-
-  //  Pesquisa por FORNECEDORES
-  if Trim(edtCodFornec.Text) <> '' then
-    LFiltro := LFiltro + ' AND CP.ID_FORNECEDOR = :ID_FORNEC ';
-
-
-  //  Pesquisa por Fatura de Cartao
-  if Trim(edtCodFatCartao.Text) <> '' then
-    LFiltro := LFiltro + ' AND CP.ID_FATURA = :ID_FT ';
-
-
-  //  Pesquisa parciais
-  if checkParciais.Checked then
-    LFiltro := LFiltro + ' AND CP.PARCIAL = ''S'' ';
-
-  //  Pesquisa vencidas
-  if checkVencidas.Checked then
-    LFiltro := LFiltro + ' AND CP.STATUS = ''A'' AND CP.DATA_VENCIMENTO < :DTATUAL ';
-
-  //  Não considera faturas
-  if checkNaoConsideraFat.Checked then
-    LFiltro := LFiltro + ' AND FATURA_CART = ''N'' ';
-
-
-  SQL := 'SELECT ' + LSelectExtract + ', SUM(VALOR_PARCELA) AS TOTAL_MENSAL, ' +
-         ' COUNT(*) AS QTD FROM CONTAS_PAGAR CP ' + LJoin + ' WHERE 1 = 1 ' + LFiltro +
-         'GROUP BY ' + LExtract +
-         'ORDER BY ' + LOrdem;
-
-  dmCPagar.FDQueryRelatorios.Close;
-  dmCPagar.FDQueryRelatorios.SQL.Clear;
-  dmCPagar.FDQueryRelatorios.Params.Clear;
-  dmCPagar.FDQueryRelatorios.SQL.Add(SQL);
-
-  //  Criando os parametros
-  dmCPagar.FDQueryRelatorios.ParamByName('DTINI').AsDate := dateIni.Date;
-  dmCPagar.FDQueryRelatorios.ParamByName('DTFIM').AsDate := dateFinal.Date;
-
-  if Trim(edtCodFornec.Text) <> '' then
-    dmCPagar.FDQueryRelatorios.ParamByName('ID_FORNEC').AsInteger := StrToInt(Trim(edtCodFornec.Text));
-
-  if Trim(edtCodFatCartao.Text) <> '' then
-    dmCPagar.FDQueryRelatorios.ParamByName('ID_FT').AsInteger := StrToInt(Trim(edtCodFatCartao.Text));
-
-  if checkVencidas.Checked then
-    dmCPagar.FDQueryRelatorios.ParamByName('DTATUAL').AsDate:= Now;
-
-
-  dmCPagar.FDQueryRelatorios.Prepare;
-  dmCPagar.FDQueryRelatorios.Open();
-
-
+  FRelatorio.CodFornecedor := Trim(edtCodFornec.Text);
+  FRelatorio.CodFaturaCartao := Trim(edtCodFatCartao.Text);
+  FRelatorio.SomenteParciais := checkParciais.Checked;
+  FRelatorio.Vencidas := checkVencidas.Checked;
+  FRelatorio.FiltrarFatCartao := not(checkNaoConsideraFat.Checked);
+  FRelatorio.TracoLinha := checkTracoLinha.Checked;
+  FRelatorio.DestacaLinha := checkDestacaLinha.Checked;
 
 end;
 
 procedure TfrmGeraRelResumoMensalCp.GeraImpressao;
 begin
-
-  //  Cria o form
-  frmRelMensalCp := TfrmRelMensalCp.Create(Self);
-
-  try
-
-    frmRelMensalCp.dsRelResumoMensal.DataSet := dmCPagar.FDQueryRelatorios;
-
-    //  Imprime
-    frmRelMensalCp.RLReport.Print;
-
-  finally
-
-    FreeAndNil(frmRelMensalCp);
-
-  end;
-
+  FRelatorio.RLReport.Print;
 end;
 
 procedure TfrmGeraRelResumoMensalCp.GeraRelatorio;
 begin
-
-  //  Cria o form
-  frmRelMensalCp := TfrmRelMensalCp.Create(Self);
-
-  if checkAgrupaFatura.Checked then
-    frmRelMensalCp.Fatura := True;
-
-  if checkTracoLinha.Checked then
-    frmRelMensalCp.TracoLinha := True;
-
-  if checkDestacaLinha.Checked then
-    frmRelMensalCp.DestacaLinha := True;
-
-  try
-
-    frmRelMensalCp.dsRelResumoMensal.DataSet := dmCPagar.FDQueryRelatorios;
-
-    //  Mostra a pre visualização
-    frmRelMensalCp.RLReport.Preview();
-
-  finally
-
-    FreeAndNil(frmRelMensalCp);
-
-  end;
-
+  FRelatorio.RLReport.Preview;
 end;
 
 end.

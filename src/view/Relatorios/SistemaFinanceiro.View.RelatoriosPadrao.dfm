@@ -17,7 +17,6 @@ object frmRelatorioPadrao: TfrmRelatorioPadrao
     Width = 794
     Height = 1123
     Borders.Sides = sdAll
-    DefaultFilter = RLPDFFilter
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlack
     Font.Height = -13
@@ -171,8 +170,8 @@ object frmRelatorioPadrao: TfrmRelatorioPadrao
         AlignWithMargins = True
         Left = 0
         Top = 1
-        Width = 49
-        Height = 16
+        Width = 716
+        Height = 34
         Align = alClient
         Caption = 'lblFiltros'
         WordWrap = True
@@ -187,7 +186,12 @@ object frmRelatorioPadrao: TfrmRelatorioPadrao
     FileName = 'relatorio'
     DisplayName = 'Documento PDF'
     ImageFormat = ifOriginal
-    Left = 304
-    Top = 336
+    Left = 40
+    Top = 256
+  end
+  object RLXLSXFilter: TRLXLSXFilter
+    DisplayName = 'Planilha Excel'
+    Left = 40
+    Top = 320
   end
 end

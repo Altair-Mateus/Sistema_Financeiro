@@ -366,6 +366,7 @@ object frmBxMultiplaCp: TfrmBxMultiplaCp
                   Visible = True
                 end
                 item
+                  Alignment = taCenter
                   Expanded = False
                   FieldName = 'ID_FORNECEDOR'
                   Title.Caption = 'Cod Forn'
@@ -387,6 +388,7 @@ object frmBxMultiplaCp: TfrmBxMultiplaCp
                   Visible = True
                 end
                 item
+                  Alignment = taCenter
                   Expanded = False
                   FieldName = 'PARCELA'
                   Title.Caption = 'Parcela'
@@ -394,6 +396,7 @@ object frmBxMultiplaCp: TfrmBxMultiplaCp
                   Visible = True
                 end
                 item
+                  Alignment = taCenter
                   Expanded = False
                   FieldName = 'DATA_VENCIMENTO'
                   Title.Caption = ' Vencimento'
@@ -401,6 +404,7 @@ object frmBxMultiplaCp: TfrmBxMultiplaCp
                   Visible = True
                 end
                 item
+                  Alignment = taRightJustify
                   Expanded = False
                   FieldName = 'VALOR_PARCELA'
                   Title.Caption = 'Valor Parcela'
@@ -408,6 +412,7 @@ object frmBxMultiplaCp: TfrmBxMultiplaCp
                   Visible = True
                 end
                 item
+                  Alignment = taCenter
                   Expanded = False
                   FieldName = 'DATA_COMPRA'
                   Title.Caption = 'Data Compra'

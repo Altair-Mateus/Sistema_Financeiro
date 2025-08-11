@@ -286,7 +286,7 @@ begin
     pDetalhes.Data := FDetalhesGeraisCp.Data;
     pDetalhes.Usuario := FDetalhesGeraisCp.Usuario;
     pDetalhes.ValorDesc := DefineValorDesconto(pValorParcelaCp);
-    pDetalhes.Valor := DefineValorPago(pValorParcelaCp,pDetalhes.ValorDesc);
+    pDetalhes.Valor := DefineValorPago(pValorParcelaCp, pDetalhes.ValorDesc);
     pDetalhes.Insert;
   except
     on E: Exception do
@@ -329,7 +329,7 @@ begin
 
 end;
 
-procedure TControllerBaixaMultCp.GravarPgtosCp(const pIdCp: Integer;const pValorPago: Double);
+procedure TControllerBaixaMultCp.GravarPgtosCp(const pIdCp: Integer; const pValorPago: Double);
 var
   lPgto: TModelPgtoBxCp;
   lContador, lUltCod: Integer;
