@@ -41,8 +41,6 @@ uses
   SistemaFinanceiro.View.FrPgto in 'src\view\SistemaFinanceiro.View.FrPgto.pas' {frmFrPgto},
   SistemaFinanceiro.View.Relatorios.FrPgto in 'src\view\Relatorios\SistemaFinanceiro.View.Relatorios.FrPgto.pas' {frmRelFrPgto},
   SistemaFinanceiro.View.BaixarCR.FrPgto in 'src\view\SistemaFinanceiro.View.BaixarCR.FrPgto.pas' {frmFrPgtoBaixaCr},
-  SistemaFinanceiro.Model.dmPgtoBxCr in 'src\model\SistemaFinanceiro.Model.dmPgtoBxCr.pas' {dmPgtoBxCr: TDataModule},
-  SistemaFinanceiro.Model.dmPgtoBxCp in 'src\model\SistemaFinanceiro.Model.dmPgtoBxCp.pas' {dmPgtoBxCp: TDataModule},
   SistemaFinanceiro.View.BaixarCP.FrPgto in 'src\view\SistemaFinanceiro.View.BaixarCP.FrPgto.pas' {frmFrPgtoBaixaCp},
   SistemaFinanceiro.View.CadAdmin in 'src\view\SistemaFinanceiro.View.CadAdmin.pas' {frmCadAdmin},
   SistemaFinanceiro.View.Ajuda in 'src\view\SistemaFinanceiro.View.Ajuda.pas' {frmAjuda},
@@ -119,8 +117,6 @@ begin
   Application.CreateForm(TdmClientes, dmClientes);
   Application.CreateForm(TdmFornecedores, dmFornecedores);
   Application.CreateForm(TdmFrPgto, dmFrPgto);
-  Application.CreateForm(TdmPgtoBxCr, dmPgtoBxCr);
-  Application.CreateForm(TdmPgtoBxCp, dmPgtoBxCp);
   Application.CreateForm(TdmFaturaCartao, dmFaturaCartao);
   Application.Run;
 

@@ -62,7 +62,7 @@ implementation
 
 {$R *.dfm}
 
-uses SistemaFinanceiro.Model.dmFrPgto, SistemaFinanceiro.Model.dmPgtoBxCp;
+uses SistemaFinanceiro.Model.dmFrPgto;
 
 procedure TfrmFrPgtoBxMultiCp.btnAdicionaClick(Sender: TObject);
 var
@@ -221,20 +221,20 @@ begin
 
         ContadorFr := ContadorFr + 1;
 
-        if dmPgtoBxCp.cdsPgtoBxCp.State in [dsBrowse, dsInactive] then
-        begin
-          dmPgtoBxCp.cdsPgtoBxCp.Insert;
-        end;
+//        if dmPgtoBxCp.cdsPgtoBxCp.State in [dsBrowse, dsInactive] then
+//        begin
+//          dmPgtoBxCp.cdsPgtoBxCp.Insert;
+//        end;
 
 //        ValorPagoTemp := cdsFrPgtoVALORPAGO.AsCurrency;
 
-        dmPgtoBxCp.GeraCodigo;
-        dmPgtoBxCp.cdsPgtoBxCpID_CP.AsInteger      := DBGridCp.DataSource.DataSet.FieldByName('ID').AsInteger;
-        dmPgtoBxCp.cdsPgtoBxCpID_FR_PGTO.AsInteger := cdsFrPgtoID_FR.AsInteger;
-        dmPgtoBxCp.cdsPgtoBxCpNR_FR.AsInteger      := ContadorFr;
-        dmPgtoBxCp.cdsPgtoBxCpDATA_HORA.AsDateTime := Now;
-
-        dmPgtoBxCp.cdsPgtoBxCpVALOR_PAGO.AsCurrency := cdsFrPgtoVALORPAGO.AsCurrency;
+//        dmPgtoBxCp.GeraCodigo;
+//        dmPgtoBxCp.cdsPgtoBxCpID_CP.AsInteger      := DBGridCp.DataSource.DataSet.FieldByName('ID').AsInteger;
+//        dmPgtoBxCp.cdsPgtoBxCpID_FR_PGTO.AsInteger := cdsFrPgtoID_FR.AsInteger;
+//        dmPgtoBxCp.cdsPgtoBxCpNR_FR.AsInteger      := ContadorFr;
+//        dmPgtoBxCp.cdsPgtoBxCpDATA_HORA.AsDateTime := Now;
+//
+//        dmPgtoBxCp.cdsPgtoBxCpVALOR_PAGO.AsCurrency := cdsFrPgtoVALORPAGO.AsCurrency;
 
 //        if ValorPagoTemp >= ValorCpTotal then
 //        begin
@@ -245,9 +245,9 @@ begin
 //
 //        ValorPagoTemp := ValorPagoTemp - ValorCpTotal;
 
-        // Gravando no banco
-        dmPgtoBxCp.cdsPgtoBxCp.Post;
-        dmPgtoBxCp.cdsPgtoBxCp.ApplyUpdates(0);
+//        // Gravando no banco
+//        dmPgtoBxCp.cdsPgtoBxCp.Post;
+//        dmPgtoBxCp.cdsPgtoBxCp.ApplyUpdates(0);
 
         cdsFrPgto.Next; // Vá para o próximo registro
 

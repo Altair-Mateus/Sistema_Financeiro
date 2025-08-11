@@ -67,7 +67,7 @@ object frmFrPgtoBxMultiCp: TfrmFrPgtoBxMultiCp
     Width = 391
     Height = 225
     Align = alTop
-    Color = 5737262
+    Color = clSeagreen
     ParentBackground = False
     TabOrder = 1
     ExplicitWidth = 387
