@@ -71,4 +71,3 @@ modules/
 src/view/uTeste.dfm
 src/view/uTeste.pas
 *.json
-*.FDB
