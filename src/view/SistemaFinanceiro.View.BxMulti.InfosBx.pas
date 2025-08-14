@@ -21,7 +21,8 @@ uses
   Vcl.ComCtrls,
   fMensagem,
   SistemaFinanceiro.Model.Entidades.CP.Detalhe,
-  SistemaFinanceiro.Model.Entidades.FrPgto;
+  SistemaFinanceiro.Model.Entidades.FrPgto,
+  System.Math;
 
 type
   TfrmInfoBxMult = class(TForm)
@@ -206,7 +207,7 @@ begin
     lValorFinal := lValorCp - lValorDesc;
 
     // retorna o valor final
-    Result := lValorFinal;
+    Result := RoundTo(lValorFinal, -2);
 
   end;
 
@@ -243,7 +244,7 @@ begin
     lValorFinal := lValorCp - lValorDesc;
 
     // retorna o valor final
-    Result := lValorFinal;
+    Result := RoundTo(lValorFinal, -2);
 
   end;
 

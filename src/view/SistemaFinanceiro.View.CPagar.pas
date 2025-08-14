@@ -1466,10 +1466,13 @@ begin
 
     // Pesquisa por tipo
     case cbStatus.ItemIndex of
+
       1:
         LFiltro := LFiltro + ' AND CP.STATUS = ''P'' ';
       2:
-        LFiltro := LFiltro + ' AND CP.STATUS = ''A'' ';
+        LFiltro := LFiltro + ' AND CP.STATUS =  ''A'' ';
+    else
+      LFiltro := LFiltro + ' AND CP.STATUS =  ''A'' ';
     end;
 
     // Pesquisa por data
@@ -1486,7 +1489,9 @@ begin
         2:
           LFiltro := LFiltro +
             ' AND CP.DATA_PAGAMENTO BETWEEN :DTINI AND :DTFIM ';
-
+      else
+        LFiltro := LFiltro +
+          ' AND CP.DATA_VENCIMENTO BETWEEN :DTINI AND :DTFIM ';
       end;
 
     end;

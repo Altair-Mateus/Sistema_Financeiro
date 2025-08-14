@@ -28,7 +28,7 @@ uses
   SistemaFinanceiro.Model.uSFQuery,
   SistemaFinanceiro.Model.Entidades.CP.Detalhe,
   System.Generics.Collections,
-  SistemaFinanceiro.Model.Entidades.PgtoBxCp;
+  SistemaFinanceiro.Model.Entidades.PgtoBxCp, System.Math;
 
 type
   TfrmBxMultiplaCp = class(TForm)
@@ -350,7 +350,7 @@ begin
     lTotal := (lTotal + lPairSel.Value);
   end;
 
-  Result := lTotal;
+  Result := RoundTo(lTotal, -2);
 end;
 
 procedure TfrmBxMultiplaCp.CalcQtdCpGrid;
