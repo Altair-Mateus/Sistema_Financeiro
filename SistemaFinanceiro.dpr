@@ -15,9 +15,7 @@ uses
   SistemaFinanceiro.View.Caixa in 'src\view\SistemaFinanceiro.View.Caixa.pas' {frmCaixa},
   SistemaFinanceiro.View.SaldoCaixa in 'src\view\SistemaFinanceiro.View.SaldoCaixa.pas' {frmSaldoCaixa},
   SistemaFinanceiro.Model.Entidades.ResumoCaixa in 'src\model\Entidades\SistemaFinanceiro.Model.Entidades.ResumoCaixa.pas',
-  SistemaFinanceiro.Model.dmCPagar in 'src\model\SistemaFinanceiro.Model.dmCPagar.pas' {dmCPagar: TDataModule},
   SistemaFinanceiro.View.CPagar in 'src\view\SistemaFinanceiro.View.CPagar.pas' {frmContasPagar},
-  SistemaFinanceiro.Model.dmCReceber in 'src\model\SistemaFinanceiro.Model.dmCReceber.pas' {dmCReceber: TDataModule},
   SistemaFinanceiro.View.CReceber in 'src\view\SistemaFinanceiro.View.CReceber.pas' {frmContasReceber},
   SistemaFinanceiro.View.BaixarCP in 'src\view\SistemaFinanceiro.View.BaixarCP.pas' {frmBaixarCP},
   SistemaFinanceiro.Model.Entidades.CP in 'src\model\Entidades\SistemaFinanceiro.Model.Entidades.CP.pas',
@@ -43,8 +41,6 @@ uses
   SistemaFinanceiro.View.FrPgto in 'src\view\SistemaFinanceiro.View.FrPgto.pas' {frmFrPgto},
   SistemaFinanceiro.View.Relatorios.FrPgto in 'src\view\Relatorios\SistemaFinanceiro.View.Relatorios.FrPgto.pas' {frmRelFrPgto},
   SistemaFinanceiro.View.BaixarCR.FrPgto in 'src\view\SistemaFinanceiro.View.BaixarCR.FrPgto.pas' {frmFrPgtoBaixaCr},
-  SistemaFinanceiro.Model.dmPgtoBxCr in 'src\model\SistemaFinanceiro.Model.dmPgtoBxCr.pas' {dmPgtoBxCr: TDataModule},
-  SistemaFinanceiro.Model.dmPgtoBxCp in 'src\model\SistemaFinanceiro.Model.dmPgtoBxCp.pas' {dmPgtoBxCp: TDataModule},
   SistemaFinanceiro.View.BaixarCP.FrPgto in 'src\view\SistemaFinanceiro.View.BaixarCP.FrPgto.pas' {frmFrPgtoBaixaCp},
   SistemaFinanceiro.View.CadAdmin in 'src\view\SistemaFinanceiro.View.CadAdmin.pas' {frmCadAdmin},
   SistemaFinanceiro.View.Ajuda in 'src\view\SistemaFinanceiro.View.Ajuda.pas' {frmAjuda},
@@ -61,7 +57,7 @@ uses
   SistemaFinanceiro.View.Relatorios.ResumoMensalCr in 'src\view\Relatorios\SistemaFinanceiro.View.Relatorios.ResumoMensalCr.pas' {frmRelMensalCr},
   SistemaFinanceiro.View.DetalhesOrigemCpCr in 'src\view\SistemaFinanceiro.View.DetalhesOrigemCpCr.pas' {frmDetalhesOrigemCpCr},
   uDaoRTTI in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\model\uDaoRTTI.pas',
-  uDBAttributes in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\model\uDBAttributes.pas',
+  uDBAttributes in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\model\uDBAttributes.pas' {$R *.res},
   SistemaFinanceiro.Model.uSFQuery in 'src\model\SistemaFinanceiro.Model.uSFQuery.pas',
   SistemaFinanceiro.Model.Entidades.PgtoBxCr in 'src\model\Entidades\SistemaFinanceiro.Model.Entidades.PgtoBxCr.pas',
   SistemaFinanceiro.Model.Entidades.LancamentoPadraoContas in 'src\model\Entidades\SistemaFinanceiro.Model.Entidades.LancamentoPadraoContas.pas',
@@ -73,27 +69,56 @@ uses
   SistemaFinanceiro.Model.Entidades.Cliente in 'src\model\Entidades\SistemaFinanceiro.Model.Entidades.Cliente.pas',
   SistemaFinanceiro.Model.Entidades.Fornecedor in 'src\model\Entidades\SistemaFinanceiro.Model.Entidades.Fornecedor.pas',
   SistemaFinanceiro.View.Relatorios.LancamentoPadrao in 'src\view\Relatorios\SistemaFinanceiro.View.Relatorios.LancamentoPadrao.pas' {frmRelLancamentoPadrao},
-  fTesteDaoRTTI in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\view\fTesteDaoRTTI.pas' {frmTesteDaoRTTI},
-  uUsuario in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\view\uUsuario.pas';
+  SistemaFinanceiro.Model.Entidades.PgtoBxCp in 'src\model\Entidades\SistemaFinanceiro.Model.Entidades.PgtoBxCp.pas',
+  SistemaFinanceiro.Exceptions.BaixaCp in 'src\exceptions\SistemaFinanceiro.Exceptions.BaixaCp.pas',
+  SistemaFinanceiro.Exceptions.ContasPagar in 'src\exceptions\SistemaFinanceiro.Exceptions.ContasPagar.pas',
+  SistemaFinanceiro.Exceptions.ContasPagarDetalhe in 'src\exceptions\SistemaFinanceiro.Exceptions.ContasPagarDetalhe.pas',
+  SistemaFinanceiro.Exceptions.LancamentoCaixa in 'src\exceptions\SistemaFinanceiro.Exceptions.LancamentoCaixa.pas',
+  SistemaFinanceiro.Exceptions.PgtoBaixaCp in 'src\exceptions\SistemaFinanceiro.Exceptions.PgtoBaixaCp.pas',
+  SistemaFinanceiro.Exceptions.ConexaoBanco in 'src\exceptions\SistemaFinanceiro.Exceptions.ConexaoBanco.pas',
+  uDbConfig in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\config\uDbConfig.pas',
+  uDBConnectorFB in 'src\model\db\uDBConnectorFB.pas',
+  System.SysUtils,
+  Winapi.Windows,
+  uDaoRTTIExceptions in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\exceptions\uDaoRTTIExceptions.pas',
+  uDbConfigExceptions in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\exceptions\uDbConfigExceptions.pas',
+  uTransactionScope in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\transactions\uTransactionScope.pas',
+  uITransactionScope in '..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\interfaces\uITransactionScope.pas',
+  SistemaFinanceiro.Model.Entidades.FrPgto in 'src\model\Entidades\SistemaFinanceiro.Model.Entidades.FrPgto.pas',
+  SistemaFinanceiro.Exceptions.FrPgto in 'src\exceptions\SistemaFinanceiro.Exceptions.FrPgto.pas',
+  SistemaFinanceiro.Controller.BaixaMultCp in 'src\controller\SistemaFinanceiro.Controller.BaixaMultCp.pas',
+  SistemaFinanceiro.Controller.BaixaContaPagar in 'src\controller\SistemaFinanceiro.Controller.BaixaContaPagar.pas',
+  SistemaFinanceiro.Model.Entidades.FaturaCartao in 'src\model\Entidades\SistemaFinanceiro.Model.Entidades.FaturaCartao.pas',
+  SistemaFinanceiro.Exceptions.FaturaCartao in 'src\exceptions\SistemaFinanceiro.Exceptions.FaturaCartao.pas',
+  SistemaFinanceiro.View.BxMulti.InfosBxCr in 'src\view\SistemaFinanceiro.View.BxMulti.InfosBxCr.pas' {frmInfoBxMultCr};
 
 {$R *.res}
 
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := False;
-  Application.CreateForm(TfrmPrincipal, frmPrincipal);
-  Application.CreateForm(TfrmTesteDaoRTTI, frmTesteDaoRTTI);
+
+  try
+
+    TDBConnectorFB.Connect;
+
+  except
+    on E: Exception do
+    begin
+      TfrmMensagem.TelaMensagem('Erro!', E.Message, tmErro);
+      ExitProcess(1); // encerra o processo de forma limpa
+    end;
+  end;
+
   Application.CreateForm(TDataModule1, DataModule1);
+  Application.CreateForm(TfrmPrincipal, frmPrincipal);
   Application.CreateForm(TdmUsuarios, dmUsuarios);
   Application.CreateForm(TdmCaixa, dmCaixa);
-  Application.CreateForm(TdmCPagar, dmCPagar);
   Application.CreateForm(TdmClientes, dmClientes);
   Application.CreateForm(TdmFornecedores, dmFornecedores);
   Application.CreateForm(TdmFrPgto, dmFrPgto);
-  Application.CreateForm(TdmPgtoBxCr, dmPgtoBxCr);
-  Application.CreateForm(TdmPgtoBxCp, dmPgtoBxCp);
   Application.CreateForm(TdmFaturaCartao, dmFaturaCartao);
-  Application.CreateForm(TfrmMensagem, frmMensagem);
-  Application.CreateForm(TfrmRelLancamentoPadrao, frmRelLancamentoPadrao);
   Application.Run;
+
+  TDbConfig.Finalize;
 end.

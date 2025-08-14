@@ -24,11 +24,11 @@ type
     FData: TDate;
     FValorDesc: Double;
   public
-    [TDBColumn('ID', True, False)]
+    [TDBColumn('ID'), TDBIsPrimaryKey]
     property Id: Integer read FId write FId;
     [TDBColumn('ID_CONTA_RECEBER')]
     property IdCR: Integer read FIdCR write FIdCR;
-    [TDBColumn('DETALHES', False, False, True)]
+    [TDBColumn('DETALHES'), TDBAcceptNull]
     property Detalhes: String read FDetalhes write FDetalhes;
     [TDBColumn('VALOR')]
     property Valor: Currency read FValor write FValor;
@@ -36,7 +36,7 @@ type
     property Data: TDate read FData write FData;
     [TDBColumn('USUARIO')]
     property Usuario: Integer read FUsuario write FUsuario;
-    [TDBColumn('DESCONTO_BX', False, False, True)]
+    [TDBColumn('DESCONTO_BX'), TDBAcceptNull]
     property ValorDesc: Double read FValorDesc write FValorDesc;
 
     constructor Create;

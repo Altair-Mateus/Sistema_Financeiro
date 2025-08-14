@@ -12,7 +12,8 @@ uses
   Winapi.Windows,
   SistemaFinanceiro.Model.Entidades.CR.Detalhe,
   SistemaFinanceiro.Model.Entidades.LancamentoCaixa,
-  SistemaFinanceiro.Model.Entidades.PgtoBxCr;
+  SistemaFinanceiro.Model.Entidades.PgtoBxCr,
+  uEnumsUtils;
 
 type
 
@@ -40,11 +41,11 @@ type
     FIdGrupoParcelas: Integer;
 
   public
-    [TDBColumn('ID', True, False)]
+    [TDBColumn('ID'), TDBIsPrimaryKey]
     property ID: Integer read FID write FID;
-    [TDBColumn('NUMERO_DOCUMENTO', False, False, True)]
+    [TDBColumn('NUMERO_DOCUMENTO'), TDBAcceptNull]
     property Doc: String read FDoc write FDoc;
-    [TDBColumn('DESCRICAO', False, False, True)]
+    [TDBColumn('DESCRICAO'), TDBAcceptNull]
     property Desc: String read FDesc write FDesc;
     [TDBColumn('PARCELA')]
     property Parcela: Integer read FParcela write FParcela;
@@ -60,19 +61,19 @@ type
     property DataCadastro: TDate read FDataCadastro write FDataCadastro;
     [TDBColumn('DATA_VENCIMENTO')]
     property DataVencimento: TDate read FDataVencimento write FDataVencimento;
-    [TDBColumn('DATA_RECEBIMENTO', False, False, True)]
+    [TDBColumn('DATA_RECEBIMENTO'), TDBAcceptNull]
     property DataRecebimento: TDate read FDataRecebimento write FDataRecebimento;
     [TDBColumn('STATUS')]
     property Status: String read FStatus write FStatus;
     [TDBColumn('PARCIAL')]
     property Parcial: String read FParcial write FParcial;
-    [TDBColumn('CR_ORIGEM', False, False, True)]
+    [TDBColumn('CR_ORIGEM'), TDBAcceptNull]
     property CrOrigem: Integer read FCrOrigem write FCrOrigem;
     [TDBColumn('ID_CLIENTE')]
     property IdCliente: Integer read FIdCliente write FIdCliente;
-    [TDBColumn('NUM_TOT_PARCELAS', False, False, True)]
+    [TDBColumn('NUM_TOT_PARCELAS'), TDBAcceptNull]
     property NumTotalParcelas: Integer read FNumTotalParcelas write FNumTotalParcelas;
-    [TDBColumn('ID_GRUPO_PARCELAS', False, False, True)]
+    [TDBColumn('ID_GRUPO_PARCELAS'), TDBAcceptNull]
     property IdGrupoParcelas: Integer read FIdGrupoParcelas write FIdGrupoParcelas;
 
     constructor Create;
@@ -89,16 +90,14 @@ type
     procedure ResetPropertiesToDefault;
     procedure AddPropertyToWhere(const APropertyName: String);
 
-    function Existe(const pId : Integer; const pCarrega : Boolean = false) : Boolean;
+    function Existe(const pId: Integer; const pCarrega: Boolean = false): Boolean;
     procedure GeraCodigo;
 
-    class function TotalCR(pDtIni, pDtFim: TDate) : Double;
-    class function GetIdGrupoParcelas : Integer;
+    class function TotalCR(pDtIni, pDtFim: TDate): Double;
+    class function GetIdGrupoParcelas: Integer;
 
-    function BaixarCR(pCrDet: TModelCrDetalhe; pCr : TModelCR) : Boolean;
-    function CancBxCr : Boolean;
-
-
+    function BaixarCR(pCrDet: TModelCrDetalhe; pCr: TModelCR): Boolean;
+    function CancBxCr: Boolean;
 
   end;
 
@@ -111,18 +110,18 @@ begin
   FDaoRTTI.AddPropertyToWhere(APropertyName);
 end;
 
-function TModelCR.BaixarCR(pCrDet: TModelCrDetalhe; pCr : TModelCR) : Boolean;
+function TModelCR.BaixarCR(pCrDet: TModelCrDetalhe; pCr: TModelCR): Boolean;
 var
-  lCaixa  : TModelLancamentoCaixa;
-  lCrParcial : TModelCR;
+  lCaixa: TModelLancamentoCaixa;
+  lCrParcial: TModelCR;
 const
-  TOLERANCIAVALORCR : Currency = 0.01;
+  TOLERANCIAVALORCR: Currency = 0.01;
 begin
 
-  Result := False;
+  Result := false;
   pCr.ValorAbatido := pCr.ValorAbatido + pCrDet.Valor;
 
-  //  Caso o valor abatido já seja igual ao valor da parcela
+  // Caso o valor abatido já seja igual ao valor da parcela
   if (pCr.ValorAbatido >= pCr.ValorParcela) then
   begin
     pCr.Status := 'P';
@@ -134,17 +133,17 @@ begin
   begin
     lCrParcial := TModelCR.Create;
     try
-      //  gera a id
+      // gera a id
       lCrParcial.GeraCodigo;
       lCrParcial.DataCadastro := now;
       lCrParcial.Status := 'A';
       lCrParcial.ValorAbatido := 0;
 
-      //  Passando os dados para o dataset
-      if (pCr.Doc = '') or (pCr.Parcial = 'S' ) then
+      // Passando os dados para o dataset
+      if (pCr.Doc = '') or (pCr.Parcial = 'S') then
         lCrParcial.Doc := pCr.Doc
       else
-        lCrParcial.Doc  := Format('%s-P', [pCr.Doc]);
+        lCrParcial.Doc := Format('%s-P', [pCr.Doc]);
 
       lCrParcial.Desc := Format('Parcial - Restante da Conta ID Nº %d - Doc Nº %s', [pCr.ID, pCr.Doc]);
       lCrParcial.ValorVenda := pCr.ValorVenda;
@@ -155,11 +154,14 @@ begin
       lCrParcial.Parcial := 'S';
       lCrParcial.CrOrigem := pCr.ID;
       lCrParcial.IdCliente := pCr.IdCliente;
+      lCrParcial.NumTotalParcelas := pCr.NumTotalParcelas;
+      lCrParcial.IdGrupoParcelas := pCr.IdGrupoParcelas;
 
-      //  Gravando no BD
+      // Gravando no BD
       if not lCrParcial.Insert then
       begin
-        Application.MessageBox('Erro ao realizar a baixa: Erro ao gerar a conta parcial!', 'Erro', MB_OK + MB_ICONERROR);
+        Application.MessageBox('Erro ao realizar a baixa: Erro ao gerar a conta parcial!', 'Erro',
+          MB_OK + MB_ICONERROR);
         exit;
       end;
 
@@ -169,7 +171,7 @@ begin
 
   end;
 
-  //  Atualizando a conta baixada
+  // Atualizando a conta baixada
   pCr.Status := 'P';
   pCr.DataRecebimento := pCrDet.Data;
   if not pCr.UpdateByPK then
@@ -178,30 +180,33 @@ begin
     exit;
   end;
 
-  //  Grava os detalhes da baixa
+  // Grava os detalhes da baixa
   pCrDet.GeraCodigo;
   if not pCrDet.Insert then
   begin
-    Application.MessageBox('Erro ao realizar a baixa: Erro ao gravar os detalhes da baixa!', 'Erro', MB_OK + MB_ICONERROR);
+    Application.MessageBox('Erro ao realizar a baixa: Erro ao gravar os detalhes da baixa!', 'Erro',
+      MB_OK + MB_ICONERROR);
     exit;
   end;
 
-  //  Lançando a baixa no caixa
+  // Lançando a baixa no caixa
   lCaixa := TModelLancamentoCaixa.Create;
   try
     lCaixa.GeraCodigo;
-    lCaixa.NumDoc       := pCr.Doc;
-    lCaixa.Desc         := Format('Baixa Conta ID Nº %d a Receber - Nº Documento: %s - Parcela: %d', [pCr.ID, pCr.Doc, pCr.Parcela]);
-    lCaixa.Valor        := pCrDet.Valor;
-    lCaixa.Tipo         := 'R';
+    lCaixa.NumDoc := pCr.Doc;
+    lCaixa.Desc := Format('Baixa Conta ID Nº %d a Receber - Nº Documento: %s - Parcela: %d',
+      [pCr.ID, pCr.Doc, pCr.Parcela]);
+    lCaixa.Valor := pCrDet.Valor;
+    lCaixa.Tipo := 'R';
     lCaixa.DataCadastro := pCrDet.Data;
-    lCaixa.Origem       := 'CR';
-    lCaixa.IdOrigem     := pCr.ID;
+    lCaixa.Origem := 'CR';
+    lCaixa.IdOrigem := pCr.ID;
 
-    //  Gravando no BD
+    // Gravando no BD
     if not lCaixa.Insert then
     begin
-      Application.MessageBox('Erro ao realizar a baixa: Erro ao ggravar lançamento no caixa!', 'Erro', MB_OK + MB_ICONERROR);
+      Application.MessageBox('Erro ao realizar a baixa: Erro ao ggravar lançamento no caixa!', 'Erro',
+        MB_OK + MB_ICONERROR);
       exit;
     end;
   finally
@@ -212,27 +217,27 @@ begin
 
 end;
 
-function TModelCR.CancBxCr : Boolean;
+function TModelCR.CancBxCr: Boolean;
 var
-  lCrDetalhe : TModelCrDetalhe;
-  lCaixa : TModelLancamentoCaixa;
-  lFrPgtoBx : TModelPgtoBxCr;
+  lCrDetalhe: TModelCrDetalhe;
+  lCaixa: TModelLancamentoCaixa;
+  lFrPgtoBx: TModelPgtoBxCr;
 begin
 
-  Result := False;
+  Result := false;
   lCrDetalhe := TModelCrDetalhe.Create;
   lCaixa := TModelLancamentoCaixa.Create;
   lFrPgtoBx := TModelPgtoBxCr.Create;
   try
 
-    //  Carrega os objetos
+    // Carrega os objetos
     if not lCrDetalhe.ExistePorCr(FID, True) then
     begin
       Application.MessageBox('Não encontrado detalhes da CR!', 'Erro', MB_OK + MB_ICONERROR);
       exit;
     end;
 
-    if not lCaixa.ExistePorCr(FID, True) then
+    if not lCaixa.ExistePorOrigem(FID, tlCr, True) then
     begin
       Application.MessageBox('Não encontrado lançamento no caixa da CR!', 'Erro', MB_OK + MB_ICONERROR);
       exit;
@@ -244,21 +249,21 @@ begin
       exit;
     end;
 
-    //  Exclui os detalhes da baixa
+    // Exclui os detalhes da baixa
     if not lCrDetalhe.DeleteByPk then
     begin
       Application.MessageBox('Erro ao excluir detalhes da baixa da CR!', 'Erro', MB_OK + MB_ICONERROR);
       exit;
     end;
 
-    //  Exclui todas as formas de pagamento
+    // Exclui todas as formas de pagamento
     if not lFrPgtoBx.DeleteBySQLText('ID_CR = ' + IntToStr(FID)) then
     begin
       Application.MessageBox('Erro ao excluir detalhes da baixa da CR!', 'Erro', MB_OK + MB_ICONERROR);
       exit;
     end;
 
-    //  Exclui o lançamento do caixa
+    // Exclui o lançamento do caixa
     if not lCaixa.DeleteByPk then
     begin
       Application.MessageBox('Erro ao excluir lançamento do caixa da CR!', 'Erro', MB_OK + MB_ICONERROR);
@@ -313,11 +318,11 @@ begin
   inherited;
 end;
 
-function TModelCR.Existe(const pId: Integer; const pCarrega : Boolean = false): Boolean;
+function TModelCR.Existe(const pId: Integer; const pCarrega: Boolean = false): Boolean;
 var
-  lQuery : TSFQuery;
+  lQuery: TSFQuery;
 begin
-  Result := False;
+  Result := false;
   lQuery := TSFQuery.Create(nil);
   try
     try
@@ -342,7 +347,7 @@ begin
       end;
 
     except
-      on E : Exception do
+      on E: Exception do
       begin
         Application.MessageBox(PWideChar('Erro ao realizar a consulta: ' + E.Message), 'Atenção', MB_OK + MB_ICONERROR);
       end;
@@ -354,7 +359,7 @@ end;
 
 procedure TModelCR.GeraCodigo;
 var
-  lQuery : TSFQuery;
+  lQuery: TSFQuery;
 begin
   lQuery := TSFQuery.Create(nil);
   try
@@ -363,15 +368,16 @@ begin
       lQuery.SQL.Clear;
       lQuery.Open('SELECT MAX(ID) AS ID FROM CONTAS_RECEBER');
 
-      //  Ultimo codigo usado + 1
+      // Ultimo codigo usado + 1
       FID := lQuery.FieldByName('ID').AsInteger + 1;
 
-      //  Insere o registro no final da tabela
+      // Insere o registro no final da tabela
       lQuery.Append;
     except
-      on E : Exception do
+      on E: Exception do
       begin
-        Application.MessageBox(PWideChar('Erro ao obter próximo ID de CR: ' + E.Message), 'Atenção', MB_OK + MB_ICONERROR);
+        Application.MessageBox(PWideChar('Erro ao obter próximo ID de CR: ' + E.Message), 'Atenção',
+          MB_OK + MB_ICONERROR);
       end;
     end;
   finally
@@ -395,7 +401,8 @@ begin
     except
       on E: Exception do
       begin
-        Application.MessageBox(PWideChar('Erro ao obter próximo ID de grupo de parcelas: ' + E.Message), 'Atenção', MB_OK + MB_ICONERROR)
+        Application.MessageBox(PWideChar('Erro ao obter próximo ID de grupo de parcelas: ' + E.Message), 'Atenção',
+          MB_OK + MB_ICONERROR)
       end;
     end;
   finally
@@ -438,7 +445,8 @@ begin
     except
       on E: Exception do
       begin
-        Application.MessageBox(PWideChar('Erro ao obter próximo ID de grupo de parcelas: ' + E.Message), 'Atenção', MB_OK + MB_ICONERROR)
+        Application.MessageBox(PWideChar('Erro ao obter valores totais do Contas a Pagar: ' + E.Message), 'Atenção',
+          MB_OK + MB_ICONERROR)
       end;
     end;
   finally

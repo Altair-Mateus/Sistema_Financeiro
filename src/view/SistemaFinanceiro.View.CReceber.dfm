@@ -3,26 +3,30 @@ inherited frmContasReceber: TfrmContasReceber
   ClientHeight = 642
   ClientWidth = 1327
   WindowState = wsMaximized
+  StyleElements = [seFont, seClient, seBorder]
   OnClose = FormClose
   OnDestroy = FormDestroy
-  ExplicitTop = -141
-  ExplicitWidth = 1339
-  ExplicitHeight = 680
+  ExplicitWidth = 1343
+  ExplicitHeight = 681
   TextHeight = 19
   inherited CardPanelPrincipal: TCardPanel
     Width = 1327
     Height = 642
-    ExplicitWidth = 1323
-    ExplicitHeight = 641
+    ActiveCard = CardPesquisa
+    StyleElements = [seFont, seClient, seBorder]
+    ExplicitWidth = 1327
+    ExplicitHeight = 642
     inherited CardCadastro: TCard
       Width = 1327
       Height = 642
+      StyleElements = [seFont, seClient, seBorder]
       OnEnter = CardCadastroEnter
       ExplicitWidth = 1327
       ExplicitHeight = 642
       inherited pnlBotoesCad: TPanel
         Top = 573
         Width = 1327
+        StyleElements = [seFont, seClient, seBorder]
         ExplicitTop = 573
         ExplicitWidth = 1327
         inherited btnSalvar: TButton
@@ -47,6 +51,7 @@ inherited frmContasReceber: TfrmContasReceber
       inherited PanelCampos: TPanel
         Width = 1327
         Height = 532
+        StyleElements = [seFont, seClient, seBorder]
         ExplicitWidth = 1327
         ExplicitHeight = 532
         object lblDataVend: TLabel
@@ -98,7 +103,7 @@ inherited frmContasReceber: TfrmContasReceber
           Height = 19
           Caption = 'lblNomeCliente'
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = 5737262
+          Font.Color = clSeagreen
           Font.Height = -16
           Font.Name = 'Tahoma'
           Font.Style = []
@@ -465,18 +470,18 @@ inherited frmContasReceber: TfrmContasReceber
           Width = 84
           Height = 21
           Color = 9750963
-          DisabledColor = 5737262
+          DisabledColor = clSeagreen
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBtnText
           Font.Height = -16
           Font.Name = 'Tahoma'
           Font.Style = []
-          FrameColor = 5737262
+          FrameColor = clSeagreen
           ParentFont = False
           StateCaptions.CaptionOn = 'Sim'
           StateCaptions.CaptionOff = 'N'#227'o'
           TabOrder = 5
-          ThumbColor = 5737262
+          ThumbColor = clSeagreen
           OnClick = toggleParcelamentoClick
         end
         object edtNDoc: TEdit
@@ -524,7 +529,7 @@ inherited frmContasReceber: TfrmContasReceber
             AlignWithMargins = True
             Left = 3
             Top = 3
-            Width = 437
+            Width = 128
             Height = 19
             Align = alTop
             Caption = 'Grupo de Parcelas'
@@ -534,7 +539,6 @@ inherited frmContasReceber: TfrmContasReceber
             Font.Name = 'Tahoma'
             Font.Style = []
             ParentFont = False
-            ExplicitWidth = 128
           end
           object grdGrupoParcelas: TDBGrid
             AlignWithMargins = True
@@ -593,22 +597,31 @@ inherited frmContasReceber: TfrmContasReceber
       end
       inherited PanelTitulo: TPanel
         Width = 1327
+        StyleElements = [seFont, seClient, seBorder]
         ExplicitWidth = 1327
+        inherited lblTitulo: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
       end
     end
     inherited CardPesquisa: TCard
       Width = 1327
       Height = 642
-      ExplicitWidth = 1323
-      ExplicitHeight = 641
+      StyleElements = [seFont, seClient, seBorder]
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 1327
+      ExplicitHeight = 642
       inherited pnlPesquisa: TPanel
         Width = 1327
         Height = 137
-        ExplicitWidth = 1323
+        StyleElements = [seFont, seClient, seBorder]
+        ExplicitWidth = 1327
         ExplicitHeight = 137
         inherited lblPesquisar: TLabel
           Left = 213
           Top = 14
+          StyleElements = [seFont, seClient, seBorder]
           ExplicitLeft = 213
           ExplicitTop = 14
         end
@@ -4783,6 +4796,7 @@ inherited frmContasReceber: TfrmContasReceber
           Left = 213
           Top = 37
           Width = 297
+          StyleElements = [seFont, seClient, seBorder]
           OnChange = PesquisaClick
           ExplicitLeft = 213
           ExplicitTop = 37
@@ -4795,7 +4809,7 @@ inherited frmContasReceber: TfrmContasReceber
           Margins.Top = 30
           Margins.Bottom = 30
           OnClick = PesquisaClick
-          ExplicitLeft = 1199
+          ExplicitLeft = 1203
           ExplicitTop = 30
           ExplicitHeight = 77
         end
@@ -4815,133 +4829,6 @@ inherited frmContasReceber: TfrmContasReceber
             'ABERTA'
             'CANCELADA')
         end
-        object gbFiltros: TGroupBox
-          Left = 762
-          Top = 13
-          Width = 236
-          Height = 109
-          Caption = 'Ordenar consulta por'
-          Color = clWhite
-          DefaultHeaderFont = False
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWhite
-          Font.Height = -16
-          Font.Name = 'Tahoma'
-          Font.Style = []
-          HeaderFont.Charset = DEFAULT_CHARSET
-          HeaderFont.Color = clWhite
-          HeaderFont.Height = -16
-          HeaderFont.Name = 'Tahoma'
-          HeaderFont.Style = []
-          ParentBackground = False
-          ParentColor = False
-          ParentFont = False
-          TabOrder = 3
-          object rbDataVenc: TRadioButton
-            Left = 3
-            Top = 33
-            Width = 118
-            Height = 17
-            Caption = 'Data Vencimento'
-            Color = 5934893
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWhite
-            Font.Height = -12
-            Font.Name = 'Tahoma'
-            Font.Style = []
-            ParentColor = False
-            ParentFont = False
-            TabOrder = 0
-            OnClick = PesquisaClick
-          end
-          object rbValorParcela: TRadioButton
-            Left = 127
-            Top = 33
-            Width = 118
-            Height = 17
-            Caption = 'Valor Parcela'
-            Color = 5934893
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWhite
-            Font.Height = -12
-            Font.Name = 'Tahoma'
-            Font.Style = []
-            ParentColor = False
-            ParentFont = False
-            TabOrder = 1
-            OnClick = PesquisaClick
-          end
-          object rbValorVenda: TRadioButton
-            Left = 127
-            Top = 61
-            Width = 118
-            Height = 17
-            Caption = 'Valor Venda'
-            Color = 5934893
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWhite
-            Font.Height = -12
-            Font.Name = 'Tahoma'
-            Font.Style = []
-            ParentColor = False
-            ParentFont = False
-            TabOrder = 2
-            OnClick = PesquisaClick
-          end
-          object rbDataVenda: TRadioButton
-            Left = 3
-            Top = 61
-            Width = 118
-            Height = 17
-            Caption = 'Data Venda'
-            Color = 5934893
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWhite
-            Font.Height = -12
-            Font.Name = 'Tahoma'
-            Font.Style = []
-            ParentColor = False
-            ParentFont = False
-            TabOrder = 3
-            OnClick = PesquisaClick
-          end
-          object rbId: TRadioButton
-            Left = 3
-            Top = 90
-            Width = 118
-            Height = 17
-            Caption = 'ID'
-            Checked = True
-            Color = 5934893
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWhite
-            Font.Height = -12
-            Font.Name = 'Tahoma'
-            Font.Style = []
-            ParentColor = False
-            ParentFont = False
-            TabOrder = 4
-            TabStop = True
-            OnClick = PesquisaClick
-          end
-          object rbIdCliente: TRadioButton
-            Left = 127
-            Top = 89
-            Width = 118
-            Height = 17
-            Caption = 'Cod Cliente'
-            Color = 5934893
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWhite
-            Font.Height = -12
-            Font.Name = 'Tahoma'
-            Font.Style = []
-            ParentColor = False
-            ParentFont = False
-            TabOrder = 5
-            OnClick = PesquisaClick
-          end
-        end
         object dateInicial: TDateTimePicker
           Left = 213
           Top = 95
@@ -4950,7 +4837,7 @@ inherited frmContasReceber: TfrmContasReceber
           Date = 45146.000000000000000000
           Time = 0.872988819442980500
           ShowCheckbox = True
-          TabOrder = 4
+          TabOrder = 3
           OnChange = PesquisaClick
         end
         object dateFinal: TDateTimePicker
@@ -4961,7 +4848,7 @@ inherited frmContasReceber: TfrmContasReceber
           Date = 45146.000000000000000000
           Time = 0.872988819442980500
           ShowCheckbox = True
-          TabOrder = 5
+          TabOrder = 4
           OnChange = PesquisaClick
         end
         object cbData: TComboBox
@@ -4971,7 +4858,7 @@ inherited frmContasReceber: TfrmContasReceber
           Height = 27
           Style = csDropDownList
           ItemIndex = 1
-          TabOrder = 6
+          TabOrder = 5
           Text = 'DATA VENCIMENTO'
           OnClick = PesquisaClick
           Items.Strings = (
@@ -4986,7 +4873,7 @@ inherited frmContasReceber: TfrmContasReceber
           Height = 57
           Color = clWhite
           ParentBackground = False
-          TabOrder = 7
+          TabOrder = 6
           object checkParciais: TCheckBox
             Left = 8
             Top = 9
@@ -5026,7 +4913,7 @@ inherited frmContasReceber: TfrmContasReceber
           Color = clWhite
           MaxLength = 10
           NumbersOnly = True
-          TabOrder = 8
+          TabOrder = 7
           OnChange = PesquisaClick
           OnExit = edtClienteExit
         end
@@ -5037,15 +4924,43 @@ inherited frmContasReceber: TfrmContasReceber
           Height = 29
           ImageIndex = 11
           Images = ImageList1
-          TabOrder = 9
+          TabOrder = 8
           OnClick = btnPesqClienteClick
+        end
+        object rdgOrdemConsulta: TRadioGroup
+          Left = 742
+          Top = 11
+          Width = 270
+          Height = 111
+          Caption = 'Ordenar consulta por'
+          Color = clWhite
+          Columns = 2
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -16
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ItemIndex = 2
+          Items.Strings = (
+            'Data Vcto'
+            'Data Venda'
+            'ID'
+            'Valor Parcela'
+            'Valor Venda'
+            'Cod Cliente')
+          ParentBackground = False
+          ParentColor = False
+          ParentFont = False
+          TabOrder = 9
+          OnClick = PesquisaClick
         end
       end
       inherited pnlBotoes: TPanel
         Top = 573
         Width = 1327
-        ExplicitTop = 572
-        ExplicitWidth = 1323
+        StyleElements = [seFont, seClient, seBorder]
+        ExplicitTop = 573
+        ExplicitWidth = 1327
         inherited btnExcluir: TButton
           OnClick = btnExcluirClick
         end
@@ -5055,7 +4970,7 @@ inherited frmContasReceber: TfrmContasReceber
         inherited btnSair: TButton
           Left = 1203
           ImageIndex = 12
-          ExplicitLeft = 1199
+          ExplicitLeft = 1203
         end
         object btnBaixarCR: TButton
           AlignWithMargins = True
@@ -5102,7 +5017,6 @@ inherited frmContasReceber: TfrmContasReceber
           Font.Style = []
           ParentFont = False
           TabOrder = 7
-          ExplicitLeft = 1003
           object lblPagas: TLabel
             Left = 31
             Top = 16
@@ -5187,9 +5101,10 @@ inherited frmContasReceber: TfrmContasReceber
         Top = 137
         Width = 1327
         Height = 407
+        StyleElements = [seFont, seClient, seBorder]
         ExplicitTop = 137
-        ExplicitWidth = 1323
-        ExplicitHeight = 406
+        ExplicitWidth = 1327
+        ExplicitHeight = 407
         inherited DBGrid1: TDBGrid
           Width = 1325
           Height = 405
@@ -5304,8 +5219,6 @@ inherited frmContasReceber: TfrmContasReceber
         Color = clWindow
         ParentBackground = False
         TabOrder = 3
-        ExplicitTop = 543
-        ExplicitWidth = 1323
         object lblQtdCp: TLabel
           AlignWithMargins = True
           Left = 923
@@ -8038,7 +7951,7 @@ inherited frmContasReceber: TfrmContasReceber
     IndexFieldNames = 'Parcela'
     Params = <>
     Left = 17
-    Top = 362
+    Top = 386
     object cdsParcelasParcela: TIntegerField
       FieldName = 'Parcela'
     end
@@ -8056,7 +7969,7 @@ inherited frmContasReceber: TfrmContasReceber
   object dsParcelas: TDataSource
     DataSet = cdsParcelas
     Left = 17
-    Top = 418
+    Top = 458
   end
   object PopupMenu: TPopupMenu
     Images = ImageList1

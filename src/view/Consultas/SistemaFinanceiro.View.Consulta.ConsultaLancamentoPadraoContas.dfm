@@ -27,15 +27,13 @@ object frmConsultaLancamentoPadraoContas: TfrmConsultaLancamentoPadraoContas
     TabOrder = 0
     object pnlBotoes: TPanel
       Left = 0
-      Top = 398
-      Width = 717
+      Top = 397
+      Width = 713
       Height = 69
       Align = alBottom
       Color = clWindow
       ParentBackground = False
       TabOrder = 0
-      ExplicitTop = 397
-      ExplicitWidth = 713
       object btnIncluir: TButton
         AlignWithMargins = True
         Left = 4
@@ -93,7 +91,7 @@ object frmConsultaLancamentoPadraoContas: TfrmConsultaLancamentoPadraoContas
       end
       object btnVoltar: TButton
         AlignWithMargins = True
-        Left = 593
+        Left = 589
         Top = 4
         Width = 120
         Height = 61
@@ -103,23 +101,20 @@ object frmConsultaLancamentoPadraoContas: TfrmConsultaLancamentoPadraoContas
         Images = ImageList1
         TabOrder = 4
         OnClick = btnVoltarClick
-        ExplicitLeft = 589
       end
     end
     object pnlGrid: TPanel
       Left = 0
       Top = 81
-      Width = 717
-      Height = 317
+      Width = 713
+      Height = 316
       Align = alClient
       TabOrder = 1
-      ExplicitWidth = 713
-      ExplicitHeight = 316
       object grdLancPadrao: TDBGrid
         Left = 1
         Top = 1
-        Width = 715
-        Height = 315
+        Width = 711
+        Height = 314
         Align = alClient
         DataSource = dsLancPadraoContas
         Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgConfirmDelete, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
@@ -164,14 +159,13 @@ object frmConsultaLancamentoPadraoContas: TfrmConsultaLancamentoPadraoContas
     object pnlPesquisa: TPanel
       Left = 0
       Top = 0
-      Width = 717
+      Width = 713
       Height = 81
       Align = alTop
       BevelOuter = bvNone
-      Color = 5737262
+      Color = clSeagreen
       ParentBackground = False
       TabOrder = 2
-      ExplicitWidth = 713
       object lblPesquisar: TLabel
         Left = 16
         Top = 16
@@ -214,7 +208,7 @@ object frmConsultaLancamentoPadraoContas: TfrmConsultaLancamentoPadraoContas
       end
       object btnPesquisae: TButton
         AlignWithMargins = True
-        Left = 593
+        Left = 589
         Top = 5
         Width = 121
         Height = 71
@@ -226,7 +220,6 @@ object frmConsultaLancamentoPadraoContas: TfrmConsultaLancamentoPadraoContas
         Images = ImageList1
         TabOrder = 1
         OnClick = PesquisaClick
-        ExplicitLeft = 589
       end
       object cbTipo: TComboBox
         Left = 382

@@ -3,10 +3,26 @@ unit SistemaFinanceiro.View.FaturaCartao;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, SistemaFinanceiro.View.CadastroPadrao,
-  Data.DB, System.ImageList, Vcl.ImgList, Vcl.Grids, Vcl.DBGrids, Vcl.StdCtrls,
-  Vcl.ExtCtrls, Vcl.WinXPanels, Vcl.WinXCtrls, Vcl.ComCtrls,
+  Winapi.Windows,
+  Winapi.Messages,
+  System.SysUtils,
+  System.Variants,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  SistemaFinanceiro.View.CadastroPadrao,
+  Data.DB,
+  System.ImageList,
+  Vcl.ImgList,
+  Vcl.Grids,
+  Vcl.DBGrids,
+  Vcl.StdCtrls,
+  Vcl.ExtCtrls,
+  Vcl.WinXPanels,
+  Vcl.WinXCtrls,
+  Vcl.ComCtrls,
   SistemaFinanceiro.View.Relatorios.FaturaCartao;
 
 type
@@ -45,9 +61,8 @@ type
     procedure ValidaCampos;
     procedure EditarFaturaCartao;
 
-
   public
-    { Public declarations }
+    function RetornaCodigo: String;
 
   protected
     procedure Pesquisar; override;
@@ -61,9 +76,10 @@ implementation
 
 {$R *.dfm}
 
-uses SistemaFinanceiro.Model.dmFaturaCartao, SistemaFinanceiro.Utilitarios;
 
-
+uses
+  SistemaFinanceiro.Model.dmFaturaCartao,
+  SistemaFinanceiro.Utilitarios;
 
 { TfrmFaturaCartao }
 
@@ -77,14 +93,14 @@ procedure TfrmFaturaCartao.btnCancelarClick(Sender: TObject);
 begin
   inherited;
 
-  //  Cancelando a incusão
+  // Cancelando a incusão
   dmFaturaCartao.cdsFaturaCartao.Cancel;
 
 end;
 
 procedure TfrmFaturaCartao.btnExcluirClick(Sender: TObject);
 var
-  option : Word;
+  option: Word;
 
 begin
   inherited;
@@ -99,23 +115,22 @@ begin
   if dmFaturaCartao.GetCpFat(DataSourceFaturaCartao.DataSet.FieldByName('ID_FT').AsInteger) = True then
   begin
 
-    Application.MessageBox('Não é possível excluir uma fatura de cartão com Conta a Pagar Cadastrada!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+    Application.MessageBox('Não é possível excluir uma fatura de cartão com Conta a Pagar Cadastrada!', 'Atenção',
+      MB_OK + MB_ICONEXCLAMATION);
     exit;
 
   end;
 
-
   try
 
-    //  Excluindo o registro
+    // Excluindo o registro
     dmFaturaCartao.cdsFaturaCartao.Delete;
     dmFaturaCartao.cdsFaturaCartao.ApplyUpdates(0);
 
-  except on E : Exception do
-    Application.MessageBox(PWidechar(E.Message), 'Erro ao excluir Fatura de Cartão', MB_OK + MB_ICONERROR);
+  except
+    on E: Exception do
+      Application.MessageBox(PWidechar(E.Message), 'Erro ao excluir Fatura de Cartão', MB_OK + MB_ICONERROR);
   end;
-
-
 
 end;
 
@@ -123,14 +138,14 @@ procedure TfrmFaturaCartao.btnImprimirClick(Sender: TObject);
 begin
   inherited;
 
-   //  Cria o form
+  // Cria o form
   frmRelFatCartao := TfrmRelFatCartao.Create(Self);
 
   try
 
     frmRelFatCartao.DataSourceFatCartao.DataSet := DataSourceFaturaCartao.DataSet;
 
-    //  Mostra a pre vizualizacao
+    // Mostra a pre vizualizacao
     frmRelFatCartao.RLReport.Preview;
 
   finally
@@ -147,10 +162,10 @@ begin
 
   lblTitulo.Caption := 'Inserindo uma nova Fatura de Cartão';
 
-  if not (dmFaturaCartao.cdsFaturaCartao.State in [dsInsert, dsEdit]) then
+  if not(dmFaturaCartao.cdsFaturaCartao.State in [dsInsert, dsEdit]) then
   begin
 
-    //  Coloca o dataset em modo de inserção
+    // Coloca o dataset em modo de inserção
     dmFaturaCartao.cdsFaturaCartao.Insert;
 
   end;
@@ -169,18 +184,18 @@ end;
 
 procedure TfrmFaturaCartao.btnSalvarClick(Sender: TObject);
 var
-  LStatus : String;
-  option : Word;
+  LStatus: String;
+  option: Word;
 
 begin
   inherited;
 
-  //  Valida os campos obrigatorios
+  // Valida os campos obrigatorios
   ValidaCampos;
 
   option := IDNO;
 
-  //  Se for um novo cad
+  // Se for um novo cad
   if dmFaturaCartao.cdsFaturaCartao.State in [dsInsert] then
   begin
 
@@ -188,7 +203,7 @@ begin
     dmFaturaCartao.cdsFaturaCartaoDATA_CADASTRO.AsDateTime := StrToDateTime(edtDtCad.Text);
   end;
 
-  //  Se for edição de um cad
+  // Se for edição de um cad
   if dmFaturaCartao.cdsFaturaCartao.State in [dsEdit] then
   begin
 
@@ -198,13 +213,14 @@ begin
     begin
 
       option := Application.MessageBox('Foi detectado alteração no dia de vencimento da fatura. ' +
-        'Deseja alterar o dia de vencimento das Contas em aberto registradas?? ', 'Confirmação', MB_YESNO + MB_ICONQUESTION);
+        'Deseja alterar o dia de vencimento das Contas em aberto registradas?? ', 'Confirmação',
+        MB_YESNO + MB_ICONQUESTION);
 
     end;
 
   end;
 
-  //  Define o status da fatura
+  // Define o status da fatura
   if ToggleStatus.State = tssOn then
   begin
     LStatus := 'A';
@@ -214,24 +230,24 @@ begin
     LStatus := 'I';
   end;
 
-  //  Passando os dados para o dataset
-  dmFaturaCartao.cdsFaturaCartaoNOME.AsString       := Trim(edtNome.Text);
+  // Passando os dados para o dataset
+  dmFaturaCartao.cdsFaturaCartaoNOME.AsString := Trim(edtNome.Text);
   dmFaturaCartao.cdsFaturaCartaoOBSERVACAO.AsString := Trim(edtObs.Text);
-  dmFaturaCartao.cdsFaturaCartaoDIA_VCTO.AsInteger  := StrToInt(edtDiaVcto.Text);
-  dmFaturaCartao.cdsFaturaCartaoSTATUS_FT.AsString  := LStatus;
+  dmFaturaCartao.cdsFaturaCartaoDIA_VCTO.AsInteger := StrToInt(edtDiaVcto.Text);
+  dmFaturaCartao.cdsFaturaCartaoSTATUS_FT.AsString := LStatus;
 
-  //  Gravando no Banco
+  // Gravando no Banco
   dmFaturaCartao.cdsFaturaCartao.Post;
   dmFaturaCartao.cdsFaturaCartao.ApplyUpdates(0);
 
-  //  Atualiza dia vcto faturas abertas
+  // Atualiza dia vcto faturas abertas
   if option = IDYES then
-     dmFaturaCartao.AlteraDiaVcto(dmFaturaCartao.cdsFaturaCartaoID_FT.AsInteger, StrToInt(Trim(edtDiaVcto.Text)));
+    dmFaturaCartao.AlteraDiaVcto(dmFaturaCartao.cdsFaturaCartaoID_FT.AsInteger, StrToInt(Trim(edtDiaVcto.Text)));
 
-  //  Retorna ao cardPesquisa;
+  // Retorna ao cardPesquisa;
   CardPanelPrincipal.ActiveCard := CardPesquisa;
 
-  //  Atualiza a lista de pesquisa
+  // Atualiza a lista de pesquisa
   Pesquisar;
 
 end;
@@ -251,27 +267,28 @@ end;
 procedure TfrmFaturaCartao.EditarFaturaCartao;
 begin
 
-  //  Coloca o data set em modo de edição
+  // Coloca o data set em modo de edição
   dmFaturaCartao.cdsFaturaCartao.Edit;
 
-  //  Coloca o nome da forma no titulo
-  lblTitulo.Caption := dmFaturaCartao.cdsFaturaCartaoID_FT.AsString + ' - ' + dmFaturaCartao.cdsFaturaCartaoNOME.AsString;
+  // Coloca o nome da forma no titulo
+  lblTitulo.Caption := dmFaturaCartao.cdsFaturaCartaoID_FT.AsString + ' - ' +
+    dmFaturaCartao.cdsFaturaCartaoNOME.AsString;
 
-  //  Carrega os dados
-  edtNome.Text    := dmFaturaCartao.cdsFaturaCartaoNOME.AsString;
-  edtObs.Text     := dmFaturaCartao.cdsFaturaCartaoOBSERVACAO.AsString;
-  edtDtCad.Text   := dmFaturaCartao.cdsFaturaCartaoDATA_CADASTRO.AsString;
-  edtDtAlt.Text   := dmFaturaCartao.cdsFaturaCartaoDATA_ALTERACAO.AsString;
+  // Carrega os dados
+  edtNome.Text := dmFaturaCartao.cdsFaturaCartaoNOME.AsString;
+  edtObs.Text := dmFaturaCartao.cdsFaturaCartaoOBSERVACAO.AsString;
+  edtDtCad.Text := dmFaturaCartao.cdsFaturaCartaoDATA_CADASTRO.AsString;
+  edtDtAlt.Text := dmFaturaCartao.cdsFaturaCartaoDATA_ALTERACAO.AsString;
   edtDiaVcto.Text := dmFaturaCartao.cdsFaturaCartaoDIA_VCTO.AsString;
 
   if dmFaturaCartao.cdsFaturaCartaoSTATUS_FT.AsString = 'A' then
   begin
     ToggleStatus.State := tssOn;
   end
-    else
-    begin
-      ToggleStatus.State := tssOff;
-    end;
+  else
+  begin
+    ToggleStatus.State := tssOff;
+  end;
 
 end;
 
@@ -284,20 +301,20 @@ end;
 procedure TfrmFaturaCartao.HabilitaBotoes;
 begin
 
-  btnAlterar.Enabled  := not DataSourceFaturaCartao.DataSet.IsEmpty;
-  btnExcluir.Enabled  := not DataSourceFaturaCartao.DataSet.IsEmpty;
+  btnAlterar.Enabled := not DataSourceFaturaCartao.DataSet.IsEmpty;
+  btnExcluir.Enabled := not DataSourceFaturaCartao.DataSet.IsEmpty;
   btnImprimir.Enabled := not DataSourceFaturaCartao.DataSet.IsEmpty;
 
 end;
 
 procedure TfrmFaturaCartao.Pesquisar;
 var
-  LFiltroEdit : String;
-  LFiltro : String;
+  LFiltroEdit: String;
+  LFiltro: String;
 
 begin
 
-  //  Validações
+  // Validações
   if cbStatus.ItemIndex < 0 then
   begin
 
@@ -310,23 +327,31 @@ begin
   dmFaturaCartao.cdsFaturaCartao.Params.Clear;
 
   LFiltroEdit := TUtilitario.LikeFind(edtPesquisar.Text, DBGrid1);
-  LFiltro     := '';
+  LFiltro := '';
 
   case cbStatus.ItemIndex of
 
-    1 : LFiltro := LFiltro + ' AND STATUS_FT = ''A'' ';
-    2 : LFiltro := LFiltro + ' AND STATUS_FT = ''I'' ';
+    1:
+      LFiltro := LFiltro + ' AND STATUS_FT = ''A'' ';
+    2:
+      LFiltro := LFiltro + ' AND STATUS_FT = ''I'' ';
 
   end;
 
   dmFaturaCartao.cdsFaturaCartao.Close;
-  dmFaturaCartao.cdsFaturaCartao.CommandText := 'SELECT * FROM FATURA_CARTAO WHERE 1 = 1 ' + LFiltroEdit + LFiltro + 'ORDER BY 1 ';
+  dmFaturaCartao.cdsFaturaCartao.CommandText := 'SELECT * FROM FATURA_CARTAO WHERE 1 = 1 ' + LFiltroEdit + LFiltro +
+    'ORDER BY 1 ';
   dmFaturaCartao.cdsFaturaCartao.Open;
 
   HabilitaBotoes;
 
   inherited;
 
+end;
+
+function TfrmFaturaCartao.RetornaCodigo: String;
+begin
+  Result := DBGrid1.DataSource.DataSet.FieldByName('ID_FT').AsString;
 end;
 
 procedure TfrmFaturaCartao.ValidaCampos;
@@ -358,7 +383,6 @@ begin
     abort;
 
   end;
-
 
 end;
 

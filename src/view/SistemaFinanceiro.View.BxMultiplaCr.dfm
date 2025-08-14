@@ -314,7 +314,7 @@ object frmBxMultiplaCR: TfrmBxMultiplaCR
     Height = 177
     Align = alTop
     BevelOuter = bvNone
-    Color = 5737262
+    Color = clSeagreen
     ParentBackground = False
     TabOrder = 2
     ExplicitWidth = 1293

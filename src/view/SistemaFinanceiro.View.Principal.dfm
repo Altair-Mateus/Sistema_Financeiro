@@ -2,9 +2,9 @@ object frmPrincipal: TfrmPrincipal
   Left = 0
   Top = 0
   Caption = 'Sistema Financeiro'
-  ClientHeight = 697
-  ClientWidth = 1190
-  Color = 5737262
+  ClientHeight = 696
+  ClientWidth = 1186
+  Color = clSeagreen
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -13
@@ -21,7 +21,7 @@ object frmPrincipal: TfrmPrincipal
     AlignWithMargins = True
     Left = 10
     Top = 10
-    Width = 1170
+    Width = 1166
     Height = 191
     Margins.Left = 10
     Margins.Top = 10
@@ -31,7 +31,6 @@ object frmPrincipal: TfrmPrincipal
     Color = clWhite
     ParentBackground = False
     TabOrder = 0
-    ExplicitWidth = 1166
     object pnlSaldoParcial: TPanel
       AlignWithMargins = True
       Left = 16
@@ -10849,8 +10848,8 @@ object frmPrincipal: TfrmPrincipal
     AlignWithMargins = True
     Left = 10
     Top = 214
-    Width = 1170
-    Height = 379
+    Width = 1166
+    Height = 378
     Margins.Left = 10
     Margins.Right = 10
     Align = alClient
@@ -10858,17 +10857,14 @@ object frmPrincipal: TfrmPrincipal
     ParentBackground = False
     TabOrder = 1
     StyleElements = [seFont, seClient]
-    ExplicitWidth = 1166
-    ExplicitHeight = 378
     object pnlBtn: TPanel
       Left = 1
       Top = 1
-      Width = 1168
+      Width = 1164
       Height = 133
       Align = alTop
       BevelOuter = bvNone
       TabOrder = 0
-      ExplicitWidth = 1164
       object pnlFundoBtnFornecedores: TPanel
         AlignWithMargins = True
         Left = 15
@@ -10907,7 +10903,7 @@ object frmPrincipal: TfrmPrincipal
             Caption = 'Fornecedores'
             Color = clWhite
             Font.Charset = DEFAULT_CHARSET
-            Font.Color = 5737262
+            Font.Color = clSeagreen
             Font.Height = -16
             Font.Name = 'Tahoma'
             Font.Style = []
@@ -11052,7 +11048,7 @@ object frmPrincipal: TfrmPrincipal
             Caption = 'Clientes'
             Color = clWhite
             Font.Charset = DEFAULT_CHARSET
-            Font.Color = 5737262
+            Font.Color = clSeagreen
             Font.Height = -16
             Font.Name = 'Tahoma'
             Font.Style = []
@@ -11203,7 +11199,7 @@ object frmPrincipal: TfrmPrincipal
             Caption = 'Contas a Receber'
             Color = clWhite
             Font.Charset = DEFAULT_CHARSET
-            Font.Color = 5737262
+            Font.Color = clSeagreen
             Font.Height = -16
             Font.Name = 'Tahoma'
             Font.Style = []
@@ -11351,7 +11347,7 @@ object frmPrincipal: TfrmPrincipal
             Caption = 'Contas a Pagar'
             Color = clWhite
             Font.Charset = DEFAULT_CHARSET
-            Font.Color = 5737262
+            Font.Color = clSeagreen
             Font.Height = -16
             Font.Name = 'Tahoma'
             Font.Style = []
@@ -11520,7 +11516,7 @@ object frmPrincipal: TfrmPrincipal
             Caption = 'Fluxo de Caixa'
             Color = clWhite
             Font.Charset = DEFAULT_CHARSET
-            Font.Color = 5737262
+            Font.Color = clSeagreen
             Font.Height = -16
             Font.Name = 'Tahoma'
             Font.Style = []
@@ -11690,7 +11686,7 @@ object frmPrincipal: TfrmPrincipal
       BiDiMode = bdLeftToRight
       Caption = 'Fornecedores'
       Font.Charset = DEFAULT_CHARSET
-      Font.Color = 5737262
+      Font.Color = clSeagreen
       Font.Height = -19
       Font.Name = 'Calibri'
       Font.Style = []
@@ -11715,7 +11711,7 @@ object frmPrincipal: TfrmPrincipal
       BiDiMode = bdLeftToRight
       Caption = 'Clientes'
       Font.Charset = DEFAULT_CHARSET
-      Font.Color = 5737262
+      Font.Color = clSeagreen
       Font.Height = -19
       Font.Name = 'Calibri'
       Font.Style = []
@@ -11741,7 +11737,7 @@ object frmPrincipal: TfrmPrincipal
       BiDiMode = bdLeftToRight
       Caption = 'Contas a Receber'
       Font.Charset = DEFAULT_CHARSET
-      Font.Color = 5737262
+      Font.Color = clSeagreen
       Font.Height = -19
       Font.Name = 'Calibri'
       Font.Style = []
@@ -11769,7 +11765,7 @@ object frmPrincipal: TfrmPrincipal
       BiDiMode = bdLeftToRight
       Caption = 'Contas a Pagar'
       Font.Charset = DEFAULT_CHARSET
-      Font.Color = 5737262
+      Font.Color = clSeagreen
       Font.Height = -19
       Font.Name = 'Calibri'
       Font.Style = []
@@ -11795,7 +11791,7 @@ object frmPrincipal: TfrmPrincipal
       BiDiMode = bdLeftToRight
       Caption = 'Caixa'
       Font.Charset = DEFAULT_CHARSET
-      Font.Color = 5737262
+      Font.Color = clSeagreen
       Font.Height = -19
       Font.Name = 'Calibri'
       Font.Style = []
@@ -11923,8 +11919,8 @@ object frmPrincipal: TfrmPrincipal
   object pnlInfos: TPanel
     AlignWithMargins = True
     Left = 10
-    Top = 606
-    Width = 1170
+    Top = 605
+    Width = 1166
     Height = 81
     Margins.Left = 10
     Margins.Top = 10
@@ -11934,11 +11930,9 @@ object frmPrincipal: TfrmPrincipal
     Color = clWhite
     ParentBackground = False
     TabOrder = 2
-    ExplicitTop = 605
-    ExplicitWidth = 1166
     object lblUserLogado: TLabel
       AlignWithMargins = True
-      Left = 1062
+      Left = 1058
       Top = 31
       Width = 97
       Height = 19
@@ -11949,7 +11943,7 @@ object frmPrincipal: TfrmPrincipal
       Caption = 'lblUserLogado'
       Color = clWhite
       Font.Charset = DEFAULT_CHARSET
-      Font.Color = 5737262
+      Font.Color = clSeagreen
       Font.Height = -16
       Font.Name = 'Calibri'
       Font.Style = [fsBold]
@@ -11959,7 +11953,7 @@ object frmPrincipal: TfrmPrincipal
     end
     object Image1: TImage
       AlignWithMargins = True
-      Left = 999
+      Left = 995
       Top = 16
       Width = 50
       Height = 49
@@ -12170,7 +12164,7 @@ object frmPrincipal: TfrmPrincipal
         BiDiMode = bdRightToLeft
         Caption = 'Sistema Financeiro'
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 5737262
+        Font.Color = clSeagreen
         Font.Height = -29
         Font.Name = 'Tahoma'
         Font.Style = []

@@ -3,576 +3,641 @@ object frmBxMultiplaCp: TfrmBxMultiplaCp
   Top = 0
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'Baixar V'#225'rias CPs'
-  ClientHeight = 685
-  ClientWidth = 1301
+  ClientHeight = 684
+  ClientWidth = 1297
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -16
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   Position = poScreenCenter
   WindowState = wsMaximized
+  OnActivate = FormActivate
   OnCreate = FormCreate
-  OnShow = FormShow
+  OnDestroy = FormDestroy
+  OnKeyPress = FormKeyPress
   TextHeight = 19
-  object pnlFiltros: TPanel
+  object pnlPrincipal: TPanel
     Left = 0
     Top = 0
-    Width = 1301
-    Height = 177
-    Align = alTop
-    BevelOuter = bvNone
-    Color = 5737262
-    ParentBackground = False
-    TabOrder = 0
-    object lblDataInicial: TLabel
-      Left = 18
-      Top = 18
-      Width = 79
-      Height = 19
-      Align = alCustom
-      Caption = 'Data Inicial'
-      Color = clWhite
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWhite
-      Font.Height = -16
-      Font.Name = 'Tahoma'
-      Font.Style = []
-      ParentColor = False
-      ParentFont = False
-    end
-    object lblDataFinal: TLabel
-      Left = 178
-      Top = 18
-      Width = 70
-      Height = 19
-      Align = alCustom
-      Caption = 'Data Final'
-      Color = clWhite
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWhite
-      Font.Height = -16
-      Font.Name = 'Tahoma'
-      Font.Style = []
-      ParentColor = False
-      ParentFont = False
-    end
-    object lblFornecedor: TLabel
-      Left = 344
-      Top = 14
-      Width = 112
-      Height = 19
-      Caption = 'Cod Fornecedor'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWhite
-      Font.Height = -16
-      Font.Name = 'Tahoma'
-      Font.Style = []
-      ParentFont = False
-    end
-    object lblNomeFornecedor: TLabel
-      Left = 586
-      Top = 41
-      Width = 138
-      Height = 19
-      Caption = 'lblNomeFornecedor'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWhite
-      Font.Height = -16
-      Font.Name = 'Tahoma'
-      Font.Style = []
-      ParentFont = False
-      Visible = False
-    end
-    object lblCodFatCartao: TLabel
-      Left = 344
-      Top = 79
-      Width = 150
-      Height = 19
-      Caption = 'Cod Fatura de Cart'#227'o'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWhite
-      Font.Height = -16
-      Font.Name = 'Tahoma'
-      Font.Style = []
-      ParentFont = False
-    end
-    object lblNomeFatCartao: TLabel
-      Left = 586
-      Top = 107
-      Width = 126
-      Height = 19
-      Caption = 'lblNomeFatCartao'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWhite
-      Font.Height = -16
-      Font.Name = 'Tahoma'
-      Font.Style = []
-      ParentFont = False
-      Visible = False
-    end
-    object lblData: TLabel
-      Left = 18
-      Top = 79
-      Width = 98
-      Height = 19
-      Align = alCustom
-      Caption = 'Filtrar data de'
-      Color = clWhite
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWhite
-      Font.Height = -16
-      Font.Name = 'Tahoma'
-      Font.Style = []
-      ParentColor = False
-      ParentFont = False
-    end
-    object lblCheckParciais: TLabel
-      Left = 39
-      Top = 137
-      Width = 120
-      Height = 19
-      Caption = 'Somente Parciais'
-      Color = 5868590
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWhite
-      Font.Height = -16
-      Font.Name = 'Tahoma'
-      Font.Style = []
-      ParentColor = False
-      ParentFont = False
-    end
-    object lblCheckSelAll: TLabel
-      Left = 218
-      Top = 137
-      Width = 120
-      Height = 19
-      Caption = 'Selecionar Todas'
-      Color = 5934893
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWhite
-      Font.Height = -16
-      Font.Name = 'Tahoma'
-      Font.Style = []
-      ParentColor = False
-      ParentFont = False
-    end
-    object dateInicial: TDateTimePicker
-      Left = 18
-      Top = 39
-      Width = 137
-      Height = 27
-      Date = 45146.000000000000000000
-      Time = 0.872988819442980500
-      ShowCheckbox = True
-      TabOrder = 0
-      OnChange = dateInicialChange
-    end
-    object dateFinal: TDateTimePicker
-      Left = 178
-      Top = 39
-      Width = 137
-      Height = 27
-      Date = 45146.000000000000000000
-      Time = 0.872988819442980500
-      ShowCheckbox = True
-      TabOrder = 1
-      OnChange = dateFinalChange
-    end
-    object btnVisualizar: TButton
-      AlignWithMargins = True
-      Left = 1179
-      Top = 45
-      Width = 121
-      Height = 87
-      Margins.Top = 45
-      Margins.Right = 5
-      Margins.Bottom = 45
-      Align = alRight
-      Caption = 'Visualizar Contas'
-      ImageIndex = 11
-      Images = ImageList1
-      TabOrder = 2
-      WordWrap = True
-      OnClick = btnVisualizarClick
-      ExplicitLeft = 1175
-    end
-    object edtFornecedor: TEdit
-      Left = 344
-      Top = 39
-      Width = 185
-      Height = 27
-      Color = clWhite
-      MaxLength = 20
-      NumbersOnly = True
-      TabOrder = 3
-      TextHint = 'Clique no bot'#227'o ao lado'
-      OnChange = edtFornecedorChange
-      OnExit = edtFornecedorExit
-    end
-    object btnPesquisaFornecedor: TButton
-      Left = 535
-      Top = 37
-      Width = 35
-      Height = 29
-      ImageIndex = 12
-      Images = ImageList1
-      TabOrder = 4
-      TabStop = False
-      OnClick = btnPesquisaFornecedorClick
-    end
-    object edtCodFatCartao: TEdit
-      Left = 344
-      Top = 104
-      Width = 185
-      Height = 27
-      Color = clWhite
-      MaxLength = 20
-      NumbersOnly = True
-      TabOrder = 5
-      TextHint = 'Clique no bot'#227'o ao lado'
-      OnChange = edtCodFatCartaoChange
-      OnExit = edtCodFatCartaoExit
-    end
-    object btnPesqFat: TButton
-      Left = 535
-      Top = 103
-      Width = 35
-      Height = 29
-      ImageIndex = 13
-      Images = ImageList1
-      TabOrder = 6
-      TabStop = False
-      OnClick = btnPesqFatClick
-    end
-    object cbData: TComboBox
-      Left = 18
-      Top = 104
-      Width = 297
-      Height = 27
-      Style = csDropDownList
-      ItemIndex = 1
-      TabOrder = 7
-      Text = 'DATA VENCIMENTO'
-      OnClick = cbDataClick
-      Items.Strings = (
-        'DATA COMPRA'
-        'DATA VENCIMENTO')
-    end
-    object checkParciais: TCheckBox
-      Left = 18
-      Top = 137
-      Width = 159
-      Height = 17
-      Color = 5868590
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWhite
-      Font.Height = -16
-      Font.Name = 'Tahoma'
-      Font.Style = []
-      ParentColor = False
-      ParentFont = False
-      TabOrder = 8
-      OnClick = checkParciaisClick
-    end
-    object checkSelAll: TCheckBox
-      Left = 194
-      Top = 137
-      Width = 159
-      Height = 17
-      Color = 5934638
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWhite
-      Font.Height = -16
-      Font.Name = 'Tahoma'
-      Font.Style = []
-      ParentColor = False
-      ParentFont = False
-      TabOrder = 9
-      OnClick = checkSelAllClick
-    end
-  end
-  object pnlContas: TPanel
-    Left = 0
-    Top = 177
-    Width = 1301
-    Height = 439
+    Width = 1297
+    Height = 684
     Align = alClient
     BevelOuter = bvNone
     Color = clWhite
     ParentBackground = False
-    TabOrder = 1
-    object DBGrid1: TDBGrid
+    TabOrder = 0
+    object pgcBaixaMult: TPageControl
       Left = 0
       Top = 0
-      Width = 1305
-      Height = 440
+      Width = 1297
+      Height = 684
+      ActivePage = tbsBaixa
       Align = alClient
-      Color = clWhite
-      DataSource = DataSourceBxMultiplaCP
-      Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgConfirmDelete, dgCancelOnExit, dgMultiSelect, dgTitleClick, dgTitleHotTrack]
-      ReadOnly = True
       TabOrder = 0
-      TitleFont.Charset = DEFAULT_CHARSET
-      TitleFont.Color = clWindowText
-      TitleFont.Height = -16
-      TitleFont.Name = 'Tahoma'
-      TitleFont.Style = []
-      OnCellClick = DBGrid1CellClick
-      OnDrawColumnCell = DBGrid1DrawColumnCell
-      OnKeyDown = DBGrid1KeyDown
-      Columns = <
-        item
-          Expanded = False
-          FieldName = 'ID'
-          Width = 59
-          Visible = True
+      object tbsBaixa: TTabSheet
+        Caption = 'Baixar Contas'
+        object pnlBaixar: TPanel
+          Left = 0
+          Top = 0
+          Width = 1289
+          Height = 650
+          Align = alClient
+          BevelOuter = bvNone
+          Color = clWhite
+          ParentBackground = False
+          TabOrder = 0
+          object pnlFiltros: TPanel
+            Left = 0
+            Top = 0
+            Width = 1289
+            Height = 177
+            Align = alTop
+            BevelOuter = bvNone
+            Color = clSeagreen
+            ParentBackground = False
+            TabOrder = 0
+            object lblDataInicial: TLabel
+              Left = 18
+              Top = 18
+              Width = 79
+              Height = 19
+              Align = alCustom
+              Caption = 'Data Inicial'
+              Color = clWhite
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWhite
+              Font.Height = -16
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentColor = False
+              ParentFont = False
+            end
+            object lblDataFinal: TLabel
+              Left = 178
+              Top = 18
+              Width = 70
+              Height = 19
+              Align = alCustom
+              Caption = 'Data Final'
+              Color = clWhite
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWhite
+              Font.Height = -16
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentColor = False
+              ParentFont = False
+            end
+            object lblFornecedor: TLabel
+              Left = 344
+              Top = 14
+              Width = 112
+              Height = 19
+              Caption = 'Cod Fornecedor'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWhite
+              Font.Height = -16
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentFont = False
+            end
+            object lblNomeFornecedor: TLabel
+              Left = 586
+              Top = 41
+              Width = 138
+              Height = 19
+              Caption = 'lblNomeFornecedor'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWhite
+              Font.Height = -16
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentFont = False
+            end
+            object lblCodFatCartao: TLabel
+              Left = 344
+              Top = 79
+              Width = 150
+              Height = 19
+              Caption = 'Cod Fatura de Cart'#227'o'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWhite
+              Font.Height = -16
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentFont = False
+            end
+            object lblNomeFatCartao: TLabel
+              Left = 586
+              Top = 107
+              Width = 126
+              Height = 19
+              Caption = 'lblNomeFatCartao'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWhite
+              Font.Height = -16
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentFont = False
+            end
+            object lblData: TLabel
+              Left = 18
+              Top = 79
+              Width = 98
+              Height = 19
+              Align = alCustom
+              Caption = 'Filtrar data de'
+              Color = clWhite
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWhite
+              Font.Height = -16
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentColor = False
+              ParentFont = False
+            end
+            object lblCheckParciais: TLabel
+              Left = 39
+              Top = 137
+              Width = 120
+              Height = 19
+              Caption = 'Somente Parciais'
+              Color = 5868590
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWhite
+              Font.Height = -16
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentColor = False
+              ParentFont = False
+            end
+            object lblCheckSelAll: TLabel
+              Left = 218
+              Top = 137
+              Width = 120
+              Height = 19
+              Caption = 'Selecionar Todas'
+              Color = 5934893
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWhite
+              Font.Height = -16
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentColor = False
+              ParentFont = False
+            end
+            object dateInicial: TDateTimePicker
+              Left = 18
+              Top = 39
+              Width = 137
+              Height = 27
+              Date = 45146.000000000000000000
+              Time = 0.872988819442980500
+              ShowCheckbox = True
+              TabOrder = 0
+              OnChange = PesquisaClick
+            end
+            object dateFinal: TDateTimePicker
+              Left = 178
+              Top = 39
+              Width = 137
+              Height = 27
+              Date = 45146.000000000000000000
+              Time = 0.872988819442980500
+              ShowCheckbox = True
+              TabOrder = 1
+              OnChange = PesquisaClick
+            end
+            object btnVisualizar: TButton
+              AlignWithMargins = True
+              Left = 1163
+              Top = 45
+              Width = 121
+              Height = 87
+              Margins.Top = 45
+              Margins.Right = 5
+              Margins.Bottom = 45
+              Align = alRight
+              Caption = 'Visualizar Contas'
+              ImageIndex = 11
+              Images = ImageList1
+              TabOrder = 2
+              WordWrap = True
+              OnClick = PesquisaClick
+            end
+            object edtFornecedor: TEdit
+              Left = 344
+              Top = 39
+              Width = 185
+              Height = 27
+              Color = clWhite
+              MaxLength = 20
+              NumbersOnly = True
+              TabOrder = 3
+              TextHint = 'Clique no bot'#227'o ao lado'
+              OnChange = PesquisaClick
+              OnExit = edtFornecedorExit
+            end
+            object btnPesquisaFornecedor: TButton
+              Left = 535
+              Top = 37
+              Width = 35
+              Height = 29
+              ImageIndex = 12
+              Images = ImageList1
+              TabOrder = 4
+              TabStop = False
+              OnClick = btnPesquisaFornecedorClick
+            end
+            object edtCodFatCartao: TEdit
+              Left = 344
+              Top = 104
+              Width = 185
+              Height = 27
+              Color = clWhite
+              MaxLength = 20
+              NumbersOnly = True
+              TabOrder = 5
+              TextHint = 'Clique no bot'#227'o ao lado'
+              OnChange = PesquisaClick
+              OnExit = edtCodFatCartaoExit
+            end
+            object btnPesqFat: TButton
+              Left = 535
+              Top = 103
+              Width = 35
+              Height = 29
+              ImageIndex = 13
+              Images = ImageList1
+              TabOrder = 6
+              TabStop = False
+              OnClick = btnPesqFatClick
+            end
+            object cbData: TComboBox
+              Left = 18
+              Top = 104
+              Width = 297
+              Height = 27
+              Style = csDropDownList
+              ItemIndex = 1
+              TabOrder = 7
+              Text = 'DATA VENCIMENTO'
+              OnClick = PesquisaClick
+              Items.Strings = (
+                'DATA COMPRA'
+                'DATA VENCIMENTO')
+            end
+            object checkParciais: TCheckBox
+              Left = 18
+              Top = 137
+              Width = 159
+              Height = 17
+              Color = 5868590
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWhite
+              Font.Height = -16
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentColor = False
+              ParentFont = False
+              TabOrder = 8
+              OnClick = PesquisaClick
+            end
+            object checkSelAll: TCheckBox
+              Left = 194
+              Top = 137
+              Width = 159
+              Height = 17
+              Color = 5934638
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWhite
+              Font.Height = -16
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentColor = False
+              ParentFont = False
+              TabOrder = 9
+              OnClick = checkSelAllClick
+            end
+          end
+          object pnlContas: TPanel
+            Left = 0
+            Top = 177
+            Width = 1289
+            Height = 404
+            Align = alClient
+            BevelOuter = bvNone
+            Color = clWhite
+            ParentBackground = False
+            TabOrder = 1
+            object grdCp: TDBGrid
+              Left = 0
+              Top = 0
+              Width = 1289
+              Height = 404
+              Align = alClient
+              Color = clWhite
+              DataSource = DataSourceBxMultiplaCP
+              Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgConfirmDelete, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
+              ReadOnly = True
+              TabOrder = 0
+              TitleFont.Charset = DEFAULT_CHARSET
+              TitleFont.Color = clWindowText
+              TitleFont.Height = -16
+              TitleFont.Name = 'Tahoma'
+              TitleFont.Style = []
+              OnCellClick = grdCpCellClick
+              OnDrawColumnCell = grdCpDrawColumnCell
+              Columns = <
+                item
+                  Expanded = False
+                  FieldName = 'SELECIONADO'
+                  Title.Caption = 'Sel'
+                  Width = 40
+                  Visible = True
+                end
+                item
+                  Expanded = False
+                  FieldName = 'ID'
+                  Width = 59
+                  Visible = True
+                end
+                item
+                  Expanded = False
+                  FieldName = 'NUMERO_DOC'
+                  Title.Caption = 'N'#186' Documento'
+                  Width = 117
+                  Visible = True
+                end
+                item
+                  Alignment = taCenter
+                  Expanded = False
+                  FieldName = 'ID_FORNECEDOR'
+                  Title.Caption = 'Cod Forn'
+                  Width = 82
+                  Visible = True
+                end
+                item
+                  Expanded = False
+                  FieldName = 'RAZAO_SOCIAL'
+                  Title.Caption = 'Nome Fornecedor'
+                  Width = 299
+                  Visible = True
+                end
+                item
+                  Expanded = False
+                  FieldName = 'DESCRICAO'
+                  Title.Caption = 'Descri'#231#227'o'
+                  Width = 300
+                  Visible = True
+                end
+                item
+                  Alignment = taCenter
+                  Expanded = False
+                  FieldName = 'PARCELA'
+                  Title.Caption = 'Parcela'
+                  Width = 67
+                  Visible = True
+                end
+                item
+                  Alignment = taCenter
+                  Expanded = False
+                  FieldName = 'DATA_VENCIMENTO'
+                  Title.Caption = ' Vencimento'
+                  Width = 109
+                  Visible = True
+                end
+                item
+                  Alignment = taRightJustify
+                  Expanded = False
+                  FieldName = 'VALOR_PARCELA'
+                  Title.Caption = 'Valor Parcela'
+                  Width = 137
+                  Visible = True
+                end
+                item
+                  Alignment = taCenter
+                  Expanded = False
+                  FieldName = 'DATA_COMPRA'
+                  Title.Caption = 'Data Compra'
+                  Width = 149
+                  Visible = True
+                end>
+            end
+          end
+          object pnlBotoes: TPanel
+            Left = 0
+            Top = 581
+            Width = 1289
+            Height = 69
+            Align = alBottom
+            Color = clWhite
+            ParentBackground = False
+            TabOrder = 2
+            object btnConfirmar: TButton
+              AlignWithMargins = True
+              Left = 6
+              Top = 4
+              Width = 120
+              Height = 61
+              Margins.Left = 5
+              Align = alLeft
+              Caption = 'Confirmar'
+              ImageIndex = 10
+              Images = ImageList1
+              TabOrder = 0
+              OnClick = btnConfirmarClick
+            end
+            object btnSair: TButton
+              AlignWithMargins = True
+              Left = 132
+              Top = 4
+              Width = 120
+              Height = 61
+              Align = alLeft
+              Caption = 'Voltar'
+              ImageIndex = 14
+              Images = ImageList1
+              ModalResult = 2
+              TabOrder = 1
+            end
+            object pnlValorSelecionadas: TPanel
+              Left = 1103
+              Top = 1
+              Width = 185
+              Height = 67
+              Align = alRight
+              BevelOuter = bvNone
+              TabOrder = 2
+              object lblValorSelecionadas: TLabel
+                Left = 13
+                Top = 6
+                Width = 156
+                Height = 19
+                Caption = 'Valor Selecionadas R$'
+                Font.Charset = DEFAULT_CHARSET
+                Font.Color = clBlack
+                Font.Height = -16
+                Font.Name = 'Tahoma'
+                Font.Style = []
+                ParentFont = False
+              end
+              object edtValorSel: TEdit
+                Left = 13
+                Top = 31
+                Width = 156
+                Height = 27
+                Color = 5934638
+                Font.Charset = DEFAULT_CHARSET
+                Font.Color = clWhite
+                Font.Height = -16
+                Font.Name = 'Tahoma'
+                Font.Style = []
+                ParentFont = False
+                ReadOnly = True
+                TabOrder = 0
+              end
+            end
+            object pnlQtdSelecionadas: TPanel
+              Left = 947
+              Top = 1
+              Width = 156
+              Height = 67
+              Align = alRight
+              BevelOuter = bvNone
+              TabOrder = 3
+              object lblQtdSelecionada: TLabel
+                Left = 22
+                Top = 7
+                Width = 114
+                Height = 19
+                Caption = 'Qtd Selecionada'
+                Font.Charset = DEFAULT_CHARSET
+                Font.Color = clBlack
+                Font.Height = -16
+                Font.Name = 'Tahoma'
+                Font.Style = []
+                ParentFont = False
+              end
+              object edtQtdSelecionada: TEdit
+                Left = 21
+                Top = 32
+                Width = 121
+                Height = 27
+                Color = 5868590
+                Font.Charset = DEFAULT_CHARSET
+                Font.Color = clWhite
+                Font.Height = -16
+                Font.Name = 'Tahoma'
+                Font.Style = []
+                ParentFont = False
+                ReadOnly = True
+                TabOrder = 0
+              end
+            end
+            object pnlQtdCp: TPanel
+              Left = 559
+              Top = 1
+              Width = 156
+              Height = 67
+              Align = alRight
+              BevelOuter = bvNone
+              TabOrder = 4
+              object lblQtdCp: TLabel
+                Left = 22
+                Top = 7
+                Width = 101
+                Height = 19
+                Caption = 'Qtd de Contas'
+                Font.Charset = DEFAULT_CHARSET
+                Font.Color = clBlack
+                Font.Height = -16
+                Font.Name = 'Tahoma'
+                Font.Style = []
+                ParentFont = False
+              end
+              object edtQtdCp: TEdit
+                Left = 21
+                Top = 32
+                Width = 121
+                Height = 27
+                Color = clWhite
+                Font.Charset = DEFAULT_CHARSET
+                Font.Color = clBlack
+                Font.Height = -16
+                Font.Name = 'Tahoma'
+                Font.Style = []
+                ParentFont = False
+                ReadOnly = True
+                TabOrder = 0
+              end
+            end
+            object pnlQtdTotCP: TPanel
+              Left = 715
+              Top = 1
+              Width = 232
+              Height = 67
+              Align = alRight
+              BevelOuter = bvNone
+              TabOrder = 5
+              object lblValorCps: TLabel
+                Left = 13
+                Top = 6
+                Width = 190
+                Height = 19
+                Caption = 'Valor Total das Contas: R$'
+                Font.Charset = DEFAULT_CHARSET
+                Font.Color = clBlack
+                Font.Height = -16
+                Font.Name = 'Tahoma'
+                Font.Style = []
+                ParentFont = False
+              end
+              object edtValorTotCP: TEdit
+                Left = 13
+                Top = 31
+                Width = 196
+                Height = 27
+                Color = clWhite
+                Font.Charset = DEFAULT_CHARSET
+                Font.Color = clBlack
+                Font.Height = -16
+                Font.Name = 'Tahoma'
+                Font.Style = []
+                ParentFont = False
+                ReadOnly = True
+                TabOrder = 0
+              end
+            end
+          end
         end
-        item
-          Expanded = False
-          FieldName = 'NUMERO_DOC'
-          Title.Caption = 'N'#186' Documento'
-          Width = 117
-          Visible = True
-        end
-        item
-          Expanded = False
-          FieldName = 'ID_FORNECEDOR'
-          Title.Caption = 'Cod Forn'
-          Width = 82
-          Visible = True
-        end
-        item
-          Expanded = False
-          FieldName = 'RAZAO_SOCIAL'
-          Title.Caption = 'Nome Fornecedor'
-          Width = 299
-          Visible = True
-        end
-        item
-          Expanded = False
-          FieldName = 'DESCRICAO'
-          Title.Caption = 'Descri'#231#227'o'
-          Width = 300
-          Visible = True
-        end
-        item
-          Expanded = False
-          FieldName = 'PARCELA'
-          Title.Caption = 'Parcela'
-          Width = 67
-          Visible = True
-        end
-        item
-          Expanded = False
-          FieldName = 'DATA_VENCIMENTO'
-          Title.Caption = ' Vencimento'
-          Width = 109
-          Visible = True
-        end
-        item
-          Expanded = False
-          FieldName = 'VALOR_PARCELA'
-          Title.Caption = 'Valor Parcela'
-          Width = 137
-          Visible = True
-        end
-        item
-          Expanded = False
-          FieldName = 'DATA_COMPRA'
-          Title.Caption = 'Data Compra'
-          Width = 149
-          Visible = True
-        end>
-    end
-  end
-  object pnlBotoes: TPanel
-    Left = 0
-    Top = 616
-    Width = 1301
-    Height = 69
-    Align = alBottom
-    Color = clWhite
-    ParentBackground = False
-    TabOrder = 2
-    object btnConfirmar: TButton
-      AlignWithMargins = True
-      Left = 6
-      Top = 4
-      Width = 120
-      Height = 61
-      Margins.Left = 5
-      Align = alLeft
-      Caption = 'Confirmar'
-      ImageIndex = 10
-      Images = ImageList1
-      TabOrder = 0
-      OnClick = btnConfirmarClick
-    end
-    object btnSair: TButton
-      AlignWithMargins = True
-      Left = 132
-      Top = 4
-      Width = 120
-      Height = 61
-      Align = alLeft
-      Caption = 'Voltar'
-      ImageIndex = 14
-      Images = ImageList1
-      TabOrder = 1
-      OnClick = btnSairClick
-    end
-    object pnlValorSelecionadas: TPanel
-      Left = 1119
-      Top = 1
-      Width = 185
-      Height = 67
-      Align = alRight
-      BevelOuter = bvNone
-      TabOrder = 2
-      ExplicitLeft = 1115
-      object lblValorSelecionadas: TLabel
-        Left = 13
-        Top = 6
-        Width = 156
-        Height = 19
-        Caption = 'Valor Selecionadas R$'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clBlack
-        Font.Height = -16
-        Font.Name = 'Tahoma'
-        Font.Style = []
-        ParentFont = False
       end
-      object edtValorSel: TEdit
-        Left = 13
-        Top = 31
-        Width = 156
-        Height = 27
-        Color = 5934638
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWhite
-        Font.Height = -16
-        Font.Name = 'Tahoma'
-        Font.Style = []
-        ParentFont = False
-        ReadOnly = True
-        TabOrder = 0
-      end
-    end
-    object pnlQtdSelecionadas: TPanel
-      Left = 963
-      Top = 1
-      Width = 156
-      Height = 67
-      Align = alRight
-      BevelOuter = bvNone
-      TabOrder = 3
-      ExplicitLeft = 959
-      object lblQtdSelecionada: TLabel
-        Left = 22
-        Top = 7
-        Width = 114
-        Height = 19
-        Caption = 'Qtd Selecionada'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clBlack
-        Font.Height = -16
-        Font.Name = 'Tahoma'
-        Font.Style = []
-        ParentFont = False
-      end
-      object edtQtdSelecionada: TEdit
-        Left = 21
-        Top = 32
-        Width = 121
-        Height = 27
-        Color = 5868590
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWhite
-        Font.Height = -16
-        Font.Name = 'Tahoma'
-        Font.Style = []
-        ParentFont = False
-        ReadOnly = True
-        TabOrder = 0
-      end
-    end
-    object pnlQtdCp: TPanel
-      Left = 575
-      Top = 1
-      Width = 156
-      Height = 67
-      Align = alRight
-      BevelOuter = bvNone
-      TabOrder = 4
-      ExplicitLeft = 571
-      object lblQtdCp: TLabel
-        Left = 22
-        Top = 7
-        Width = 101
-        Height = 19
-        Caption = 'Qtd de Contas'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clBlack
-        Font.Height = -16
-        Font.Name = 'Tahoma'
-        Font.Style = []
-        ParentFont = False
-      end
-      object edtQtdCp: TEdit
-        Left = 21
-        Top = 32
-        Width = 121
-        Height = 27
-        Color = clWhite
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clBlack
-        Font.Height = -16
-        Font.Name = 'Tahoma'
-        Font.Style = []
-        ParentFont = False
-        ReadOnly = True
-        TabOrder = 0
-      end
-    end
-    object pnlQtdTotCP: TPanel
-      Left = 731
-      Top = 1
-      Width = 232
-      Height = 67
-      Align = alRight
-      BevelOuter = bvNone
-      TabOrder = 5
-      ExplicitLeft = 727
-      object lblValorCps: TLabel
-        Left = 13
-        Top = 6
-        Width = 190
-        Height = 19
-        Caption = 'Valor Total das Contas: R$'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clBlack
-        Font.Height = -16
-        Font.Name = 'Tahoma'
-        Font.Style = []
-        ParentFont = False
-      end
-      object edtValorTotCP: TEdit
-        Left = 13
-        Top = 31
-        Width = 196
-        Height = 27
-        Color = clWhite
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clBlack
-        Font.Height = -16
-        Font.Name = 'Tahoma'
-        Font.Style = []
-        ParentFont = False
-        ReadOnly = True
-        TabOrder = 0
+      object tbsLogErros: TTabSheet
+        Caption = 'Log Erros'
+        ImageIndex = 1
+        object pnlLogErros: TPanel
+          Left = 0
+          Top = 0
+          Width = 1289
+          Height = 650
+          Align = alClient
+          BevelOuter = bvNone
+          Color = clWhite
+          ParentBackground = False
+          TabOrder = 0
+          object memLogErros: TMemo
+            Left = 0
+            Top = 0
+            Width = 1289
+            Height = 650
+            Align = alClient
+            ScrollBars = ssVertical
+            TabOrder = 0
+          end
+        end
       end
     end
   end
@@ -580,8 +645,8 @@ object frmBxMultiplaCp: TfrmBxMultiplaCp
     ColorDepth = cd32Bit
     Height = 32
     Width = 32
-    Left = 772
-    Top = 256
+    Left = 60
+    Top = 416
     Bitmap = {
       494C010112001800040020002000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000080000000A000000001002000000000000040
@@ -3231,13 +3296,12 @@ object frmBxMultiplaCp: TfrmBxMultiplaCp
       000000000000}
   end
   object DataSourceBxMultiplaCP: TDataSource
-    DataSet = dmCPagar.cdsBxMultipla
-    Left = 768
-    Top = 329
+    Left = 64
+    Top = 281
   end
-  object ImageList2: TImageList
-    Left = 640
-    Top = 241
+  object ImageListGrd: TImageList
+    Left = 64
+    Top = 345
     Bitmap = {
       494C010102000800040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010

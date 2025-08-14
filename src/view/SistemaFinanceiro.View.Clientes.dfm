@@ -3,25 +3,28 @@ inherited frmCliente: TfrmCliente
   ClientHeight = 646
   ClientWidth = 1343
   WindowState = wsMaximized
-  ExplicitTop = -135
-  ExplicitWidth = 1355
-  ExplicitHeight = 684
+  StyleElements = [seFont, seClient, seBorder]
+  ExplicitWidth = 1359
+  ExplicitHeight = 685
   TextHeight = 19
   inherited CardPanelPrincipal: TCardPanel
     Width = 1343
     Height = 646
-    ExplicitWidth = 1339
-    ExplicitHeight = 645
+    StyleElements = [seFont, seClient, seBorder]
+    ExplicitWidth = 1343
+    ExplicitHeight = 646
     inherited CardCadastro: TCard
       Width = 1343
       Height = 646
-      ExplicitWidth = 1339
-      ExplicitHeight = 645
+      StyleElements = [seFont, seClient, seBorder]
+      ExplicitWidth = 1343
+      ExplicitHeight = 646
       inherited pnlBotoesCad: TPanel
         Top = 577
         Width = 1343
-        ExplicitTop = 576
-        ExplicitWidth = 1339
+        StyleElements = [seFont, seClient, seBorder]
+        ExplicitTop = 577
+        ExplicitWidth = 1343
         inherited btnSalvar: TButton
           OnClick = btnSalvarClick
         end
@@ -29,8 +32,9 @@ inherited frmCliente: TfrmCliente
       inherited PanelCampos: TPanel
         Width = 1343
         Height = 536
-        ExplicitWidth = 1339
-        ExplicitHeight = 535
+        StyleElements = [seFont, seClient, seBorder]
+        ExplicitWidth = 1343
+        ExplicitHeight = 536
         object LabelNome: TLabel
           Left = 32
           Top = 48
@@ -332,19 +336,19 @@ inherited frmCliente: TfrmCliente
           Width = 105
           Height = 21
           Color = 9750962
-          DisabledColor = 5737262
+          DisabledColor = clSeagreen
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBtnText
           Font.Height = -16
           Font.Name = 'Tahoma'
           Font.Style = []
-          FrameColor = 5737262
+          FrameColor = clSeagreen
           ParentFont = False
           State = tssOn
           StateCaptions.CaptionOn = 'Ativo'
           StateCaptions.CaptionOff = 'Inativo'
           TabOrder = 14
-          ThumbColor = 5737262
+          ThumbColor = clSeagreen
         end
         object edtCep: TMaskEdit
           Left = 208
@@ -359,30 +363,33 @@ inherited frmCliente: TfrmCliente
       end
       inherited PanelTitulo: TPanel
         Width = 1343
-        ExplicitWidth = 1339
+        StyleElements = [seFont, seClient, seBorder]
+        ExplicitWidth = 1343
         inherited lblTitulo: TLabel
-          Width = 210
+          Width = 220
           Caption = 'Inserindo um novo Cliente'
           Color = 5934893
-          ExplicitWidth = 210
+          StyleElements = [seFont, seClient, seBorder]
+          ExplicitWidth = 220
         end
       end
     end
     inherited CardPesquisa: TCard
       Width = 1343
       Height = 646
-      ExplicitLeft = 0
-      ExplicitTop = 0
+      StyleElements = [seFont, seClient, seBorder]
       ExplicitWidth = 1343
       ExplicitHeight = 646
       inherited pnlPesquisa: TPanel
         Width = 1343
         Height = 137
+        StyleElements = [seFont, seClient, seBorder]
         ExplicitWidth = 1343
         ExplicitHeight = 137
         inherited lblPesquisar: TLabel
           Left = 176
           Top = 40
+          StyleElements = [seFont, seClient, seBorder]
           ExplicitLeft = 176
           ExplicitTop = 40
         end
@@ -617,6 +624,7 @@ inherited frmCliente: TfrmCliente
           Left = 176
           Top = 64
           Width = 297
+          StyleElements = [seFont, seClient, seBorder]
           OnChange = edtPesquisarChange
           ExplicitLeft = 176
           ExplicitTop = 64
@@ -655,17 +663,11 @@ inherited frmCliente: TfrmCliente
           Height = 92
           Caption = 'Ordenar consulta por'
           Color = clWhite
-          DefaultHeaderFont = False
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWhite
+          Font.Color = clBlack
           Font.Height = -16
           Font.Name = 'Tahoma'
           Font.Style = []
-          HeaderFont.Charset = DEFAULT_CHARSET
-          HeaderFont.Color = clWhite
-          HeaderFont.Height = -16
-          HeaderFont.Name = 'Tahoma'
-          HeaderFont.Style = []
           ParentBackground = False
           ParentColor = False
           ParentFont = False
@@ -743,6 +745,7 @@ inherited frmCliente: TfrmCliente
       inherited pnlBotoes: TPanel
         Top = 577
         Width = 1343
+        StyleElements = [seFont, seClient, seBorder]
         ExplicitTop = 577
         ExplicitWidth = 1343
         inherited btnExcluir: TButton
@@ -760,6 +763,7 @@ inherited frmCliente: TfrmCliente
         Top = 137
         Width = 1343
         Height = 440
+        StyleElements = [seFont, seClient, seBorder]
         ExplicitTop = 137
         ExplicitWidth = 1343
         ExplicitHeight = 440

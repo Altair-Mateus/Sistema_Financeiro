@@ -11,8 +11,12 @@ object frmFrPgtoBaixaCp: TfrmFrPgtoBaixaCp
   Font.Height = -16
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   Position = poScreenCenter
+  OnActivate = FormActivate
+  OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
+  OnKeyPress = FormKeyPress
   OnShow = FormShow
   TextHeight = 19
   object pnlBotoes: TPanel
@@ -24,8 +28,6 @@ object frmFrPgtoBaixaCp: TfrmFrPgtoBaixaCp
     Color = clWindow
     ParentBackground = False
     TabOrder = 0
-    ExplicitTop = 445
-    ExplicitWidth = 387
     object btnConfirmar: TButton
       AlignWithMargins = True
       Left = 71
@@ -40,9 +42,9 @@ object frmFrPgtoBaixaCp: TfrmFrPgtoBaixaCp
       Caption = 'Confirmar'
       ImageIndex = 6
       Images = ImageList1
+      ModalResult = 1
       TabOrder = 0
       WordWrap = True
-      OnClick = btnConfirmarClick
     end
     object btnCancelar: TButton
       AlignWithMargins = True
@@ -59,10 +61,9 @@ object frmFrPgtoBaixaCp: TfrmFrPgtoBaixaCp
       Caption = 'Cancelar'
       ImageIndex = 0
       Images = ImageList1
+      ModalResult = 2
       ParentBiDiMode = False
       TabOrder = 1
-      OnClick = btnCancelarClick
-      ExplicitLeft = 196
     end
   end
   object pnlForma: TPanel
@@ -72,10 +73,9 @@ object frmFrPgtoBaixaCp: TfrmFrPgtoBaixaCp
     Height = 225
     Align = alTop
     BevelOuter = bvNone
-    Color = 5737262
+    Color = clSeagreen
     ParentBackground = False
     TabOrder = 1
-    ExplicitWidth = 387
     object lblCodFrPgto: TLabel
       Left = 16
       Top = 16
@@ -150,7 +150,6 @@ object frmFrPgtoBaixaCp: TfrmFrPgtoBaixaCp
       Font.Style = []
       ParentColor = False
       ParentFont = False
-      Visible = False
     end
     object edtCodFrPgto: TEdit
       Left = 16
@@ -179,6 +178,7 @@ object frmFrPgtoBaixaCp: TfrmFrPgtoBaixaCp
       Height = 27
       TabOrder = 1
       OnEnter = edtValorFormaEnter
+      OnKeyPress = KeyPressValor
     end
     object edtValorCp: TEdit
       Left = 151
@@ -187,6 +187,7 @@ object frmFrPgtoBaixaCp: TfrmFrPgtoBaixaCp
       Height = 27
       ReadOnly = True
       TabOrder = 5
+      OnKeyPress = KeyPressValor
     end
     object edtValorRest: TEdit
       Left = 16
@@ -195,17 +196,19 @@ object frmFrPgtoBaixaCp: TfrmFrPgtoBaixaCp
       Height = 27
       ReadOnly = True
       TabOrder = 6
+      OnKeyPress = KeyPressValor
     end
     object btnAdiciona: TButton
       Left = 129
       Top = 102
-      Width = 40
-      Height = 29
+      Width = 41
+      Height = 30
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWhite
       Font.Height = -16
       Font.Name = 'Tahoma'
       Font.Style = []
+      ImageAlignment = iaCenter
       ImageIndex = 4
       Images = ImageList1
       ParentFont = False
@@ -233,8 +236,6 @@ object frmFrPgtoBaixaCp: TfrmFrPgtoBaixaCp
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 2
-    ExplicitWidth = 387
-    ExplicitHeight = 220
     object DBGrid1: TDBGrid
       Left = 0
       Top = 0
@@ -278,7 +279,7 @@ object frmFrPgtoBaixaCp: TfrmFrPgtoBaixaCp
     ColorDepth = cd32Bit
     Height = 40
     Width = 40
-    Left = 347
+    Left = 339
     Top = 383
     Bitmap = {
       494C010107000800040028002800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
@@ -1940,8 +1941,8 @@ object frmFrPgtoBaixaCp: TfrmFrPgtoBaixaCp
   end
   object dsFrPgto: TDataSource
     DataSet = cdsFrPgto
-    Left = 323
-    Top = 281
+    Left = 339
+    Top = 265
   end
   object cdsFrPgto: TClientDataSet
     PersistDataPacket.Data = {
@@ -1952,8 +1953,8 @@ object frmFrPgtoBaixaCp: TfrmFrPgtoBaixaCp
     Active = True
     Aggregates = <>
     Params = <>
-    Left = 323
-    Top = 337
+    Left = 339
+    Top = 329
     object cdsFrPgtoID_FR: TIntegerField
       FieldName = 'ID_FR'
     end

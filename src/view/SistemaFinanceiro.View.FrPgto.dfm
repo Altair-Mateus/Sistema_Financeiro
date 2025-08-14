@@ -1,22 +1,23 @@
 inherited frmFrPgto: TfrmFrPgto
   Caption = 'Cadastro de Formas de Pagamento'
   ClientWidth = 791
-  ExplicitWidth = 803
-  ExplicitHeight = 543
+  StyleElements = [seFont, seClient, seBorder]
+  ExplicitWidth = 807
   TextHeight = 19
   inherited CardPanelPrincipal: TCardPanel
     Width = 791
-    ActiveCard = CardCadastro
+    StyleElements = [seFont, seClient, seBorder]
     ExplicitWidth = 787
     ExplicitHeight = 504
     inherited CardCadastro: TCard
-      Width = 789
-      Height = 503
+      Width = 791
+      StyleElements = [seFont, seClient, seBorder]
       ExplicitWidth = 789
       ExplicitHeight = 503
       inherited pnlBotoesCad: TPanel
         Top = 434
         Width = 789
+        StyleElements = [seFont, seClient, seBorder]
         ExplicitTop = 434
         ExplicitWidth = 789
         inherited btnSalvar: TButton
@@ -26,6 +27,7 @@ inherited frmFrPgto: TfrmFrPgto
       inherited PanelCampos: TPanel
         Width = 789
         Height = 393
+        StyleElements = [seFont, seClient, seBorder]
         ExplicitWidth = 789
         ExplicitHeight = 393
         object LabelNome: TLabel
@@ -90,20 +92,20 @@ inherited frmFrPgto: TfrmFrPgto
           Width = 105
           Height = 21
           Color = 9750962
-          DisabledColor = 5737262
+          DisabledColor = clSeagreen
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBtnText
           Font.Height = -16
           Font.Name = 'Tahoma'
           Font.Style = []
-          FrameColor = 5737262
+          FrameColor = clSeagreen
           ParentFont = False
           State = tssOn
           StateCaptions.CaptionOn = 'Ativo'
           StateCaptions.CaptionOff = 'Inativo'
           TabOrder = 1
           TabStop = False
-          ThumbColor = 5737262
+          ThumbColor = clSeagreen
         end
         object edtDesc: TEdit
           Left = 32
@@ -175,23 +177,29 @@ inherited frmFrPgto: TfrmFrPgto
       end
       inherited PanelTitulo: TPanel
         Width = 789
+        StyleElements = [seFont, seClient, seBorder]
         ExplicitWidth = 789
         inherited lblTitulo: TLabel
-          Width = 332
+          Width = 354
           Caption = 'Inserindo uma nova Forma de Pagamento'
           Color = 5934893
-          ExplicitWidth = 332
+          StyleElements = [seFont, seClient, seBorder]
+          ExplicitWidth = 354
         end
       end
     end
     inherited CardPesquisa: TCard
-      Width = 789
-      Height = 503
+      Width = 791
+      StyleElements = [seFont, seClient, seBorder]
       ExplicitWidth = 785
       ExplicitHeight = 502
       inherited pnlPesquisa: TPanel
-        Width = 789
+        Width = 791
+        StyleElements = [seFont, seClient, seBorder]
         ExplicitWidth = 785
+        inherited lblPesquisar: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
         object lblStatus: TLabel [1]
           Left = 278
           Top = 15
@@ -226,11 +234,12 @@ inherited frmFrPgto: TfrmFrPgto
         end
         inherited edtPesquisar: TEdit
           Width = 249
+          StyleElements = [seFont, seClient, seBorder]
           OnChange = edtPesquisarChange
           ExplicitWidth = 249
         end
         inherited btnPesquisae: TButton
-          Left = 665
+          Left = 667
           OnClick = btnPesquisaeClick
           ExplicitLeft = 661
         end
@@ -270,8 +279,8 @@ inherited frmFrPgto: TfrmFrPgto
         end
       end
       inherited pnlBotoes: TPanel
-        Top = 434
-        Width = 789
+        Width = 791
+        StyleElements = [seFont, seClient, seBorder]
         ExplicitTop = 433
         ExplicitWidth = 785
         inherited btnExcluir: TButton
@@ -286,8 +295,8 @@ inherited frmFrPgto: TfrmFrPgto
         end
       end
       inherited pnlGrid: TPanel
-        Width = 789
-        Height = 353
+        Width = 791
+        StyleElements = [seFont, seClient, seBorder]
         ExplicitWidth = 785
         ExplicitHeight = 352
         inherited DBGrid1: TDBGrid

@@ -3,10 +3,25 @@ unit SistemaFinanceiro.View.FrPgto;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, SistemaFinanceiro.View.CadastroPadrao,
-  Data.DB, System.ImageList, Vcl.ImgList, Vcl.Grids, Vcl.DBGrids, Vcl.StdCtrls,
-  Vcl.ExtCtrls, Vcl.WinXPanels, Vcl.WinXCtrls,
+  Winapi.Windows,
+  Winapi.Messages,
+  System.SysUtils,
+  System.Variants,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  SistemaFinanceiro.View.CadastroPadrao,
+  Data.DB,
+  System.ImageList,
+  Vcl.ImgList,
+  Vcl.Grids,
+  Vcl.DBGrids,
+  Vcl.StdCtrls,
+  Vcl.ExtCtrls,
+  Vcl.WinXPanels,
+  Vcl.WinXCtrls,
   SistemaFinanceiro.View.Relatorios.FrPgto;
 
 type
@@ -49,7 +64,7 @@ type
     procedure EditarFrPgto;
 
   public
-    { Public declarations }
+    function RetornaCodigo: String;
 
   protected
     procedure Pesquisar; override;
@@ -63,7 +78,10 @@ implementation
 
 {$R *.dfm}
 
-uses SistemaFinanceiro.Model.dmFrPgto, SistemaFinanceiro.Utilitarios;
+
+uses
+  SistemaFinanceiro.Model.dmFrPgto,
+  SistemaFinanceiro.Utilitarios;
 
 { TfrmFrPgto }
 
@@ -79,14 +97,14 @@ procedure TfrmFrPgto.btnCancelarClick(Sender: TObject);
 begin
   inherited;
 
-  //  Cancelando a incusão
+  // Cancelando a incusão
   dmFrPgto.cdsFrPgto.Cancel;
 
 end;
 
 procedure TfrmFrPgto.btnExcluirClick(Sender: TObject);
 var
-  option : Word;
+  option: Word;
 
 begin
   inherited;
@@ -101,20 +119,21 @@ begin
   if dmFrPgto.GetCpCrFrPgto(DataSourceFrPgto.DataSet.FieldByName('ID_FR').AsInteger) = True then
   begin
 
-    Application.MessageBox('Não é possível excluir uma Forma de Pagamento com Baixa de Contas cadastradas!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+    Application.MessageBox('Não é possível excluir uma Forma de Pagamento com Baixa de Contas cadastradas!', 'Atenção',
+      MB_OK + MB_ICONEXCLAMATION);
     exit;
 
   end;
 
-
   try
 
-    //  Excluindo registro
+    // Excluindo registro
     dmFrPgto.cdsFrPgto.Delete;
     dmFrPgto.cdsFrPgto.ApplyUpdates(0);
 
-  except on E : Exception do
-    Application.MessageBox(PWidechar(E.Message), 'Erro ao excluir Forma de pagamento', MB_OK + MB_ICONERROR);
+  except
+    on E: Exception do
+      Application.MessageBox(PWidechar(E.Message), 'Erro ao excluir Forma de pagamento', MB_OK + MB_ICONERROR);
   end;
 
 end;
@@ -123,14 +142,14 @@ procedure TfrmFrPgto.btnImprimirClick(Sender: TObject);
 begin
   inherited;
 
-  //  Cria o form
+  // Cria o form
   frmRelFrPgto := TfrmRelFrPgto.Create(Self);
 
   try
 
     frmRelFrPgto.DataSourceFrPgto.DataSet := DataSourceFrPgto.DataSet;
 
-    //  Mostra a pre vizualizacao
+    // Mostra a pre vizualizacao
     frmRelFrPgto.RLReport.Preview;
 
   finally
@@ -147,23 +166,23 @@ begin
 
   lblTitulo.Caption := 'Inserindo uma nova Forma de Pagamento';
 
-  if not (dmFrPgto.cdsFrPgto.State in [dsInsert, dsEdit]) then
+  if not(dmFrPgto.cdsFrPgto.State in [dsInsert, dsEdit]) then
   begin
 
-    //  Coloca o dataset em modo de inserção
+    // Coloca o dataset em modo de inserção
     dmFrPgto.cdsFrPgto.Insert;
 
   end;
 
   edtNome.SetFocus;
 
-  //  Seta previamente o metodo como dinheiro
+  // Seta previamente o metodo como dinheiro
   rbDinheiro.Checked := True;
-  rbCCred.Checked    := False;
-  rbCDeb.Checked     := False;
-  rbPix.Checked      := False;
-  rbCheque.Checked   := False;
-  rbDv.Checked       := False;
+  rbCCred.Checked := False;
+  rbCDeb.Checked := False;
+  rbPix.Checked := False;
+  rbCheque.Checked := False;
+  rbDv.Checked := False;
 
 end;
 
@@ -177,15 +196,15 @@ end;
 
 procedure TfrmFrPgto.btnSalvarClick(Sender: TObject);
 var
-  LStatus : String;
+  LStatus: String;
   LMetodoPag: String;
 
 begin
 
-  //  Valida os campos obrigatórios
+  // Valida os campos obrigatórios
   ValidaCampos;
 
-  //  Se for novo cad
+  // Se for novo cad
   if dmFrPgto.cdsFrPgto.State in [dsInsert] then
   begin
 
@@ -194,7 +213,7 @@ begin
 
   end;
 
-  //  Se for edição de um cad
+  // Se for edição de um cad
   if dmFrPgto.cdsFrPgto.State in [dsEdit] then
   begin
 
@@ -202,7 +221,7 @@ begin
 
   end;
 
-  //  Define o status da forma
+  // Define o status da forma
   if ToggleStatus.State = tssOn then
   begin
     LStatus := 'A';
@@ -212,47 +231,46 @@ begin
     LStatus := 'I';
   end;
 
-  //  Define o metodo de pagamento
+  // Define o metodo de pagamento
   if rbDinheiro.Checked then
   begin
     LMetodoPag := 'DI';
   end
   else if rbCCred.Checked then
-       begin
-        LMetodoPag := 'CC';
-       end
-      else if rbPix.Checked then
-           begin
-            LMetodoPag := 'PX';
-           end
-           else if rbCDeb.Checked then
-                begin
-                  LMetodoPag := 'CD';
-                end
-                else if rbDv.Checked then
-                     begin
-                       LMetodoPag := 'DV';
-                     end
-                     else if rbCheque.Checked then
-                          begin
-                            LMetodoPag := 'CH';
-                          end;
+  begin
+    LMetodoPag := 'CC';
+  end
+  else if rbPix.Checked then
+  begin
+    LMetodoPag := 'PX';
+  end
+  else if rbCDeb.Checked then
+  begin
+    LMetodoPag := 'CD';
+  end
+  else if rbDv.Checked then
+  begin
+    LMetodoPag := 'DV';
+  end
+  else if rbCheque.Checked then
+  begin
+    LMetodoPag := 'CH';
+  end;
 
-
-  //  Passando os dados para o dataset
+  // Passando os dados para o dataset
   dmFrPgto.cdsFrPgtoNOME_FR.AsString := Trim(edtNome.Text);
-  dmFrPgto.cdsFrPgtoDESC.AsString    := Trim(edtDesc.Text);
-  dmFrPgto.cdsFrPgtoSTATUS.AsString  := LStatus;
+  dmFrPgto.cdsFrPgtoDESC.AsString := Trim(edtDesc.Text);
+  dmFrPgto.cdsFrPgtoSTATUS.AsString := LStatus;
   dmFrPgto.cdsFrPgtoMETODO_PAG.AsString := LMetodoPag;
 
-  //  Gravando no banco
+  // Gravando no banco
   dmFrPgto.cdsFrPgto.Post;
   dmFrPgto.cdsFrPgto.ApplyUpdates(0);
 
-  //  Retorna ao cardPesquisa;
+  // Retorna ao cardPesquisa;
   CardPanelPrincipal.ActiveCard := CardPesquisa;
 
-  //  Atualiza a lista de pesquisa
+  // Atualiza a lista de pesquisa
   Pesquisar;
 
   inherited;
@@ -280,13 +298,13 @@ end;
 procedure TfrmFrPgto.EditarFrPgto;
 begin
 
-  //  Coloca o data set em modo de edição
+  // Coloca o data set em modo de edição
   dmFrPgto.cdsFrPgto.Edit;
 
-  //  Coloca o nome da forma no titulo
+  // Coloca o nome da forma no titulo
   lblTitulo.Caption := dmFrPgto.cdsFrPgtoID_FR.AsString + ' - ' + dmFrPgto.cdsFrPgtoNOME_FR.AsString;
 
-  //  Carrega os dados
+  // Carrega os dados
   edtNome.Text := dmFrPgto.cdsFrPgtoNOME_FR.AsString;
   edtDesc.Text := dmFrPgto.cdsFrPgtoDESC.AsString;
 
@@ -294,80 +312,77 @@ begin
   begin
     ToggleStatus.State := tssOn;
   end
-    else
-    begin
-      ToggleStatus.State := tssOff;
-    end;
+  else
+  begin
+    ToggleStatus.State := tssOff;
+  end;
 
   if dmFrPgto.cdsFrPgtoMETODO_PAG.AsString = 'DI' then
   begin
 
     rbDinheiro.Checked := True;
-    rbCCred.Checked    := False;
-    rbCDeb.Checked     := False;
-    rbPix.Checked      := False;
-    rbCheque.Checked   := False;
-    rbDv.Checked       := False;
+    rbCCred.Checked := False;
+    rbCDeb.Checked := False;
+    rbPix.Checked := False;
+    rbCheque.Checked := False;
+    rbDv.Checked := False;
 
   end
-    else if dmFrPgto.cdsFrPgtoMETODO_PAG.AsString = 'CC' then
-    begin
+  else if dmFrPgto.cdsFrPgtoMETODO_PAG.AsString = 'CC' then
+  begin
 
-      rbDinheiro.Checked := False;
-      rbCCred.Checked    := True;
-      rbCDeb.Checked     := False;
-      rbPix.Checked      := False;
-      rbCheque.Checked   := False;
-      rbDv.Checked       := False;
+    rbDinheiro.Checked := False;
+    rbCCred.Checked := True;
+    rbCDeb.Checked := False;
+    rbPix.Checked := False;
+    rbCheque.Checked := False;
+    rbDv.Checked := False;
 
-    end
-    else if dmFrPgto.cdsFrPgtoMETODO_PAG.AsString = 'CD' then
-         begin
+  end
+  else if dmFrPgto.cdsFrPgtoMETODO_PAG.AsString = 'CD' then
+  begin
 
-          rbDinheiro.Checked := False;
-          rbCCred.Checked    := False;
-          rbCDeb.Checked     := True;
-          rbPix.Checked      := False;
-          rbCheque.Checked   := False;
-          rbDv.Checked       := False;
+    rbDinheiro.Checked := False;
+    rbCCred.Checked := False;
+    rbCDeb.Checked := True;
+    rbPix.Checked := False;
+    rbCheque.Checked := False;
+    rbDv.Checked := False;
 
-         end
-         else if dmFrPgto.cdsFrPgtoMETODO_PAG.AsString = 'PX' then
-              begin
+  end
+  else if dmFrPgto.cdsFrPgtoMETODO_PAG.AsString = 'PX' then
+  begin
 
-                rbDinheiro.Checked := False;
-                rbCCred.Checked    := False;
-                rbCDeb.Checked     := False;
-                rbPix.Checked      := True;
-                rbCheque.Checked   := False;
-                rbDv.Checked       := False;
+    rbDinheiro.Checked := False;
+    rbCCred.Checked := False;
+    rbCDeb.Checked := False;
+    rbPix.Checked := True;
+    rbCheque.Checked := False;
+    rbDv.Checked := False;
 
-              end
-              else if dmFrPgto.cdsFrPgtoMETODO_PAG.AsString = 'CH' then
-                   begin
+  end
+  else if dmFrPgto.cdsFrPgtoMETODO_PAG.AsString = 'CH' then
+  begin
 
-                    rbDinheiro.Checked := False;
-                    rbCCred.Checked    := False;
-                    rbCDeb.Checked     := False;
-                    rbPix.Checked      := False;
-                    rbCheque.Checked   := True;
-                    rbDv.Checked       := False;
+    rbDinheiro.Checked := False;
+    rbCCred.Checked := False;
+    rbCDeb.Checked := False;
+    rbPix.Checked := False;
+    rbCheque.Checked := True;
+    rbDv.Checked := False;
 
-                   end
-                   else if dmFrPgto.cdsFrPgtoMETODO_PAG.AsString = 'DV' then
-                        begin
+  end
+  else if dmFrPgto.cdsFrPgtoMETODO_PAG.AsString = 'DV' then
+  begin
 
-                          rbDinheiro.Checked := False;
-                          rbCCred.Checked    := False;
-                          rbCDeb.Checked     := False;
-                          rbPix.Checked      := False;
-                          rbCheque.Checked   := False;
-                          rbDv.Checked       := True;
+    rbDinheiro.Checked := False;
+    rbCCred.Checked := False;
+    rbCDeb.Checked := False;
+    rbPix.Checked := False;
+    rbCheque.Checked := False;
+    rbDv.Checked := True;
 
-                        end;
-
-
-
+  end;
 
 end;
 
@@ -380,20 +395,20 @@ end;
 procedure TfrmFrPgto.HabilitaBotoes;
 begin
 
-  btnAlterar.Enabled  := not DataSourceFrPgto.DataSet.IsEmpty;
-  btnExcluir.Enabled  := not DataSourceFrPgto.DataSet.IsEmpty;
+  btnAlterar.Enabled := not DataSourceFrPgto.DataSet.IsEmpty;
+  btnExcluir.Enabled := not DataSourceFrPgto.DataSet.IsEmpty;
   btnImprimir.Enabled := not DataSourceFrPgto.DataSet.IsEmpty;
 
 end;
 
 procedure TfrmFrPgto.Pesquisar;
 var
-  LFiltroEdit : String;
-  LFiltro : String;
+  LFiltroEdit: String;
+  LFiltro: String;
 
 begin
 
-  //  Validações
+  // Validações
   if cbStatus.ItemIndex < 0 then
   begin
 
@@ -415,23 +430,31 @@ begin
   dmFrPgto.cdsFrPgto.Params.Clear;
 
   LFiltroEdit := TUtilitario.LikeFind(edtPesquisar.Text, DBGrid1);
-  LFiltro     := '';
+  LFiltro := '';
 
   case cbMet.ItemIndex of
 
-    1 : LFiltro := LFiltro + ' AND METODO_PAG = ''DI'' ';
-    2 : LFiltro := LFiltro + ' AND METODO_PAG = ''CC'' ';
-    3 : LFiltro := LFiltro + ' AND METODO_PAG = ''CD'' ';
-    4 : LFiltro := LFiltro + ' AND METODO_PAG = ''PX'' ';
-    5 : LFiltro := LFiltro + ' AND METODO_PAG = ''CH'' ';
-    6 : LFiltro := LFiltro + ' AND METODO_PAG = ''DV'' ';
+    1:
+      LFiltro := LFiltro + ' AND METODO_PAG = ''DI'' ';
+    2:
+      LFiltro := LFiltro + ' AND METODO_PAG = ''CC'' ';
+    3:
+      LFiltro := LFiltro + ' AND METODO_PAG = ''CD'' ';
+    4:
+      LFiltro := LFiltro + ' AND METODO_PAG = ''PX'' ';
+    5:
+      LFiltro := LFiltro + ' AND METODO_PAG = ''CH'' ';
+    6:
+      LFiltro := LFiltro + ' AND METODO_PAG = ''DV'' ';
 
   end;
 
   case cbStatus.ItemIndex of
 
-    1 : LFiltro := LFiltro + ' AND STATUS = ''A'' ';
-    2 : LFiltro := LFiltro + ' AND STATUS = ''I'' ';
+    1:
+      LFiltro := LFiltro + ' AND STATUS = ''A'' ';
+    2:
+      LFiltro := LFiltro + ' AND STATUS = ''I'' ';
 
   end;
 
@@ -443,6 +466,11 @@ begin
 
   inherited;
 
+end;
+
+function TfrmFrPgto.RetornaCodigo: String;
+begin
+  Result := DBGrid1.DataSource.DataSet.FieldByName('ID_FR').AsString
 end;
 
 procedure TfrmFrPgto.ValidaCampos;

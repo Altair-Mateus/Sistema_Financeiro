@@ -18,8 +18,10 @@ uses
   System.ImageList,
   Vcl.ImgList,
   uEnumsUtils,
-  SistemaFinanceiro.Model.Entidades.LancamentoPadraoContas, fMensagem,
-  SistemaFinanceiro.View.Fornecedores, SistemaFinanceiro.View.Clientes;
+  SistemaFinanceiro.Model.Entidades.LancamentoPadraoContas,
+  fMensagem,
+  SistemaFinanceiro.View.Fornecedores,
+  SistemaFinanceiro.View.Clientes;
 
 type
   TfrmCadLancamentoPadrao = class(TForm)
@@ -54,15 +56,20 @@ type
     procedure btnPesquisarClick(Sender: TObject);
     procedure edtIdCliFornecExit(Sender: TObject);
   private
-    FTelaAtiva : Boolean;
+    FTelaAtiva: Boolean;
     FOperacaoCadastro: TOperacaoCadastro;
     FCodLancamento: Integer;
-    FLancamentoPadrao : TModelLancamentoPadrao;
-    function CarregaDadosAlteracao : Boolean;
+    FLancamentoPadrao: TModelLancamentoPadrao;
+
+    function CarregaDadosAlteracao: Boolean;
     procedure ExibeTelaFornecedor;
     procedure ExibeTelaCliente;
     procedure ValidaCliente;
     procedure ValidaFornecedor;
+
+    function TipoIndiceParaEnum: TTipoLancamento;
+    function TipoEnumParaIndice: Integer;
+
   public
     property OperacaoCadastro: TOperacaoCadastro read FOperacaoCadastro write FOperacaoCadastro;
     property CodLancamento: Integer read FCodLancamento write FCodLancamento;
@@ -74,6 +81,7 @@ var
 implementation
 
 {$R *.dfm}
+
 
 uses
   SistemaFinanceiro.Utilitarios,
@@ -88,14 +96,16 @@ end;
 procedure TfrmCadLancamentoPadrao.btnPesquisarClick(Sender: TObject);
 begin
   case rdgTipo.ItemIndex of
-    0 : ExibeTelaCliente;
-    1 : ExibeTelaFornecedor;
+    0:
+      ExibeTelaCliente;
+    1:
+      ExibeTelaFornecedor;
   end;
 end;
 
 procedure TfrmCadLancamentoPadrao.btnSalvarClick(Sender: TObject);
 var
-  lTipo : Integer;
+  lTipo: Integer;
 begin
 
   lTipo := rdgTipo.ItemIndex;
@@ -108,14 +118,20 @@ begin
   end;
 
   FLancamentoPadrao.Descricao := Trim(edtDescricao.Text);
-  FLancamentoPadrao.Tipo := lTipo;
-  FLancamentoPadrao.Status := Ord(ToggleStatus.State);
+  FLancamentoPadrao.Tipo := TipoIndiceParaEnum;
+
+  if (ToggleStatus.State = tssOn) then
+    FLancamentoPadrao.Status := scAtivo
+  else
+    FLancamentoPadrao.Status := scInativo;
 
   if not Trim(edtIdCliFornec.Text).IsEmpty then
   begin
     case lTipo of
-      0 : FLancamentoPadrao.Id_Cliente := Trim(edtIdCliFornec.Text).ToInteger;
-      1 : FLancamentoPadrao.Id_Fornecedor := Trim(edtIdCliFornec.Text).ToInteger;
+      0:
+        FLancamentoPadrao.Id_Cliente := Trim(edtIdCliFornec.Text).ToInteger;
+      1:
+        FLancamentoPadrao.Id_Fornecedor := Trim(edtIdCliFornec.Text).ToInteger;
     end;
   end;
 
@@ -147,12 +163,12 @@ begin
 
     edtDescricao.Text := FLancamentoPadrao.Descricao;
     edtDtCad.Text := DateTimeToStr(FLancamentoPadrao.Data_Cadastro);
-    rdgTipo.ItemIndex := FLancamentoPadrao.Tipo;
+    rdgTipo.ItemIndex := TipoEnumParaIndice;
     ToggleStatus.State := TToggleSwitchState(FLancamentoPadrao.Status);
 
-    if (FLancamentoPadrao.Tipo = Smallint(tlCr)) then
+    if (FLancamentoPadrao.Tipo = tlCr) then
       edtIdCliFornec.Text := FLancamentoPadrao.Id_Cliente.ToString
-    else if (FLancamentoPadrao.Tipo = Smallint(tlCp)) then
+    else if (FLancamentoPadrao.Tipo = tlCp) then
       edtIdCliFornec.Text := FLancamentoPadrao.Id_Fornecedor.ToString;
 
     if FLancamentoPadrao.Data_Alteracao > 0 then
@@ -164,20 +180,22 @@ end;
 procedure TfrmCadLancamentoPadrao.edtIdCliFornecExit(Sender: TObject);
 begin
   case rdgTipo.ItemIndex of
-    0 : ValidaCliente;
-    1 : ValidaFornecedor;
+    0:
+      ValidaCliente;
+    1:
+      ValidaFornecedor;
   end;
 end;
 
 procedure TfrmCadLancamentoPadrao.ExibeTelaCliente;
 var
-  lFormulario : TfrmCliente;
+  lFormulario: TfrmCliente;
 begin
   lFormulario := TfrmCliente.Create(Self);
 
   try
     lFormulario.ShowModal;
-    //  Pega a ID do cliente selecionado
+    // Pega a ID do cliente selecionado
     edtIdCliFornec.Text := lFormulario.DBGrid1.DataSource.DataSet.FieldByName('ID_CLI').AsString;
   finally
     lFormulario.Free;
@@ -187,13 +205,13 @@ end;
 
 procedure TfrmCadLancamentoPadrao.ExibeTelaFornecedor;
 var
-  lFormulario : TfrmFornecedores;
+  lFormulario: TfrmFornecedores;
 begin
   lFormulario := TfrmFornecedores.Create(Self);
 
   try
     lFormulario.ShowModal;
-    //  Pega a ID do cliente selecionado
+    // Pega a ID do cliente selecionado
     edtIdCliFornec.Text := lFormulario.DBGrid1.DataSource.DataSet.FieldByName('ID_FORNEC').AsString;
   finally
     lFormulario.Free;
@@ -213,7 +231,8 @@ begin
     begin
       if not(CarregaDadosAlteracao) then
       begin
-        TfrmMensagem.TelaMensagem('Erro!', 'Erro ao recuperar dados do lançamento padrão nº ' + FCodLancamento.ToString, tmErro);
+        TfrmMensagem.TelaMensagem('Erro!', 'Erro ao recuperar dados do lançamento padrão nº ' +
+          FCodLancamento.ToString, tmErro);
         TUtilitario.FecharFormulario(Self);
       end;
 
@@ -235,7 +254,7 @@ end;
 
 procedure TfrmCadLancamentoPadrao.rdgTipoClick(Sender: TObject);
 begin
-  //  Libera para informar cliente ou fornecedor
+  // Libera para informar cliente ou fornecedor
   edtIdCliFornec.Enabled := True;
   btnPesquisar.Enabled := True;
 
@@ -246,9 +265,33 @@ begin
   end;
 end;
 
+function TfrmCadLancamentoPadrao.TipoEnumParaIndice: Integer;
+begin
+  case FLancamentoPadrao.Tipo of
+    tlCr:
+      Result := 0;
+    tlCp:
+      Result := 1;
+  else
+    Result := -1;
+  end;
+end;
+
+function TfrmCadLancamentoPadrao.TipoIndiceParaEnum: TTipoLancamento;
+begin
+  case rdgTipo.ItemIndex of
+    0:
+      Result := tlCr;
+    1:
+      Result := tlCp;
+  else
+    Result := tlTodos;
+  end;
+end;
+
 procedure TfrmCadLancamentoPadrao.ValidaCliente;
 var
-  lCliente : TModelCliente;
+  lCliente: TModelCliente;
 begin
 
   if not Trim(edtIdCliFornec.Text).IsEmpty then
@@ -269,7 +312,7 @@ end;
 
 procedure TfrmCadLancamentoPadrao.ValidaFornecedor;
 var
-  lFornecedor : TModelFornecedor;
+  lFornecedor: TModelFornecedor;
 begin
 
   if not Trim(edtIdCliFornec.Text).IsEmpty then

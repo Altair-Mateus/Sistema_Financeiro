@@ -1,7 +1,7 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <ProjectGuid>{B4C8DA2C-5B7F-419A-BCF6-08BA38BDF58A}</ProjectGuid>
-        <ProjectVersion>19.5</ProjectVersion>
+        <ProjectVersion>20.1</ProjectVersion>
         <FrameworkType>VCL</FrameworkType>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
@@ -9,6 +9,7 @@
         <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Application</AppType>
         <MainSource>SistemaFinanceiro.dpr</MainSource>
+        <ProjectName Condition="'$(ProjectName)'==''">SistemaFinanceiro</ProjectName>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
         <Base>true</Base>
@@ -60,9 +61,9 @@
         <SanitizedProjectName>SistemaFinanceiro</SanitizedProjectName>
         <DCC_UnitSearchPath>modules\.dcp;modules\.dcu;modules;modules\bcrypt\src;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <VerInfo_Locale>1046</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=24.8.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=24.8.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=25.8.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=25.8.0.0;Comments=</VerInfo_Keys>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <VerInfo_MajorVer>24</VerInfo_MajorVer>
+        <VerInfo_MajorVer>25</VerInfo_MajorVer>
         <VerInfo_MinorVer>8</VerInfo_MinorVer>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
@@ -74,7 +75,7 @@
         <UWP_DelphiLogo44>SistemaFinanceiro_Icon.ico</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>SistemaFinanceiro_Icon.ico</UWP_DelphiLogo150>
         <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
-        <VerInfo_Keys>CompanyName=Dev Altair Mateus T Alencastro;FileDescription=Sistema Financeiro;FileVersion=24.8.0.0;InternalName=;LegalCopyright=Dev Altair Mateus T Alencastro;LegalTrademarks=;OriginalFilename=;ProgramID=;ProductName=Sistema Financeiro;ProductVersion=24.8.0.0;Comments=github.com/Altair-Mateus</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=Dev Altair Mateus T Alencastro;FileDescription=Sistema Financeiro;FileVersion=25.8.0.0;InternalName=;LegalCopyright=Dev Altair Mateus T Alencastro;LegalTrademarks=;OriginalFilename=;ProgramID=;ProductName=Sistema Financeiro;ProductVersion=25.8.0.0;Comments=github.com/Altair-Mateus</VerInfo_Keys>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win64)'!=''">
         <DCC_UsePackage>DBXSqliteDriver;IndyIPCommon;RESTComponents;bindcompdbx;DBXInterBaseDriver;vcl;IndyIPServer;vclactnband;ZComponent;vclFireDAC;IndySystem;ZCore;bindcompvclsmp;tethering;bindcompvclwinx;dsnapcon;FireDACADSDriver;FireDACMSAccDriver;fmxFireDAC;vclimg;ZDbc;TeeDB;FireDAC;vcltouch;vcldb;bindcompfmx;FireDACSqliteDriver;FireDACPgDriver;ibmonitor;inetdb;FMXTee;soaprtl;DbxCommonDriver;FmxTeeUI;ibxpress;fmx;FireDACIBDriver;fmxdae;xmlrtl;soapmidas;vcledge;fmxobj;vclwinx;ibxbindings;rtl;vclib;DbxClientDriver;Tee;CustomIPTransport;vcldsnap;dbexpress;IndyCore;vclx;ZParseSql;bindcomp;appanalytics;dsnap;ZPlain;FireDACCommon;IndyIPClient;bindcompvcl;RESTBackendComponents;TeeUI;VCLRESTComponents;soapserver;dbxcds;VclSmp;adortl;vclie;bindengine;DBXMySQLDriver;CloudService;dsnapxml;FireDACMySQLDriver;dbrtl;IndyProtocols;inetdbxpress;FireDACCommonODBC;FireDACCommonDriver;inet;fmxase;$(DCC_UsePackage)</DCC_UsePackage>
@@ -93,7 +94,7 @@
         <DCC_DcuOutput>.\dcu</DCC_DcuOutput>
         <DCC_ExeOutput>.\bin</DCC_ExeOutput>
         <Icon_MainIcon>SistemaFinanceiro_Icon.ico</Icon_MainIcon>
-        <VerInfo_Keys>CompanyName=Desenvolvedor Altair Mateus T Alencastro;FileDescription=Sistema Financeiro;FileVersion=24.8.0.0;InternalName=;LegalCopyright=Dev Altair Mateus T Alencastro;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=Sistema Financeiro;ProductVersion=24.8.0.0;Comments=github.com/Altair-Mateus</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=Desenvolvedor Altair Mateus T Alencastro;FileDescription=Sistema Financeiro;FileVersion=25.8.0.0;InternalName=;LegalCopyright=Dev Altair Mateus T Alencastro;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=Sistema Financeiro;ProductVersion=25.8.0.0;Comments=github.com/Altair-Mateus</VerInfo_Keys>
         <UWP_DelphiLogo44>img\ico_logo.ico</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>img\ico_logo.ico</UWP_DelphiLogo150>
     </PropertyGroup>
@@ -108,7 +109,7 @@
         <Icon_MainIcon>SistemaFinanceiro_Icon1.ico</Icon_MainIcon>
         <UWP_DelphiLogo44>SistemaFinanceiro_Icon1.ico</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>SistemaFinanceiro_Icon1.ico</UWP_DelphiLogo150>
-        <VerInfo_Keys>CompanyName=Dev Altair Mateus T Alencastro;FileDescription=Sistema Financeiro;FileVersion=24.8.0.0;InternalName=;LegalCopyright=Dev Altair Mateus T Alencastro;LegalTrademarks=;OriginalFilename=;ProgramID=;ProductName=Sistema Financeiro;ProductVersion=24.8.0.0;Comments=github.com/Altair-Mateus</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=Dev Altair Mateus T Alencastro;FileDescription=Sistema Financeiro;FileVersion=25.8.0.0;InternalName=;LegalCopyright=Dev Altair Mateus T Alencastro;LegalTrademarks=;OriginalFilename=;ProgramID=;ProductName=Sistema Financeiro;ProductVersion=25.8.0.0;Comments=github.com/Altair-Mateus</VerInfo_Keys>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
@@ -128,7 +129,6 @@
         </DCCReference>
         <DCCReference Include="src\model\SistemaFinanceiro.Model.udmDados.pas">
             <Form>DataModule1</Form>
-            <FormType>dfm</FormType>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <DCCReference Include="src\view\SistemaFinanceiro.View.Usuarios.pas">
@@ -164,19 +164,9 @@
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="src\model\Entidades\SistemaFinanceiro.Model.Entidades.ResumoCaixa.pas"/>
-        <DCCReference Include="src\model\SistemaFinanceiro.Model.dmCPagar.pas">
-            <Form>dmCPagar</Form>
-            <FormType>dfm</FormType>
-            <DesignClass>TDataModule</DesignClass>
-        </DCCReference>
         <DCCReference Include="src\view\SistemaFinanceiro.View.CPagar.pas">
             <Form>frmContasPagar</Form>
             <FormType>dfm</FormType>
-        </DCCReference>
-        <DCCReference Include="src\model\SistemaFinanceiro.Model.dmCReceber.pas">
-            <Form>dmCReceber</Form>
-            <FormType>dfm</FormType>
-            <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <DCCReference Include="src\view\SistemaFinanceiro.View.CReceber.pas">
             <Form>frmContasReceber</Form>
@@ -266,16 +256,6 @@
             <Form>frmFrPgtoBaixaCr</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="src\model\SistemaFinanceiro.Model.dmPgtoBxCr.pas">
-            <Form>dmPgtoBxCr</Form>
-            <FormType>dfm</FormType>
-            <DesignClass>TDataModule</DesignClass>
-        </DCCReference>
-        <DCCReference Include="src\model\SistemaFinanceiro.Model.dmPgtoBxCp.pas">
-            <Form>dmPgtoBxCp</Form>
-            <FormType>dfm</FormType>
-            <DesignClass>TDataModule</DesignClass>
-        </DCCReference>
         <DCCReference Include="src\view\SistemaFinanceiro.View.BaixarCP.FrPgto.pas">
             <Form>frmFrPgtoBaixaCp</Form>
             <FormType>dfm</FormType>
@@ -362,11 +342,29 @@
             <Form>frmRelLancamentoPadrao</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\view\fTesteDaoRTTI.pas">
-            <Form>frmTesteDaoRTTI</Form>
+        <DCCReference Include="src\model\Entidades\SistemaFinanceiro.Model.Entidades.PgtoBxCp.pas"/>
+        <DCCReference Include="src\exceptions\SistemaFinanceiro.Exceptions.BaixaCp.pas"/>
+        <DCCReference Include="src\exceptions\SistemaFinanceiro.Exceptions.ContasPagar.pas"/>
+        <DCCReference Include="src\exceptions\SistemaFinanceiro.Exceptions.ContasPagarDetalhe.pas"/>
+        <DCCReference Include="src\exceptions\SistemaFinanceiro.Exceptions.LancamentoCaixa.pas"/>
+        <DCCReference Include="src\exceptions\SistemaFinanceiro.Exceptions.PgtoBaixaCp.pas"/>
+        <DCCReference Include="src\exceptions\SistemaFinanceiro.Exceptions.ConexaoBanco.pas"/>
+        <DCCReference Include="..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\config\uDbConfig.pas"/>
+        <DCCReference Include="src\model\db\uDBConnectorFB.pas"/>
+        <DCCReference Include="..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\exceptions\uDaoRTTIExceptions.pas"/>
+        <DCCReference Include="..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\exceptions\uDbConfigExceptions.pas"/>
+        <DCCReference Include="..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\transactions\uTransactionScope.pas"/>
+        <DCCReference Include="..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\interfaces\uITransactionScope.pas"/>
+        <DCCReference Include="src\model\Entidades\SistemaFinanceiro.Model.Entidades.FrPgto.pas"/>
+        <DCCReference Include="src\exceptions\SistemaFinanceiro.Exceptions.FrPgto.pas"/>
+        <DCCReference Include="src\controller\SistemaFinanceiro.Controller.BaixaMultCp.pas"/>
+        <DCCReference Include="src\controller\SistemaFinanceiro.Controller.BaixaContaPagar.pas"/>
+        <DCCReference Include="src\model\Entidades\SistemaFinanceiro.Model.Entidades.FaturaCartao.pas"/>
+        <DCCReference Include="src\exceptions\SistemaFinanceiro.Exceptions.FaturaCartao.pas"/>
+        <DCCReference Include="src\view\SistemaFinanceiro.View.BxMulti.InfosBxCr.pas">
+            <Form>frmInfoBxMultCr</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="..\New Delphi\Classes_Compartilhadas\DaoRTTI\src\view\uUsuario.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -388,8 +386,8 @@
                     <Source Name="MainSource">SistemaFinanceiro.dpr</Source>
                 </Source>
                 <Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k280.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp280.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k290.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp290.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
                 </Excluded_Packages>
             </Delphi.Personality>
             <Deployment Version="4">
@@ -510,6 +508,16 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
+                <DeployClass Name="AndroidSplashImageDefV21">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-anydpi-v21</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-anydpi-v21</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
                 <DeployClass Name="AndroidSplashStyles">
                     <Platform Name="Android">
                         <RemoteDir>res\values</RemoteDir>
@@ -530,6 +538,66 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
+                <DeployClass Name="AndroidSplashStylesV31">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-v31</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\values-v31</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_AdaptiveIcon">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-anydpi-v26</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-anydpi-v26</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_AdaptiveIconBackground">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_AdaptiveIconForeground">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_AdaptiveIconMonochrome">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_AdaptiveIconV33">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-anydpi-v33</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-anydpi-v33</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
                 <DeployClass Name="Android_Colors">
                     <Platform Name="Android">
                         <RemoteDir>res\values</RemoteDir>
@@ -537,6 +605,16 @@
                     </Platform>
                     <Platform Name="Android64">
                         <RemoteDir>res\values</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_ColorsDark">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-night-v21</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\values-night-v21</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
@@ -707,6 +785,56 @@
                     </Platform>
                     <Platform Name="Android64">
                         <RemoteDir>res\values</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_VectorizedNotificationIcon">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-anydpi-v24</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-anydpi-v24</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_VectorizedSplash">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_VectorizedSplashDark">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-night-anydpi-v21</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-night-anydpi-v21</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_VectorizedSplashV31">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-anydpi-v31</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-anydpi-v31</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_VectorizedSplashV31Dark">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-night-anydpi-v31</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-night-anydpi-v31</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
@@ -948,6 +1076,9 @@
                         <Operation>1</Operation>
                     </Platform>
                     <Platform Name="Win64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win64x">
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
@@ -1243,6 +1374,7 @@
                 <ProjectRoot Platform="OSXARM64" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="Win32" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="Win64x" Name="$(PROJECTNAME)"/>
             </Deployment>
             <Platforms>
                 <Platform value="Win32">True</Platform>

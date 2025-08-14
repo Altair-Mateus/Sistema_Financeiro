@@ -1,12 +1,34 @@
 unit SistemaFinanceiro.View.Caixa;
+
 interface
+
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, SistemaFinanceiro.View.CadastroPadrao,
-  Data.DB, System.ImageList, Vcl.ImgList, Vcl.Grids, Vcl.DBGrids, Vcl.ExtCtrls,
-  Vcl.StdCtrls, Vcl.WinXPanels, Vcl.ComCtrls, Vcl.Mask, Vcl.Imaging.pngimage, SistemaFinanceiro.Model.Entidades.ResumoCaixa,
-  Vcl.Menus, SistemaFinanceiro.View.DetalhesOrigemCpCr,
+  Winapi.Windows,
+  Winapi.Messages,
+  System.SysUtils,
+  System.Variants,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  SistemaFinanceiro.View.CadastroPadrao,
+  Data.DB,
+  System.ImageList,
+  Vcl.ImgList,
+  Vcl.Grids,
+  Vcl.DBGrids,
+  Vcl.ExtCtrls,
+  Vcl.StdCtrls,
+  Vcl.WinXPanels,
+  Vcl.ComCtrls,
+  Vcl.Mask,
+  Vcl.Imaging.pngimage,
+  SistemaFinanceiro.Model.Entidades.ResumoCaixa,
+  Vcl.Menus,
+  SistemaFinanceiro.View.DetalhesOrigemCpCr,
   SistemaFinanceiro.Model.Entidades.LancamentoCaixa;
+
 type
   TfrmCaixa = class(TfrmCadastroPadrao)
     DataSourceCaixa: TDataSource;
@@ -77,13 +99,12 @@ type
 
   private
     { Private declarations }
-    FResumoCaixa : TModelResumoCaixa;
+    FResumoCaixa: TModelResumoCaixa;
     procedure ValidaCampos;
     procedure HabilitaBotoes;
     procedure EditarRegCaixa;
     procedure KeyPressValor(Sender: TObject; var Key: Char);
     procedure ExibeTelaDetalhesOrigem;
-
 
   public
     { Public declarations }
@@ -92,16 +113,21 @@ type
     procedure Pesquisar; override;
 
   end;
+
 var
   frmCaixa: TfrmCaixa;
 
 implementation
+
 {$R *.dfm}
+
+
 uses
   SistemaFinanceiro.Model.dmCaixa,
   SistemaFinanceiro.Utilitarios,
   SistemaFinanceiro.View.Principal,
-  System.DateUtils, SistemaFinanceiro.View.Relatorios.Caixa;
+  System.DateUtils,
+  SistemaFinanceiro.View.Relatorios.Caixa;
 
 procedure TfrmCaixa.btnAlterarClick(Sender: TObject);
 begin
@@ -115,14 +141,14 @@ procedure TfrmCaixa.btnCancelarClick(Sender: TObject);
 begin
 
   inherited;
-  //  Cancelando inclusão
+  // Cancelando inclusão
   dmCaixa.cdsCaixa.Cancel;
 
 end;
 
 procedure TfrmCaixa.btnExcluirClick(Sender: TObject);
 var
-  option : Word;
+  option: Word;
 
 begin
 
@@ -136,16 +162,17 @@ begin
   end;
 
   try
-    //  Excluindo registro
+    // Excluindo registro
     dmCaixa.cdsCaixa.Delete;
     dmCaixa.cdsCaixa.ApplyUpdates(0);
 
-    //  Atualiza relatorio tela principal
+    // Atualiza relatorio tela principal
     frmPrincipal.ResumoMensalCaixa;
 
-  except on E : Exception do
+  except
+    on E: Exception do
 
-    Application.MessageBox(PWidechar(E.Message), 'Erro ao excluir lançamento do caixa', MB_OK + MB_ICONERROR);
+      Application.MessageBox(PWidechar(E.Message), 'Erro ao excluir lançamento do caixa', MB_OK + MB_ICONERROR);
 
   end;
 
@@ -155,7 +182,7 @@ procedure TfrmCaixa.btnImprimirClick(Sender: TObject);
 begin
   inherited;
 
-  //  Cria o form
+  // Cria o form
   frmRelCaixa := TfrmRelCaixa.Create(Self);
 
   try
@@ -164,7 +191,7 @@ begin
 
     frmRelCaixa.ResumoCaixa(FResumoCaixa);
 
-    //  Exibe a pre visualizacao
+    // Exibe a pre visualizacao
     frmRelCaixa.RLReport.Preview();
 
   finally
@@ -183,15 +210,15 @@ begin
   inherited;
   lblTitulo.Caption := 'Inserindo um novo Lançamento no Caixa';
 
-  if not (dmCaixa.cdsCaixa.State in [dsInsert, dsEdit]) then
+  if not(dmCaixa.cdsCaixa.State in [dsInsert, dsEdit]) then
   begin
 
-    //  Colocando o data set em modo de inserção de dados
+    // Colocando o data set em modo de inserção de dados
     dmCaixa.cdsCaixa.Insert;
 
   end;
 
-  //  Coloca a data atual no datetimepicker
+  // Coloca a data atual no datetimepicker
   DateTimePicker.Date := now;
 
   edtNDoc.SetFocus;
@@ -209,40 +236,40 @@ end;
 procedure TfrmCaixa.btnSalvarClick(Sender: TObject);
 begin
 
-  //  Valida os campos obrigatórios
+  // Valida os campos obrigatórios
   ValidaCampos;
 
-  //  Passando os dados para o dataset
+  // Passando os dados para o dataset
   dmCaixa.cdsCaixadata_cadastro.AsDateTime := DateTimePicker.Date;
-  dmCaixa.cdsCaixavalor.AsFloat            := StrToFloat(Trim(edtValor.text));
-  dmCaixa.cdsCaixanumero_doc.AsString      := Trim(edtNDoc.text);
-  dmCaixa.cdsCaixadescricao.AsString       := Trim(memDesc.text);
-  dmCaixa.cdsCaixaORIGEM.AsString          := 'CX';
+  dmCaixa.cdsCaixavalor.AsFloat := StrToFloat(Trim(edtValor.text));
+  dmCaixa.cdsCaixanumero_doc.AsString := Trim(edtNDoc.text);
+  dmCaixa.cdsCaixadescricao.AsString := Trim(memDesc.text);
+  dmCaixa.cdsCaixaORIGEM.AsString := 'CX';
 
   if RadioGroup.ItemIndex = 0 then
   begin
     dmCaixa.cdsCaixatipo.AsString := 'R';
   end
-    else if RadioGroup.ItemIndex = 1 then
-    begin
-      dmCaixa.cdsCaixatipo.AsString := 'D';
-    end;
+  else if RadioGroup.ItemIndex = 1 then
+  begin
+    dmCaixa.cdsCaixatipo.AsString := 'D';
+  end;
   if dmCaixa.cdsCaixa.State in [dsInsert] then
   begin
     dmCaixa.GeraCodigo;
   end;
 
-  //  Gravando no banco de dados
+  // Gravando no banco de dados
   dmCaixa.cdsCaixa.Post;
   dmCaixa.cdsCaixa.ApplyUpdates(0);
 
-  //  Retorna ao cardPesquisa;
+  // Retorna ao cardPesquisa;
   CardPanelPrincipal.ActiveCard := CardPesquisa;
 
-  //  Atualiza a lista
+  // Atualiza a lista
   Pesquisar;
 
-  //  Atualiza relatorio tela principal
+  // Atualiza relatorio tela principal
   frmPrincipal.ResumoMensalCaixa;
   inherited;
 end;
@@ -291,18 +318,18 @@ procedure TfrmCaixa.DBGrid1DrawColumnCell(Sender: TObject; const Rect: TRect;
   DataCol: Integer; Column: TColumn; State: TGridDrawState);
 begin
 
-  //  Altera a cor das receitas
+  // Altera a cor das receitas
   if (not DBGrid1.DataSource.DataSet.IsEmpty) and
-     (DBGrid1.DataSource.DataSet.FieldByName('TIPO').AsString = 'R')then
+    (DBGrid1.DataSource.DataSet.FieldByName('TIPO').AsString = 'R') then
   begin
-    DBGrid1.Canvas.Font.Color := clHotLight;  // Define a cor do texto da célula
+    DBGrid1.Canvas.Font.Color := clHotLight; // Define a cor do texto da célula
   end;
 
-  //  Altera a cor das receitas
+  // Altera a cor das receitas
   if (not DBGrid1.DataSource.DataSet.IsEmpty) and
-     (DBGrid1.DataSource.DataSet.FieldByName('TIPO').AsString = 'D')then
+    (DBGrid1.DataSource.DataSet.FieldByName('TIPO').AsString = 'D') then
   begin
-    DBGrid1.Canvas.Font.Color := $004F50FF;  // Define a cor do texto da célula
+    DBGrid1.Canvas.Font.Color := $004F50FF; // Define a cor do texto da célula
   end;
 
   // Desenha a célula com as propriedades de cor atualizadas
@@ -315,26 +342,26 @@ end;
 procedure TfrmCaixa.EditarRegCaixa;
 begin
 
-  //  Coloca o dataset em modo de edição
+  // Coloca o dataset em modo de edição
   dmCaixa.cdsCaixa.Edit;
 
-  //  Coloca o numero do registro no titulo
-  lblTitulo.Caption := 'Alterando lançamento Nº '+ dmCaixa.cdsCaixaid.AsString;
+  // Coloca o numero do registro no titulo
+  lblTitulo.Caption := 'Alterando lançamento Nº ' + dmCaixa.cdsCaixaid.AsString;
 
-  //  Carrega os dados
-  edtNDoc.Text        := dmCaixa.cdsCaixanumero_doc.AsString;
-  memDesc.Text        := dmCaixa.cdsCaixadescricao.AsString;
-  edtValor.Text       := TUtilitario.FormatarValor(dmCaixa.cdsCaixavalor.AsCurrency);
+  // Carrega os dados
+  edtNDoc.text := dmCaixa.cdsCaixanumero_doc.AsString;
+  memDesc.text := dmCaixa.cdsCaixadescricao.AsString;
+  edtValor.text := TUtilitario.FormatarValor(dmCaixa.cdsCaixavalor.AsCurrency);
   DateTimePicker.Date := dmCaixa.cdsCaixadata_cadastro.AsDateTime;
 
   if dmCaixa.cdsCaixatipo.AsString = 'R' then
   begin
     RadioGroup.ItemIndex := 0;
   end
-    else if dmCaixa.cdsCaixatipo.AsString = 'D' then
-    begin
-      RadioGroup.ItemIndex := 1;
-    end;
+  else if dmCaixa.cdsCaixatipo.AsString = 'D' then
+  begin
+    RadioGroup.ItemIndex := 1;
+  end;
 
 end;
 
@@ -350,28 +377,25 @@ procedure TfrmCaixa.edtValorExit(Sender: TObject);
 begin
 
   inherited;
-  edtValor.Text := TUtilitario.FormatarValor(edtValor.Text);
+  edtValor.text := TUtilitario.FormatarValor(edtValor.text);
 
 end;
 
 procedure TfrmCaixa.ExibeTelaDetalhesOrigem;
+var
+  lFormulario: TfrmDetalhesOrigemCpCr;
 begin
 
-  //  Cria o Form
-  frmDetalhesOrigemCpCr := TfrmDetalhesOrigemCpCr.Create(Self);
-
+  // Cria o Form
+  lFormulario := TfrmDetalhesOrigemCpCr.Create(Self);
   try
 
-    frmDetalhesOrigemCpCr.CarregaDados(DataSourceCaixa.DataSet.FieldByName('ID_ORIGEM').AsInteger, DataSourceCaixa.DataSet.FieldByName('ORIGEM').AsString);
-
-    //  Exibe o Form
-    frmDetalhesOrigemCpCr.ShowModal;
+    lFormulario.IdOrigem := DBGrid1.DataSource.DataSet.FieldByName('ID_ORIGEM').AsInteger;
+    lFormulario.Origem := DBGrid1.DataSource.DataSet.FieldByName('ORIGEM').AsString;
+    lFormulario.ShowModal;
 
   finally
-
-    //  Libera da memoria
-    FreeAndNil(frmDetalhesOrigemCpCr);
-
+    lFormulario.Free;
   end
 
 end;
@@ -382,9 +406,9 @@ begin
   inherited;
   edtValor.OnKeyPress := KeyPressValor;
 
-  //  Define as datas
-  dateInicial.Date := StartOfTheMonth(Now);
-  dateFinal.Date   := EndOfTheMonth(Now);
+  // Define as datas
+  dateInicial.Date := StartOfTheMonth(now);
+  dateFinal.Date := EndOfTheMonth(now);
 
 end;
 
@@ -408,27 +432,27 @@ begin
 
   if Key = #13 then
   begin
-    //  Verifica se a tecla pressionada é o Enter
-    //  Cancela o efeito do enter
+    // Verifica se a tecla pressionada é o Enter
+    // Cancela o efeito do enter
     Key := #0;
-    //  Pula para o proximo
+    // Pula para o proximo
     Perform(WM_NEXTDLGCTL, 0, 0);
   end;
 
-  //  Se for digitado um ponto, será convertido para virgula
+  // Se for digitado um ponto, será convertido para virgula
   if Key = FormatSettings.ThousandSeparator then
-   begin
-      Key := #0;
-    end;
+  begin
+    Key := #0;
+  end;
 
   // Permite apenas digitar os caracteres dentro do charinset
-  if not (CharInSet(Key, ['0'..'9', FormatSettings.DecimalSeparator, #8, #13])) then
+  if not(CharInSet(Key, ['0' .. '9', FormatSettings.DecimalSeparator, #8, #13])) then
   begin
     Key := #0;
   end;
 
   // Valida se já existe o ponto decimal
-  if (Key = FormatSettings.DecimalSeparator) and (pos(Key, TEdit(Sender).Text) > 0) then
+  if (Key = FormatSettings.DecimalSeparator) and (pos(Key, TEdit(Sender).text) > 0) then
   begin
     Key := #0;
   end;
@@ -437,13 +461,13 @@ end;
 
 procedure TfrmCaixa.Pesquisar;
 var
-  LFiltroEdit : String;
-  LFiltro     : String;
-  LOrdem      : String;
+  LFiltroEdit: String;
+  LFiltro: String;
+  LOrdem: String;
 
 begin
 
-  //  Validações
+  // Validações
   if dateInicial.Date > dateFinal.Date then
   begin
 
@@ -462,34 +486,39 @@ begin
 
   end;
 
-  LFiltroEdit := TUtilitario.LikeFind(edtPesquisar.Text, DBGrid1);
+  LFiltroEdit := TUtilitario.LikeFind(edtPesquisar.text, DBGrid1);
   LFiltro := '';
   LOrdem := '';
 
   dmCaixa.cdsCaixa.Params.Clear;
 
-  //  Pesquisa por tipo de lcto
+  // Pesquisa por tipo de lcto
   case cbTipoLcto.ItemIndex of
-    1 : LFiltro := LFiltro + ' AND TIPO = ''R'' ';
-    2 : LFiltro := LFiltro + ' AND TIPO = ''D'' ';
+    1:
+      LFiltro := LFiltro + ' AND TIPO = ''R'' ';
+    2:
+      LFiltro := LFiltro + ' AND TIPO = ''D'' ';
   end;
 
-  //  Pesquisa por origem
+  // Pesquisa por origem
   case cbOrigem.ItemIndex of
 
-    1 : LFiltro := LFiltro + ' AND ORIGEM = ''CR'' ';
-    2 : LFiltro := LFiltro + ' AND ORIGEM = ''CP'' ';
-    3 : LFiltro := LFiltro + ' AND ORIGEM = ''CX'' ';
+    1:
+      LFiltro := LFiltro + ' AND ORIGEM = ''CR'' ';
+    2:
+      LFiltro := LFiltro + ' AND ORIGEM = ''CP'' ';
+    3:
+      LFiltro := LFiltro + ' AND ORIGEM = ''CX'' ';
 
   end;
 
-  //  Pesquisa por data
+  // Pesquisa por data
   if (dateInicial.Checked) and (dateFinal.Checked) then
   begin
 
     LFiltro := LFiltro + ' AND DATA_CADASTRO BETWEEN :DTINI AND :DTFIM ';
 
-    //  Criando os parametros
+    // Criando os parametros
     dmCaixa.cdsCaixa.Params.CreateParam(TFieldType.ftDate, 'DTINI', TParamType.ptInput);
     dmCaixa.cdsCaixa.ParamByName('DTINI').AsDate := dateInicial.Date;
 
@@ -498,24 +527,23 @@ begin
 
   end;
 
-  //  Ordem de pesquisa
+  // Ordem de pesquisa
   if rbId.Checked then
   begin
     LOrdem := ' ORDER BY ID DESC';
   end
-    else if rbData.Checked then
-    begin
-      LOrdem := ' ORDER BY DATA_CADASTRO DESC';
-    end
-      else if rbValor.Checked then
-      begin
-        LOrdem := ' ORDER BY VALOR DESC';
-      end
-        else
-        begin
-          LOrdem := ' ORDER BY ID DESC';
-        end;
-
+  else if rbData.Checked then
+  begin
+    LOrdem := ' ORDER BY DATA_CADASTRO DESC';
+  end
+  else if rbValor.Checked then
+  begin
+    LOrdem := ' ORDER BY VALOR DESC';
+  end
+  else
+  begin
+    LOrdem := ' ORDER BY ID DESC';
+  end;
 
   dmCaixa.cdsCaixa.Close;
   dmCaixa.cdsCaixa.CommandText := 'SELECT * FROM CAIXA WHERE 1 = 1' + LFiltroEdit + LFiltro + LOrdem;
@@ -524,18 +552,17 @@ begin
   if Assigned(FResumoCaixa) then
     FResumoCaixa.Free;
 
-  //  Atualiza valores de entrada e saida
+  // Atualiza valores de entrada e saida
   FResumoCaixa := TModelLancamentoCaixa.ResumoCaixa(dateInicial.Date, dateFinal.Date);
 
   lblVTotalEnt.Caption := TUtilitario.FormatoMoeda(FResumoCaixa.TotalEntradas);
   lblVTotalSai.Caption := TUtilitario.FormatoMoeda(FResumoCaixa.TotalSaidas);
 
-
   HabilitaBotoes;
   inherited;
 
-
 end;
+
 procedure TfrmCaixa.rbDataClick(Sender: TObject);
 begin
   inherited;
@@ -563,14 +590,14 @@ end;
 procedure TfrmCaixa.ValidaCampos;
 begin
 
-  if Trim(memDesc.Text) = '' then
+  if Trim(memDesc.text) = '' then
   begin
     Application.MessageBox('Campo Descrição não pode estar vazio!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
     memDesc.SetFocus;
     abort;
   end;
 
-  if Trim(edtValor.Text) = '' then
+  if Trim(edtValor.text) = '' then
   begin
     Application.MessageBox('Campo Valor não pode estar vazio!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
     edtValor.SetFocus;
@@ -583,6 +610,7 @@ begin
   end;
 
 end;
+
 procedure TfrmCaixa.DetalhesOrigemCpCrClick(Sender: TObject);
 begin
 
@@ -593,7 +621,6 @@ begin
     abort;
 
   end;
-
 
   ExibeTelaDetalhesOrigem;
 

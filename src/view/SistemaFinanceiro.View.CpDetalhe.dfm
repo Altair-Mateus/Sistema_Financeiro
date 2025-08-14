@@ -3,37 +3,37 @@ object frmCpDetalhe: TfrmCpDetalhe
   Top = 0
   BorderIcons = [biSystemMenu]
   Caption = 'Detalhes Conta Paga'
-  ClientHeight = 673
-  ClientWidth = 841
-  Color = 5737262
+  ClientHeight = 671
+  ClientWidth = 833
+  Color = clSeagreen
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -16
   Font.Name = 'Tahoma'
   Font.Style = []
   Position = poOwnerFormCenter
+  OnActivate = FormActivate
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
   TextHeight = 19
   object pnlPrincipal: TPanel
     Left = 0
     Top = 0
-    Width = 841
-    Height = 673
+    Width = 833
+    Height = 671
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitWidth = 837
-    ExplicitHeight = 672
     object pnlPesquisa: TPanel
       Left = 0
       Top = 0
-      Width = 841
+      Width = 833
       Height = 129
       Align = alTop
       BevelOuter = bvNone
-      Color = 5737262
+      Color = clSeagreen
       ParentBackground = False
       TabOrder = 0
-      ExplicitWidth = 837
       object lblTValorParcela: TLabel
         Left = 408
         Top = 91
@@ -247,18 +247,16 @@ object frmCpDetalhe: TfrmCpDetalhe
     end
     object pnlBotoes: TPanel
       Left = 0
-      Top = 604
-      Width = 841
+      Top = 602
+      Width = 833
       Height = 69
       Align = alBottom
       Color = clWindow
       ParentBackground = False
       TabOrder = 1
-      ExplicitTop = 603
-      ExplicitWidth = 837
       object btnVoltar: TButton
         AlignWithMargins = True
-        Left = 717
+        Left = 709
         Top = 4
         Width = 120
         Height = 61
@@ -268,21 +266,19 @@ object frmCpDetalhe: TfrmCpDetalhe
         Images = ImageList1
         TabOrder = 0
         OnClick = btnVoltarClick
-        ExplicitLeft = 713
       end
     end
     object pnlInfopag: TPanel
       AlignWithMargins = True
       Left = 3
       Top = 132
-      Width = 835
+      Width = 827
       Height = 137
       Align = alTop
       BevelOuter = bvNone
       Color = clWhite
       ParentBackground = False
       TabOrder = 2
-      ExplicitWidth = 831
       object lblDtPag: TLabel
         Left = 16
         Top = 6
@@ -390,36 +386,33 @@ object frmCpDetalhe: TfrmCpDetalhe
     object pnlGrids: TPanel
       Left = 0
       Top = 272
-      Width = 841
-      Height = 332
+      Width = 833
+      Height = 330
       Align = alClient
       BevelOuter = bvNone
-      Color = 5737262
+      Color = clSeagreen
       ParentBackground = False
       TabOrder = 3
-      ExplicitWidth = 837
-      ExplicitHeight = 331
       object pnlGridFormasPagamento: TPanel
         Left = 0
         Top = 0
-        Width = 841
+        Width = 833
         Height = 160
         Margins.Left = 0
         Margins.Right = 0
         Align = alTop
         BevelOuter = bvNone
-        Color = 5737262
+        Color = clSeagreen
         Padding.Left = 5
         Padding.Top = 5
         Padding.Right = 5
         Padding.Bottom = 5
         ParentBackground = False
         TabOrder = 0
-        ExplicitWidth = 837
         object lblFrPgto: TLabel
           Left = 5
           Top = 5
-          Width = 831
+          Width = 823
           Height = 19
           Align = alTop
           Caption = 'Formas de Pagamento'
@@ -437,7 +430,7 @@ object frmCpDetalhe: TfrmCpDetalhe
           AlignWithMargins = True
           Left = 8
           Top = 34
-          Width = 825
+          Width = 817
           Height = 118
           Margins.Top = 10
           Align = alClient
@@ -467,8 +460,8 @@ object frmCpDetalhe: TfrmCpDetalhe
             item
               Expanded = False
               FieldName = 'VALOR_PAGO'
-              Title.Caption = 'Valor Pago'
-              Width = 143
+              Title.Caption = 'Valor Pago R$'
+              Width = 134
               Visible = True
             end>
         end
@@ -476,22 +469,21 @@ object frmCpDetalhe: TfrmCpDetalhe
       object pnlGridParciais: TPanel
         Left = 0
         Top = 160
-        Width = 841
+        Width = 833
         Height = 160
         Align = alTop
         BevelOuter = bvNone
-        Color = 5737262
+        Color = clSeagreen
         Padding.Left = 5
         Padding.Top = 5
         Padding.Right = 5
         Padding.Bottom = 5
         ParentBackground = False
         TabOrder = 1
-        ExplicitWidth = 837
         object lblParciais: TLabel
           Left = 5
           Top = 5
-          Width = 831
+          Width = 823
           Height = 19
           Align = alTop
           Caption = 'Contas Parciais Geradas:'
@@ -509,7 +501,7 @@ object frmCpDetalhe: TfrmCpDetalhe
           AlignWithMargins = True
           Left = 5
           Top = 34
-          Width = 831
+          Width = 823
           Height = 118
           Margins.Left = 0
           Margins.Top = 10
@@ -567,8 +559,8 @@ object frmCpDetalhe: TfrmCpDetalhe
     ColorDepth = cd32Bit
     Height = 32
     Width = 32
-    Left = 720
-    Top = 80
+    Left = 288
+    Top = 616
     Bitmap = {
       494C010109001800040020002000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       00000000000036000000280000008000000060000000010020000000000000C0
@@ -2161,19 +2153,12 @@ object frmCpDetalhe: TfrmCpDetalhe
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000}
   end
-  object DataSourceCPDetalhe: TDataSource
-    DataSet = dmCPagar.FDQueryCpDetalhes
-    Left = 688
-    Top = 233
-  end
   object DataSourcePgto: TDataSource
-    DataSet = dmCPagar.FDQueryPgtoCp
-    Left = 568
-    Top = 233
+    Left = 88
+    Top = 617
   end
   object DataSourceParciais: TDataSource
-    DataSet = dmCPagar.FDQueryCpParciais
-    Left = 696
-    Top = 385
+    Left = 191
+    Top = 617
   end
 end

@@ -4,8 +4,8 @@ object frmBaixarCP: TfrmBaixarCP
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'Baixar Contas a Pagar'
-  ClientHeight = 546
-  ClientWidth = 622
+  ClientHeight = 544
+  ClientWidth = 647
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -13,23 +13,26 @@ object frmBaixarCP: TfrmBaixarCP
   Font.Name = 'Tahoma'
   Font.Style = []
   Position = poScreenCenter
+  OnActivate = FormActivate
+  OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
   TextHeight = 19
   object pnlPrincipal: TPanel
     Left = 0
     Top = 0
-    Width = 622
-    Height = 546
+    Width = 647
+    Height = 544
     Align = alClient
     BevelOuter = bvNone
-    Color = 5737262
+    Color = clSeagreen
     ParentBackground = False
     TabOrder = 0
     object pnlDocInfo: TPanel
       AlignWithMargins = True
       Left = 10
       Top = 10
-      Width = 606
+      Width = 627
       Height = 262
       Margins.Left = 10
       Margins.Top = 10
@@ -39,14 +42,11 @@ object frmBaixarCP: TfrmBaixarCP
       Color = clWhite
       ParentBackground = False
       TabOrder = 0
-      ExplicitLeft = 11
-      ExplicitTop = 11
-      ExplicitWidth = 600
       object gbDocInfo: TGroupBox
         AlignWithMargins = True
         Left = 21
         Top = 21
-        Width = 564
+        Width = 585
         Height = 220
         Margins.Left = 20
         Margins.Top = 20
@@ -58,7 +58,6 @@ object frmBaixarCP: TfrmBaixarCP
         ParentBackground = False
         ParentColor = False
         TabOrder = 0
-        ExplicitWidth = 558
         object lblNDoc: TLabel
           Left = 290
           Top = 75
@@ -225,7 +224,7 @@ object frmBaixarCP: TfrmBaixarCP
       AlignWithMargins = True
       Left = 10
       Top = 282
-      Width = 606
+      Width = 627
       Height = 182
       Margins.Left = 10
       Margins.Top = 5
@@ -235,14 +234,11 @@ object frmBaixarCP: TfrmBaixarCP
       Color = clWhite
       ParentBackground = False
       TabOrder = 1
-      ExplicitLeft = 11
-      ExplicitTop = 283
-      ExplicitWidth = 600
       object gbDetalhes: TGroupBox
         AlignWithMargins = True
         Left = 21
         Top = 21
-        Width = 564
+        Width = 585
         Height = 140
         Margins.Left = 20
         Margins.Top = 20
@@ -251,7 +247,6 @@ object frmBaixarCP: TfrmBaixarCP
         Align = alClient
         Caption = 'Detalhes'
         TabOrder = 0
-        ExplicitWidth = 558
         object lblObs: TLabel
           Left = 28
           Top = 32
@@ -294,7 +289,9 @@ object frmBaixarCP: TfrmBaixarCP
           Top = 31
           Width = 425
           Height = 27
+          MaxLength = 200
           TabOrder = 0
+          OnKeyPress = EditKeyPress
         end
         object edtValor: TEdit
           Left = 474
@@ -312,6 +309,7 @@ object frmBaixarCP: TfrmBaixarCP
           Date = 45133.000000000000000000
           Time = 0.840443912034970700
           TabOrder = 1
+          OnKeyPress = EditKeyPress
         end
         object edtValorDesc: TEdit
           Left = 473
@@ -349,16 +347,13 @@ object frmBaixarCP: TfrmBaixarCP
     end
     object pnlBotoes: TPanel
       Left = 0
-      Top = 477
-      Width = 626
+      Top = 474
+      Width = 647
       Height = 70
       Align = alBottom
       Color = clWindow
       ParentBackground = False
       TabOrder = 2
-      ExplicitLeft = 1
-      ExplicitTop = 475
-      ExplicitWidth = 620
       object btnConfirmar: TButton
         AlignWithMargins = True
         Left = 191
@@ -373,12 +368,12 @@ object frmBaixarCP: TfrmBaixarCP
         Caption = 'Confirmar'
         ImageIndex = 1
         Images = ImageList1
+        ModalResult = 1
         TabOrder = 0
-        OnClick = btnConfirmarClick
       end
       object btnCancelar: TButton
         AlignWithMargins = True
-        Left = 315
+        Left = 336
         Top = 1
         Width = 120
         Height = 68
@@ -391,10 +386,9 @@ object frmBaixarCP: TfrmBaixarCP
         Caption = 'Cancelar'
         ImageIndex = 0
         Images = ImageList1
+        ModalResult = 2
         ParentBiDiMode = False
         TabOrder = 1
-        OnClick = btnCancelarClick
-        ExplicitLeft = 309
       end
     end
   end
@@ -402,8 +396,8 @@ object frmBaixarCP: TfrmBaixarCP
     ColorDepth = cd32Bit
     Height = 40
     Width = 40
-    Left = 474
-    Top = 440
+    Left = 514
+    Top = 480
     Bitmap = {
       494C010102000800040028002800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000A00000002800000001002000000000000064

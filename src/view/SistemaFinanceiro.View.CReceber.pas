@@ -32,8 +32,10 @@ uses
   SistemaFinanceiro.View.BxMultiplaCr,
   uEnumsUtils,
   SistemaFinanceiro.Model.Entidades.Cr,
-  SistemaFinanceiro.Model.uSFQuery, fMensagem,
-  SistemaFinanceiro.View.Consulta.ConsultaLancamentoPadraoContas;
+  SistemaFinanceiro.Model.uSFQuery,
+  fMensagem,
+  SistemaFinanceiro.View.Consulta.ConsultaLancamentoPadraoContas,
+  FireDAC.Stan.Param;
 
 type
   TfrmContasReceber = class(TfrmCadastroPadrao)
@@ -68,19 +70,13 @@ type
     lblStatus: TLabel;
     edtNDoc: TEdit;
     lblNDoc: TLabel;
-    gbFiltros: TGroupBox;
-    rbDataVenc: TRadioButton;
-    rbValorParcela: TRadioButton;
     lblDataInicial: TLabel;
     dateInicial: TDateTimePicker;
     lblDataFinal: TLabel;
     dateFinal: TDateTimePicker;
     cbData: TComboBox;
     lblData: TLabel;
-    rbValorVenda: TRadioButton;
-    rbDataVenda: TRadioButton;
     btnBaixarCR: TButton;
-    rbId: TRadioButton;
     btnDetalhes: TButton;
     Image3: TImage;
     lblCR: TLabel;
@@ -129,11 +125,11 @@ type
     btnBxMultipla: TButton;
     chkBaixarAoSalvar: TCheckBox;
     dsGrupoParcelas: TDataSource;
-    rbIdCliente: TRadioButton;
     pnlFundoGrupoParcelas: TPanel;
     lblGrupoParcelas: TLabel;
     grdGrupoParcelas: TDBGrid;
     btnLancPadrao: TButton;
+    rdgOrdemConsulta: TRadioGroup;
     procedure FormCreate(Sender: TObject);
     procedure btnIncluirClick(Sender: TObject);
     procedure toggleParcelamentoClick(Sender: TObject);
@@ -203,6 +199,7 @@ var
 implementation
 
 {$R *.dfm}
+
 
 uses
   SistemaFinanceiro.Utilitarios,
@@ -797,8 +794,6 @@ var
 
 begin
 
-  QtdCr := 0;
-
   // Realiza a conta
   QtdCr := DBGrid1.DataSource.DataSet.RecordCount;
 
@@ -879,7 +874,7 @@ begin
     if (lLancamento.Existe(pCod, True)) then
     begin
 
-      if (lLancamento.Status = Smallint(scInativo)) then
+      if (lLancamento.Status = scInativo) then
       begin
         TfrmMensagem.TelaMensagem('Cadastro Inativo!',
           'Lançamento Padrão inativo, altere o cadastro do mesmo e tente novamente.',
@@ -957,8 +952,6 @@ end;
 
 procedure TfrmContasReceber.DBGrid1DrawColumnCell(Sender: TObject;
   const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
-var
-  lDisplayText: String;
 begin
 
   // Altera a cor das duplicatas vencidas
@@ -1329,21 +1322,23 @@ begin
   end;
 
   // Ordem de pesquisa
-  if rbId.Checked then
-    lFiltros := lFiltros + ' | Ordem Registros do relatório: Código da Conta '
-  else if rbDataVenc.Checked then
-    lFiltros := lFiltros +
-      ' | Ordem Registros do relatório: Data de Vencimento '
-  else if rbValorParcela.Checked then
-    lFiltros := lFiltros + ' | Ordem Registros do relatório: Valor da Parcela '
-  else if rbValorVenda.Checked then
-    lFiltros := lFiltros + ' | Ordem Registros do relatório: Valor da Venda '
-  else if rbDataVenda.Checked then
-    lFiltros := lFiltros + ' | Ordem Registros do relatório: Data da Venda '
-  else if rbIdCliente.Checked then
-    lFiltros := lFiltros + ' | Ordem Registros do relatório: Cod Cliente '
+  case rdgOrdemConsulta.ItemIndex of
+    0:
+      lFiltros := lFiltros + ' | Ordem Registros do relatório: Data de Vencimento ';
+    1:
+      lFiltros := lFiltros + ' | Ordem Registros do relatório: Data da Venda ';
+    2:
+      lFiltros := lFiltros + ' | Ordem Registros do relatório: Código da Conta ';
+    3:
+      lFiltros := lFiltros + ' | Ordem Registros do relatório: Valor da Parcela ';
+    4:
+      lFiltros := lFiltros + ' | Ordem Registros do relatório: Valor da Venda ';
+    5:
+      lFiltros := lFiltros + ' | Ordem Registros do relatório: Cod Cliente ';
+
   else
     lFiltros := lFiltros + ' | Ordem Registros do relatório: Código da Conta ';
+  end;
 
   Result := lFiltros;
 
@@ -1618,20 +1613,22 @@ begin
       LFiltro := LFiltro + ' AND CR.ID_CLIENTE = :ID';
 
     // Ordem de pesquisa
-    if rbId.Checked then
-      LOrdem := ' ORDER BY CR.ID DESC'
-    else if rbDataVenc.Checked then
-      LOrdem := ' ORDER BY CR.DATA_VENCIMENTO'
-    else if rbValorParcela.Checked then
-      LOrdem := ' ORDER BY CR.VALOR_PARCELA DESC'
-    else if rbValorVenda.Checked then
-      LOrdem := ' ORDER BY CR.VALOR_VENDA DESC'
-    else if rbDataVenda.Checked then
-      LOrdem := ' ORDER BY CR.DATA_VENDA DESC'
-    else if rbIdCliente.Checked then
-      LOrdem := ' ORDER BY CR.ID_CLIENTE'
+    case rdgOrdemConsulta.ItemIndex of
+      0:
+        LOrdem := ' ORDER BY CR.DATA_VENCIMENTO';
+      1:
+        LOrdem := ' ORDER BY CR.DATA_VENDA DESC';
+      2:
+        LOrdem := ' ORDER BY CR.ID DESC';
+      3:
+        LOrdem := ' ORDER BY CR.VALOR_PARCELA DESC';
+      4:
+        LOrdem := ' ORDER BY CR.VALOR_VENDA DESC';
+      5:
+        LOrdem := ' ORDER BY CR.ID_CLIENTE'
     else
       LOrdem := ' ORDER BY CR.ID DESC';
+    end;
 
     FQueryPesquisa.Close;
     FQueryPesquisa.SQL.Clear;

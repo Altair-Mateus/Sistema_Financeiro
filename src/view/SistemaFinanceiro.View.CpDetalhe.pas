@@ -3,9 +3,28 @@ unit SistemaFinanceiro.View.CpDetalhe;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Data.DB, Vcl.StdCtrls, Vcl.Grids,
-  Vcl.DBGrids, Vcl.ExtCtrls, System.ImageList, Vcl.ImgList;
+  Winapi.Windows,
+  Winapi.Messages,
+  System.SysUtils,
+  System.Variants,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  Data.DB,
+  Vcl.StdCtrls,
+  Vcl.Grids,
+  Vcl.DBGrids,
+  Vcl.ExtCtrls,
+  System.ImageList,
+  Vcl.ImgList,
+  SistemaFinanceiro.Model.Entidades.CP.Detalhe,
+  SistemaFinanceiro.Model.Entidades.CP,
+  fMensagem,
+  System.StrUtils,
+  SistemaFinanceiro.Model.uSFQuery,
+  System.Math;
 
 type
   TfrmCpDetalhe = class(TForm)
@@ -13,7 +32,6 @@ type
     pnlBotoes: TPanel;
     btnVoltar: TButton;
     pnlPesquisa: TPanel;
-    DataSourceCPDetalhe: TDataSource;
     lblTValorParcela: TLabel;
     lblTValorCompra: TLabel;
     lblValorCompra: TLabel;
@@ -50,11 +68,32 @@ type
     DBGridParciais: TDBGrid;
     lblParciais: TLabel;
     procedure btnVoltarClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+
   private
-    { Private declarations }
+    FTelaAtiva: Boolean;
+    FIdCp: Integer;
+    FCp: TModelCP;
+    FDetalhesCp: TModelCpDetalhe;
+    FQueryPgtos, FQueryParcias: TSFQuery;
+
+    procedure CriarObjetos;
+    procedure DestruirObjetos;
+    function InicializaCampos: Boolean;
+
+    function CarregaDadosCp: Boolean;
+    procedure CarregaDadosCpNaTela;
+    function CarregaDadosDetalhesCp: Boolean;
+    procedure CarregaDadosDetalhesCpNaTela;
+    function CarregaPagamentos: Boolean;
+    procedure CarregaParciais;
+    procedure GrdParciaisVisivel(const pTemParciais: Boolean);
+    procedure DefineTamanhoTela(const pTemParciais: Boolean);
+
   public
-    { Public declarations }
-    procedure ExibirCPDetalhes(IDCp : integer);
+    property IdCp: Integer read FIdCp write FIdCp;
   end;
 
 var
@@ -64,9 +103,10 @@ implementation
 
 {$R *.dfm}
 
-uses SistemaFinanceiro.Model.dmCPagar,
-  SistemaFinanceiro.Model.Entidades.CP.Detalhe,
-  SistemaFinanceiro.Model.Entidades.CP, SistemaFinanceiro.Utilitarios;
+
+uses
+  SistemaFinanceiro.Utilitarios,
+  uEnumsUtils;
 
 { TfrmCpDetalhe }
 
@@ -75,108 +115,156 @@ begin
   ModalResult := mrOk;
 end;
 
-procedure TfrmCpDetalhe.ExibirCPDetalhes(IDCp: integer);
-var
-  Cp          : TModelCp;
-  CpDet       : TModelCpDetalhe;
-  SQL         : String;
-  SqlPgto     : String;
-  SQLParciais : String;
+function TfrmCpDetalhe.CarregaDadosCp: Boolean;
+begin
+  Result := False;
 
+  FCp.ID := FIdCp;
+  if (FCp.LoadObjectByPK) then
+  begin
+    CarregaDadosCpNaTela;
+    Result := True;
+  end;
+end;
+
+procedure TfrmCpDetalhe.CarregaDadosCpNaTela;
 begin
 
-  if IDCp <= 0 then
-  begin
-    raise Exception.Create('ID do contas a pagar inválido!');
-  end;
-
-  Cp := dmCPagar.GetCp(IDCp);
-
-  try
-
-    if Cp.ID.IsEmpty then
-    begin
-      raise Exception.Create('Conta a pagar não encontrado!');
-    end;
-
-    //  Carrega os dados da CR
-    if Cp.Doc <> '' then
-    begin
-      lblNumDoc.Caption := Cp.Doc;
-    end
-      else
-      begin
-        lblNumDoc.Caption := 'Não Informado';
-      end;
-
-    lblDesc.Caption         := Cp.Desc;
-    lblVencimento.Caption   := FormatDateTime('DD/MM/YYYY', Cp.DataVencimento);
-    lblNumParcela.Caption   := IntToStr(Cp.Parcela);
-    lblValorCompra.Caption  := TUtilitario.FormatoMoeda(Cp.ValorCompra);
-    lblValorParcela.Caption := TUtilitario.FormatoMoeda(Cp.ValorParcela);
-    lblCodFornec.Caption    := IntToStr(Cp.IdFornecedor);
-
-  finally
-
-    Cp.Free;
-
-  end;
-
-
-  CpDet := dmCPagar.GetCpDet(IDCp);
-
-  try
-
-    edtDtPag.Text   := FormatDateTime('DD/MM/YYYY', CpDet.Data);
-    edtValPago.Text := TUtilitario.FormatoMoeda(CpDet.Valor);
-    edtValDesc.Text := TUtilitario.FormatoMoeda(CpDet.ValorDesc);
-    edtUser.Text    := CpDet.Usuario;
-    edtObsPag.Text  := CpDet.Detalhes;
-
-  finally
-    CpDet.Free;
-  end;
-
-  //  Montando o SQL dos pagamentos
-  SqlPgto := 'SELECT PG.*, FR.NOME_FR FROM PGTO_BX_CP PG ' +
-             'LEFT JOIN FR_PGTO FR ON PG.ID_FR_PGTO = FR.ID_FR ' +
-             'WHERE PG.ID_CP = :IDCP';
-
-  dmCPagar.FDQueryPgtoCp.Close;
-  dmCPagar.FDQueryPgtoCp.SQL.Clear;
-  dmCPagar.FDQueryPgtoCp.Params.Clear;
-  dmCPagar.FDQueryPgtoCp.SQL.Add(SqlPgto);
-
-  dmCPagar.FDQueryPgtoCp.ParamByName('IDCP').AsInteger := IDCp;
-  dmCPagar.FDQueryPgtoCp.Prepare;
-  dmCPagar.FDQueryPgtoCp.Open();
-
-
-  //  Montando o SQL das Parciais
-  SQLParciais := 'SELECT * FROM CONTAS_PAGAR WHERE PARCIAL = ''S'' ' +
-                 ' AND CP_ORIGEM = :IDCP';
-
-  dmCPagar.FDQueryCpParciais.Close;
-  dmCPagar.FDQueryCpParciais.SQl.Clear;
-  dmCPagar.FDQueryCpParciais.Params.Clear;
-  dmCPagar.FDQueryCpParciais.SQL.Add(SQLParciais);
-
-  dmCPagar.FDQueryCpParciais.ParamByName('IDCP').AsInteger := IDCp;
-  dmCPagar.FDQueryCpParciais.Prepare;
-  dmCPagar.FDQueryCpParciais.Open;
-
-
-  //  Se não exisitir nenhuma CP Parcial ira ocultar
-  //  O grid das parciais e diminuir a altura da tela
-  if dmCPagar.FDQueryCpParciais.IsEmpty then
-  begin
-    pnlGridParciais.Visible := False;
-    frmCpDetalhe.Height := 540;
-  end;
-
+  lblNumDoc.Caption := IfThen(FCp.Doc.Trim.IsEmpty, 'Não Informado', FCp.Doc);
+  lblDesc.Caption := FCp.Desc;
+  lblVencimento.Caption := FormatDateTime('DD/MM/YYYY', FCp.DataVencimento);
+  lblNumParcela.Caption := IntToStr(FCp.Parcela);
+  lblValorCompra.Caption := TUtilitario.FormatoMoeda(FCp.ValorCompra);
+  lblValorParcela.Caption := TUtilitario.FormatoMoeda(FCp.ValorParcela);
+  lblCodFornec.Caption := IntToStr(FCp.IdFornecedor);
 
 end;
 
+function TfrmCpDetalhe.CarregaDadosDetalhesCp: Boolean;
+begin
+  Result := False;
 
+  if (FDetalhesCp.ExistePorCp(FIdCp, True)) then
+  begin
+    CarregaDadosDetalhesCpNaTela;
+    Result := True;
+  end;
+end;
+
+procedure TfrmCpDetalhe.CarregaDadosDetalhesCpNaTela;
+begin
+  edtDtPag.Text := FormatDateTime('DD/MM/YYYY', FDetalhesCp.Data);
+  edtValPago.Text := TUtilitario.FormatoMoeda(FDetalhesCp.Valor);
+  edtValDesc.Text := TUtilitario.FormatoMoeda(FDetalhesCp.ValorDesc);
+  edtUser.Text := IntToStr(FDetalhesCp.Usuario);
+  edtObsPag.Text := FDetalhesCp.Detalhes;
+end;
+
+function TfrmCpDetalhe.CarregaPagamentos: Boolean;
+begin
+
+  Result := False;
+
+  FQueryPgtos.Close;
+  FQueryPgtos.SQL.Clear;
+  FQueryPgtos.SQL.Text := 'SELECT PG.*, FR.NOME_FR FROM PGTO_BX_CP PG ' +
+    'LEFT JOIN FR_PGTO FR ON PG.ID_FR_PGTO = FR.ID_FR ' +
+    'WHERE PG.ID_CP = :IDCP';
+
+  FQueryPgtos.ParamByName('IDCP').AsInteger := FIdCp;
+  FQueryPgtos.Prepare;
+  FQueryPgtos.Open;
+
+  DBGridPgto.DataSource.DataSet := FQueryPgtos;
+
+  Result := (not FQueryPgtos.IsEmpty);
+end;
+
+procedure TfrmCpDetalhe.CarregaParciais;
+begin
+  FQueryParcias.Close;
+  FQueryParcias.SQL.Clear;
+  FQueryParcias.SQL.Text := 'SELECT * FROM CONTAS_PAGAR WHERE PARCIAL = :SN ' +
+    ' AND CP_ORIGEM = :IDCP';
+
+  FQueryParcias.ParamByName('SN').AsString := 'S';
+  FQueryParcias.ParamByName('IDCP').AsInteger := FIdCp;
+  FQueryParcias.Open;
+
+  DBGridParciais.DataSource.DataSet := FQueryParcias;
+
+end;
+
+procedure TfrmCpDetalhe.CriarObjetos;
+begin
+  FCp := TModelCP.Create;
+  FDetalhesCp := TModelCpDetalhe.Create;
+  FQueryPgtos := TSFQuery.Create(nil);
+  FQueryParcias := TSFQuery.Create(nil);
+end;
+
+procedure TfrmCpDetalhe.DefineTamanhoTela(const pTemParciais: Boolean);
+begin
+  Height := IfThen(pTemParciais, 710, 540);
+end;
+
+procedure TfrmCpDetalhe.DestruirObjetos;
+begin
+  FCp.Free;
+  FDetalhesCp.Free;
+  FQueryPgtos.Free;
+  FQueryParcias.Free;
+end;
+
+procedure TfrmCpDetalhe.FormActivate(Sender: TObject);
+begin
+  if not(FTelaAtiva) then
+  begin
+
+    if not(InicializaCampos) then
+    begin
+      TfrmMensagem.TelaMensagem('Erro!', 'Não foi possível carregar os dados da Conta selecionada.', tmErro);
+      TUtilitario.FecharFormulario(Self);
+      Exit;
+    end;
+
+    FTelaAtiva := True;
+  end;
+end;
+
+procedure TfrmCpDetalhe.FormCreate(Sender: TObject);
+begin
+  FTelaAtiva := False;
+  CriarObjetos;
+end;
+
+procedure TfrmCpDetalhe.FormDestroy(Sender: TObject);
+begin
+  DestruirObjetos;
+end;
+
+procedure TfrmCpDetalhe.GrdParciaisVisivel(const pTemParciais: Boolean);
+begin
+  pnlGridParciais.Visible := pTemParciais;
+end;
+
+function TfrmCpDetalhe.InicializaCampos: Boolean;
+var
+  lTemParciais: Boolean;
+begin
+
+  Result := False;
+  lTemParciais := False;
+
+  if not((CarregaDadosCp) and (CarregaDadosDetalhesCp) and (CarregaPagamentos)) then
+    Exit;
+
+  CarregaParciais;
+  lTemParciais := (not DBGridParciais.DataSource.DataSet.IsEmpty);
+  GrdParciaisVisivel(lTemParciais);
+  DefineTamanhoTela(lTemParciais);
+
+  Result := True;
+end;
 
 end.

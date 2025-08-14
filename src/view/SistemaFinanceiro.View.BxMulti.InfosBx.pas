@@ -3,10 +3,26 @@ unit SistemaFinanceiro.View.BxMulti.InfosBx;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls,
-  System.ImageList, Vcl.ImgList, SistemaFinanceiro.View.FrPgto,
-  Vcl.Imaging.pngimage, Vcl.ComCtrls;
+  Winapi.Windows,
+  Winapi.Messages,
+  System.SysUtils,
+  System.Variants,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  Vcl.ExtCtrls,
+  Vcl.StdCtrls,
+  System.ImageList,
+  Vcl.ImgList,
+  SistemaFinanceiro.View.FrPgto,
+  Vcl.Imaging.pngimage,
+  Vcl.ComCtrls,
+  fMensagem,
+  SistemaFinanceiro.Model.Entidades.CP.Detalhe,
+  SistemaFinanceiro.Model.Entidades.FrPgto,
+  System.Math;
 
 type
   TfrmInfoBxMult = class(TForm)
@@ -15,25 +31,26 @@ type
     btnConfirmar: TButton;
     btnCancelar: TButton;
     ImageList1: TImageList;
-    edtCodFrPgto: TEdit;
-    btnPesqFrPgto: TButton;
-    pnlInfos: TPanel;
-    pnlImgInfos: TPanel;
-    Image1: TImage;
+    pnlFundoFrPgto: TPanel;
     pnlFrPgto: TPanel;
+    lblNomeFrPgto: TLabel;
+    btnPesqFrPgto: TButton;
+    edtCodFrPgto: TEdit;
     pnlImgFrPgto: TPanel;
     imgPgto: TImage;
-    lblNomeFrPgto: TLabel;
+    pnlFundoInfo: TPanel;
+    pnlInfos: TPanel;
     Label1: TLabel;
-    datePgto: TDateTimePicker;
     lblValor: TLabel;
+    lblDesconto: TLabel;
+    lblValorDesc: TLabel;
+    pnlImgInfos: TPanel;
+    Image1: TImage;
+    datePgto: TDateTimePicker;
     edtValor: TEdit;
     checkDesconto: TCheckBox;
-    lblDesconto: TLabel;
     edtPorcDesc: TEdit;
-    lblValorDesc: TLabel;
     edtValorDesc: TEdit;
-    procedure btnConfirmarClick(Sender: TObject);
     procedure btnPesqFrPgtoClick(Sender: TObject);
     procedure edtCodFrPgtoExit(Sender: TObject);
     procedure btnCancelarClick(Sender: TObject);
@@ -48,32 +65,33 @@ type
       Shift: TShiftState);
     procedure edtValorDescKeyUp(Sender: TObject; var Key: Word;
       Shift: TShiftState);
-    procedure FormShow(Sender: TObject);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure FormActivate(Sender: TObject);
 
   private
-    { Private declarations }
+    FTelaAtiva: Boolean;
+    FCpDetalhe: TModelCpDetalhe;
     FCodFrPgto: Integer;
-    FValorDesc: Currency;
-    FDataPgto: TDate;
-    FValorPago: Currency;
-    FValorCpSel: Currency;
+    FValorCpSel: Double;
     FDtMaisAnt: TDate;
 
+    procedure InicializaTela;
+    procedure LimparLabelsNomes;
+    function ValidaInicializacao: Boolean;
     procedure BuscaNomeFrPgto;
     procedure EditKeyPress(Sender: TObject; var Key: Char);
     procedure KeyPressValor(Sender: TObject; var Key: Char);
-    function CalcValorDesc : Currency;
-    function CalcPorcentDesc : Currency;
-    procedure SetValorPago(const Value: Currency);
-    procedure SetDtMaisAnt(const Value: TDate);
+    function CalcValorDesc: Double;
+    function CalcPorcentDesc: Double;
+
+    function ValidaCampos: Boolean;
+    procedure Confirmar;
 
   public
-    { Public declarations }
-    property CodFrPgto   : Integer  read FCodFrPgto;
-    property ValorPago   : Currency read FValorPago write SetValorPago;
-    property ValorDesc   : Currency read FValorDesc;
-    property DataPgto    : TDate    read FDataPgto;
-    property DtMaisAnt   : TDate    read FDtMaisAnt write SetDtMaisAnt;
+    property CodFrPgto: Integer read FCodFrPgto;
+    property ValorCpSel: Double read FValorCpSel write FValorCpSel;
+    property DtMaisAnt: TDate read FDtMaisAnt write FDtMaisAnt;
+    function ObterDetalhes: TModelCpDetalhe;
 
   end;
 
@@ -84,214 +102,149 @@ implementation
 
 {$R *.dfm}
 
-uses SistemaFinanceiro.Model.dmFrPgto, SistemaFinanceiro.Utilitarios;
+
+uses
+  SistemaFinanceiro.Model.dmFrPgto,
+  SistemaFinanceiro.Utilitarios,
+  uEnumsUtils,
+  SistemaFinanceiro.Model.dmUsuarios;
 
 { TfrmFrPgtoBxMultCp }
-
-
 
 procedure TfrmInfoBxMult.btnCancelarClick(Sender: TObject);
 begin
   ModalResult := MrCancel;
 end;
 
-procedure TfrmInfoBxMult.btnConfirmarClick(Sender: TObject);
-begin
-
-  //  Validaçoes
-  if not TryStrToInt(edtCodFrPgto.Text, FCodFrPgto) then
-  begin
-
-    edtCodFrPgto.SetFocus;
-    Application.MessageBox('Forma de Pagamento não informada!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
-    abort;
-
-  
-  end;
-
-  if (not TryStrToCurr(edtValor.Text, FValorPago)) or (FValorPago <= 0)  then
-  begin
-    edtValor.SetFocus;
-    Application.MessageBox('Valor inválido!', 'Atenção', MB_OK + MB_ICONWARNING);
-    abort;
-  end;
-
-
-  if FValorPago > FValorCpSel then
-  begin
-
-    edtValor.SetFocus;
-    Application.MessageBox('Valor pago não pode ser maior que o valor das parcelas!', 'Atenção', MB_OK + MB_ICONWARNING);
-    abort;
-
-    edtValor.Text := CurrToStr(FValorPago);
-
-  end;
-
-  if checkDesconto.Checked then
-  begin
-
-    if (not TryStrToCurr(edtValorDesc.Text, FValorDesc)) or (FValorDesc > FValorCpSel) then
-    begin
-
-      edtValorDesc.SetFocus;
-      Application.MessageBox('Valor de desconto inválido!', 'Atenção', MB_OK + MB_ICONWARNING);
-      abort;
-
-    end;
-
-  end;
-
-
-  if datePgto.Date < FDtMaisAnt then
-  begin
-
-    datePgto.SetFocus;
-    Application.MessageBox('A data de pagamento não pode ser menor que a data da compra!', 'Atenção', MB_OK + MB_ICONWARNING);
-    abort;
-
-  end;
-
-  if datePgto.Date > Now then
-   begin
-
-    datePgto.SetFocus;
-    Application.MessageBox('A data de pagamento não pode ser maior que a data atual!', 'Atenção', MB_OK + MB_ICONWARNING);
-    abort;
-
-  end;
-
-
-  FDataPgto := datePgto.Date;
-
-  ModalResult := mrOk;
-
-
-end;
-
 procedure TfrmInfoBxMult.btnPesqFrPgtoClick(Sender: TObject);
+var
+  lFormulario: TfrmFrPgto;
 begin
 
-   //  Cria o form
-  frmFrPgto := TfrmFrPgto.Create(Self);
-
+  lFormulario := TfrmFrPgto.Create(Self);
   try
 
-    //  Exibe o form
-    frmFrPgto.ShowModal;
+    lFormulario.ShowModal;
+
+    // Pega a ID da forma de pgto selecionado
+    edtCodFrPgto.Text := lFormulario.RetornaCodigo;
+    edtCodFrPgto.SetFocus;
 
   finally
-
-    //  Pega a ID da forma de pgto selecionado
-    edtCodFrPgto.Text := frmFrPgto.DataSourceFrPgto.DataSet.FieldByName('ID_FR').AsString;
-
-    //  Libera da  memoria
-    FreeAndNil(frmFrPgto);
-
+    lFormulario.Free;
   end;
-
-  btnConfirmar.SetFocus;
 
 end;
 
 procedure TfrmInfoBxMult.BuscaNomeFrPgto;
 var
-  NomeFrPgto : String;
+  lFormaPgto: TModelFrPgto;
+  lCod: Integer;
+begin
+  lblNomeFrPgto.Caption := '';
+
+  if not(Trim(edtCodFrPgto.Text).IsEmpty) then
+  begin
+
+    lFormaPgto := TModelFrPgto.Create;
+    try
+
+      lCod := StrToIntDef(Trim(edtCodFrPgto.Text), 0);
+      if not(lFormaPgto.Existe(lCod, True)) then
+      begin
+        TfrmMensagem.TelaMensagem('Atenção', 'Forma de Pagamento não encontrada!', tmAviso);
+        edtCodFrPgto.SetFocus;
+        edtCodFrPgto.Clear;
+        Exit;
+      end;
+
+      if not(lFormaPgto.Status) then
+      begin
+        TfrmMensagem.TelaMensagem('Atenção', 'Forma de Pagamento não está Ativa!!', tmAviso);
+        edtCodFrPgto.SetFocus;
+        edtCodFrPgto.Clear;
+        Exit;
+      end;
+
+      lblNomeFrPgto.Caption := lFormaPgto.NomeFr;
+      btnConfirmar.SetFocus;
+
+    finally
+      lFormaPgto.Free;
+    end;
+  end;
+
+end;
+
+function TfrmInfoBxMult.CalcPorcentDesc: Double;
+var
+  lValorFinal: Double;
+  lPorcentDesc: Double;
+  lValorDesc: Double;
+  lValorCp: Double;
 
 begin
 
-  if Trim(edtCodFrPgto.Text) <> '' then
+  lValorCp := FValorCpSel;
+  lValorDesc := 0;
+  lValorFinal := 0;
+  lPorcentDesc := 0;
+  Result := 0;
+
+  TryStrToFloat(edtPorcDesc.Text, lPorcentDesc);
+  TryStrToFloat(edtValorDesc.Text, lValorDesc);
+
+  if lPorcentDesc > 0 then
   begin
 
-    NomeFrPgto := dmFrPgto.GetNomeFrPgto(Trim(edtCodFrPgto.Text));
+    // Calcula o valor do desconto
+    lValorDesc := (lPorcentDesc / 100) * lValorCp;
 
-    if (Trim(edtCodFrPgto.Text) = '') or (NomeFrPgto = '') then
-    begin
+    // Atribui o valor do desconto ao campo
+    edtValorDesc.Text := CurrToStr(lValorDesc);
 
-      Application.MessageBox('Forma de Pagamento não encontrada!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
-      edtCodFrPgto.SetFocus;
-      edtCodFrPgto.Clear;
+    // Calcula o valor final
+    lValorFinal := lValorCp - lValorDesc;
 
-    end;
-
-    lblNomeFrPgto.Visible := True;
-    lblNomeFrPgto.Caption := NomeFrPgto;
+    // retorna o valor final
+    Result := RoundTo(lValorFinal, -2);
 
   end;
 
 end;
 
-function TfrmInfoBxMult.CalcPorcentDesc: Currency;
+function TfrmInfoBxMult.CalcValorDesc: Double;
 var
-  ValorFinal : Currency;
-  PorcentDesc : Currency;
-  ValorDesc : Currency;
-  ValorCp : Currency;
-
-begin
-
-  ValorCp     := FValorCpSel;
-  ValorDesc   := 0;
-  ValorFinal  := 0;
-  PorcentDesc := 0;
-  Result      := 0;
-
-  TryStrToCurr(edtPorcDesc.Text, PorcentDesc);
-  TryStrToCurr(edtValorDesc.Text, ValorDesc);
-
-  if PorcentDesc > 0 then
-    begin
-
-      //  Calcula o valor do desconto
-      ValorDesc := (PorcentDesc / 100) * ValorCp;
-
-      //  Atribui o valor do desconto ao campo
-      edtValorDesc.Text := CurrToStr(ValorDesc);
-
-      //  Calcula o valor final
-      ValorFinal := ValorCp - ValorDesc;
-
-      //  retorna o valor final
-      Result := ValorFinal;
-
-    end;
-
-
-end;
-
-function TfrmInfoBxMult.CalcValorDesc: Currency;
-var
-  ValorCp     : Currency;
-  ValorDesc   : Currency;
-  ValorFinal : Currency;
-  PorcentDesc : Currency;
-
+  lValorCp: Double;
+  lValorDesc: Double;
+  lValorFinal: Double;
+  lPorcentDesc: Double;
 begin
 
   Result := 0;
 
-  ValorCp     := FValorCpSel;
-  ValorDesc   := 0;
-  ValorFinal  := 0;
-  PorcentDesc := 0;
+  lValorCp := FValorCpSel;
+  lValorDesc := 0;
+  lValorFinal := 0;
+  lPorcentDesc := 0;
 
-  TryStrToCurr(edtPorcDesc.Text, PorcentDesc);
-  TryStrToCurr(edtValorDesc.Text, ValorDesc);
+  TryStrToFloat(edtPorcDesc.Text, lPorcentDesc);
+  TryStrToFloat(edtValorDesc.Text, lValorDesc);
 
-  if ValorDesc > 0 then
+  if lValorDesc > 0 then
   begin
 
-    //  Calcula a porcentagem de desconto
-    PorcentDesc := (ValorDesc / ValorCp) * 100;
+    // Calcula a porcentagem de desconto
+    lPorcentDesc := (lValorDesc / lValorCp) * 100;
 
-    //  Atribui a porcentagem no campo
-    edtPorcDesc.Text := CurrToStr(PorcentDesc);
+    // Atribui a porcentagem no campo
+    edtPorcDesc.Text := CurrToStr(lPorcentDesc);
 
-    //  Calcula o valor final
-    ValorFinal := ValorCp - ValorDesc;
+    // Calcula o valor final
+    lValorFinal := lValorCp - lValorDesc;
 
-    //  retorna o valor final
-    Result := ValorFinal;
+    // retorna o valor final
+    Result := RoundTo(lValorFinal, -2);
 
   end;
 
@@ -300,52 +253,34 @@ end;
 procedure TfrmInfoBxMult.checkDescontoClick(Sender: TObject);
 begin
 
-  if checkDesconto.Checked then
-  begin
+  // Libera e mostra os campos do desconto
+  edtValorDesc.Enabled := (checkDesconto.Checked);
+  edtValorDesc.Visible := (checkDesconto.Checked);
+  edtPorcDesc.Visible := (checkDesconto.Checked);
+  edtPorcDesc.Enabled := (checkDesconto.Checked);
+  lblDesconto.Visible := (checkDesconto.Checked);
+  lblValorDesc.Visible := (checkDesconto.Checked);
 
-    //  Libera e mostra os campos do desconto
-    edtValorDesc.Enabled := True;
-    edtValorDesc.Visible := True;
-    edtPorcDesc.Visible  := True;
-    edtPorcDesc.Enabled  := True;
-    lblDesconto.Visible  := True;
-    lblValorDesc.Visible := True;
+end;
 
-  end
-  else
-  begin
+procedure TfrmInfoBxMult.Confirmar;
+begin
+  FCpDetalhe := TModelCpDetalhe.Create;
 
-    //  Bloqueia e oculta os campos do desconto
-    edtValorDesc.Enabled := False;
-    edtValorDesc.Visible := False;
-    edtPorcDesc.Visible  := False;
-    edtPorcDesc.Enabled  := False;
-    lblDesconto.Visible  := False;
-    lblValorDesc.Visible := False;
+  FCpDetalhe.GeraCodigo;
+  FCpDetalhe.Valor := StrToFloatDef(Trim(edtValor.Text), 0);
+  FCpDetalhe.Data := datePgto.Date;
+  FCpDetalhe.Usuario := dmUsuarios.GetUsuarioLogado.id;
+  if (checkDesconto.Checked) then
+    FCpDetalhe.ValorDesc := StrToFloatDef(Trim(edtValorDesc.Text), 0);
 
+  FCodFrPgto := StrToIntDef(Trim(edtCodFrPgto.Text), 0);
 
-  end;
 end;
 
 procedure TfrmInfoBxMult.edtCodFrPgtoExit(Sender: TObject);
 begin
-
   BuscaNomeFrPgto;
-
-  if Trim(edtCodFrPgto.Text) <> '' then
-  begin
-    if dmFrPgto.GetStatus(Trim(edtCodFrPgto.Text)) = False then
-    begin
-
-      edtCodFrPgto.Clear;
-      edtCodFrPgto.SetFocus;
-      lblNomeFrPgto.Caption := '';
-      Application.MessageBox('Forma de Pagamento não está Ativa!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
-      abort;
-
-    end;
-  end;
-
 end;
 
 procedure TfrmInfoBxMult.edtPorcDescKeyDown(Sender: TObject; var Key: Word;
@@ -377,50 +312,79 @@ begin
   edtValor.Text := TUtilitario.FormatarValor(Trim(edtValor.Text));
 end;
 
+procedure TfrmInfoBxMult.FormActivate(Sender: TObject);
+begin
+  if not(FTelaAtiva) then
+  begin
+
+    if not(ValidaInicializacao) then
+    begin
+      TUtilitario.FecharFormulario(Self);
+      Exit;
+    end;
+
+    InicializaTela;
+    FTelaAtiva := True;
+  end;
+end;
+
+procedure TfrmInfoBxMult.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+begin
+  CanClose := False;
+
+  if (ModalResult = mrOk) then
+  begin
+
+    if not(ValidaCampos) then
+      Exit;
+
+    Confirmar;
+
+  end;
+
+  CanClose := True;
+end;
+
 procedure TfrmInfoBxMult.FormCreate(Sender: TObject);
 begin
+  FTelaAtiva := False;
 
+  // Coloca no KeyPress o enter para ir para o proximo campo
+  datePgto.OnKeyPress := EditKeyPress;
+  edtValor.OnKeyPress := KeyPressValor;
+  edtValorDesc.OnKeyPress := KeyPressValor;
+  edtPorcDesc.OnKeyPress := KeyPressValor;
+  edtCodFrPgto.OnKeyPress := EditKeyPress;
+
+end;
+
+procedure TfrmInfoBxMult.InicializaTela;
+begin
+  LimparLabelsNomes;
   datePgto.Date := Now;
-
-  //  Coloca no KeyPress o enter para ir para o proximo campo
-  datePgto.OnKeyPress      := EditKeyPress;
-  edtValor.OnKeyPress      := KeyPressValor;
-  edtValorDesc.OnKeyPress  := KeyPressValor;
-  edtPorcDesc.OnKeyPress   := KeyPressValor;
-  edtCodFrPgto.OnKeyPress  := EditKeyPress;
-
+  edtValor.Text := FloatToStr(FValorCpSel);
+  edtValor.SetFocus;
 end;
 
-procedure TfrmInfoBxMult.FormShow(Sender: TObject);
+procedure TfrmInfoBxMult.KeyPressValor(Sender: TObject; var Key: Char);
 begin
-
-  //  Coloca o valor pago previamente como o valor total das contas selecionadas
-  edtValor.Text := CurrToStr(FValorPago);
-
-  //  Armazena o valor das CPs Selecionadas
-  FValorCpSel := FValorPago;
-
-end;
-
-procedure TfrmInfoBxMult.keyPressvalor(Sender: TObject; var Key: Char);
-begin
-   if Key = #13 then
+  if Key = #13 then
   begin
-    //  Verifica se a tecla pressionada é o Enter
-    //  Cancela o efeito do enter
+    // Verifica se a tecla pressionada é o Enter
+    // Cancela o efeito do enter
     Key := #0;
-    //  Pula para o proximo
+    // Pula para o proximo
     Perform(WM_NEXTDLGCTL, 0, 0);
   end;
 
-  //  Se for digitado um ponto, será convertido para virgula
+  // Se for digitado um ponto, será convertido para virgula
   if Key = FormatSettings.ThousandSeparator then
-   begin
-      Key := #0;
-    end;
+  begin
+    Key := #0;
+  end;
 
   // Permite apenas digitar os caracteres dentro do charinset
-  if not (CharInSet(Key, ['0'..'9', FormatSettings.DecimalSeparator, #8, #13])) then
+  if not(CharInSet(Key, ['0' .. '9', FormatSettings.DecimalSeparator, #8, #13])) then
   begin
     Key := #0;
   end;
@@ -432,14 +396,90 @@ begin
   end;
 end;
 
-procedure TfrmInfoBxMult.SetDtMaisAnt(const Value: TDate);
+procedure TfrmInfoBxMult.LimparLabelsNomes;
 begin
-  FDtMaisAnt := Value;
+  lblNomeFrPgto.Caption := '';
 end;
 
-procedure TfrmInfoBxMult.SetValorPago(const Value: Currency);
+function TfrmInfoBxMult.ObterDetalhes: TModelCpDetalhe;
 begin
-  FValorPago := Value;
+  Result := FCpDetalhe;
+end;
+
+function TfrmInfoBxMult.ValidaCampos: Boolean;
+var
+  lValorPago: Double;
+  lDesconto: Double;
+begin
+  Result := False;
+
+  if (Trim(edtCodFrPgto.Text).IsEmpty) then
+  begin
+    TfrmMensagem.TelaMensagem('Atenção!', 'Forma de Pagamento não informada!', tmAviso);
+    edtCodFrPgto.SetFocus;
+    Exit;
+  end;
+
+  if (not TryStrToFloat(edtValor.Text, lValorPago)) or (lValorPago <= 0) then
+  begin
+    TfrmMensagem.TelaMensagem('Atenção!', 'Valor inválido!', tmAviso);
+    edtValor.SetFocus;
+    Exit;
+  end;
+
+  if (lValorPago > FValorCpSel) then
+  begin
+    TfrmMensagem.TelaMensagem('Atenção!', 'Valor pago não pode ser maior que o valor das parcelas!', tmAviso);
+    edtValor.SetFocus;
+    Exit;
+  end;
+
+  if (checkDesconto.Checked) then
+  begin
+
+    if (not TryStrToFloat(edtValorDesc.Text, lDesconto)) or (lDesconto > FValorCpSel) then
+    begin
+      TfrmMensagem.TelaMensagem('Atenção!', 'Valor de desconto inválido!', tmAviso);
+      edtValorDesc.SetFocus;
+      Exit;
+    end;
+
+  end;
+
+  if (datePgto.Date < FDtMaisAnt) then
+  begin
+    TfrmMensagem.TelaMensagem('Atenção!', 'A data de pagamento não pode ser menor que a data da compra!', tmAviso);
+    datePgto.SetFocus;
+    Exit;
+  end;
+
+  if (datePgto.Date > Now) then
+  begin
+    TfrmMensagem.TelaMensagem('Atenção!', 'A data de pagamento não pode ser maior que a data atual!', tmAviso);
+    datePgto.SetFocus;
+    Exit;
+  end;
+
+  Result := True;
+end;
+
+function TfrmInfoBxMult.ValidaInicializacao: Boolean;
+begin
+  Result := False;
+
+  if not(FValorCpSel > 0) then
+  begin
+    TfrmMensagem.TelaMensagem('Atenção!', 'Valor total das contas selecionadas deve ser maior que zero.', tmAviso);
+    Exit;
+  end;
+
+  if (FDtMaisAnt > Now) then
+  begin
+    TfrmMensagem.TelaMensagem('Atenção!', 'Data da CP mais antiga não pode ser maior que a data atual.', tmAviso);
+    Exit;
+  end;
+
+  Result := True;
 end;
 
 procedure TfrmInfoBxMult.EditKeyPress(Sender: TObject; var Key: Char);
@@ -447,13 +487,13 @@ begin
 
   if Key = #13 then
   begin
-    //  Verifica se a tecla pressionada é o Enter
-    //  Cancela o efeito do enter
+    // Verifica se a tecla pressionada é o Enter
+    // Cancela o efeito do enter
     Key := #0;
-    //  Pula para o proximo
+    // Pula para o proximo
     Perform(WM_NEXTDLGCTL, 0, 0);
   end;
-  
+
 end;
 
 end.

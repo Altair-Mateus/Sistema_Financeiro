@@ -9,9 +9,12 @@ uses
   Vcl.Dialogs,
   System.SysUtils,
   Vcl.Forms,
-  Winapi.Windows, SistemaFinanceiro.Model.Entidades.ResumoCaixa;
+  Winapi.Windows,
+  SistemaFinanceiro.Model.Entidades.ResumoCaixa,
+  uEnumsUtils;
 
 type
+
   [TDBTable('CAIXA')]
   TModelLancamentoCaixa = class
 
@@ -26,26 +29,26 @@ type
     FIdOrigem: Integer;
     FOrigem: String;
 
-    class function GetSaldoAnteriorCaixa(pData : TDate) : Double;
-    class function GetTotalEntradasCaixa(DataInicial, DataFinal : TDate) : Double;
-    class function GetTotalSaidasCaixa(DataInicial, DataFinal : TDate) : Double;
+    class function GetSaldoAnteriorCaixa(pData: TDate): Double;
+    class function GetTotalEntradasCaixa(DataInicial, DataFinal: TDate): Double;
+    class function GetTotalSaidasCaixa(DataInicial, DataFinal: TDate): Double;
   public
-    [TDBColumn('ID', True, False)]
-    property ID : Integer read FID write FID;
-    [TDBColumn('NUMERO_DOC', False, False, True)]
-    property NumDoc : string read FNumeroDoc write FNumeroDoc;
-    [TDBColumn('DESCRICAO', False, False, True)]
-    property Desc : string read FDescricao write FDescricao;
+    [TDBColumn('ID'), TDBIsPrimaryKey]
+    property ID: Integer read FID write FID;
+    [TDBColumn('NUMERO_DOC'), TDBAcceptNull]
+    property NumDoc: string read FNumeroDoc write FNumeroDoc;
+    [TDBColumn('DESCRICAO'), TDBAcceptNull]
+    property Desc: string read FDescricao write FDescricao;
     [TDBColumn('VALOR')]
-    property Valor : Double read FValor write FValor;
+    property Valor: Double read FValor write FValor;
     [TDBColumn('TIPO')]
-    property Tipo : string read FTipo write FTipo;
+    property Tipo: string read FTipo write FTipo;
     [TDBColumn('DATA_CADASTRO')]
-    property DataCadastro : TDate read FDataCadastro write FDataCadastro;
+    property DataCadastro: TDate read FDataCadastro write FDataCadastro;
     [TDBColumn('ORIGEM')]
-    property Origem : String read FOrigem write FOrigem;
-    [TDBColumn('ID_ORIGEM', False, False, True)]
-    property IdOrigem : Integer read FIdOrigem write FIdOrigem;
+    property Origem: String read FOrigem write FOrigem;
+    [TDBColumn('ID_ORIGEM'), TDBAcceptNull]
+    property IdOrigem: Integer read FIdOrigem write FIdOrigem;
 
     constructor Create;
     destructor Destroy; override;
@@ -62,9 +65,10 @@ type
     procedure AddPropertyToWhere(const APropertyName: String);
 
     procedure GeraCodigo;
-    function Existe(const pId : Integer; const pCarrega : Boolean = false) : Boolean;
-    function ExistePorCr(const pIdCr : Integer; const pCarrega : Boolean = false) : Boolean;
-    class function  ResumoCaixa(pDtIni, pDtFim : TDate ) : TModelResumoCaixa;
+    function Existe(const pId: Integer; const pCarrega: Boolean = false): Boolean;
+    function ExistePorOrigem(const pIdOrigem: Integer; const pTpLancamento: TTipoLancamento;
+      const pCarrega: Boolean = false): Boolean;
+    class function ResumoCaixa(pDtIni, pDtFim: TDate): TModelResumoCaixa;
 
   end;
 
@@ -85,7 +89,7 @@ end;
 
 function TModelLancamentoCaixa.DeleteByPk: Boolean;
 begin
-  Result := FDaoRTTI.DeleteByPK(Self);
+  Result := FDaoRTTI.DeleteByPk(Self);
 end;
 
 function TModelLancamentoCaixa.DeleteByProp: Boolean;
@@ -107,9 +111,9 @@ end;
 function TModelLancamentoCaixa.Existe(const pId: Integer;
   const pCarrega: Boolean): Boolean;
 var
-  lQuery : TSFQuery;
+  lQuery: TSFQuery;
 begin
-  Result := False;
+  Result := false;
   lQuery := TSFQuery.Create(nil);
   try
     try
@@ -134,9 +138,10 @@ begin
       end;
 
     except
-      on E : Exception do
+      on E: Exception do
       begin
-        Application.MessageBox(PWideChar('Erro ao realizar a consulta: ' + E.Message), 'Atenção', MB_OK + MB_ICONERROR);
+        Application.MessageBox(PWideChar('Erro ao realizar a consulta: ' +
+          E.Message), 'Atenção', MB_OK + MB_ICONERROR);
       end;
     end;
   finally
@@ -145,12 +150,12 @@ begin
 
 end;
 
-function TModelLancamentoCaixa.ExistePorCr(const pIdCr: Integer;
+function TModelLancamentoCaixa.ExistePorOrigem(const pIdOrigem: Integer; const pTpLancamento: TTipoLancamento;
   const pCarrega: Boolean): Boolean;
 var
-  lQuery : TSFQuery;
+  lQuery: TSFQuery;
 begin
-  Result := False;
+  Result := false;
   lQuery := TSFQuery.Create(nil);
   try
     try
@@ -158,8 +163,17 @@ begin
       lQuery.SQL.Clear;
       lQuery.SQL.Add(' SELECT ID FROM CAIXA         ');
       lQuery.SQL.Add(' WHERE ID_ORIGEM = :ID_ORIGEM ');
-      lQuery.SQL.Add(' AND ORIGEM = ''CR''          ');
-      lQuery.ParamByName('ID_ORIGEM').AsInteger := pIdCr;
+      lQuery.SQL.Add(' AND ORIGEM = :ORIGEM         ');
+      lQuery.ParamByName('ID_ORIGEM').AsInteger := pIdOrigem;
+
+      case pTpLancamento of
+        tlCr:
+          lQuery.ParamByName('ORIGEM').AsString := 'CR';
+
+        tlCp:
+          lQuery.ParamByName('ORIGEM').AsString := 'CP';
+      end;
+
       lQuery.Open;
 
       if (lQuery.RecordCount > 0) then
@@ -176,9 +190,11 @@ begin
       end;
 
     except
-      on E : Exception do
+      on E:
+        Exception do
       begin
-        Application.MessageBox(PWideChar('Erro ao realizar a consulta: ' + E.Message), 'Atenção', MB_OK + MB_ICONERROR);
+        Application.MessageBox(PWideChar('Erro ao realizar a consulta: ' +
+          E.Message), 'Atenção', MB_OK + MB_ICONERROR);
       end;
     end;
   finally
@@ -189,7 +205,7 @@ end;
 
 procedure TModelLancamentoCaixa.GeraCodigo;
 var
-  lQuery : TSFQuery;
+  lQuery: TSFQuery;
 begin
   lQuery := TSFQuery.Create(nil);
   try
@@ -198,15 +214,16 @@ begin
       lQuery.SQL.Clear;
       lQuery.Open('SELECT MAX(ID) AS ID FROM CAIXA');
 
-      //  Ultimo codigo usado + 1
+      // Ultimo codigo usado + 1
       FID := lQuery.FieldByName('ID').AsInteger + 1;
 
-      //  Insere o registro no final da tabela
+      // Insere o registro no final da tabela
       lQuery.Append;
     except
-      on E : Exception do
+      on E: Exception do
       begin
-        Application.MessageBox(PWideChar('Erro ao obter próximo ID deo Caixa: ' + E.Message), 'Atenção', MB_OK + MB_ICONERROR);
+        Application.MessageBox(PWideChar('Erro ao obter próximo ID deo Caixa: '
+          + E.Message), 'Atenção', MB_OK + MB_ICONERROR);
       end;
     end;
   finally
@@ -215,11 +232,12 @@ begin
 
 end;
 
-class function TModelLancamentoCaixa.GetSaldoAnteriorCaixa(pData: TDate): Double;
+class function TModelLancamentoCaixa.GetSaldoAnteriorCaixa
+  (pData: TDate): Double;
 var
-  lQuery : TSFQuery;
-  lTotalEntradas : Currency;
-  lTotalSaidas : Currency;
+  lQuery: TSFQuery;
+  lTotalEntradas: Currency;
+  lTotalSaidas: Currency;
 
 begin
 
@@ -228,23 +246,25 @@ begin
 
   try
 
-    //  Pegando o valor total de entradas
+    // Pegando o valor total de entradas
     lQuery.Close;
     lQuery.SQL.Clear;
-    lQuery.SQL.Add('SELECT COALESCE(SUM(VALOR), 0) AS VALOR FROM CAIXA WHERE TIPO = ''R'' ');
+    lQuery.SQL.Add
+      ('SELECT COALESCE(SUM(VALOR), 0) AS VALOR FROM CAIXA WHERE TIPO = ''R'' ');
     lQuery.SQL.Add(' AND DATA_CADASTRO < :DATA ');
     lQuery.ParamByName('DATA').AsDate := pData;
     lQuery.Open();
-    lTotalEntradas :=  lQuery.FieldByName('VALOR').AsCurrency;
+    lTotalEntradas := lQuery.FieldByName('VALOR').AsCurrency;
 
-    //  Pegando o valor total de saidas
+    // Pegando o valor total de saidas
     lQuery.Close;
     lQuery.SQL.Clear;
-    lQuery.SQL.Add('SELECT COALESCE(SUM(VALOR), 0) AS VALOR FROM CAIXA WHERE TIPO = ''D'' ');
+    lQuery.SQL.Add
+      ('SELECT COALESCE(SUM(VALOR), 0) AS VALOR FROM CAIXA WHERE TIPO = ''D'' ');
     lQuery.SQL.Add(' AND DATA_CADASTRO < :DATA ');
     lQuery.ParamByName('DATA').AsDate := pData;
     lQuery.Open();
-    lTotalSaidas :=  lQuery.FieldByName('VALOR').AsCurrency;
+    lTotalSaidas := lQuery.FieldByName('VALOR').AsCurrency;
 
   finally
     lQuery.Free;
@@ -257,18 +277,19 @@ end;
 class function TModelLancamentoCaixa.GetTotalEntradasCaixa(DataInicial,
   DataFinal: TDate): Double;
 var
-  lQuery : TSFQuery;
+  lQuery: TSFQuery;
 
 begin
 
-   Result := 0;
-   lQuery := TSFQuery.Create(nil);
+  Result := 0;
+  lQuery := TSFQuery.Create(nil);
 
-   try
+  try
 
     lQuery.Close;
     lQuery.SQL.Clear;
-    lQuery.SQL.Add('SELECT COALESCE(SUM(VALOR), 0 ) AS VALOR FROM CAIXA WHERE TIPO = ''R'' ');
+    lQuery.SQL.Add
+      ('SELECT COALESCE(SUM(VALOR), 0 ) AS VALOR FROM CAIXA WHERE TIPO = ''R'' ');
     lQuery.SQL.Add(' AND DATA_CADASTRO BETWEEN :DATA_INICIAL AND :DATA_FINAL');
 
     lQuery.ParamByName('DATA_INICIAL').AsDate := DataInicial;
@@ -277,16 +298,16 @@ begin
 
     Result := lQuery.FieldByName('VALOR').AsCurrency;
 
-   finally
+  finally
     lQuery.Free;
-   end;
+  end;
 
 end;
 
 class function TModelLancamentoCaixa.GetTotalSaidasCaixa(DataInicial,
   DataFinal: TDate): Double;
 var
- lQuery : TSFQuery;
+  lQuery: TSFQuery;
 
 begin
   Result := 0;
@@ -296,7 +317,8 @@ begin
 
     lQuery.Close;
     lQuery.SQL.Clear;
-    lQuery.SQL.Add('SELECT COALESCE(SUM(VALOR), 0) AS VALOR FROM CAIXA WHERE TIPO = ''D'' ');
+    lQuery.SQL.Add
+      ('SELECT COALESCE(SUM(VALOR), 0) AS VALOR FROM CAIXA WHERE TIPO = ''D'' ');
     lQuery.SQL.Add(' AND DATA_CADASTRO BETWEEN :DATA_INICIAL AND :DATA_FINAL');
 
     lQuery.ParamByName('DATA_INICIAL').AsDate := DataInicial;
@@ -329,8 +351,8 @@ begin
   FDaoRTTI.ResetPropertiesToDefault(Self);
 end;
 
-class function TModelLancamentoCaixa.ResumoCaixa(pDtIni,
-  pDtFim: TDate): TModelResumoCaixa;
+class function TModelLancamentoCaixa.ResumoCaixa(pDtIni, pDtFim: TDate)
+  : TModelResumoCaixa;
 begin
 
   if pDtIni > pDtFim then
@@ -341,9 +363,9 @@ begin
   Result := TModelResumoCaixa.Create;
 
   try
-    Result.SaldoInicial  := GetSaldoAnteriorCaixa(pDtIni);
+    Result.SaldoInicial := GetSaldoAnteriorCaixa(pDtIni);
     Result.TotalEntradas := GetTotalEntradasCaixa(pDtIni, pDtFim);
-    Result.TotalSaidas   := GetTotalSaidasCaixa(pDtIni, pDtFim);
+    Result.TotalSaidas := GetTotalSaidasCaixa(pDtIni, pDtFim);
   except
     Result.Free;
     raise;
@@ -360,8 +382,8 @@ begin
   Result := FDaoRTTI.UpdateByProp(Self);
 end;
 
-function TModelLancamentoCaixa.UpdateBySQLText(
-  const pWhereClause: string): Boolean;
+function TModelLancamentoCaixa.UpdateBySQLText(const pWhereClause
+  : string): Boolean;
 begin
   Result := FDaoRTTI.UpdateBySQLText(Self, pWhereClause);
 end;

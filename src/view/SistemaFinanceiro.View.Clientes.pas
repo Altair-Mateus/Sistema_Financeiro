@@ -3,10 +3,27 @@ unit SistemaFinanceiro.View.Clientes;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, SistemaFinanceiro.View.CadastroPadrao,
-  Data.DB, System.ImageList, Vcl.ImgList, Vcl.Grids, Vcl.DBGrids, Vcl.ExtCtrls,
-  Vcl.StdCtrls, Vcl.WinXPanels, Vcl.Imaging.pngimage, Vcl.Mask, Vcl.WinXCtrls;
+  Winapi.Windows,
+  Winapi.Messages,
+  System.SysUtils,
+  System.Variants,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  SistemaFinanceiro.View.CadastroPadrao,
+  Data.DB,
+  System.ImageList,
+  Vcl.ImgList,
+  Vcl.Grids,
+  Vcl.DBGrids,
+  Vcl.ExtCtrls,
+  Vcl.StdCtrls,
+  Vcl.WinXPanels,
+  Vcl.Imaging.pngimage,
+  Vcl.Mask,
+  Vcl.WinXCtrls;
 
 type
   TfrmCliente = class(TfrmCadastroPadrao)
@@ -92,9 +109,11 @@ implementation
 
 {$R *.dfm}
 
+
 uses
   SistemaFinanceiro.Model.dmClientes,
-  SistemaFinanceiro.Utilitarios, SistemaFinanceiro.View.Relatorios.Clientes;
+  SistemaFinanceiro.Utilitarios,
+  SistemaFinanceiro.View.Relatorios.Clientes;
 
 procedure TfrmCliente.btnAlterarClick(Sender: TObject);
 begin
@@ -108,14 +127,14 @@ procedure TfrmCliente.btnCancelarClick(Sender: TObject);
 begin
   inherited;
 
-  //  Cancelando a inclusão
+  // Cancelando a inclusão
   dmClientes.cdsClientes.Cancel;
 
 end;
 
 procedure TfrmCliente.btnExcluirClick(Sender: TObject);
 var
-  option : Word;
+  option: Word;
 
 begin
   inherited;
@@ -127,22 +146,23 @@ begin
     exit;
   end;
 
-  //  Verifica se o cliente possui uma CR cadastrada
-  if dmClientes.GetCr(DataSourceCliente.DataSet.FieldByName('ID_CLI').AsInteger)  = True then
+  // Verifica se o cliente possui uma CR cadastrada
+  if dmClientes.GetCr(DataSourceCliente.DataSet.FieldByName('ID_CLI').AsInteger) = True then
   begin
-    Application.MessageBox('Não é possível excluir cliente com Conta a Receber Cadastrada!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
+    Application.MessageBox('Não é possível excluir cliente com Conta a Receber Cadastrada!', 'Atenção',
+      MB_OK + MB_ICONEXCLAMATION);
     exit;
   end;
 
-
   try
 
-    //  Excluindo registro
+    // Excluindo registro
     dmClientes.cdsClientes.Delete;
     dmClientes.cdsClientes.ApplyUpdates(0);
 
-  except on E : Exception do
-    Application.MessageBox(PWidechar(E.Message), 'Erro ao excluir Cliente', MB_OK + MB_ICONERROR);
+  except
+    on E: Exception do
+      Application.MessageBox(PWidechar(E.Message), 'Erro ao excluir Cliente', MB_OK + MB_ICONERROR);
   end;
 
 end;
@@ -151,14 +171,14 @@ procedure TfrmCliente.btnImprimirClick(Sender: TObject);
 begin
   inherited;
 
-  //  Cria o form
+  // Cria o form
   frmRelClientes := TfrmRelClientes.Create(Self);
 
   try
 
     frmRelClientes.DataSourceClientes.DataSet := DataSourceCliente.DataSet;
 
-    //  Mostra a pre vizualizacao
+    // Mostra a pre vizualizacao
     frmRelClientes.RLReport.Preview;
 
   finally
@@ -177,21 +197,21 @@ begin
 
   lblTitulo.Caption := 'Inserindo um novo Cliente';
 
-  if not (dmClientes.cdsClientes.State in [dsEdit, dsInsert]) then
+  if not(dmClientes.cdsClientes.State in [dsEdit, dsInsert]) then
   begin
 
-    //  Colocando o data set em modo de inserção de dados
+    // Colocando o data set em modo de inserção de dados
     dmClientes.cdsClientes.Insert;
 
   end;
 
   edtNome.SetFocus;
 
-  //  Defindo tipo de cliente previamente como PF
+  // Defindo tipo de cliente previamente como PF
   rbFisica.Checked;
-  edtCpf.Enabled  := True;
+  edtCpf.Enabled := True;
   edtCnpj.Enabled := False;
-  edtIe.Enabled   := False;
+  edtIe.Enabled := False;
 
   cbUf.ItemIndex := -1;
 
@@ -207,18 +227,18 @@ end;
 
 procedure TfrmCliente.btnSalvarClick(Sender: TObject);
 var
-  TipoCli : String;
-  Cpf     : String;
-  Cnpj    : String;
-  Status  : String;
-  Cep     : String;
+  TipoCli: String;
+  Cpf: String;
+  Cnpj: String;
+  Status: String;
+  Cep: String;
 
 begin
 
-  //  Valida os campos obrigatórios
+  // Valida os campos obrigatórios
   ValidaCampos;
 
-  //  Se for um novo cliente
+  // Se for um novo cliente
   if (dmClientes.cdsClientes.State in [dsInsert]) then
   begin
 
@@ -227,7 +247,7 @@ begin
 
   end;
 
-  //  Se for uma edição
+  // Se for uma edição
   if (dmClientes.cdsClientes.State in [dsEdit]) then
   begin
 
@@ -235,19 +255,19 @@ begin
 
   end;
 
-  //  Ignora a mascara do cpf
+  // Ignora a mascara do cpf
   Cpf := StringReplace(edtCpf.Text, '.', '', [rfReplaceAll]);
   Cpf := StringReplace(Cpf, '-', '', [rfReplaceAll]);
 
-  //  Ignora a mascara do cnpj
+  // Ignora a mascara do cnpj
   Cnpj := StringReplace(edtCnpj.Text, '.', '', [rfReplaceAll]);
   Cnpj := StringReplace(Cnpj, '-', '', [rfReplaceAll]);
   Cnpj := StringReplace(Cnpj, '/', '', [rfReplaceAll]);
 
-  //  Ignora a mascara do CEP
+  // Ignora a mascara do CEP
   Cep := StringReplace(edtCep.Text, '-', '', [rfReplaceAll]);
 
-  //  Define o tipo de cliente
+  // Define o tipo de cliente
   if rbFisica.Checked then
   begin
     TipoCli := 'F';
@@ -257,7 +277,7 @@ begin
     TipoCli := 'J';
   end;
 
-  //  Define o status do cliente
+  // Define o status do cliente
   if ToggleStatus.State = tssOn then
   begin
     Status := 'A';
@@ -267,32 +287,32 @@ begin
     Status := 'I';
   end;
 
-  //  Passando os dados para o dataset
-  dmClientes.cdsClientesNOME.AsString         := Trim(edtNome.Text);
-  dmClientes.cdsClientesTIPO.AsString         := TipoCli;
-  dmClientes.cdsClientesCPF.AsString          := Trim(Cpf);
-  dmClientes.cdsClientesCNPJ.AsString         := Trim(Cnpj);
-  dmClientes.cdsClientesIE.AsString           := Trim(edtIe.Text);
-  dmClientes.cdsClientesENDERECO.AsString     := Trim(edtEndereco.Text);
+  // Passando os dados para o dataset
+  dmClientes.cdsClientesNOME.AsString := Trim(edtNome.Text);
+  dmClientes.cdsClientesTIPO.AsString := TipoCli;
+  dmClientes.cdsClientesCPF.AsString := Trim(Cpf);
+  dmClientes.cdsClientesCNPJ.AsString := Trim(Cnpj);
+  dmClientes.cdsClientesIE.AsString := Trim(edtIe.Text);
+  dmClientes.cdsClientesENDERECO.AsString := Trim(edtEndereco.Text);
   dmClientes.cdsClientesN_LOGRADOURO.AsString := Trim(edtNumLog.Text);
-  dmClientes.cdsClientesBAIRRO.AsString       := Trim(edtBairro.Text);
-  dmClientes.cdsClientesCIDADE.AsString       := Trim(edtCidade.Text);
-  dmClientes.cdsClientesESTADO.AsString       := cbUf.Text;
-  dmClientes.cdsClientesCEP.AsString          := Trim(Cep);
-  dmClientes.cdsClientesCELULAR.AsString      := Trim(edtCelular.Text);
-  dmClientes.cdsClientesTELEFONE.AsString     := Trim(edtTelefone.Text);
-  dmClientes.cdsClientesCOMPLEMENTO.AsString  := Trim(edtComplemento.Text);
-  dmClientes.cdsClientesEMAIL.AsString        := Trim(edtEmail.Text);
-  dmClientes.cdsClientesSTATUS_CLI.AsString   := Status;
+  dmClientes.cdsClientesBAIRRO.AsString := Trim(edtBairro.Text);
+  dmClientes.cdsClientesCIDADE.AsString := Trim(edtCidade.Text);
+  dmClientes.cdsClientesESTADO.AsString := cbUf.Text;
+  dmClientes.cdsClientesCEP.AsString := Trim(Cep);
+  dmClientes.cdsClientesCELULAR.AsString := Trim(edtCelular.Text);
+  dmClientes.cdsClientesTELEFONE.AsString := Trim(edtTelefone.Text);
+  dmClientes.cdsClientesCOMPLEMENTO.AsString := Trim(edtComplemento.Text);
+  dmClientes.cdsClientesEMAIL.AsString := Trim(edtEmail.Text);
+  dmClientes.cdsClientesSTATUS_CLI.AsString := Status;
 
-  //  Gravando no banco de dados
+  // Gravando no banco de dados
   dmClientes.cdsClientes.Post;
   dmClientes.cdsClientes.ApplyUpdates(0);
 
-  //  Retorna ao cardPesquisa;
+  // Retorna ao cardPesquisa;
   CardPanelPrincipal.ActiveCard := CardPesquisa;
 
-  //  Atualiza a lista de pesquisa
+  // Atualiza a lista de pesquisa
   Pesquisar;
 
   inherited;
@@ -323,44 +343,44 @@ end;
 
 procedure TfrmCliente.EditarCliente;
 var
-  IndexCb : Integer;
+  IndexCb: Integer;
 
 begin
 
-  //  Coloca o dataset em modo de edição
+  // Coloca o dataset em modo de edição
   dmClientes.cdsClientes.Edit;
 
-  //  Coloca o nome do usuario no titulo
+  // Coloca o nome do usuario no titulo
   lblTitulo.Caption := dmClientes.cdsClientesId.AsString + ' - ' + dmClientes.cdsClientesNOME.AsString;
 
   if dmClientes.cdsClientesSTATUS_CLI.AsString = 'A' then
   begin
     ToggleStatus.State := tssOn;
   end
-    else
-    begin
-      ToggleStatus.State := tssOff;
-    end;
+  else
+  begin
+    ToggleStatus.State := tssOff;
+  end;
 
-  //  Carrega os dados
-  edtNome.Text        := dmClientes.cdsClientesNOME.AsString;
-  edtCpf.Text         := dmClientes.cdsClientesCPF.AsString;
-  edtCnpj.Text        := dmClientes.cdsClientesCNPJ.AsString;
-  edtIe.Text          := dmClientes.cdsClientesIE.AsString;
-  edtEndereco.Text    := dmClientes.cdsClientesENDERECO.AsString;
-  edtNumLog.Text      := dmClientes.cdsClientesN_LOGRADOURO.AsString;
-  edtBairro.Text      := dmClientes.cdsClientesBAIRRO.AsString;
-  edtCidade.Text      := dmClientes.cdsClientesCIDADE.AsString;
-  edtCep.Text         := dmClientes.cdsClientesCEP.AsString;
-  edtCelular.Text     := dmClientes.cdsClientesCELULAR.AsString;
-  edtTelefone.Text    := dmClientes.cdsClientesTELEFONE.AsString;
+  // Carrega os dados
+  edtNome.Text := dmClientes.cdsClientesNOME.AsString;
+  edtCpf.Text := dmClientes.cdsClientesCPF.AsString;
+  edtCnpj.Text := dmClientes.cdsClientesCNPJ.AsString;
+  edtIe.Text := dmClientes.cdsClientesIE.AsString;
+  edtEndereco.Text := dmClientes.cdsClientesENDERECO.AsString;
+  edtNumLog.Text := dmClientes.cdsClientesN_LOGRADOURO.AsString;
+  edtBairro.Text := dmClientes.cdsClientesBAIRRO.AsString;
+  edtCidade.Text := dmClientes.cdsClientesCIDADE.AsString;
+  edtCep.Text := dmClientes.cdsClientesCEP.AsString;
+  edtCelular.Text := dmClientes.cdsClientesCELULAR.AsString;
+  edtTelefone.Text := dmClientes.cdsClientesTELEFONE.AsString;
   edtComplemento.Text := dmClientes.cdsClientesCOMPLEMENTO.AsString;
-  edtEmail.Text       := dmClientes.cdsClientesEMAIL.AsString;
+  edtEmail.Text := dmClientes.cdsClientesEMAIL.AsString;
 
   // Procura a sigla do estado no cb
   IndexCb := cbUf.Items.IndexOf(dmClientes.cdsClientesESTADO.AsString);
 
-  //  Ao localizar define a mesma no cb
+  // Ao localizar define a mesma no cb
   if IndexCb >= 0 then
   begin
     cbUf.ItemIndex := IndexCb;
@@ -373,23 +393,23 @@ begin
   if dmClientes.cdsClientesTIPO.AsString = 'F' then
   begin
 
-    rbFisica.Checked   := True;
+    rbFisica.Checked := True;
     rbJuridica.Checked := False;
 
-    edtCpf.Enabled  := True;
+    edtCpf.Enabled := True;
     edtCnpj.Enabled := False;
-    edtIe.Enabled   := False;
+    edtIe.Enabled := False;
 
   end
   else
   begin
 
     rbJuridica.Checked := True;
-    rbFisica.Checked   := False;
+    rbFisica.Checked := False;
 
-    edtCpf.Enabled  := False;
+    edtCpf.Enabled := False;
     edtCnpj.Enabled := True;
-    edtIe.Enabled   := True;
+    edtIe.Enabled := True;
   end;
 
 end;
@@ -405,8 +425,8 @@ end;
 procedure TfrmCliente.HabilitaBotoes;
 begin
 
-  btnAlterar.Enabled  := not DataSourceCliente.DataSet.IsEmpty;
-  btnExcluir.Enabled  := not DataSourceCliente.DataSet.IsEmpty;
+  btnAlterar.Enabled := not DataSourceCliente.DataSet.IsEmpty;
+  btnExcluir.Enabled := not DataSourceCliente.DataSet.IsEmpty;
   btnImprimir.Enabled := not DataSourceCliente.DataSet.IsEmpty;
 
 end;
@@ -414,14 +434,13 @@ end;
 procedure TfrmCliente.Pesquisar;
 var
   LFiltroEdit: String;
-  LFiltro : String;
-  LOrdem : String;
+  LFiltro: String;
+  LOrdem: String;
 
 begin
 
-
   if cbTipo.ItemIndex < 0 then
-   begin
+  begin
 
     cbTipo.SetFocus;
     Application.MessageBox('Selecione um tipo de CLIENTE!', 'Atenção', MB_OK + MB_ICONEXCLAMATION);
@@ -435,19 +454,23 @@ begin
 
   dmClientes.cdsClientes.Params.Clear;
 
-  //  Pesquisa por tipo
+  // Pesquisa por tipo
   case cbTipo.ItemIndex of
 
-    1 : LFiltroEdit := LFiltro + ' AND TIPO = ''F'' ';
-    2 : LFiltroEdit := LFiltro + ' AND TIPO = ''J'' ';
+    1:
+      LFiltroEdit := LFiltro + ' AND TIPO = ''F'' ';
+    2:
+      LFiltroEdit := LFiltro + ' AND TIPO = ''J'' ';
 
   end;
 
-  //  Pesquisa por Status
+  // Pesquisa por Status
   case cbStatus.ItemIndex of
 
-    1 : LFiltroEdit := LFiltro + ' AND STATUS = ''A'' ';
-    2 : LFiltroEdit := LFiltro + ' AND STATUS = ''I'' ';
+    1:
+      LFiltroEdit := LFiltro + ' AND STATUS = ''A'' ';
+    2:
+      LFiltroEdit := LFiltro + ' AND STATUS = ''I'' ';
 
   end;
 
@@ -457,21 +480,20 @@ begin
     LOrdem := ' ORDER BY ID_CLI';
   end
   else if rbDataCad.Checked then
-       begin
-         LOrdem := 'ORDER BY DATA_CADASTRO';
-       end
-       else if rbNome.Checked then
-            begin
-              LOrdem := 'ORDER BY NOME';
-            end
-            else
-            begin
-              LOrdem := ' ORDER BY ID_CLI';
-            end;
-
+  begin
+    LOrdem := 'ORDER BY DATA_CADASTRO';
+  end
+  else if rbNome.Checked then
+  begin
+    LOrdem := 'ORDER BY NOME';
+  end
+  else
+  begin
+    LOrdem := ' ORDER BY ID_CLI';
+  end;
 
   dmClientes.cdsClientes.Close;
-  dmClientes.cdsClientes.CommandText := 'SELECT * FROM CLIENTES WHERE 1 = 1 ' + LFiltroEdit +  lFiltro + LOrdem;
+  dmClientes.cdsClientes.CommandText := 'SELECT * FROM CLIENTES WHERE 1 = 1 ' + LFiltroEdit + LFiltro + LOrdem;
   dmClientes.cdsClientes.Open;
 
   HabilitaBotoes;
@@ -492,13 +514,12 @@ procedure TfrmCliente.rbFisicaClick(Sender: TObject);
 begin
   inherited;
 
-  edtCpf.Enabled  := True;
+  edtCpf.Enabled := True;
   edtCnpj.Enabled := False;
-  edtIe.Enabled   := False;
+  edtIe.Enabled := False;
 
   edtCnpj.Clear;
   edtIe.Clear;
-
 
 end;
 
@@ -515,8 +536,8 @@ begin
   inherited;
 
   edtCnpj.Enabled := True;
-  edtIe.Enabled   := True;
-  edtCpf.Enabled  := False;
+  edtIe.Enabled := True;
+  edtCpf.Enabled := False;
 
   edtCpf.Clear;
 

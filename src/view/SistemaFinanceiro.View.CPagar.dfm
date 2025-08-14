@@ -4,27 +4,31 @@ inherited frmContasPagar: TfrmContasPagar
   ClientWidth = 1323
   Position = poDesigned
   WindowState = wsMaximized
+  StyleElements = [seFont, seClient, seBorder]
   OnClose = FormClose
-  ExplicitTop = -140
-  ExplicitWidth = 1335
-  ExplicitHeight = 679
+  OnDestroy = FormDestroy
+  ExplicitWidth = 1339
+  ExplicitHeight = 680
   TextHeight = 19
   inherited CardPanelPrincipal: TCardPanel
     Width = 1323
     Height = 641
-    ExplicitWidth = 1319
-    ExplicitHeight = 640
+    StyleElements = [seFont, seClient, seBorder]
+    ExplicitWidth = 1323
+    ExplicitHeight = 641
     inherited CardCadastro: TCard
       Width = 1323
       Height = 641
+      StyleElements = [seFont, seClient, seBorder]
       OnEnter = CardCadastroEnter
-      ExplicitWidth = 1319
-      ExplicitHeight = 640
+      ExplicitWidth = 1323
+      ExplicitHeight = 641
       inherited pnlBotoesCad: TPanel
         Top = 572
         Width = 1323
-        ExplicitTop = 571
-        ExplicitWidth = 1319
+        StyleElements = [seFont, seClient, seBorder]
+        ExplicitTop = 572
+        ExplicitWidth = 1323
         inherited btnSalvar: TButton
           ImageIndex = 7
           OnClick = btnSalvarClick
@@ -51,8 +55,9 @@ inherited frmContasPagar: TfrmContasPagar
       inherited PanelCampos: TPanel
         Width = 1323
         Height = 531
-        ExplicitWidth = 1319
-        ExplicitHeight = 530
+        StyleElements = [seFont, seClient, seBorder]
+        ExplicitWidth = 1323
+        ExplicitHeight = 531
         object lblDesc: TLabel
           Left = 44
           Top = 32
@@ -102,7 +107,7 @@ inherited frmContasPagar: TfrmContasPagar
           Height = 19
           Caption = 'lblNomeFornecedor'
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = 5737262
+          Font.Color = clSeagreen
           Font.Height = -16
           Font.Name = 'Tahoma'
           Font.Style = []
@@ -131,7 +136,7 @@ inherited frmContasPagar: TfrmContasPagar
           Height = 19
           Caption = 'lblNomeFatCartao'
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = 5737262
+          Font.Color = clSeagreen
           Font.Height = -16
           Font.Name = 'Tahoma'
           Font.Style = []
@@ -223,18 +228,18 @@ inherited frmContasPagar: TfrmContasPagar
           Width = 84
           Height = 21
           Color = 9750962
-          DisabledColor = 5737262
+          DisabledColor = clSeagreen
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBtnText
           Font.Height = -16
           Font.Name = 'Tahoma'
           Font.Style = []
-          FrameColor = 5737262
+          FrameColor = clSeagreen
           ParentFont = False
           StateCaptions.CaptionOn = 'Sim'
           StateCaptions.CaptionOff = 'N'#227'o'
           TabOrder = 5
-          ThumbColor = 5737262
+          ThumbColor = clSeagreen
           OnClick = toggleParcelamentoClick
         end
         object CardPanelParcela: TCardPanel
@@ -555,18 +560,18 @@ inherited frmContasPagar: TfrmContasPagar
           Width = 84
           Height = 21
           Color = 9750963
-          DisabledColor = 5737262
+          DisabledColor = clSeagreen
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBtnText
           Font.Height = -16
           Font.Name = 'Tahoma'
           Font.Style = []
-          FrameColor = 5737262
+          FrameColor = clSeagreen
           ParentFont = False
           StateCaptions.CaptionOn = 'Sim'
           StateCaptions.CaptionOff = 'N'#227'o'
           TabOrder = 8
-          ThumbColor = 5737262
+          ThumbColor = clSeagreen
           OnClick = toggleFaturaClick
         end
         object edtCodFatCartao: TEdit
@@ -764,6 +769,7 @@ inherited frmContasPagar: TfrmContasPagar
             Width = 437
             Height = 132
             Align = alClient
+            DataSource = dsGrupoParcelas
             ReadOnly = True
             TabOrder = 0
             TitleFont.Charset = DEFAULT_CHARSET
@@ -813,9 +819,11 @@ inherited frmContasPagar: TfrmContasPagar
       end
       inherited PanelTitulo: TPanel
         Width = 1323
-        ExplicitWidth = 1319
+        StyleElements = [seFont, seClient, seBorder]
+        ExplicitWidth = 1323
         inherited lblTitulo: TLabel
           Left = 23
+          StyleElements = [seFont, seClient, seBorder]
           ExplicitLeft = 23
         end
       end
@@ -823,16 +831,21 @@ inherited frmContasPagar: TfrmContasPagar
     inherited CardPesquisa: TCard
       Width = 1323
       Height = 641
+      StyleElements = [seFont, seClient, seBorder]
+      ExplicitLeft = 0
+      ExplicitTop = 0
       ExplicitWidth = 1323
       ExplicitHeight = 641
       inherited pnlPesquisa: TPanel
         Width = 1323
         Height = 153
+        StyleElements = [seFont, seClient, seBorder]
         ExplicitWidth = 1323
         ExplicitHeight = 153
         inherited lblPesquisar: TLabel
           Left = 192
           Top = 8
+          StyleElements = [seFont, seClient, seBorder]
           ExplicitLeft = 192
           ExplicitTop = 8
         end
@@ -3621,7 +3634,8 @@ inherited frmContasPagar: TfrmContasPagar
           Left = 192
           Top = 32
           Width = 297
-          OnChange = edtPesquisarChange
+          StyleElements = [seFont, seClient, seBorder]
+          OnChange = PesquisaClick
           ExplicitLeft = 192
           ExplicitTop = 32
           ExplicitWidth = 297
@@ -3634,7 +3648,7 @@ inherited frmContasPagar: TfrmContasPagar
           Margins.Right = 5
           Margins.Bottom = 30
           ImageIndex = 6
-          OnClick = btnPesquisaeClick
+          OnClick = PesquisaClick
           ExplicitLeft = 1197
           ExplicitTop = 30
           ExplicitHeight = 93
@@ -3645,125 +3659,12 @@ inherited frmContasPagar: TfrmContasPagar
           Width = 173
           Height = 27
           Style = csDropDownList
-          ItemIndex = 0
           TabOrder = 2
-          Text = 'TODAS'
-          OnClick = cbStatusClick
+          OnClick = PesquisaClick
           Items.Strings = (
             'TODAS'
             'PAGA'
-            'ABERTA'
-            'CANCELADA')
-        end
-        object gbFiltros: TGroupBox
-          Left = 705
-          Top = 8
-          Width = 236
-          Height = 109
-          Caption = 'Ordenar consulta por'
-          Color = clWhite
-          DefaultHeaderFont = False
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWhite
-          Font.Height = -16
-          Font.Name = 'Tahoma'
-          Font.Style = []
-          HeaderFont.Charset = DEFAULT_CHARSET
-          HeaderFont.Color = clWhite
-          HeaderFont.Height = -16
-          HeaderFont.Name = 'Tahoma'
-          HeaderFont.Style = []
-          ParentBackground = False
-          ParentColor = False
-          ParentFont = False
-          TabOrder = 3
-          object rbDataVenc: TRadioButton
-            Left = 3
-            Top = 33
-            Width = 118
-            Height = 17
-            Caption = 'Data Vencimento'
-            Color = 5934893
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWhite
-            Font.Height = -12
-            Font.Name = 'Tahoma'
-            Font.Style = []
-            ParentColor = False
-            ParentFont = False
-            TabOrder = 0
-            OnClick = rbDataVencClick
-          end
-          object rbValorParcela: TRadioButton
-            Left = 127
-            Top = 33
-            Width = 118
-            Height = 17
-            Caption = 'Valor Parcela'
-            Color = 5934893
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWhite
-            Font.Height = -12
-            Font.Name = 'Tahoma'
-            Font.Style = []
-            ParentColor = False
-            ParentFont = False
-            TabOrder = 1
-            OnClick = rbValorParcelaClick
-          end
-          object rbValorCompra: TRadioButton
-            Left = 127
-            Top = 61
-            Width = 118
-            Height = 17
-            Caption = 'Valor Compra'
-            Color = 5934893
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWhite
-            Font.Height = -12
-            Font.Name = 'Tahoma'
-            Font.Style = []
-            ParentColor = False
-            ParentFont = False
-            TabOrder = 2
-            OnClick = rbValorCompraClick
-          end
-          object rbDataCompra: TRadioButton
-            Left = 3
-            Top = 61
-            Width = 118
-            Height = 17
-            Caption = 'Data Compra'
-            Color = 5934893
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWhite
-            Font.Height = -12
-            Font.Name = 'Tahoma'
-            Font.Style = []
-            ParentColor = False
-            ParentFont = False
-            TabOrder = 3
-            OnClick = rbDataCompraClick
-          end
-          object rbId: TRadioButton
-            Left = 3
-            Top = 90
-            Width = 118
-            Height = 17
-            Caption = 'ID'
-            Checked = True
-            Color = 5934893
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWhite
-            Font.Height = -12
-            Font.Name = 'Tahoma'
-            Font.Style = []
-            ParentColor = False
-            ParentFont = False
-            TabOrder = 4
-            TabStop = True
-            OnClick = rbIdClick
-          end
+            'ABERTA')
         end
         object cbData: TComboBox
           Left = 507
@@ -3772,9 +3673,9 @@ inherited frmContasPagar: TfrmContasPagar
           Height = 27
           Style = csDropDownList
           ItemIndex = 1
-          TabOrder = 4
+          TabOrder = 3
           Text = 'DATA VENCIMENTO'
-          OnClick = cbDataClick
+          OnClick = PesquisaClick
           Items.Strings = (
             'DATA COMPRA'
             'DATA VENCIMENTO'
@@ -3788,8 +3689,8 @@ inherited frmContasPagar: TfrmContasPagar
           Date = 45146.000000000000000000
           Time = 0.872988819442980500
           ShowCheckbox = True
-          TabOrder = 5
-          OnChange = dateFinalChange
+          TabOrder = 4
+          OnChange = PesquisaClick
         end
         object dateInicial: TDateTimePicker
           Left = 192
@@ -3799,8 +3700,8 @@ inherited frmContasPagar: TfrmContasPagar
           Date = 45146.000000000000000000
           Time = 0.872988819442980500
           ShowCheckbox = True
-          TabOrder = 6
-          OnChange = dateInicialChange
+          TabOrder = 5
+          OnChange = PesquisaClick
         end
         object pnlParciais: TPanel
           Left = 962
@@ -3809,7 +3710,7 @@ inherited frmContasPagar: TfrmContasPagar
           Height = 72
           Color = clWhite
           ParentBackground = False
-          TabOrder = 7
+          TabOrder = 6
           object checkParciais: TCheckBox
             Left = 8
             Top = 5
@@ -3823,7 +3724,7 @@ inherited frmContasPagar: TfrmContasPagar
             Font.Style = []
             ParentFont = False
             TabOrder = 0
-            OnClick = checkParciaisClick
+            OnClick = PesquisaClick
           end
           object checkVencidas: TCheckBox
             Left = 8
@@ -3838,7 +3739,7 @@ inherited frmContasPagar: TfrmContasPagar
             Font.Style = []
             ParentFont = False
             TabOrder = 1
-            OnClick = checkParciaisClick
+            OnClick = PesquisaClick
           end
           object checkNaoConsideraFatura: TCheckBox
             Left = 8
@@ -3866,8 +3767,8 @@ inherited frmContasPagar: TfrmContasPagar
           Color = clWhite
           MaxLength = 10
           NumbersOnly = True
-          TabOrder = 8
-          OnChange = edtFiltroFornecedorChange
+          TabOrder = 7
+          OnChange = PesquisaClick
         end
         object btnPesqFornecedor: TButton
           Left = 1096
@@ -3876,7 +3777,7 @@ inherited frmContasPagar: TfrmContasPagar
           Height = 29
           ImageIndex = 12
           Images = ImageList1
-          TabOrder = 9
+          TabOrder = 8
           OnClick = btnPesqFornecedorClick
         end
         object btnPesqFtCartao: TButton
@@ -3886,7 +3787,7 @@ inherited frmContasPagar: TfrmContasPagar
           Height = 29
           ImageIndex = 13
           Images = ImageList1
-          TabOrder = 10
+          TabOrder = 9
           OnClick = btnPesqFtCartaoClick
         end
         object edtFiltroFatCartao: TEdit
@@ -3897,14 +3798,41 @@ inherited frmContasPagar: TfrmContasPagar
           Color = clWhite
           MaxLength = 10
           NumbersOnly = True
+          TabOrder = 10
+          OnChange = PesquisaClick
+        end
+        object rdgOrdemConsulta: TRadioGroup
+          Left = 686
+          Top = 5
+          Width = 270
+          Height = 111
+          Caption = 'Ordenar consulta por'
+          Color = clWhite
+          Columns = 2
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -16
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ItemIndex = 2
+          Items.Strings = (
+            'Data Vcto'
+            'Data Compra'
+            'ID'
+            'Valor Parcela'
+            'Valor Compra')
+          ParentBackground = False
+          ParentColor = False
+          ParentFont = False
           TabOrder = 11
-          OnChange = edtFiltroFatCartaoChange
+          OnClick = PesquisaClick
         end
       end
       inherited pnlBotoes: TPanel
         Top = 572
         Width = 1323
         BevelOuter = bvNone
+        StyleElements = [seFont, seClient, seBorder]
         ExplicitTop = 572
         ExplicitWidth = 1323
         inherited btnIncluir: TButton
@@ -4084,6 +4012,7 @@ inherited frmContasPagar: TfrmContasPagar
         Top = 153
         Width = 1323
         Height = 390
+        StyleElements = [seFont, seClient, seBorder]
         ExplicitTop = 153
         ExplicitWidth = 1323
         ExplicitHeight = 390
@@ -4108,6 +4037,7 @@ inherited frmContasPagar: TfrmContasPagar
               Visible = True
             end
             item
+              Alignment = taCenter
               Expanded = False
               FieldName = 'ID_FORNECEDOR'
               Title.Caption = 'Cod Fornecedor'
@@ -4128,8 +4058,9 @@ inherited frmContasPagar: TfrmContasPagar
               Visible = True
             end
             item
+              Alignment = taCenter
               Expanded = False
-              FieldName = 'PARCELA'
+              FieldName = 'QTDPARC'
               Title.Caption = 'Parcela'
               Width = 67
               Visible = True
@@ -4142,6 +4073,7 @@ inherited frmContasPagar: TfrmContasPagar
               Visible = True
             end
             item
+              Alignment = taCenter
               Expanded = False
               FieldName = 'DATA_VENCIMENTO'
               Title.Caption = ' Vencimento'
@@ -4163,6 +4095,7 @@ inherited frmContasPagar: TfrmContasPagar
               Visible = True
             end
             item
+              Alignment = taCenter
               Expanded = False
               FieldName = 'DATA_COMPRA'
               Title.Caption = 'Data da Compra'
@@ -4170,6 +4103,7 @@ inherited frmContasPagar: TfrmContasPagar
               Visible = True
             end
             item
+              Alignment = taCenter
               Expanded = False
               FieldName = 'DATA_PAGAMENTO'
               Title.Caption = 'Data de Pagamento'
@@ -6910,7 +6844,6 @@ inherited frmContasPagar: TfrmContasPagar
       000000000000}
   end
   object DataSourceCPagar: TDataSource
-    DataSet = dmCPagar.cdsCPagar
     OnDataChange = DataSourceCPagarDataChange
     Left = 1280
     Top = 304
@@ -6956,5 +6889,10 @@ inherited frmContasPagar: TfrmContasPagar
       ImageIndex = 16
       OnClick = CancelarBaixa1Click
     end
+  end
+  object dsGrupoParcelas: TDataSource
+    DataSet = cdsParcelas
+    Left = 1273
+    Top = 434
   end
 end

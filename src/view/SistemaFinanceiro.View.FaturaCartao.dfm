@@ -1,24 +1,21 @@
 inherited frmFaturaCartao: TfrmFaturaCartao
   Caption = 'Cadastro de Faturas de Cart'#227'o'
-  ClientHeight = 506
-  ClientWidth = 787
+  StyleElements = [seFont, seClient, seBorder]
   TextHeight = 19
   inherited CardPanelPrincipal: TCardPanel
-    Width = 787
-    Height = 506
+    StyleElements = [seFont, seClient, seBorder]
+    ExplicitWidth = 787
+    ExplicitHeight = 506
     inherited CardCadastro: TCard
-      ExplicitWidth = 783
-      ExplicitHeight = 505
+      StyleElements = [seFont, seClient, seBorder]
       inherited pnlBotoesCad: TPanel
-        ExplicitTop = 436
-        ExplicitWidth = 783
+        StyleElements = [seFont, seClient, seBorder]
         inherited btnSalvar: TButton
           OnClick = btnSalvarClick
         end
       end
       inherited PanelCampos: TPanel
-        ExplicitWidth = 783
-        ExplicitHeight = 395
+        StyleElements = [seFont, seClient, seBorder]
         object LabelNome: TLabel
           Left = 32
           Top = 40
@@ -88,20 +85,20 @@ inherited frmFaturaCartao: TfrmFaturaCartao
           Width = 105
           Height = 21
           Color = 9750962
-          DisabledColor = 5737262
+          DisabledColor = clSeagreen
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBtnText
           Font.Height = -16
           Font.Name = 'Tahoma'
           Font.Style = []
-          FrameColor = 5737262
+          FrameColor = clSeagreen
           ParentFont = False
           State = tssOn
           StateCaptions.CaptionOn = 'Ativo'
           StateCaptions.CaptionOff = 'Inativo'
           TabOrder = 1
           TabStop = False
-          ThumbColor = 5737262
+          ThumbColor = clSeagreen
         end
         object edtObs: TEdit
           Left = 32
@@ -169,22 +166,28 @@ inherited frmFaturaCartao: TfrmFaturaCartao
         end
       end
       inherited PanelTitulo: TPanel
-        ExplicitWidth = 783
+        StyleElements = [seFont, seClient, seBorder]
         inherited lblTitulo: TLabel
-          Width = 315
+          Width = 340
           Caption = 'Cadastrando uma nova Fatura de Cart'#227'o'
           Color = 5934893
-          ExplicitWidth = 315
+          StyleElements = [seFont, seClient, seBorder]
+          ExplicitWidth = 340
         end
       end
     end
     inherited CardPesquisa: TCard
+      StyleElements = [seFont, seClient, seBorder]
       ExplicitLeft = 0
       ExplicitTop = 0
       ExplicitWidth = 787
       ExplicitHeight = 506
       inherited pnlPesquisa: TPanel
+        StyleElements = [seFont, seClient, seBorder]
         ExplicitWidth = 787
+        inherited lblPesquisar: TLabel
+          StyleElements = [seFont, seClient, seBorder]
+        end
         object lblStatus: TLabel [1]
           Left = 278
           Top = 15
@@ -203,6 +206,7 @@ inherited frmFaturaCartao: TfrmFaturaCartao
         end
         inherited edtPesquisar: TEdit
           Width = 234
+          StyleElements = [seFont, seClient, seBorder]
           OnChange = edtPesquisarChange
           ExplicitWidth = 234
         end
@@ -227,6 +231,7 @@ inherited frmFaturaCartao: TfrmFaturaCartao
         end
       end
       inherited pnlBotoes: TPanel
+        StyleElements = [seFont, seClient, seBorder]
         ExplicitTop = 437
         ExplicitWidth = 787
         inherited btnExcluir: TButton
@@ -240,6 +245,7 @@ inherited frmFaturaCartao: TfrmFaturaCartao
         end
       end
       inherited pnlGrid: TPanel
+        StyleElements = [seFont, seClient, seBorder]
         ExplicitWidth = 787
         ExplicitHeight = 356
         inherited DBGrid1: TDBGrid
