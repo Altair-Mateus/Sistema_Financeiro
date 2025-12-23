@@ -26,8 +26,6 @@ object frmBxMultiplaCR: TfrmBxMultiplaCR
     Color = clWhite
     ParentBackground = False
     TabOrder = 0
-    ExplicitTop = 614
-    ExplicitWidth = 1293
     object btnConfirmar: TButton
       AlignWithMargins = True
       Left = 6
@@ -63,7 +61,6 @@ object frmBxMultiplaCR: TfrmBxMultiplaCR
       Align = alRight
       BevelOuter = bvNone
       TabOrder = 2
-      ExplicitLeft = 1107
       object lblValorSelecionadas: TLabel
         Left = 13
         Top = 6
@@ -101,7 +98,6 @@ object frmBxMultiplaCR: TfrmBxMultiplaCR
       Align = alRight
       BevelOuter = bvNone
       TabOrder = 3
-      ExplicitLeft = 951
       object lblQtdSelecionada: TLabel
         Left = 22
         Top = 7
@@ -139,7 +135,6 @@ object frmBxMultiplaCR: TfrmBxMultiplaCR
       Align = alRight
       BevelOuter = bvNone
       TabOrder = 4
-      ExplicitLeft = 563
       object lblQtdCr: TLabel
         Left = 22
         Top = 7
@@ -177,7 +172,6 @@ object frmBxMultiplaCR: TfrmBxMultiplaCR
       Align = alRight
       BevelOuter = bvNone
       TabOrder = 5
-      ExplicitLeft = 719
       object lblValorCRs: TLabel
         Left = 13
         Top = 6
@@ -218,8 +212,6 @@ object frmBxMultiplaCR: TfrmBxMultiplaCR
     Color = clWhite
     ParentBackground = False
     TabOrder = 1
-    ExplicitWidth = 1293
-    ExplicitHeight = 437
     object DBGrid1: TDBGrid
       Left = 0
       Top = 0
@@ -317,7 +309,6 @@ object frmBxMultiplaCR: TfrmBxMultiplaCR
     Color = clSeagreen
     ParentBackground = False
     TabOrder = 2
-    ExplicitWidth = 1293
     object lblDataInicial: TLabel
       Left = 18
       Top = 18
@@ -398,9 +389,9 @@ object frmBxMultiplaCR: TfrmBxMultiplaCR
       ParentFont = False
     end
     object lblCheckParciais: TLabel
-      Left = 39
-      Top = 137
-      Width = 120
+      Left = 209
+      Top = 141
+      Width = 132
       Height = 19
       Caption = 'Somente Parciais'
       Color = 5868590
@@ -413,8 +404,8 @@ object frmBxMultiplaCR: TfrmBxMultiplaCR
       ParentFont = False
     end
     object lblCheckSelAll: TLabel
-      Left = 218
-      Top = 137
+      Left = 41
+      Top = 141
       Width = 120
       Height = 19
       Caption = 'Selecionar Todas'
@@ -465,7 +456,6 @@ object frmBxMultiplaCR: TfrmBxMultiplaCR
       TabOrder = 2
       WordWrap = True
       OnClick = btnVisualizarClick
-      ExplicitLeft = 1167
     end
     object edtCliente: TEdit
       Left = 344
@@ -495,9 +485,9 @@ object frmBxMultiplaCR: TfrmBxMultiplaCR
         'DATA VENCIMENTO')
     end
     object checkParciais: TCheckBox
-      Left = 18
-      Top = 137
-      Width = 159
+      Left = 188
+      Top = 141
+      Width = 171
       Height = 17
       Color = 5868590
       Font.Charset = DEFAULT_CHARSET
@@ -511,8 +501,8 @@ object frmBxMultiplaCR: TfrmBxMultiplaCR
       OnClick = checkParciaisClick
     end
     object checkSelAll: TCheckBox
-      Left = 194
-      Top = 137
+      Left = 17
+      Top = 141
       Width = 159
       Height = 17
       Color = 5934638

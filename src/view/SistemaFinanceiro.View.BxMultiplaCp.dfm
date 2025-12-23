@@ -160,8 +160,8 @@ object frmBxMultiplaCp: TfrmBxMultiplaCp
               ParentFont = False
             end
             object lblCheckParciais: TLabel
-              Left = 39
-              Top = 137
+              Left = 204
+              Top = 143
               Width = 120
               Height = 19
               Caption = 'Somente Parciais'
@@ -175,11 +175,26 @@ object frmBxMultiplaCp: TfrmBxMultiplaCp
               ParentFont = False
             end
             object lblCheckSelAll: TLabel
-              Left = 218
-              Top = 137
+              Left = 42
+              Top = 143
               Width = 120
               Height = 19
               Caption = 'Selecionar Todas'
+              Color = 5934893
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWhite
+              Font.Height = -16
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentColor = False
+              ParentFont = False
+            end
+            object lblNaoConsidFatura: TLabel
+              Left = 368
+              Top = 143
+              Width = 165
+              Height = 19
+              Caption = 'N'#227'o Considerar Faturas'
               Color = 5934893
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clWhite
@@ -291,8 +306,8 @@ object frmBxMultiplaCp: TfrmBxMultiplaCp
                 'DATA VENCIMENTO')
             end
             object checkParciais: TCheckBox
-              Left = 18
-              Top = 137
+              Left = 183
+              Top = 143
               Width = 159
               Height = 17
               Color = 5868590
@@ -307,8 +322,8 @@ object frmBxMultiplaCp: TfrmBxMultiplaCp
               OnClick = PesquisaClick
             end
             object checkSelAll: TCheckBox
-              Left = 194
-              Top = 137
+              Left = 18
+              Top = 143
               Width = 159
               Height = 17
               Color = 5934638
@@ -321,6 +336,22 @@ object frmBxMultiplaCp: TfrmBxMultiplaCp
               ParentFont = False
               TabOrder = 9
               OnClick = checkSelAllClick
+            end
+            object chkNaoConsidFatura: TCheckBox
+              Left = 344
+              Top = 143
+              Width = 159
+              Height = 17
+              Color = 5934893
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWhite
+              Font.Height = -16
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentColor = False
+              ParentFont = False
+              TabOrder = 10
+              OnClick = chkNaoConsidFaturaClick
             end
           end
           object pnlContas: TPanel

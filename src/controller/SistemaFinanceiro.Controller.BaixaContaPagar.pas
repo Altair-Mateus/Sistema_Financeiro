@@ -32,8 +32,6 @@ type
     procedure GravarPgtosCp;
     procedure GravarLctoCaixa;
 
-  published
-
   public
     destructor Destroy; override;
 

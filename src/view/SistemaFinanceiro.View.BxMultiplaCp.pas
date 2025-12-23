@@ -28,7 +28,8 @@ uses
   SistemaFinanceiro.Model.uSFQuery,
   SistemaFinanceiro.Model.Entidades.CP.Detalhe,
   System.Generics.Collections,
-  SistemaFinanceiro.Model.Entidades.PgtoBxCp, System.Math;
+  SistemaFinanceiro.Model.Entidades.PgtoBxCp,
+  System.Math;
 
 type
   TfrmBxMultiplaCp = class(TForm)
@@ -79,6 +80,8 @@ type
     pnlBaixar: TPanel;
     pnlLogErros: TPanel;
     memLogErros: TMemo;
+    chkNaoConsidFatura: TCheckBox;
+    lblNaoConsidFatura: TLabel;
     procedure btnPesquisaFornecedorClick(Sender: TObject);
     procedure btnPesqFatClick(Sender: TObject);
     procedure edtFornecedorExit(Sender: TObject);
@@ -93,6 +96,7 @@ type
     procedure FormActivate(Sender: TObject);
     procedure FormKeyPress(Sender: TObject; var Key: Char);
     procedure FormCreate(Sender: TObject);
+    procedure chkNaoConsidFaturaClick(Sender: TObject);
 
   private
     FTelaAtiva: Boolean;
@@ -416,6 +420,28 @@ begin
 
 end;
 
+procedure TfrmBxMultiplaCp.chkNaoConsidFaturaClick(Sender: TObject);
+begin
+  // Bloqueia as faturas de cartão
+  if chkNaoConsidFatura.Checked then
+  begin
+
+    btnPesqFat.Enabled := False;
+    edtCodFatCartao.Enabled := False;
+    edtCodFatCartao.Clear;
+
+  end
+  else
+  begin
+
+    btnPesqFat.Enabled := True;
+    edtCodFatCartao.Enabled := True;
+
+  end;
+
+  PesquisaClick(Sender);
+end;
+
 procedure TfrmBxMultiplaCp.Confirmar;
 var
   lDetalhes: TModelCpDetalhe;
@@ -474,6 +500,8 @@ begin
     lDetalhes.Free;
     lPgtos.Free;
     lControllerBaixa.Free;
+    CalcQtdCpSel;
+    CalcCpSel;
   end;
 
 end;
@@ -791,6 +819,11 @@ begin
     if not(Trim(edtCodFatCartao.Text).IsEmpty) then
     begin
       LFiltro := LFiltro + ' AND CP.ID_FATURA = :ID_FT ';
+    end;
+
+    if (chkNaoConsidFatura.Checked) then
+    begin
+      LFiltro := LFiltro + ' AND CP.FATURA_CART = ''N'' ';
     end;
 
     // Ordem de pesquisa
