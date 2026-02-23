@@ -1466,13 +1466,10 @@ begin
 
     // Pesquisa por tipo
     case cbStatus.ItemIndex of
-
       1:
         LFiltro := LFiltro + ' AND CP.STATUS = ''P'' ';
       2:
         LFiltro := LFiltro + ' AND CP.STATUS =  ''A'' ';
-    else
-      LFiltro := LFiltro + ' AND CP.STATUS =  ''A'' ';
     end;
 
     // Pesquisa por data

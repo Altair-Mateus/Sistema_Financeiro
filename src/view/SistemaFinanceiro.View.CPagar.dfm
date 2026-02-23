@@ -32,7 +32,6 @@ inherited frmContasPagar: TfrmContasPagar
         inherited btnSalvar: TButton
           ImageIndex = 7
           OnClick = btnSalvarClick
-          ExplicitLeft = -5
         end
         inherited btnCancelar: TButton
           ImageIndex = 4

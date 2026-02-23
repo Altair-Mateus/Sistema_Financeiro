@@ -501,7 +501,7 @@ begin
     lPgtos.Free;
     lControllerBaixa.Free;
     CalcQtdCpSel;
-    CalcCpSel;
+    edtValorSel.Text := TUtilitario.FormatoMoeda(CalcCpSel);
   end;
 
 end;
