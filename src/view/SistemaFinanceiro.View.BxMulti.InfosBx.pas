@@ -363,7 +363,7 @@ begin
   LimparLabelsNomes;
   datePgto.Date := Now;
   edtValor.Text := FloatToStr(FValorCpSel);
-  edtValor.SetFocus;
+  datePgto.SetFocus;
 end;
 
 procedure TfrmInfoBxMult.KeyPressValor(Sender: TObject; var Key: Char);
